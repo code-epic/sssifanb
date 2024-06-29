@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, Validators} from '@angular/forms';
+import { FormGroup, UntypedFormControl, UntypedFormBuilder, Validators} from '@angular/forms';
 import {FormsModule,ReactiveFormsModule} from '@angular/forms';
 
 
@@ -20,9 +20,9 @@ export class HechiceroComponent implements OnInit {
 
   grupos : any
 
-  tipologias = new FormControl('');
+  tipologias = new UntypedFormControl('');
 
-  constructor(private _formBuilder: FormBuilder) {}
+  constructor(private _formBuilder: UntypedFormBuilder) {}
 
   ngOnInit(): void {
   }
