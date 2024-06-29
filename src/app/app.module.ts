@@ -30,7 +30,7 @@ import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
 import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
 
-import { AngularFileUploaderModule } from "angular-file-uploader";
+// import { AngularFileUploaderModule } from "angular-file-uploader";
 import { AuthInterceptorService } from './services/seguridad/auth-interceptor.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -105,7 +105,7 @@ const ngxUiLoaderConfig: NgxUiLoaderConfig = {
       progressBar: true,
       positionClass: "toast-top-right",
       preventDuplicates: false    }),
-    AngularFileUploaderModule
+    // AngularFileUploaderModule
 
   ],
   declarations: [
