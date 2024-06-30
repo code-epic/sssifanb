@@ -10,21 +10,35 @@ import {FormsModule,ReactiveFormsModule} from '@angular/forms';
 })
 export class HechiceroComponent implements OnInit {
 
-  firstFormGroup = this._formBuilder.group({
-    firstCtrl: ['', Validators.required],
-  });
-  secondFormGroup = this._formBuilder.group({
-    secondCtrl: ['', Validators.required],
-  });
+  
   isEditable = false;
 
   grupos : any
 
   tipologias = new UntypedFormControl('');
+  firstFormGroup: FormGroup;
+  secondFormGroup:FormGroup;
 
   constructor(private _formBuilder: UntypedFormBuilder) {}
 
+  // firstFormGroup = this._formBuilder.group({
+  //   firstCtrl: ['', Validators.required],
+  // });
+  // secondFormGroup = this._formBuilder.group({
+  //   secondCtrl: ['', Validators.required],
+  // });
+
   ngOnInit(): void {
+    this.initForm();
   }
 
+  initForm() {
+    this.firstFormGroup = this._formBuilder.group({
+      firstCtrl: ['', Validators.required],
+    });
+    this.secondFormGroup = this._formBuilder.group({
+      secondCtrl: ['', Validators.required],
+    });
+
+  }
 }
