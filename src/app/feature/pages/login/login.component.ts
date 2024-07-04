@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { NgxUiLoaderService, NgxUiLoaderModule } from 'ngx-ui-loader';
 import { IToken } from '../../../core/models/login/token-model';
 import { LoginService } from 'src/app/core/services/login/login.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: true,
+    imports: [NgxUiLoaderModule, FormsModule]
 })
 
 export class LoginComponent implements OnInit {

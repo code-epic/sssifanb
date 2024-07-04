@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { LoginService } from 'src/app/core/services/login/login.service';
+import { NgFor } from '@angular/common';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 
 declare interface RouteInfo {
     path: string;
@@ -11,9 +13,11 @@ declare interface RouteInfo {
 export const ROUTES: RouteInfo[] = [];
 
 @Component({
-  selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+    selector: 'app-sidebar',
+    templateUrl: './sidebar.component.html',
+    styleUrls: ['./sidebar.component.scss'],
+    standalone: true,
+    imports: [RouterLinkActive, RouterLink, NgbCollapse, NgFor]
 })
 export class SidebarComponent implements OnInit {
 

@@ -1,14 +1,20 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { IAPICore } from '../../../../core/models/api/api-model';
 import { ApiService } from '../../../../core/services/api.service';
 import { Maestro } from '../../../../core/services/util/tabla.service';
+import { MatMiniFabButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 
 @Component({
-  selector: 'app-tabla',
-  templateUrl: './tabla.component.html',
-  styleUrls: ['./tabla.component.scss']
+    selector: 'app-tabla',
+    templateUrl: './tabla.component.html',
+    styleUrls: ['./tabla.component.scss'],
+    standalone: true,
+    imports: [MatFormField, MatLabel, MatInput, MatIcon, MatSuffix, MatMiniFabButton, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator]
 })
 export class TablaComponent implements OnInit {
  

@@ -2,11 +2,15 @@ import { Component, OnInit, ElementRef } from '@angular/core';
 import { ROUTES } from '../sidebar/sidebar.component';
 import { Location} from '@angular/common';
 import Swal from 'sweetalert2';
+import { NgbDropdown, NgbDropdownToggle, NgbDropdownMenu } from '@ng-bootstrap/ng-bootstrap';
+import { RouterLinkActive, RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+    selector: 'app-navbar',
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.scss'],
+    standalone: true,
+    imports: [RouterLinkActive, RouterLink, NgbDropdown, NgbDropdownToggle, NgbDropdownMenu]
 })
 export class NavbarComponent implements OnInit {
   public focus;

@@ -1,11 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { MensajeService } from 'src/app/core/services/util/mensaje.service';
+import { FooterComponent } from '../../../shared/components/footer/footer.component';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 
 @Component({
-  selector: 'app-admin-layout',
-  templateUrl: './admin-layout.component.html',
-  styleUrls: ['./admin-layout.component.scss']
+    selector: 'app-admin-layout',
+    templateUrl: './admin-layout.component.html',
+    styleUrls: ['./admin-layout.component.scss'],
+    standalone: true,
+    imports: [SidebarComponent, NavbarComponent, RouterOutlet, FooterComponent]
 })
 export class AdminLayoutComponent implements OnInit {
 

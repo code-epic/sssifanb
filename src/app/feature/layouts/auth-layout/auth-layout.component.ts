@@ -1,10 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-auth-layout',
-  templateUrl: './auth-layout.component.html',
-  styleUrls: ['./auth-layout.component.scss']
+    selector: 'app-auth-layout',
+    templateUrl: './auth-layout.component.html',
+    styleUrls: ['./auth-layout.component.scss'],
+    standalone: true,
+    imports: [NgbCollapse, RouterOutlet, DatePipe]
 })
 export class AuthLayoutComponent implements OnInit, OnDestroy {
   test: Date = new Date();

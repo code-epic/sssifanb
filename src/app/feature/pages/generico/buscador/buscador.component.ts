@@ -1,13 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { NgxUiLoaderService, NgxUiLoaderModule } from 'ngx-ui-loader';
 import { ApiService } from '../../../../core/services/api.service';
 import { LoginService } from '../../../../core/services/login/login.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatTabGroup, MatTab, MatTabLabel } from '@angular/material/tabs';
+import { NgClass, NgIf, NgFor, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-buscador',
-  templateUrl: './buscador.component.html',
-  styleUrls: ['./buscador.component.scss']
+    selector: 'app-buscador',
+    templateUrl: './buscador.component.html',
+    styleUrls: ['./buscador.component.scss'],
+    standalone: true,
+    imports: [NgxUiLoaderModule, FormsModule, NgClass, NgIf, MatTabGroup, MatTab, MatTabLabel, MatIcon, NgFor, DecimalPipe]
 })
 export class BuscadorComponent implements OnInit {
 

@@ -8,8 +8,8 @@ describe('CambiarclaveComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CambiarclaveComponent ]
-    })
+    imports: [CambiarclaveComponent]
+})
     .compileComponents();
   });
 
