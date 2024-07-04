@@ -4,12 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
-import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
-import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppRoutingModule } from './app.routing';
-import { ComponentsModule } from './components/components.module';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -27,17 +23,20 @@ import { NgxUiLoaderModule,  NgxUiLoaderConfig } from "ngx-ui-loader";
 
 import { MatCommonModule } from '@angular/material/core';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
-import { AuthGuardGuard } from './services/seguridad/auth-guard.guard';
+import { AuthGuardGuard } from './core/guards/auth-guard.guard';
 import { HashLocationStrategy, JsonPipe, LocationStrategy } from '@angular/common';
 
 // import { AngularFileUploaderModule } from "angular-file-uploader";
-import { AuthInterceptorService } from './services/seguridad/auth-interceptor.service';
+import { AuthInterceptorService } from './core/interceptors/auth-interceptor.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { MatTableModule } from '@angular/material/table';
+import { ComponentsModule } from './shared/components/components.module';
+import { AdminLayoutComponent } from './feature/layouts/admin-layout/admin-layout.component';
+import { AuthLayoutComponent } from './feature/layouts/auth-layout/auth-layout.component';
 
 const ngxUiLoaderConfig: NgxUiLoaderConfig = {
   "bgsColor": "#79c680",
