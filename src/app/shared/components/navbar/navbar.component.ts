@@ -1,9 +1,9 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
-import { ROUTES } from '../sidebar/sidebar.component';
 import { Location} from '@angular/common';
 import Swal from 'sweetalert2';
 import { NgbDropdown, NgbDropdownToggle, NgbDropdownMenu } from '@ng-bootstrap/ng-bootstrap';
 import { RouterLinkActive, RouterLink } from '@angular/router';
+import { ROUTES } from 'src/app/core/models/menu/menu-models';
 
 @Component({
     selector: 'app-navbar',

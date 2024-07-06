@@ -3,14 +3,9 @@ import { Router, RouterLinkActive, RouterLink } from '@angular/router';
 import { LoginService } from 'src/app/core/services/login/login.service';
 import { NgFor } from '@angular/common';
 import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
+import { ROUTES } from '../../../core/models/menu/menu-models';
 
-declare interface RouteInfo {
-    path: string;
-    title: string;
-    icon: string;
-    class: string;
-}
-export const ROUTES: RouteInfo[] = [];
+
 
 @Component({
     selector: 'app-sidebar',
@@ -30,8 +25,6 @@ export class SidebarComponent implements OnInit {
 
   async ngOnInit() {
 
-    
-    
     if (ROUTES.length == 0){
       await this.loginService.Iniciar()
       var App = this.loginService.Aplicacion
