@@ -71,17 +71,14 @@ export class PerfilComponent implements OnInit {
     });
   }
 
- 
-
-
   ngOnInit(): void {
-    if(this.loginService.Usuario != null){
-      console.log(this.loginService.Usuario)
-      this.nombrecompleto = this.loginService.Usuario.nombre
-      this.nombre = this.loginService.Usuario.usuario
-      this.perfil = this.loginService.Usuario.Perfil.descripcion
-      this.correo = this.loginService.Usuario.correo
-      this.cedula = this.loginService.Usuario.cedula
+    if (this.loginService.usuario != null) {
+      console.log(this.loginService.usuario);
+      this.nombrecompleto = this.loginService.usuario.nombre;
+      this.nombre = this.loginService.usuario.usuario;
+      this.perfil = this.loginService.usuario.Perfil.descripcion;
+      this.correo = this.loginService.usuario.correo;
+      this.cedula = this.loginService.usuario.cedula;
     }
   }
 

@@ -10,7 +10,7 @@ import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.com
     templateUrl: './admin-layout.component.html',
     styleUrls: ['./admin-layout.component.scss'],
     standalone: true,
-    imports: [SidebarComponent, NavbarComponent, RouterOutlet, FooterComponent]
+    imports: [ SidebarComponent, NavbarComponent, RouterOutlet, FooterComponent ]
 })
 export class AdminLayoutComponent implements OnInit {
 

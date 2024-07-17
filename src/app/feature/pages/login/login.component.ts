@@ -5,6 +5,7 @@ import { NgxUiLoaderService, NgxUiLoaderModule } from 'ngx-ui-loader';
 import { IToken } from '../../../core/models/login/token-model';
 import { LoginService } from 'src/app/core/services/login/login.service';
 import { FormsModule } from '@angular/forms';
+import {IUsuario} from '../../../core/models/login/usuario-model';
 
 @Component({
     selector: 'app-login',
@@ -15,23 +16,10 @@ import { FormsModule } from '@angular/forms';
 })
 
 export class LoginComponent implements OnInit {
-  
-  redirectDelay: number;
-  showMessages: any;
-  strategy: string;
   errors: string[];
-  messages: string[];
-  usuario : string;
+  usuario: string;
   clave: string;
-
-  submitted: boolean;
-  rememberMe: boolean;
-
   loading = false;
-  isHidden: boolean = true;
-  // public iToken: IToken = {
-  //   token: '',
-  // };
 
   public itk: IToken;
   private index: number = 0;
@@ -51,27 +39,30 @@ export class LoginComponent implements OnInit {
 
 
   async login(){
-    this.ngxService.startLoader("loader-login");
-    
-    await this.loginService.getLogin(this.usuario, this.clave).subscribe(
-      (data) => { // Success
-        this.itk = data;
-        sessionStorage.setItem("token", this.itk.token );
-        this.ngxService.stopLoader("loader-login");
-        this.router.navigate(['/principal']);
+    this.ngxService.startLoader('loader-login');
+    const command: IUsuario = {
+        nombre: this.usuario,
+        clave: this.clave
+    };
+      console.log('command', command);
+      this.loginService.getLogin(command).subscribe(
+          (data) => {
+              this.itk = data;
+              sessionStorage.setItem('token', this.itk.token);
+              this.ngxService.stopLoader('loader-login');
+              this.router.navigate(['/principal']);
+          },
+          (error) => {
+              this.usuario = '';
+              this.clave = '';
+              this.ngxService.stopLoader('loader-login');
 
-      },
-      (error) => {
-        this.usuario = ''
-        this.clave = ''
-        this.ngxService.stopLoader("loader-login");
-
-        this.toastrService.error(
-          'Error al acceder a los datos de conexion',
-          `Bus Empresarial`
-        );
-      }
-    );
+              this.toastrService.error(
+                  'Error al acceder a los datos de conexion',
+                  `Bus Empresarial`
+              );
+          }
+      );
   }
 
 }

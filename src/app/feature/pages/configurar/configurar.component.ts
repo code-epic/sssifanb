@@ -11,6 +11,8 @@ import { NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import {MatTableDataSource} from '@angular/material/table';
+import {Maestro} from '../../../core/services/util/tabla.service';
 
 @Component({
   selector: 'app-configurar',
@@ -21,44 +23,47 @@ import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field'
     MatFormField,
     MatLabel,
     MatSelect,
-    FormsModule, 
-    NgFor, 
-    MatOption, 
-    MatIcon, 
-    MatSuffix, 
-    MatButton, 
-    TablaComponent, 
+    FormsModule,
+    NgFor,
+    MatOption,
+    MatIcon,
+    MatSuffix,
+    MatButton,
+    TablaComponent,
     HechiceroComponent]
 })
 export class ConfigurarComponent implements OnInit {
 
-  public producto: string = "0"
+  public producto = '0';
 
   public xAPI: IAPICore = {
     funcion: '',
     parametros: ''
-  }
+  };
 
   @ViewChild('hechicero', { static: true }) hechicero: TemplateRef<any>;
 
-  public lstMaestro: any
-
-
+  public lstMaestro: any;
 
   constructor(public dialog: MatDialog, private apiService: ApiService) { }
 
   ngOnInit(): void {
-    this.xAPI.funcion = "CCEC_CMaestro"
-    this.xAPI.parametros = "%"
-    this.apiService.Ejecutar(this.xAPI).subscribe(
-      (data) => {
-        this.lstMaestro = data.Cuerpo
-      },
-      (err) => {
-        console.error(err)
-      }
-    )
+    this.xAPI.funcion = 'CCEC_CMaestro';
+    this.xAPI.parametros = '%';
 
+    this.apiService.post(this.xAPI).subscribe({
+      next: this.successMaestro.bind(this),
+      error: this.errorMaestro.bind(this)
+    });
+
+  }
+
+  successMaestro(data: any) {
+    this.lstMaestro = data.Cuerpo;
+  }
+
+  errorMaestro(error: any) {
+    console.log('error =>', error);
   }
 
   openDialog(): void {
@@ -71,9 +76,5 @@ export class ConfigurarComponent implements OnInit {
       console.log('The dialog was closed');
       // this.animal = result;
     });
-  }
-
-  seleccionNavegacion(e) {
-
   }
 }

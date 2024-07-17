@@ -1,89 +1,84 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { IToken } from '../../models/login/token-model';
 import { IUsuario } from '../../models/login/usuario-model';
+import {ApiService} from '../api.service';
+import {HttpHeaders} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
- 
-  public URL : string =  environment.API
-  
-  public Id : string = ''
-  
-  public SToken : any
+  public url: string =  environment.API;
+  public id = '';
+  public sToken: any;
+  public token: any;
+  public usuario: any;
+  public aplicacion: any;
 
-  public Token : any
-
-  public Usuario : any
-
-  public Aplicacion : any
-
-  constructor(private router: Router, private http : HttpClient) {
-    this.Id = environment.ID
-    if (sessionStorage.getItem("token") != undefined ) this.SToken = sessionStorage.getItem("token");
+  constructor(private router: Router, private http: ApiService) {
+    this.id = environment.ID;
+    if (sessionStorage.getItem('token') !== undefined) {
+      this.sToken = sessionStorage.getItem('token');
+    }
   }
 
   async Iniciar() {
-    await this.getUserDecrypt()
-    this.obenterAplicacion()
-    
+    await this.getUserDecrypt();
+    this.obenterAplicacion();
   }
-  getLogin(user: string, clave : string) : Observable<IToken>{
-    var usuario = {
-      "nombre" : user,
-      "clave" : clave,
-    }
-    var url = this.URL + 'wusuario/login'
-    return this.http.post<IToken>(url, usuario )
-  }
-  
-  makeUser(user: IUsuario): Observable<any>{    
-    var url = this.URL + 'identicacion'   
-    return this.http.post<any>( url, user )
+  getLogin(user: IUsuario): Observable<IToken> {
+    return this.http.postLogin<IUsuario, IToken>('wusuario/login', user);
   }
 
-  logout(){
+  makeUser(user: IUsuario): Observable<any> {
+    const url = this.url + 'identicacion';
+    return this.http.postLogin<IUsuario, any>(url, user, {});
+  }
+
+  logout() {
     this.router.navigate(['login']);
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("id");
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('id');
   }
 
-  protected getUserDecrypt() : any {    
-    var e = sessionStorage.getItem("token");
-    var s = e.split(".");
-    
-    //var str = Buffer.from(s[1], 'base64').toString();
-    var str = atob( s[1] );
-    this.Token = JSON.parse(str)
+  protected getUserDecrypt(): any {
+    const e = sessionStorage.getItem('token');
+    const s = e.split('.');
+
+    // var str = Buffer.from(s[1], 'base64').toString();
+    const str = atob(s[1]);
+    this.token = JSON.parse(str);
     // console.info(this.Token)
-    this.Usuario = this.Token.Usuario
+    this.usuario = this.token.Usuario;
     return JSON.parse(str);
   }
-  
-  //ObenterAplicacion 
-  protected obenterAplicacion(){
-    var Aplicacion = this.Token.Usuario.Aplicacion
-    Aplicacion.forEach(e => {
-      if(e.id == this.Id ){
-        this.Aplicacion = e;
+
+    // ObenterAplicacion
+  protected obenterAplicacion() {
+    const app = this.token.Usuario.Aplicacion;
+    app.forEach(e => {
+      if (e.id === this.id) {
+        this.aplicacion = e;
       }
     });
   }
-  
-  obtenerMenu() : any {
-    return this.Aplicacion.Rol.Menu
+
+  obtenerMenu(): any {
+    return this.aplicacion.Rol.Menu;
   }
 
-  obtenerSubMenu(idUrl : string) : any{   
-    var App = this.Aplicacion
-    var SubMenu = [] 
-    App.Rol.Menu.forEach(e => {if (e.url == idUrl) SubMenu = e.SubMenu});
-    return SubMenu
+  obtenerSubMenu(idUrl: string): any {
+    const app = this.aplicacion;
+    let subMenu = [];
+    app.Rol.Menu.forEach(e => {
+      if (e.url === idUrl) {
+        subMenu = e.SubMenu;
+      }
+    });
+    return subMenu;
   }
 
 }
