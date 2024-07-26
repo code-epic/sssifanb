@@ -7,8 +7,7 @@ export const routes: Routes =[
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
-  }, 
-  {
+  }, {
     path: '',
     component: AdminLayoutComponent,
     children: [
@@ -26,8 +25,7 @@ export const routes: Routes =[
         loadChildren: () => import('./feature/layouts/auth-layout/auth-layout.routing').then(m => m.AuthLayoutRoutes)
       }
     ]
-  },
-  {
+  }, {
     path: '**',
     redirectTo: 'login'
   }

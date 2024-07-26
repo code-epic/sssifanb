@@ -46,6 +46,7 @@ export class TablaComponent implements OnInit {
   ngOnInit(): void {
   }
 
+
   cargarContenido(): any {
     this.ELEMENT_DATA = [];
     this.xAPI.funcion = 'CCEC_CContenido';

@@ -41,8 +41,8 @@ export class ApiService {
     // }
 // }
 
-    private _Url: string = environment.API;
-    private _Api: string = environment.Path + environment.Hash;
+    private _Url: string = environment.api;
+    private _Api: string = environment.path + environment.hash;
     constructor(private _httpClient: HttpClient) {}
 
     getBlob(): Observable<Blob> {

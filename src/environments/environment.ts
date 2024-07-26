@@ -4,11 +4,18 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 export const environment = {
   production: false,
-  ID : 'ID-001',
-  Url: 'http://localhost',
-  // API: '/v1/api/',
-  API: '/devel/api/',
-  Hash: ':6366af5d4c4d4674f9ce04652ad0206c.sse',
-  Path: 'crud'
+  id : 'ID-001',
+  url: 'http://localhost',
+  api: '/v1/api/',
+  // API: '/devel/api/',
+  hash: ':6366af5d4c4d4674f9ce04652ad0206c.sse',
+  path: 'crud',
+  functions: {
+    master: 'CCEC_CMaestro',
+    content: 'CCEC_CContenido'
+  },
+  subPath: {
+    login: 'wusuario/login'
+  }
 };
 

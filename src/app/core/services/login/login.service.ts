@@ -5,13 +5,12 @@ import { environment } from '../../../../environments/environment';
 import { IToken } from '../../models/login/token-model';
 import { IUsuario } from '../../models/login/usuario-model';
 import {ApiService} from '../api.service';
-import {HttpHeaders} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
-  public url: string =  environment.API;
+  public url: string =  environment.api;
   public id = '';
   public sToken: any;
   public token: any;
@@ -19,18 +18,19 @@ export class LoginService {
   public aplicacion: any;
 
   constructor(private router: Router, private http: ApiService) {
-    this.id = environment.ID;
-    if (sessionStorage.getItem('token') !== undefined) {
-      this.sToken = sessionStorage.getItem('token');
-    }
+    this.id = environment.id;
+    if (this.isToken()) { this.sToken = sessionStorage.getItem('token'); }
+    // if (sessionStorage.getItem('token') !== undefined) {
+    // }
   }
 
   async Iniciar() {
     await this.getUserDecrypt();
     this.obenterAplicacion();
   }
+
   getLogin(user: IUsuario): Observable<IToken> {
-    return this.http.postLogin<IUsuario, IToken>('wusuario/login', user);
+    return this.http.postLogin<IUsuario, IToken>(environment.subPath.login, user);
   }
 
   makeUser(user: IUsuario): Observable<any> {
@@ -40,8 +40,8 @@ export class LoginService {
 
   logout() {
     this.router.navigate(['login']);
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('id');
+    this.removeSessionStorage('id');
+    this.removeSessionStorage('token');
   }
 
   protected getUserDecrypt(): any {
@@ -81,4 +81,15 @@ export class LoginService {
     return subMenu;
   }
 
+  /* ELIMINAR CUALRQUIER COSA EN EL SESSION STORAGE DEBES MANDAR EL KEY */
+  protected removeSessionStorage(key: any) {
+    sessionStorage.removeItem(key);
+  }
+
+   /*** EL TOKEN EXISTE?
+   * SI => TRUE, NO => FALSE
+   **/
+  isToken() {
+    return sessionStorage.getItem('token') !== undefined ? false : true;
+  }
 }

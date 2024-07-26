@@ -13,6 +13,7 @@ import { MatSelect } from '@angular/material/select';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import {MatTableDataSource} from '@angular/material/table';
 import {Maestro} from '../../../core/services/util/tabla.service';
+import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'app-configurar',
@@ -48,7 +49,7 @@ export class ConfigurarComponent implements OnInit {
   constructor(public dialog: MatDialog, private apiService: ApiService) { }
 
   ngOnInit(): void {
-    this.xAPI.funcion = 'CCEC_CMaestro';
+    this.xAPI.funcion = environment.functions.master;
     this.xAPI.parametros = '%';
 
     this.apiService.post(this.xAPI).subscribe({
