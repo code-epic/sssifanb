@@ -1,11 +1,8 @@
 <div class="row">
-
   <div class="col-md-8">
-
     <div class="card card-profile shadow">
       <div class="card-body">
-
-        <form>
+        <!-- <form>
           <h6 class="heading-small text-muted mb-4">Información de Usuario</h6>
           <div class="row">
             <div class="col-md-12">
@@ -87,16 +84,24 @@
             </div>
           </div>
 
-        </form>
+        </form> -->
 
+        <app-childrem 
+          [typeDni]="json"
+          [form]="form">
+        </app-childrem>
+
+        <div class="col-sm-3">
+          <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="save()"> 
+              <mat-icon>check</mat-icon> SAVE
+             </button>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="col-md-4">
     <div class="card card-profile shadow">
-
-
       <div class="card-body">
         <div class="row">
           <div class="col">
@@ -117,17 +122,15 @@
           </div>
         </div>
         <div class="text-center">
-          <h3>
-            {{nombre}}<span class="font-weight-light"></span>
-          </h3>
+          <h3>{{ nombre }}<span class="font-weight-light"></span></h3>
           <div class="h5 font-weight-300">
             <i class="ni location_pin mr-2"></i>Caracas, Venezuela
           </div>
           <div class="h5 mt-2">
-            <i class="ni business_briefcase-24 mr-2"></i>{{perfil}}
+            <i class="ni business_briefcase-24 mr-2"></i>{{ perfil }}
           </div>
           <h6 class="heading-small text-muted mb-2">Información General</h6>
-          <div class="row text-left ">
+          <div class="row text-left">
             <ul class="list-group list-group-flush">
               <li class="list-group-item">Cargo:</li>
               <li class="list-group-item">Año de Registro:</li>
@@ -137,7 +140,9 @@
           </div>
           <hr class="my-3" />
           <div class="text-center">
-            <button mat-flat-button color="primary"  (click)="openDialog()">Cambiar Contraseña</button>
+            <button mat-flat-button color="primary" (click)="openDialog()">
+              Cambiar Contraseña
+            </button>
           </div>
         </div>
       </div>
@@ -145,11 +150,6 @@
   </div>
 </div>
 
-
-
-
-
 <ng-template #cambiarClave let-modal>
   <app-cambiarclave></app-cambiarclave>
 </ng-template>
-
