@@ -86,15 +86,35 @@
 
         </form> -->
 
-        <app-childrem 
+        <!-- <app-childrem 
           [typeDni]="json"
           [form]="form">
-        </app-childrem>
+        </app-childrem> -->
 
+        <app-form-upload
+          hashBs64="LT264845722"
+          [form]="form"
+          (onSender)="onReceivedFile($event)"
+        ></app-form-upload>
+
+        <div style="margin: 50px 0 50px 0">{{ message }}</div>
+
+        @if(uploading) {
+        <mat-progress-bar
+          mode="determinate"
+          [value]="progress"
+        ></mat-progress-bar>
+        }
+        <br />
         <div class="col-sm-3">
-          <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="save()"> 
-              <mat-icon>check</mat-icon> SAVE
-             </button>
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="form.invalid"
+            (click)="save()"
+          >
+            <mat-icon>check</mat-icon> SAVE
+          </button>
         </div>
       </div>
     </div>

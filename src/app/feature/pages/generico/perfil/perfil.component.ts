@@ -14,6 +14,11 @@ import { NgFor } from '@angular/common';
 import { ChildremComponent } from './componets/childrem/childrem.component';
 import { log } from 'console';
 import { onlyNumberValidator } from 'src/app/core/directive/only-number-validator.directive';
+import { PerfilService } from 'src/app/core/services/perfil/perfil.service';
+import { FormUploadComponent } from "./componets/form-upload/form-upload.component";
+import { filter, forkJoin, map, Observable, of, tap } from 'rxjs';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 export interface DialogData {
   animal: string;
@@ -36,9 +41,12 @@ export interface DialogData {
     MatOption,
     MatIcon,
     MatSuffix,
+    MatProgressBarModule,
     MatButton,
     ChildremComponent,
-    CambiarclaveComponent]
+    CambiarclaveComponent,
+    FormUploadComponent,
+]
 })
 
 export class PerfilComponent implements OnInit {
@@ -56,11 +64,12 @@ export class PerfilComponent implements OnInit {
   @ViewChild('cambiarClave', { static: true }) cambiarClave: TemplateRef<any>;
   // email = new FormControl('', [Validators.required, Validators.email]);
 
-  @Input() form: FormGroup;
+  form: FormGroup;
 
   constructor(
     private loginService: LoginService,
     private fb: FormBuilder,
+    private perfilService: PerfilService,
     public dialog: MatDialog,
     private modalService: NgbModal) {
   }
@@ -78,12 +87,13 @@ export class PerfilComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({ 
-      dni: new FormControl(null, [Validators.required, onlyNumberValidator()]),
-      typeDni: new FormControl(null, []),
-      name: new FormControl(null, [Validators.required]),
-      lastname: new FormControl(null, []),
-      campo1: new FormControl(null, []),
-      campo2: new FormControl(null, []),
+      // dni: new FormControl(null, [Validators.required, onlyNumberValidator()]),
+      // typeDni: new FormControl(null, []),
+      // name: new FormControl(null, [Validators.required]),
+      // lastname: new FormControl(null, []),
+      // campo1: new FormControl(null, []),
+      // campo2: new FormControl(null, []),
+      archivo: new FormControl(null, []),
     });
 
     if (this.loginService.usuario != null) {
@@ -94,6 +104,8 @@ export class PerfilComponent implements OnInit {
       this.correo = this.loginService.usuario.correo;
       this.cedula = this.loginService.usuario.cedula;
     }
+
+    this.getAllData();
   }
 
   open(content) {
@@ -131,6 +143,107 @@ export class PerfilComponent implements OnInit {
   //   return this.email.hasError('email') ? 'Correo no validado' : '';
   // }
 
-}
+  progress = 0;
+  message = "";
+  uploading = false;
+  onReceivedFile(event:any) {
+
+    this.uploading = true; 
+    this.progress = 0; 
+
+    this.perfilService.upload(event)
+    .pipe(
+      tap(event => {
+        console.log(event.type);
+        
+        if (event.type === HttpEventType.UploadProgress) {
+          const progressEvent = event as { loaded: number, total: number };
+          this.totalSize = progressEvent.total; // Almacena el tamaño total
+          this.simulateProgress(); // Simula el progreso
+        } else if (event.type === HttpEventType.Response) {
+          clearInterval(this.intervalId);
+          this.progress = 100;
+          this.message = "Archivo guardado";
+          // this.uploading = false;
+        }
+      
+      })
+    ).subscribe({
+        next: (value:any) => {
+          console.log("=> ", value);
+          
+        },
+        error: (error) => {
+          this.message = "Error al subir el archivo";
+          this.uploading = false;
+        }
+      });
+
+    // this.perfilService.upload(event).subscribe({
+    //   next: (value:any) => {
+    //     console.log("=> ", value);
+        
+    //   }
+    // })
+    
+  }
+
+  intervalId: any;
+  millisecons = 500;
+  totalSize = 0; // Almacena el tamaño total del archivo
+  simulateProgress() {
+    let currentLoaded = 0;
+    this.intervalId = setInterval(() => {
+      if (currentLoaded >= this.totalSize) {
+        clearInterval(this.intervalId);
+        return;
+      }
+      currentLoaded += this.totalSize / 100; // Incrementa el loaded gradualmente
+      this.progress = Math.round((100 * currentLoaded) / this.totalSize);
+      if (this.progress >= 100) {
+        clearInterval(this.intervalId);
+        this.progress = 100;
+      }
+    }, this.millisecons); // Ajusta el intervalo para controlar la velocidad
+  }
+
+  getAllData() {
+    forkJoin([
+      this.perfilService.sexo(),
+      this.perfilService.pais(),
+      this.perfilService.estado(),
+    ]).subscribe({
+      next: ([peticion1, peticion2, peticion3]) => {
+        console.log("peticion1", peticion1);
+        console.log("peticion2", peticion2);
+        console.log("peticion3", peticion3);
+      },
+      error: (error: any) => {
+        console.error('Error in one or both observables:', error);
+      }
+    });
+  }
 
 
+  private getEventMessage(event: HttpEvent<any>, file: File) {
+    switch (event.type) {
+      case HttpEventType.Sent:
+        return `Uploading file "${file.name}" of size ${file.size}.`;
+  
+      case HttpEventType.UploadProgress:
+        // Compute and show the % done:
+        const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
+        return `File "${file.name}" is ${percentDone}% uploaded.`;
+  
+      case HttpEventType.Response:
+        return `File "${file.name}" was completely uploaded!`;
+  
+      default:
+        return `File "${file.name}" surprising upload event: ${event.type}.`;
+    }
+  }
+
+  
+  }
+  
+  

@@ -20,13 +20,14 @@ export class AuthInterceptorService implements HttpInterceptor {
     const token: string = sessionStorage.getItem('token')
 
     let request = req;
-
-    if (token) {
-      // request = req.clone({
-      //   setHeaders: {
-      //     authorization: `Bearer ${ token }`
-      //   }
-      // });
+    // console.log("log", token);
+    
+    if (token ) {
+      request = req.clone({
+        setHeaders: {
+          authorization: `Bearer ${ token }`
+        }
+      });
     }
     
     return next.handle(request).pipe(

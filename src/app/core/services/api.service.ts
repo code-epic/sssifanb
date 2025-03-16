@@ -135,6 +135,27 @@ export class ApiService {
             .pipe(catchError((error: any) => this._handleError(this, error)));
     }
 
+    public sendFile<MODEL, RESPONSE>(
+        path: any,
+        body: MODEL,
+        params:
+            | HttpParams
+            | {
+            [param: string]:
+                | string
+                | number
+                | boolean
+                | ReadonlyArray<string | number | boolean>;
+        }
+            | null = null,
+        headers: HttpHeaders | { [header: string]: string | string[] } | null = null
+    ): Observable<RESPONSE> {
+        const uri = this._getPathLogin(path);
+        return this._httpClient
+            .post<RESPONSE>(uri, body, this._getOptions(params, headers))
+            .pipe(catchError((error: any) => this._handleError(this, error)));
+    }
+
     public put<MODEL, RESPONSE>(
         url: string,
         body: MODEL,

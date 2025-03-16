@@ -15,7 +15,8 @@ export const environment = {
     content: 'CCEC_CContenido'
   },
   subPath: {
-    login: 'wusuario/login'
+    login: 'wusuario/login',
+    subPath: 'subirarchivosdinamicos'
   }
 };
 
