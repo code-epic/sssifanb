@@ -1,1 +1,53 @@
-<p>template-form-file works!</p>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card card-profile shadow">
+      <div class="card-body">
+        <form [formGroup]="form">
+          <div class="row">
+            <div class="col-md-6">
+              <mat-form-field appearance="outline">
+                <mat-label>Subir Archivo</mat-label>
+                <input
+                  matInput
+                  placeholder="Subir Archivo"
+                  (click)="fileInput.click()"
+                  [readonly]="true"
+                  formControlName="test1"
+                />
+                <mat-icon matSuffix class="mat-icon-button small-icon"
+                  >file_upload</mat-icon
+                >
+                <input
+                  matInput
+                  type="file"
+                  #fileInput
+                  [readonly]="true"
+                  style="display: none"
+                  (change)="onFileSelected($event)"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Tamaño del Archivo</mat-label>
+                <input
+                  matInput
+                  placeholder="Seleccione"
+                  formControlName="test2"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <br>
+            <button mat-raised-button color="primary" type="submit" [disabled]="selectedFile == null" (click)='sendFile()'>Procesar</button>
+          </div>
+        </form>
+
+        <!-- here component loading -->
+      </div>
+    </div>
+  </div>
+</div>

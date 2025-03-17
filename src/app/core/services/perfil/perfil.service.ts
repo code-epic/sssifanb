@@ -23,8 +23,7 @@ export class PerfilService {
     const req = new HttpRequest('POST', this.url + environment.subPath.subPath, formData, {
       reportProgress: true
     });
-    return this.httpClient.request(req);
-    // return this.apiService.sendFile(environment.subPath.subPath, formData);
+    return this.httpClient.request(req);    
   }
 
   load() {

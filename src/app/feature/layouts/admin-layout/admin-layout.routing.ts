@@ -5,6 +5,7 @@ import { BuscadorComponent } from '../../pages/generico/buscador/buscador.compon
 import { PerfilComponent } from '../../pages/generico/perfil/perfil.component';
 import { ConfigurarComponent } from '../../pages/configurar/configurar.component';
 import { ReportesComponent } from '../../pages/reportes/reportes.component';
+import { TemplateFormFileComponent } from '../../pages/template-form-file/template-form-file.component';
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -26,6 +27,11 @@ export const AdminLayoutRoutes: Routes = [
     }, {
         path: 'reportes',
         component: ReportesComponent,
+        // canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'template-file',
+        component: TemplateFormFileComponent,
         // canActivate: [AuthGuardGuard]
     },
 

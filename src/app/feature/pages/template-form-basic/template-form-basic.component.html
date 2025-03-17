@@ -1,1 +1,34 @@
-<p>template-form-basic works!</p>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card card-profile shadow">
+      <div class="card-body">
+        <form [formGroup]="form"></form>
+        <div class="row">
+          <div class="col-sm-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Subir Archivo</mat-label>
+              <input matInput placeholder="cedula" formControlName="file"/>
+              <mat-icon matSuffix>file</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-sm-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre del Archivo</mat-label>
+              <input matInput placeholder="cedula" formControlName="test1"/>
+              <mat-icon matSuffix>check</mat-icon>
+            </mat-form-field>
+          </div>
+          <div class="col-sm-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Tamaño del Archivo</mat-label>
+              <input matInput placeholder="cedula" formControlName="test2" />
+              <mat-icon matSuffix>size</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- here component loading -->
+      </div>
+    </div>
+  </div>
+</div>

@@ -32,10 +32,16 @@ export const ROUTES: RouteInfo[] = [
         "icon": "ni ni-palette",
         "class": "nav-link",
     },
+    // {
+    //     "path": "/principal",
+    //     "title": "Hola",
+    //     "icon": "ni ni-palette",
+    //     "class": "nav-link",
+    // },
     {
-        "path": "/principal",
-        "title": "Hola",
-        "icon": "ni ni-palette",
+        "path": "/template-file",
+        "title": "Archivos",
+        "icon": "ni ni-active-40",
         "class": "nav-link",
     },
 
