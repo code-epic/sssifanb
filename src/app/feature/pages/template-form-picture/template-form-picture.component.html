@@ -12,20 +12,34 @@
                     <button mat-raised-button color="accent" (click)="openFilePicker()">
                         <mat-icon>cloud_upload</mat-icon> Subir Archivo
                     </button>
-                    <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)"
-                        accept="image/*" />
+                    <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" />
                 </div>
 
-
-                @if(imageUrl != null) {
-                <div class="preview-container" style="text-align: center;">
-                    <img [src]="imageUrl" alt="Vista Previa de la Imagen" class="preview-image" />
-                    <div class="text-right">
-                        <br>
-                        <button mat-raised-button color="primary" type="submit" (click)='sendFile()'>Procesar</button>
+                @if (imageUrl != null && fileType && fileType.startsWith('image/')) {
+                    <div class="preview-container" style="text-align: center">
+                      <img
+                        [src]="imageUrl"
+                        alt="Vista Previa de la Imagen"
+                        class="preview-image"
+                      />
+                      <div class="text-right">
+                        <br />
+                        <button mat-raised-button color="primary" type="submit" (click)="sendFile()">
+                          Procesar
+                        </button>
+                      </div>
                     </div>
-                </div>
-                }
+                    } @if (imageUrl != null && fileType === 'application/pdf') {
+                    <div class="preview-container" style="text-align: center">
+                      <iframe [src]="imageUrl" width="500" height="500"></iframe>
+                      <div class="text-right">
+                        <br />
+                        <button mat-raised-button color="primary" type="submit" (click)="sendFile()">
+                          Procesar
+                        </button>
+                      </div>
+                    </div>
+                    }
 
                 @if(showCamera) {
                 <video #videoElement autoplay class="preview-video"></video>
