@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 export class MessageService {
 
     public CONFIRM_FILE_MESSAGE = "¿Esta seguro que desea procesar el archivo?";
-
+    public CONFIRM_MULTI_FILE_MESSAGE = "¿Esta seguro que desea procesar el lote de archivos?";
     constructor() { }
 
     success(message: string, title: string = 'Completado') {
