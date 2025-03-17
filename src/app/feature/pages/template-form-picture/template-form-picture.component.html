@@ -29,7 +29,7 @@
                         </button>
                       </div>
                     </div>
-                    } @if (imageUrl != null && fileType === 'application/pdf') {
+                    } @else if (imageUrl != null && fileType === 'application/pdf') {
                     <div class="preview-container" style="text-align: center">
                       <iframe [src]="imageUrl" width="500" height="500"></iframe>
                       <div class="text-right">

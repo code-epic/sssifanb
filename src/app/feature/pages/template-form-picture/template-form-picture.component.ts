@@ -62,25 +62,29 @@ export class TemplateFormPictureComponent {
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
     if (this.selectedFile) {
-      this.fileType = this.selectedFile.type; // Almacenar el tipo de archivo
-
+      console.log(this.selectedFile); // Verificar el archivo seleccionado
+      this.fileType = this.selectedFile.type;
+      console.log(this.fileType); //Verificar el tipo de archivo.
+  
       const reader = new FileReader();
       reader.onload = (e: any) => {
         if (this.fileType.startsWith('image/')) {
           this.imageUrl = e.target.result;
         } else if (this.fileType === 'application/pdf') {
-          // Previsualizar PDF (puedes usar un visor de PDF como pdf.js)
-          this.imageUrl = e.target.result; //Usar la url para embeber el pdf
+          this.imageUrl = e.target.result;
         } else if (
           this.fileType ===
           'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         ) {
-          // Previsualizar documento de Word (puedes usar una librería como mammoth.js)
-          this.imageUrl = null; // No se puede previsualizar directamente en el navegador
+          this.imageUrl = null;
           alert('Los archivos Word no se pueden previsualizar directamente.');
         } else {
-          this.imageUrl = e.target.result; //mostrar la url de cualquier otro archivo.
+          this.imageUrl = e.target.result;
         }
+      };
+      reader.onerror = (error) => {
+        console.error('Error al leer el archivo:', error);
+        alert('Error al leer el archivo.');
       };
       reader.readAsDataURL(this.selectedFile);
     }
