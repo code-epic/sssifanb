@@ -1,0 +1,39 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card card-profile shadow">
+            <div class="card-body">
+                <h2 class="text-warning mb-0" style="font-size:32px">Open Camara Or Upload Picture</h2>
+                <br><br>
+
+                <div style="text-align: center;">
+                    <button mat-raised-button color="primary" (click)="openCamera()">
+                        <mat-icon>videocam</mat-icon> Abrir Cámara
+                    </button>
+                    <button mat-raised-button color="accent" (click)="openFilePicker()">
+                        <mat-icon>cloud_upload</mat-icon> Subir Archivo
+                    </button>
+                    <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)"
+                        accept="image/*" />
+                </div>
+
+
+                @if(imageUrl != null) {
+                <div class="preview-container" style="text-align: center;">
+                    <img [src]="imageUrl" alt="Vista Previa de la Imagen" class="preview-image" />
+                    <div class="text-right">
+                        <br>
+                        <button mat-raised-button color="primary" type="submit" (click)='sendFile()'>Procesar</button>
+                    </div>
+                </div>
+                }
+
+                @if(showCamera) {
+                <video #videoElement autoplay class="preview-video"></video>
+                }
+
+                @if(selectedFile != null && confimated == true) {
+                <app-progress-upload-file [file]="selectedFile" [observer$]="observer$"></app-progress-upload-file>
+                }
+            </div>
+        </div>
+    </div>

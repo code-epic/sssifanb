@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { PrincipalComponent } from '../../pages/principal/principal.component';
-import { AuthGuardGuard } from '../../../core/guards/auth-guard.guard';
+import { ConfigurarComponent } from '../../pages/configurar/configurar.component';
 import { BuscadorComponent } from '../../pages/generico/buscador/buscador.component';
 import { PerfilComponent } from '../../pages/generico/perfil/perfil.component';
-import { ConfigurarComponent } from '../../pages/configurar/configurar.component';
+import { PrincipalComponent } from '../../pages/principal/principal.component';
 import { ReportesComponent } from '../../pages/reportes/reportes.component';
 import { TemplateFormFileComponent } from '../../pages/template-form-file/template-form-file.component';
+import { TemplateFormPictureComponent } from '../../pages/template-form-picture/template-form-picture.component';
 
 export const AdminLayoutRoutes: Routes = [
     {
@@ -32,6 +32,11 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'template-file',
         component: TemplateFormFileComponent,
+        // canActivate: [AuthGuardGuard]
+    },
+    {
+        path: 'template-picture',
+        component: TemplateFormPictureComponent,
         // canActivate: [AuthGuardGuard]
     },
 

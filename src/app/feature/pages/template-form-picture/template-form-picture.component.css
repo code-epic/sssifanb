@@ -1,0 +1,21 @@
+div {
+    margin-bottom: 20px;
+  }
+  
+  .preview-container {
+    margin-top: 20px;
+  }
+  
+  .preview-image {
+    width: 500px;
+    height: 500px;
+  }
+  
+  .preview-video {
+    max-width: 300px;
+    max-height: 300px;
+  }
+  
+  button {
+    margin-right: 10px;
+  }

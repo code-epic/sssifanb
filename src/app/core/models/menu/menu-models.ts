@@ -44,5 +44,11 @@ export const ROUTES: RouteInfo[] = [
         "icon": "ni ni-active-40",
         "class": "nav-link",
     },
+    {
+        "path": "/template-picture",
+        "title": "Camara/Imagenes",
+        "icon": "ni ni-palette",
+        "class": "nav-link",
+    },
 
 ];
