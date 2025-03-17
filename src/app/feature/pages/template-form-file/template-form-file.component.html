@@ -46,6 +46,12 @@
           </div>
         </form>
 
+        @if(selectedFile != null && confimated == true) {
+          <app-progress-upload-file 
+          [file]="selectedFile"
+          [observer$]="observer$"
+          ></app-progress-upload-file>
+        }
         <!-- here component loading -->
       </div>
     </div>

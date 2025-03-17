@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { MATERIAL_MODULES } from 'src/app/core/imports/material/material';
 
 @Component({
@@ -15,8 +16,21 @@ export class ProgressUploadFileComponent {
   private incr = 1;
   public progress = 0;
 
+  timeout = 500;
+  @Input() observer$ = new BehaviorSubject<any>(null);
+  @Input() file: File;
+  message = "Procesando Archivo"
+
   ngOnInit() {
-    setInterval(() => this.manageProgress(), 150 )
+    let idInterval = setInterval(() => this.manageProgress(), this.timeout)
+
+    this.observer$.subscribe(value => {
+      if(value.isTerminate == true) {
+        clearInterval(idInterval);
+        this.progress = 100;
+        this.message = "Archivo subido exitosamente";
+      }
+    })
   }
 
   manageProgress() {

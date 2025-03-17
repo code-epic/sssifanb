@@ -1,5 +1,8 @@
+
+<br>
 <div style="position: relative">
     <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
-    <span style="position: absolute; top: 0.5em;" 
-        [ngStyle]="{'left': progress + '%'}">{{progress}}%</span>
-  </div>
+</div>
+<div style="text-align: right;">
+    <span [ngStyle]="{'left': progress + '%'}">{{message}} {{progress}}%</span>
+</div>

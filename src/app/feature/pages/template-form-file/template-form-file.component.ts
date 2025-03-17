@@ -1,7 +1,7 @@
 import { HttpEventType } from '@angular/common/http';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { tap } from 'rxjs';
+import { Subject, tap } from 'rxjs';
 import { COMPONENTS_SHARED, MATERIAL_FORM_MODULE, MATERIAL_MODULES } from 'src/app/core/imports/material/material';
 import { MessageService } from 'src/app/core/services/message/message-service';
 import { PerfilService } from 'src/app/core/services/perfil/perfil.service';
@@ -27,10 +27,9 @@ export class TemplateFormFileComponent {
   public form!: FormGroup;
   protected selectedFile: any = null;
   protected fileName: any = '';
-  protected fileSize: any = "0 KB"
+  protected fileSize: any = "0 KB";
 
-  // @ViewChild('fileInput') fileInput: ElementRef;
-
+  observer$ = new Subject<any>();
   ngOnInit() {
     this.form = this.fb.group({
       file: new FormControl(null),
@@ -55,13 +54,16 @@ export class TemplateFormFileComponent {
   }
 
   sendFile() {
+    this.confimated = false;
     this.message.confirm(this.message.CONFIRM_FILE_MESSAGE).then(
       (response) => response == true ? this.successConfirm() : console.log("not confirm"),
       (error) => { console.log("error", error); }
     );
   }
 
+  confimated:boolean = false;
   protected successConfirm() {
+    
     
     const formData = new FormData();
     formData.append('archivos', this.selectedFile);
@@ -70,15 +72,13 @@ export class TemplateFormFileComponent {
     this.perfilService.upload(formData)
       .pipe(
         tap(event => {
+          
           if (event.type === HttpEventType.UploadProgress) {
-            // const progressEvent = event as { loaded: number, total: number };
-            // this.totalSize = progressEvent.total; // Almacena el tamaño total
-            // this.simulateProgress(); // Simula el progreso
+            this.confimated = true;
           } else if (event.type === HttpEventType.Response) {
-            // clearInterval(this.intervalId);
-            // this.progress = 100;
-            // this.message = "Archivo guardado";
-            // this.uploading = false;
+            this.observer$.next({
+              isTerminate: true,
+            });
           }
 
         })
