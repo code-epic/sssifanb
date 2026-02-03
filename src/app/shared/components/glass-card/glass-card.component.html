@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="col-xl-3 col-lg-6 mb-4 mb-xl-0" *ngFor="let card of cards">
+    <div class="card glass-neo-card h-100" (click)="onClick(card.route)">
+      <div class="card-body">
+        
+        <div class="card-header-custom">
+            <div class="icon-wrapper">
+                <i [class]="card.icon"></i>
+            </div>
+            <div class="card-meta">
+                <div class="card-label">{{ card.title }}</div>
+                <h2 class="h2-value">{{ card.value }}</h2>
+            </div>
+        </div>
+
+        <div class="description-slide">
+            <strong [ngClass]="card.trendClass">
+                <i [class]="card.trendIcon"></i> {{ card.trendText }}
+            </strong>
+             {{ card.description }}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

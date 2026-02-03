@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from './feature/layouts/admin-layout/admin-layout.component';
 import { AuthLayoutComponent } from './feature/layouts/auth-layout/auth-layout.component';
 
-export const routes: Routes =[
+export const routes: Routes = [
   {
     path: '',
     redirectTo: 'login',
@@ -25,7 +25,17 @@ export const routes: Routes =[
         loadChildren: () => import('./feature/layouts/auth-layout/auth-layout.routing').then(m => m.AuthLayoutRoutes)
       }
     ]
-  }, {
+  },
+  {
+    path: 'afiliacion',
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./feature/pages/afiliacion/afiliacion.module').then(m => m.AfiliacionModule)
+      }
+    ]
+  },
+  {
     path: '**',
     redirectTo: 'login'
   }

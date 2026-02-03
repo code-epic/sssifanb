@@ -1,0 +1,129 @@
+$primary-teal: #598c89;
+$teal-accent: #598c89;
+
+// Custom Badge for RCP (Green marked)
+.badge-rcp {
+    background-color: #00796b; // Teal 700 - Darker/Stronger Green
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 121, 107, 0.3);
+    font-weight: 700;
+}
+
+.hover-arrow {
+    transition: transform 0.2s ease;
+    &:hover {
+        transform: translateX(3px);
+    }
+}
+
+// Table Styles Matching Grupo Familiar Pattern
+.table {
+    thead th {
+        background-color: #fff !important;
+        color: $teal-accent;
+        border-bottom: 2px solid rgba($teal-accent, 0.15);
+        font-weight: 600;
+        text-transform: none; // Cleaner, non-uppercase headers
+        font-size: 0.85rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        
+        i {
+            color: rgba($teal-accent, 0.7);
+            margin-right: 0.5rem;
+        }
+    }
+    
+    tbody tr {
+         transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+         cursor: pointer;
+         border-left: 3px solid transparent; // Subtle indicator prep
+
+         // Subtle Striping
+         &:nth-of-type(odd) {
+            background-color: rgba($teal-accent, 0.03); 
+         }
+
+         &:hover {
+             background-color: rgba($teal-accent, 0.12) !important; 
+             transform: translateY(-2px);
+             box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+             border-left-color: $teal-accent; // Add the accent border on hover
+             z-index: 10;
+             
+             td {
+                 color: darken($teal-accent, 10%) !important;
+             }
+         }
+         
+         td {
+             border-color: rgba(240, 240, 240, 0.8);
+             vertical-align: middle;
+             font-size: 0.9rem;
+         }
+    }
+}
+
+.card {
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #efefef;
+    padding: 1.25rem 1.5rem;
+    
+    h3 {
+        color: $teal-accent; // Match header color
+        text-transform: none; // Match familiar title style
+        font-size: 1.1rem;
+    }
+}
+
+// Custom Pagination Theme
+::ng-deep .pagination {
+    justify-content: flex-end;
+    margin-bottom: 0;
+    
+    .page-item {
+        margin: 0 3px;
+        
+        .page-link {
+            border: none;
+            border-radius: 50% !important;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8898aa;
+            font-weight: 500;
+            background-color: transparent;
+            transition: all 0.2s ease;
+            
+            &:hover {
+                background-color: rgba($teal-accent, 0.15);
+                color: $teal-accent;
+                transform: translateY(-1px);
+            }
+            
+            &:focus {
+                box-shadow: none;
+            }
+        }
+        
+        &.active .page-link {
+            background-color: $teal-accent;
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(89, 140, 137, 0.3);
+        }
+
+        &.disabled .page-link {
+            color: #e9ecef;
+            background: transparent;
+        }
+    }
+}

@@ -14,16 +14,16 @@ export class PerfilService {
   private httpClient = inject(HttpClient);
 
   //configurations
-  public url: string =  environment.api;
+  public url: string = environment.API;
   public id = '';
 
   constructor() { }
 
   upload(formData: any) {
-    const req = new HttpRequest('POST', this.url + environment.subPath.subPath, formData, {
+    const req = new HttpRequest('POST', this.url + environment.subPath, formData, {
       reportProgress: true
     });
-    return this.httpClient.request(req);    
+    return this.httpClient.request(req);
   }
 
   load() {
@@ -31,17 +31,17 @@ export class PerfilService {
   }
 
   sexo() {
-    return of({id: "2"});
+    return of({ id: "2" });
     // return this.httpClient.post(url, formData);
   }
 
   pais() {
-    return of({id: "1"});
+    return of({ id: "1" });
     // return this.httpClient.post(url, formData);
   }
 
   estado() {
-    return of({id: "1"});
+    return of({ id: "1" });
     // return this.httpClient.post(url, formData);
   }
 }

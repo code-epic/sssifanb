@@ -46,7 +46,7 @@ export interface DialogData {
     ChildremComponent,
     CambiarclaveComponent,
     FormUploadComponent,
-]
+  ]
 })
 
 export class PerfilComponent implements OnInit {
@@ -86,7 +86,7 @@ export class PerfilComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.form = this.fb.group({ 
+    this.form = this.fb.group({
       // dni: new FormControl(null, [Validators.required, onlyNumberValidator()]),
       // typeDni: new FormControl(null, []),
       // name: new FormControl(null, [Validators.required]),
@@ -96,13 +96,13 @@ export class PerfilComponent implements OnInit {
       archivo: new FormControl(null, []),
     });
 
-    if (this.loginService.usuario != null) {
-      console.log(this.loginService.usuario);
-      this.nombrecompleto = this.loginService.usuario.nombre;
-      this.nombre = this.loginService.usuario.usuario;
-      this.perfil = this.loginService.usuario.Perfil.descripcion;
-      this.correo = this.loginService.usuario.correo;
-      this.cedula = this.loginService.usuario.cedula;
+    if (this.loginService.Usuario != null) {
+      console.log(this.loginService.Usuario);
+      this.nombrecompleto = this.loginService.Usuario.nombre;
+      this.nombre = this.loginService.Usuario.Usuario;
+      this.perfil = this.loginService.Usuario.Perfil.descripcion;
+      this.correo = this.loginService.Usuario.correo;
+      this.cedula = this.loginService.Usuario.cedula;
     }
 
     this.getAllData();
@@ -146,32 +146,32 @@ export class PerfilComponent implements OnInit {
   progress = 0;
   message = "";
   uploading = false;
-  onReceivedFile(event:any) {
+  onReceivedFile(event: any) {
 
-    this.uploading = true; 
-    this.progress = 0; 
+    this.uploading = true;
+    this.progress = 0;
 
     this.perfilService.upload(event)
-    .pipe(
-      tap(event => {
-        console.log(event.type);
-        
-        if (event.type === HttpEventType.UploadProgress) {
-          const progressEvent = event as { loaded: number, total: number };
-          this.totalSize = progressEvent.total; // Almacena el tamaño total
-          this.simulateProgress(); // Simula el progreso
-        } else if (event.type === HttpEventType.Response) {
-          clearInterval(this.intervalId);
-          this.progress = 100;
-          this.message = "Archivo guardado";
-          // this.uploading = false;
-        }
-      
-      })
-    ).subscribe({
-        next: (value:any) => {
+      .pipe(
+        tap(event => {
+          console.log(event.type);
+
+          if (event.type === HttpEventType.UploadProgress) {
+            const progressEvent = event as { loaded: number, total: number };
+            this.totalSize = progressEvent.total; // Almacena el tamaño total
+            this.simulateProgress(); // Simula el progreso
+          } else if (event.type === HttpEventType.Response) {
+            clearInterval(this.intervalId);
+            this.progress = 100;
+            this.message = "Archivo guardado";
+            // this.uploading = false;
+          }
+
+        })
+      ).subscribe({
+        next: (value: any) => {
           console.log("=> ", value);
-          
+
         },
         error: (error) => {
           this.message = "Error al subir el archivo";
@@ -182,10 +182,10 @@ export class PerfilComponent implements OnInit {
     // this.perfilService.upload(event).subscribe({
     //   next: (value:any) => {
     //     console.log("=> ", value);
-        
+
     //   }
     // })
-    
+
   }
 
   intervalId: any;
@@ -229,21 +229,21 @@ export class PerfilComponent implements OnInit {
     switch (event.type) {
       case HttpEventType.Sent:
         return `Uploading file "${file.name}" of size ${file.size}.`;
-  
+
       case HttpEventType.UploadProgress:
         // Compute and show the % done:
         const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
         return `File "${file.name}" is ${percentDone}% uploaded.`;
-  
+
       case HttpEventType.Response:
         return `File "${file.name}" was completely uploaded!`;
-  
+
       default:
         return `File "${file.name}" surprising upload event: ${event.type}.`;
     }
   }
 
-  
-  }
-  
-  
+
+}
+
+

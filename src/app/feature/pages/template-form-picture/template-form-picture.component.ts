@@ -2,7 +2,7 @@ import { HttpEventType } from '@angular/common/http';
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { Subject, tap } from 'rxjs';
 import { COMPONENTS_SHARED, MATERIAL_FORM_MODULE, MATERIAL_MODULES } from 'src/app/core/imports/material/material';
-import { MessageService } from 'src/app/core/services/message/message-service';
+import { MessageService } from 'src/app/core/services/message/message.service';
 import { PerfilService } from 'src/app/core/services/perfil/perfil.service';
 
 @Component({
@@ -27,7 +27,7 @@ export class TemplateFormPictureComponent {
   showCamera: boolean = false;
   videoStream: MediaStream | null = null;
   selectedFile: File | null = null;
-  fileType: string | null = null; 
+  fileType: string | null = null;
 
   public confimated: boolean = false;
   public observer$ = new Subject<any>();
@@ -65,7 +65,7 @@ export class TemplateFormPictureComponent {
       console.log(this.selectedFile); // Verificar el archivo seleccionado
       this.fileType = this.selectedFile.type;
       console.log(this.fileType); //Verificar el tipo de archivo.
-  
+
       const reader = new FileReader();
       reader.onload = (e: any) => {
         if (this.fileType.startsWith('image/')) {
@@ -100,7 +100,7 @@ export class TemplateFormPictureComponent {
 
   protected successConfirm() {
     const formData = new FormData();
-      formData.append('image', this.selectedFile, this.selectedFile.name);
+    formData.append('image', this.selectedFile, this.selectedFile.name);
 
     this.perfilService.upload(formData)
       .pipe(

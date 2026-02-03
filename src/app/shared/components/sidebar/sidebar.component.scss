@@ -1,0 +1,157 @@
+// Variables
+$primary-teal: #00897b; // Verde azulado principal
+$light-teal: rgba(0, 137, 123, 0.1); // Fondo suave
+$hover-bg: #e0f2f1; // Fondo sutil al hover
+$text-color: #37474f;
+$active-border: #26a69a;
+
+// Minimalist Pastel Theme
+$pastel-teal-light: #e0f2f1; // Fondo muy suave para activo/hover
+$pastel-teal-dark: #00796b;  // Color de texto/icono activo
+$text-muted: #607d8b;        // Color de texto normal
+$icon-muted: #90a4ae;        // Color de icono normal
+
+.navbar-vertical .navbar-nav .nav-link {
+    color: $text-muted;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease-in-out;
+    border-radius: 8px; // Bordes redondeados suaves
+    margin: 2px 12px;   // Margen más ajustado
+    display: flex;
+    align-items: center;
+
+    // Icono Minimalista
+    i {
+        font-size: 1.1rem;
+        margin-right: 12px;
+        color: $icon-muted;
+        transition: color 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px; // Ancho fijo para alineación
+        height: 24px;
+    }
+
+    // Efecto Hover (Muy sutil)
+    &:hover {
+        color: $pastel-teal-dark;
+        background-color: rgba(224, 242, 241, 0.5); // Pastel translúcido
+
+        i {
+            color: $pastel-teal-dark;
+        }
+    }
+
+    // Estado Activo (Minimalista)
+    &.active {
+        color: $pastel-teal-dark;
+        font-weight: 600;
+        background-color: $pastel-teal-light; // Fondo pastel sólido suave
+        box-shadow: none; // Sin sombras agresivas
+        border: none; // Sin bordes
+
+        i {
+            color: $pastel-teal-dark; // Icono toma el color del tema
+            // Sin fondo ni gradientes extraños en el icono
+        }
+    }
+}
+
+// Separadores
+.navbar-heading {
+    padding-left: 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #90a4ae;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+// Logo Radar Container
+.logo-radar {
+    position: relative;
+    width: 150px; // Aumentar contenedor
+    height: 150px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-img {
+    width: 130px; // Logo más grande
+    height: 130px;
+    object-fit: contain;
+    border-radius: 50%;
+    z-index: 2;
+    background: white;
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+// Radar Animation
+.radar-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 137, 123, 0.4);
+    opacity: 0;
+    z-index: 1;
+    animation: radarWave 2.5s infinite ease-out;
+}
+
+@keyframes radarWave {
+    0% {
+        width: 130px;
+        height: 130px;
+        opacity: 0.8;
+        border-width: 3px;
+    }
+    100% {
+        width: 180px;
+        height: 180px;
+        opacity: 0;
+        border-width: 0px;
+    }
+}
+
+// Shield Badge (Certificado)
+.shield-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 28px; 
+    height: 28px;
+    background: #689f38; // Verde Mate
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15); // Sombra más suave
+    z-index: 3;
+    border: 2px solid white;
+    
+    i {
+        text-shadow: none; // Limpiamos sombra de texto
+        color: #f1f8e9;
+    }
+}
+
+// Navbar Background Softening (Glass Sidebar)
+.bg-glass-sidebar {
+    background-color: rgba(255, 255, 255, 0.92) !important; // No 100% blanco
+    backdrop-filter: blur(10px); // Efecto blur si hay fondo detrás
+    -webkit-backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(0,0,0,0.05); // Borde sutil
+}

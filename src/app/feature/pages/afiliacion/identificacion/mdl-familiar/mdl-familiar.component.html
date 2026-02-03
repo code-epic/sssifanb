@@ -1,0 +1,321 @@
+<div class="modal-header border-0 pb-0 bg-secondary">
+  <h5 class="modal-title font-weight-bold text-dark d-flex align-items-center">
+    <div class="icon-shape icon-shape-primary rounded-circle shadow-sm mr-2 text-white bg-gradient-teal">
+        <i class="fas fa-users-cog"></i> <!-- More relevant icon -->
+    </div>
+    <span class="text-dark">Ficha de Afiliación Familiar</span>
+  </h5>
+  <button type="button" class="close text-muted" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body pt-4">
+  <form [formGroup]="familiarForm">
+    <div class="row">
+        <!-- LEFT COLUMN: PHOTO & STATUS -->
+        <div class="col-lg-3 border-right pr-4">
+             <!-- Photo Card -->
+             <div class="card card-profile shadow-sm border-0 mb-4 bg-secondary">
+                 <div class="card-body pt-0 pt-md-4">
+                     <div class="row justify-content-center">
+                         <div class="col">
+                             <div class="card-profile-image text-center mb-3 mt--3">
+                                 <a href="javascript:void(0)">
+                                     <img src="assets/img/theme/team-4-800x800.jpg" class="rounded-circle shadow hover-shadow-lg" style="width: 140px; height: 140px; object-fit: cover; border: 4px solid #fff;">
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="text-center mt-3">
+                        <h5 class="h4 font-weight-bold text-dark mb-0">{{ f['nombres'].value | slice:0:15 }}{{ f['nombres'].value?.length > 15 ? '...' : '' }}</h5>
+                        <div class="h6 font-weight-300 text-muted mb-2"> <i class="ni location_pin mr-1"></i>{{ f['parentesco'].value }}</div>
+                        <span class="badge badge-pill badge-primary text-uppercase">{{ f['beneficio'].value ? 'Beneficiario' : 'Sin Beneficio' }}</span>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Status Toggles - Reorganized -->
+             <div class="status-panel">
+                 <h6 class="text-muted text-uppercase ls-1 mb-3 text-xs font-weight-700">Controles de Estado</h6>
+                 
+                 <div class="status-item d-flex align-items-center justify-content-between p-3 mb-2 rounded shadow-sm bg-white border-left-status" [class.active-status]="f['beneficio'].value">
+                     <div class="d-flex align-items-center">
+                         <div class="icon icon-xs rounded-circle mr-3" [ngClass]="f['beneficio'].value ? 'bg-success text-white' : 'bg-light text-muted'">
+                             <i class="fas fa-check"></i>
+                         </div>
+                         <span class="text-sm font-weight-500">Beneficio</span>
+                     </div>
+                     <label class="custom-toggle custom-toggle-success mb-0">
+                         <input type="checkbox" formControlName="beneficio">
+                         <span class="custom-toggle-slider rounded-circle"></span>
+                     </label>
+                 </div>
+
+                 <div class="status-item d-flex align-items-center justify-content-between p-3 mb-2 rounded shadow-sm bg-white border-left-status" [class.active-status]="f['esmilitar'].value">
+                     <div class="d-flex align-items-center">
+                         <div class="icon icon-xs rounded-circle mr-3" [ngClass]="f['esmilitar'].value ? 'bg-primary text-white' : 'bg-light text-muted'">
+                             <i class="fas fa-shield-alt"></i>
+                         </div>
+                         <span class="text-sm font-weight-500">Es Militar</span>
+                     </div>
+                     <label class="custom-toggle mb-0">
+                         <input type="checkbox" formControlName="esmilitar">
+                         <span class="custom-toggle-slider rounded-circle"></span>
+                     </label>
+                 </div>
+             </div>
+        </div>
+
+
+        <!-- RIGHT COLUMN: DATA FORM -->
+        <div class="col-lg-9 pl-4">
+            
+            <!-- SECTION 1: IDENTITY -->
+            <div class="row">
+                <!-- Nacionalidad -->
+                <div class="col-md-2">
+                     <div class="modern-form-group">
+                        <label>Nacionalidad</label>
+                        <div class="input-group">
+                            <select class="form-control" formControlName="nacionalidad">
+                                <option value="V">V</option>
+                                <option value="E">E</option>
+                            </select>
+                        </div>
+                     </div>
+                </div>
+                 <!-- Cedula -->
+                <div class="col-md-4">
+                     <div class="modern-form-group">
+                        <label>Cédula de Identidad</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-id-card"></i></span></div>
+                            <input type="text" class="form-control font-weight-bold" formControlName="cedula" placeholder="00000000">
+                        </div>
+                     </div>
+                </div>
+                 <!-- Condicion -->
+                <div class="col-md-3">
+                    <div class="modern-form-group">
+                        <label>Condición</label>
+                        <div class="input-group">
+                            <select class="form-control" formControlName="situacion">
+                                <option [value]="1">Sano</option>
+                                <option [value]="0">Especial</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- Status Row -->
+                <div class="col-md-3"></div>
+            </div>
+
+            <div class="row">
+                 <div class="col-md-6">
+                     <div class="modern-form-group">
+                        <label>Nombres</label>
+                         <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-user"></i></span></div>
+                            <input type="text" class="form-control" formControlName="nombres">
+                        </div>
+                     </div>
+                 </div>
+                 <div class="col-md-6">
+                     <div class="modern-form-group">
+                        <label>Apellidos</label>
+                         <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-user"></i></span></div>
+                            <input type="text" class="form-control" formControlName="apellidos">
+                        </div>
+                     </div>
+                 </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                     <div class="modern-form-group">
+                        <label>Fecha de Nacimiento</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-calendar-alt"></i></span></div>
+                            <input type="date" class="form-control" formControlName="fechanacimiento">
+                        </div>
+                     </div>
+                </div>
+                <!-- Edad -->
+                <div class="col-md-2">
+                     <div class="modern-form-group">
+                        <label>Edad</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control text-center font-weight-bold" formControlName="edad" readonly>
+                        </div>
+                     </div>
+                </div>
+                <div class="col-md-3">
+                     <div class="modern-form-group">
+                        <label>Sexo</label>
+                        <div class="input-group">
+                            <select class="form-control" formControlName="sexo">
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+                     </div>
+                </div>
+                 <div class="col-md-3">
+                     <div class="modern-form-group">
+                        <label>Estado Civil</label>
+                        <div class="input-group">
+                            <select class="form-control" formControlName="edocivil">
+                                <option value="S">Soltero(a)</option>
+                                <option value="C">Casado(a)</option>
+                                <option value="D">Divorciado(a)</option>
+                                <option value="V">Viudo(a)</option>
+                            </select>
+                        </div>
+                     </div>
+                </div>
+            </div>
+
+            <!-- TABS AREA -->
+            <div class="mt-4">
+                <ul class="nav nav-tabs modern-tabs border-bottom-0 mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link pointer" [class.active]="activeTab === 'direccion'" (click)="selectTab('direccion')">
+                            <i class="fas fa-map-marker-alt mr-2"></i> Dirección
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pointer" [class.active]="activeTab === 'banco'" (click)="selectTab('banco')">
+                            <i class="fas fa-university mr-2"></i> Banco
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link pointer" [class.active]="activeTab === 'partida'" (click)="selectTab('partida')">
+                            <i class="fas fa-file-contract mr-2"></i> Documentos
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content pt-2" style="min-height: 250px;">
+                    <!-- DIRECCION TAB -->
+                    <div *ngIf="activeTab === 'direccion'" class="fade-in-tab">
+                         <div class="row">
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label>Estado</label>
+                                    <div class="input-group">
+                                        <select class="form-control" formControlName="estado">
+                                            <option value="">Seleccione</option>
+                                            <option value="VE-A">Distrito Capital</option>
+                                            <option value="VE-B">Anzoátegui</option>
+                                            <option value="VE-C">Apure</option>
+                                            <option value="VE-D">Aragua</option>
+                                            <option value="VE-E">Barinas</option>
+                                            <option value="VE-F">Bolívar</option>
+                                            <option value="VE-G">Carabobo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label>Ciudad</label>
+                                     <div class="input-group">
+                                         <input type="text" class="form-control" formControlName="ciudad">
+                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label>Municipio</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" formControlName="municipio">
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                         <div class="row">
+                             <div class="col-md-12">
+                                 <div class="modern-form-group">
+                                    <label>Dirección Detallada</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-map-signs"></i></span></div>
+                                        <textarea class="form-control" formControlName="calle" placeholder="Avenida, Calle, Edificio..." rows="3"></textarea>
+                                    </div>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="row">
+                            <div class="col-md-6">
+                                 <div class="modern-form-group">
+                                    <label>Teléfono</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-phone"></i></span></div>
+                                        <input class="form-control" type="text" formControlName="telefono">
+                                    </div>
+                                 </div>
+                            </div>
+                             <div class="col-md-6">
+                                 <div class="modern-form-group">
+                                    <label>Correo Electrónico</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div>
+                                        <input class="form-control" type="email" formControlName="correo">
+                                    </div>
+                                 </div>
+                            </div>
+                         </div>
+                    </div>
+
+                    <!-- BANCO TAB -->
+                    <div *ngIf="activeTab === 'banco'" class="fade-in-tab">
+                         <div class="row">
+                             <div class="col-md-6">
+                                 <div class="modern-form-group">
+                                     <label>Institución Financiera</label>
+                                     <div class="input-group">
+                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-university"></i></span></div>
+                                         <select class="form-control" formControlName="banco_institucion">
+                                             <option value="">Seleccione...</option>
+                                             <option value="0102">BANCO DE VENEZUELA</option>
+                                             <option value="0134">BANESCO</option>
+                                             <option value="0105">MERCANTIL</option>
+                                             <option value="0108">PROVINCIAL</option>
+                                             <option value="0177">BANFANB</option>
+                                         </select>
+                                     </div>
+                                 </div>
+                             </div>
+                             <div class="col-md-6">
+                                 <div class="modern-form-group">
+                                    <label>Número de Cuenta</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-money-check"></i></span></div>
+                                        <input type="text" class="form-control font-weight-bold" formControlName="banco_cuenta" placeholder="0000-0000-00-0000000000" maxlength="20">
+                                    </div>
+                                 </div>
+                             </div>
+                         </div>
+                    </div>
+
+                     <!-- PARTIDA TAB -->
+                    <div *ngIf="activeTab === 'partida'" class="fade-in-tab">
+                        <div class="text-center py-5">
+                            <i class="ni ni-folder-17 fa-3x text-muted opacity-5 mb-3"></i>
+                            <h6 class="text-muted">Carga de documentos no disponible en esta vista.</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer pt-3 pb-3 bg-secondary border-0 rounded-bottom">
+  <button type="button" class="btn btn-outline-secondary border-0 text-muted shadow-sm hover-translate-y" (click)="close()">Cancelar</button>
+  <button type="button" class="btn btn-primary bg-gradient-teal border-0 shadow-lg px-5 hover-translate-y" (click)="save()">
+      <i class="fas fa-save mr-2"></i>Guardar Cambios
+  </button>
+</div>

@@ -1,0 +1,184 @@
+// Variables
+$teal-accent: #598c89; 
+$pastel-green: #77dd77;
+$pastel-green-light: #dcedc8;
+$text-muted: #8898aa;
+$text-dark: #32325d;
+$input-bg: #f8f9fe; 
+$input-border: #e9ecef;
+
+// --- MODERN INPUTS (Read-Only Optimized) ---
+.modern-form-group {
+  margin-bottom: 2rem;
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #525f7f;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .input-group {
+    border-radius: 0.25rem;
+    background-color: #ffffff;
+    border: 1px solid $input-border;
+    transition: all 0.2s ease;
+    align-items: center; // Vertically align content
+
+    // Read-only state style
+    &.readonly {
+      background-color: #f6f9fc;
+      border-color: transparent;
+    }
+  }
+
+  .form-control {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    height: 2.8rem;
+    padding-left: 0.75rem;
+    color: $text-dark;
+    font-weight: 400;
+    font-size: 0.95rem;
+    
+    // If it's a div acting as input
+    display: flex;
+    align-items: center;
+
+    &[readonly] {
+        background-color: transparent;
+        cursor: default;
+    }
+  }
+
+  // Icon Container
+  .input-group-prepend .input-group-text,
+  .input-group-append .input-group-text {
+    background: transparent;
+    border: none;
+    color: #ced4da;
+    padding-right: 0.25rem;
+    padding-left: 0.75rem;
+  }
+}
+
+// --- MODERN TABS ---
+.modern-tabs {
+  border-bottom: 2px solid #eaecf5;
+  display: flex;
+  margin-bottom: 2rem;
+  padding-left: 0;
+  list-style: none;
+  
+  .nav-item {
+    margin-right: 2rem;
+    cursor: pointer;
+  }
+
+  .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: $text-muted;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 1rem 0.5rem;
+    background: transparent;
+    
+    i {
+      margin-right: 0.5rem;
+      font-size: 1.1rem;
+      color: #adb5bd;
+      transition: color 0.3s ease;
+    }
+
+    &:hover {
+      color: $teal-accent;
+      i { color: $teal-accent; }
+    }
+
+    &.active {
+      color: $teal-accent;
+      border-bottom-color: $teal-accent;
+      font-weight: 600;
+      i { color: $teal-accent; }
+    }
+  }
+}
+
+// --- SECTIONS & CARDS ---
+.section-title {
+    display: flex;
+    align-items: center;
+    color: $teal-accent;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 0.75rem;
+
+    i {
+        font-size: 1.1rem;
+        margin-right: 0.75rem;
+        color: $teal-accent;
+    }
+}
+
+// --- TREE VIEW / MENU LIST ---
+.menu-list {
+  background: white;
+  border-radius: 0.5rem;
+  
+  .menu-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1rem;
+    
+    &:last-child { border-bottom: none; }
+
+    .menu-header {
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      color: $text-dark;
+      
+      i {
+        width: 30px;
+        text-align: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+      }
+    }
+
+    .submenu-list {
+        margin-top: 0.75rem;
+        padding-left: 3.5rem; // Indent
+        
+        .submenu-item {
+            display: inline-block;
+            background: #f8f9fe;
+            color: $text-muted;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e9ecef;
+
+            i { margin-right: 0.3rem; }
+        }
+    }
+  }
+}
+
+// --- JSON VIEWER SIMILAR (Token Area) ---
+.token-display {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.85rem;
+    max-height: 300px;
+    overflow-y: auto;
+}

@@ -1,0 +1,181 @@
+<div class="card shadow-none bg-transparent border-0 mb-3">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <div class="avatar avatar-lg rounded-circle bg-white shadow-sm text-teal">
+                <i class="fas fa-user-circle fa-2x" style="color: #598c89;"></i>
+            </div>
+        </div>
+        <div class="col ml--2">
+            <h2 class="mb-0 text-dark">{{ tokenData.nombre || 'Usuario' }}</h2>
+            <div class="d-flex align-items-center mt-1">
+                <span class="badge badge-dot mr-4">
+                    <i class="bg-success"></i> <span class="status text-success font-weight-bold">Activo</span>
+                </span>
+                <span class="text-muted text-sm border-left pl-3">{{ tokenData.cargo }}</span>
+                <span class="text-muted text-sm border-left pl-3 ml-3">{{ tokenData.correo }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="nav-wrapper mb-4">
+    <ul class="nav modern-tabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="currentTab === 'datos'" (click)="switchTab('datos')">
+                <i class="fas fa-id-card"></i> Datos Generales
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="currentTab === 'seguridad'" (click)="switchTab('seguridad')">
+                <i class="fas fa-user-shield"></i> Seguridad y Firma
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="currentTab === 'aplicaciones'" (click)="switchTab('aplicaciones')">
+                <i class="fas fa-th-large"></i> Aplicaciones y Menú
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" [class.active]="currentTab === 'raw'" (click)="switchTab('raw')">
+                <i class="fas fa-code"></i> Token Raw
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        
+        <!-- DATOS GENERALES -->
+        <div *ngIf="currentTab === 'datos'" class="fade-in">
+            <h6 class="section-title"><i class="fas fa-info-circle"></i>Información Básica</h6>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="modern-form-group">
+                        <label>Cédula</label>
+                        <div class="input-group readonly">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-fingerprint"></i></span></div>
+                            <input type="text" class="form-control" [value]="tokenData.cedula" readonly>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-4">
+                    <div class="modern-form-group">
+                        <label>Login / Usuario</label>
+                        <div class="input-group readonly">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
+                            <input type="text" class="form-control" [value]="tokenData.login" readonly>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-4">
+                    <div class="modern-form-group">
+                        <label>Sucursal</label>
+                        <div class="input-group readonly">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-building"></i></span></div>
+                            <input type="text" class="form-control" [value]="tokenData.sucursal" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="row">
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Descripción</label>
+                        <div class="input-group readonly">
+                            <input type="text" class="form-control" [value]="tokenData.descripcion" readonly>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Sistema</label>
+                        <div class="input-group readonly">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-laptop-code"></i></span></div>
+                            <input type="text" class="form-control" [value]="tokenData.sistema" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEGURIDAD -->
+        <div *ngIf="currentTab === 'seguridad'" class="fade-in">
+             <h6 class="section-title"><i class="fas fa-shield-alt"></i>Firma Digital</h6>
+             <div class="row">
+                 <div class="col-md-6">
+                      <div class="modern-form-group">
+                        <label>Sesión ID</label>
+                        <div class="input-group readonly">
+                            <input type="text" class="form-control text-monospace text-sm" [value]="tokenData.firmadigital.sesion" readonly>
+                        </div>
+                    </div>
+                 </div>
+                 <div class="col-md-3">
+                      <div class="modern-form-group">
+                        <label>Nivel</label>
+                        <div class="input-group readonly">
+                            <input type="text" class="form-control" [value]="tokenData.firmadigital.nivel" readonly>
+                        </div>
+                    </div>
+                 </div>
+                  <div class="col-md-3">
+                      <div class="modern-form-group">
+                        <label>Tiempo / Emisión</label>
+                        <div class="input-group readonly">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-clock"></i></span></div>
+                            <input type="text" class="form-control" [value]="tokenData.firmadigital.tiempo | date:'medium'" readonly>
+                        </div>
+                    </div>
+                 </div>
+             </div>
+             
+             <h6 class="section-title mt-4"><i class="fas fa-key"></i>Credenciales</h6>
+             <div class="row">
+                 <div class="col-md-12">
+                     <div class="alert alert-secondary border-0 shadow-sm">
+                         <div class="row align-items-center">
+                             <div class="col">
+                                 <small class="text-muted d-block text-uppercase font-weight-bold">Hash de Clave</small>
+                                 <span class="text-dark text-monospace text-break">{{ tokenData.clave }}</span>
+                             </div>
+                             <div class="col-auto">
+                                 <i class="fas fa-lock fa-2x text-muted"></i>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- APLICACIONES -->
+        <div *ngIf="currentTab === 'aplicaciones'" class="fade-in">
+             <h6 class="section-title"><i class="fas fa-sitemap"></i>Árbol de Menú & Accesos</h6>
+             
+             <!-- Menu Visualizer -->
+             <div class="menu-list shadow-sm border">
+                 <div class="menu-item" *ngFor="let menu of menus">
+                     <div class="menu-header">
+                         <i [class]="menu.icono || 'ni ni-ungroup'" [class.text-primary]="!menu.color" [style.color]="menu.color ? '' : ''"></i> 
+                         {{ menu.nombre }}
+                         <span class="badge badge-pill badge-light ml-auto text-muted">{{ menu.SubMenu?.length || 0 }} Items</span>
+                     </div>
+                     
+                     <div class="submenu-list" *ngIf="menu.SubMenu && menu.SubMenu.length > 0">
+                         <div class="submenu-item" *ngFor="let sub of menu.SubMenu">
+                             <i [class]="sub.icono || 'fas fa-circle'" class="text-xs"></i>
+                             {{ sub.nombre }}
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <!-- RAW -->
+        <div *ngIf="currentTab === 'raw'" class="fade-in">
+            <h6 class="section-title"><i class="fas fa-code"></i>JSON Token Original</h6>
+            <pre class="token-display shadow-inner">{{ tokenData | json }}</pre>
+        </div>
+
+    </div>
+</div>

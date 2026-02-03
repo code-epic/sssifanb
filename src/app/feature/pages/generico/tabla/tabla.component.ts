@@ -11,17 +11,17 @@ import { ApiService } from '../../../../core/services/api.service';
 import { Maestro } from '../../../../core/services/util/tabla.service';
 
 @Component({
-    selector: 'app-tabla',
-    templateUrl: './tabla.component.html',
-    styleUrls: ['./tabla.component.scss'],
-    standalone: true,
-    // tslint:disable-next-line:max-line-length
-    imports: [MatFormField, MatLabel, MatInput, MatIcon, MatSuffix, MatMiniFabButton, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator]
+  selector: 'app-tabla',
+  templateUrl: './tabla.component.html',
+  styleUrls: ['./tabla.component.scss'],
+  standalone: true,
+  // tslint:disable-next-line:max-line-length
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatSuffix, MatMiniFabButton, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator]
 })
 export class TablaComponent implements OnInit {
   public xAPI: IAPICore = {
-    funcion : '',
-    parametros : ''
+    funcion: '',
+    parametros: ''
   };
 
   public ELEMENT_DATA: Maestro[] = [];
@@ -30,15 +30,15 @@ export class TablaComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  @Input () API: any;
+  @Input() API: any;
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService) { }
 
 
   async ngOnChanges() {
     console.log('Entrando a la conexion ', this.API);
-      // tslint:disable-next-line:triple-equals
-    if (this.API !== '0' ) {
+    // tslint:disable-next-line:triple-equals
+    if (this.API !== '0') {
       await this.cargarContenido();
     }
   }
@@ -49,23 +49,24 @@ export class TablaComponent implements OnInit {
 
   cargarContenido(): any {
     this.ELEMENT_DATA = [];
+    this.xAPI = {} as IAPICore;
     this.xAPI.funcion = 'CCEC_CContenido';
     this.xAPI.parametros = this.API;
 
-    this.apiService.post(this.xAPI).subscribe({
-        next: this.successCargarContenido.bind(this),
-        error: this.errorCargarContenido.bind(this)
+    this.apiService.post("crud", this.xAPI).subscribe({
+      next: this.successCargarContenido.bind(this),
+      error: this.errorCargarContenido.bind(this)
     });
   }
 
-  successCargarContenido(data: any){
-      this.ELEMENT_DATA = data.Cuerpo;
-      this.dataSource = new MatTableDataSource<Maestro>(this.ELEMENT_DATA);
-      this.dataSource.paginator = this.paginator;
+  successCargarContenido(data: any) {
+    this.ELEMENT_DATA = data.Cuerpo;
+    this.dataSource = new MatTableDataSource<Maestro>(this.ELEMENT_DATA);
+    this.dataSource.paginator = this.paginator;
   }
 
   errorCargarContenido(error: any) {
-      console.log('error =>', error);
+    console.log('error =>', error);
   }
 
 }

@@ -1,190 +1,83 @@
-<ngx-ui-loader [loaderId]="'loader-buscar'"></ngx-ui-loader>
-<div class="container mb-5">
-  <!-- <div class="row">
-    <div class="col-md-1"></div>
-
-    <div class="col-md-10 text-center">
-
-      <div class="row text-center">
-        <div class="col-md-1"></div>
-        <div class="col-md-2 cardround" *ngFor="let item of SubMenu">
-          <a routerLinkActive="active" [routerLink]="[item.url]">
-            <div class="text-center botones">
-              <br>
-              <h2 class="text-center  {{item.color}}"><i class="{{item.icono}}" style="font-size: 42px;"></i>
-              </h2>
-              <p>{{item.nombre}}</p>
-            </div>
-          </a>
+  <!-- Loading Overlay (Visible only when loading) -->
+<div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-card">
+        <div class="spinner-box">
+            <div class="circle-border"></div>
         </div>
-        <div class="col-md-1"></div>
-      </div>
-
+        <p>Analizando datos...</p>
     </div>
+</div>
 
-    <div class="col-md-1"></div>
-
-  </div> -->
-  <br>
-  <div class="row">
-    <div class="col-md-3 text-right">
-
-    </div>
-    <div class="col-md-6 text-center">
+<div  [ngClass]="{'search-wrapper': true, 'blur-content': isLoading}">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10 text-center position-relative">
       
-      <h2 class="text-warning mb-0" style="font-size:32px">Code Epic Technologies</h2>
-      <br>
-      <form class="navbar-search">
-        <div class="form-group" [ngClass]="{ 'focused': focus === true }">
-          <div class="input-group input-group-alternative">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa fa-search "></i></span>
-            </div>
-            <input class="form-control" placeholder="Buscar" type="text" [ngModelOptions]="{standalone: true}"
-              [(ngModel)]="buscar" (focus)="focus = true" (blur)="focus = false" (keypress)="Consultar($event)">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa fa-sliders"></i></span>
-            </div>
+        
 
+          <h2 class="title-search">Búsqueda <strong>Inteligente</strong></h2>
+          <p class="subtitle-search">Ingrese la Cédula o Cadena de texto para localizar expedientes militares</p>
+          
+          <form class="navbar-search" (submit)="$event.preventDefault()">
+            <div class="form-group mb-0" [ngClass]="{ 'focused': focus === true }">
+              <div class="input-group custom-input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fas fa-search"></i></span>
+                </div>
+                <input class="form-control" placeholder="Cédula de Identidad o Cadena de Texto..." type="text" 
+                  [ngModelOptions]="{standalone: true}" [(ngModel)]="buscar" 
+                  (focus)="focus = true" (blur)="focus = false" (keyup.enter)="Consultar($event)"
+                  (click)="$event.target.select()"
+                  [disabled]="isLoading"
+                  spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
+                <div class="input-group-append btn-search-append" (click)="Consultar($event)">
+                   <span class="input-group-text"><i class="fas fa-sliders-h" title="Configuración Avanzada"></i></span>
+                </div>
+              </div>
+            </div>
+            <small class="text-danger mt-2 d-block text-left pl-3" *ngIf="errorMessage">{{ errorMessage }}</small>
+          </form>
+
+          <!-- Security Badge -->
+          <div class="security-badge-container" *ngIf="militares.length === 0">
+              <div class="security-badge">
+                  <div class="badge-icon">
+                      <div class="icon-circle bg-gradient-warning text-white">
+                          <i class="fas fa-shield-alt"></i>
+                      </div>
+                  </div>
+                  <div class="security-content">
+                      <h6 class="text-uppercase text-muted ls-1 font-weight-bold mb-1" style="font-size: 0.75rem;">
+                          Seguridad Activa & Auditoría
+                      </h6>
+                      <h5 class="font-weight-bold text-dark mb-2" style="font-size: 0.95rem;">
+                          <i class="fas fa-check-circle text-success mr-1" style="font-size: 0.8rem;"></i> Conexión Segura y Monitoreada
+                      </h5>
+                      <p class="text-muted mb-3" style="font-size: 0.85rem; line-height: 1.6;">
+                          Toda actividad es registrada y geo-referenciada. El uso indebido será sancionado según la <strong>Ley de Delitos Informáticos</strong>.
+                      </p>
+                      <div class="d-flex align-items-center flex-wrap">
+                          <span class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                              <i class="fas fa-lock mr-1"></i> TLS 1.3
+                          </span>
+                          <span class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                              <i class="fas fa-fingerprint mr-1"></i> IP Tracking
+                          </span>
+                          <span class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                              <i class="fas fa-file-contract mr-1"></i> ISO 27001
+                          </span>
+                      </div>
+                  </div>
+              </div>
           </div>
-        </div>
-      </form>
-
+          
     </div>
-    <div class="col-md-3">
-
-    </div>
-
   </div>
 
-
-  <mat-tab-group *ngIf="blBuscar" (selectedIndexChange)="seleccionNavegacion($event)">
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="example-tab-icon">search</mat-icon>
-        Todos los documentos
-      </ng-template>
-      <div class="container">
-        <br>
-        <small class="mr-5" style="font-size: 14px;" *ngIf="blBuscar">
-          Cerca de {{cantidad | number }} resultados...
-        </small>
-        <br>
-        <!-- <div class="row enlace" *ngFor="let e of lst">
-          <div class="col-md-10">
-            <a (click)="AgregarView(e.score,e.id, indice, e.skey, e.meta.ref, e.tipo);">{{ e.skey }} - {{
-              e.titu }} </a> <br>
-            <p id="{{ e.skey }}">{{ e.subt }}<br>
-              {{ e.resu }}<br>
-              <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página {{ e.view }}
-                veces</small>
-              <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: {{ e.fech }}</small>
-              <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
-            </p>
-          </div>
-          <div class="col-md-2"></div>
-        </div> -->
+  <!-- Results List (Full Width) -->
+  <div class="row mt-4 animate-fade-in" *ngIf="militares.length > 0">
+      <div class="col-12">
+          <app-afi-listar [militares]="militares" (onSelect)="selectMilitarFromList($event)"></app-afi-listar>
       </div>
-    </mat-tab>
-
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="example-tab-icon primary">list</mat-icon>
-        Expedientes
-      </ng-template>
-      <div class="container">
-        <br>
-        <small class="mr-5" style="font-size: 14px;" *ngIf="blBuscar">
-          Cerca de {{cantidad | number }} resultados...
-        </small>
-        <br>
-        <!-- <div class="row enlace" *ngFor="let e of lst">
-          <div class="col-md-10">
-            <a (click)="AgregarView(e.score,e.id, indice, e.skey, e.meta.ref, e.tipo);">{{ e.skey }} - {{
-              e.titu
-              }} </a> <br>
-            <p id="{{ e.skey }}">{{ e.subt }}<br>
-              {{ e.resu }}<br>
-              <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página {{ e.view }}
-                veces</small>
-              <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: {{ e.fech }}</small>
-              <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
-            </p>
-          </div>
-          <div class="col-md-2"></div>
-        </div> -->
-      </div>
-    </mat-tab>
-
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="example-tab-icon">article</mat-icon>
-        Articulos
-      </ng-template>
-      <div class="container">
-        <br>
-        <small class="mr-5" style="font-size: 14px;" *ngIf="blBuscar">
-          Cerca de {{cantidad | number }} resultados...
-        </small>
-        <br>
-        <!-- <div class="row enlace" *ngFor="let e of lst">
-          <div class="col-md-10">
-            <a (click)="AgregarView(e.score,e.id, indice, e.skey, e.meta.ref, e.tipo);">{{ e.skey }} - {{
-              e.titu
-              }} </a> <br>
-            <p id="{{ e.skey }}">{{ e.subt }}<br>
-              {{ e.resu }}<br>
-              <small class=" mr-4"><i class="fa fa-globe"></i>&nbsp; Visitaste esta página {{ e.view }}
-                veces</small>
-              <small class=" mr-4"><i class="fa fa-calendar"></i>&nbsp; Última visita: {{ e.fech }}</small>
-              <small class=" mr-4"><i class="fa fa-map-pin"></i>&nbsp; {{ e.ubic }}</small>
-            </p>
-          </div>
-          <div class="col-md-2"></div>
-        </div> -->
-      </div>
-    </mat-tab>
-
-  </mat-tab-group>
-  <!-- <hr style="margin-top:5px; margin-bottom:5px"> -->
-
-
-
-  <br><br>
-  <div class="row">
-
-    <div class="col-md-3"></div>
-    <div class="col-md-6 text-center">
-      <nav aria-label="Page navigation example" *ngIf="blBuscar">
-
-        <div class="row">
-          <div class="col-md-1">
-            <ul class="pagination justify-content-center">
-              <li class="page-item">
-                <a class="page-link" *ngIf="antes" (click)="posicion(actual-1)">
-                  < </a>
-              </li>
-            </ul>
-          </div>
-          <div class="col-md-10">
-            <ul class="pagination justify-content-center">
-              <li class="page-item" *ngFor="let e of lstPaginas">
-                <a class="page-link {{ e.color }}" (click)="posicion(e.id)">{{ e.id }}</a>
-              </li>
-            </ul>
-          </div>
-          <div class="col-md-1">
-            <ul class="pagination justify-content-center">
-              <li class="page-item">
-                <a class="page-link" *ngIf="despues" (click)="posicion(actual+1)">></a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-
-      </nav>
-    </div>
-    <div class="col-md-3"></div>
   </div>
+
 </div>

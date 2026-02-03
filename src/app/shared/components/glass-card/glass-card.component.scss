@@ -1,0 +1,164 @@
+// Ultimate Glass Theme (Amplified Soft)
+$glass-bg: rgba(255, 255, 255, 0.55); // Más transparente y suave
+$glass-border: 1px solid rgba(255, 255, 255, 0.3); // Borde más sutil
+$shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08); // Sombra muy difusa
+$primary-teal: #00897b;
+$text-dark: #263238; 
+$text-muted: #546e7a;
+
+.glass-neo-card {
+  background: $glass-bg;
+  
+  // Efecto Blur Suavizado
+  backdrop-filter: blur(16px) saturate(120%); 
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  
+  border: $glass-border;
+  border-top: 1px solid rgba(255, 255, 255, 0.6); 
+  border-left: 1px solid rgba(255, 255, 255, 0.6); 
+  
+  border-radius: 20px; 
+  box-shadow: $shadow-glass;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  
+  // Animación de entrada
+  opacity: 0;
+  animation: fadeSlideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+
+  // Brillo interno sutil
+  &::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(125deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.05) 40%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+  }
+
+  &:hover {
+    transform: translateY(-8px) scale(1.02); // Elevación y escala suave
+    background: rgba(255, 255, 255, 0.8); // Se vuelve un poco más sólido para leer mejor
+    box-shadow: 0 20px 50px rgba(0, 50, 60, 0.15); // Sombra profunda
+    border-color: rgba(255, 255, 255, 0.9);
+
+    .icon-wrapper {
+        background: $primary-teal;
+        color: white;
+        border-color: transparent;
+        transform: rotate(10deg) scale(1.15);
+        box-shadow: 0 10px 25px rgba(0, 137, 123, 0.4); // Glow intenso
+    }
+  }
+
+  .card-body {
+    padding: 1.25rem; // Reducido de 1.75rem
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+  }
+
+  // Header 
+  .card-header-custom {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem; // Reducido
+  }
+
+  // Icono Glass Profundo
+  .icon-wrapper {
+      width: 48px; // Reducido de 60px
+      height: 48px;
+      min-width: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem; // Icono ajustado
+      border-radius: 14px; 
+      
+      // Glass sobre Glass
+      background: rgba(255, 255, 255, 0.4); 
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      
+      color: $text-muted;
+      margin-right: 1rem; // Margen reducido
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  }
+
+  .card-meta {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+  }
+
+  .card-label {
+      font-family: 'Roboto', sans-serif;
+      font-size: 0.7rem; // Reducido
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(55, 71, 79, 0.7); 
+      margin-bottom: 2px;
+  }
+
+  .h2-value {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 300; 
+      font-size: 1.5rem; // Reducido de 1.9rem
+      color: $text-dark;
+      margin: 0;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+  }
+
+  // Footer
+  .description-slide {
+      margin-top: 0.75rem; // Reducido
+      padding-top: 0.75rem;
+      font-size: 0.8rem; // Reducido
+      color: $text-muted;
+      border-top: 1px solid rgba(255, 255, 255, 0.5); 
+      display: flex;
+      align-items: center;
+      font-family: 'Roboto', sans-serif;
+
+      strong {
+          font-weight: 600;
+          margin-right: 6px;
+          display: flex;
+          align-items: center;
+          color: $primary-teal; 
+          
+          i { margin-right: 4px; font-size: 0.9em; }
+          
+          &.text-warning, &.text-success, &.text-danger {
+              color: $primary-teal !important; 
+          }
+      }
+  }
+}
+
+// Stagger Animation
+@keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(30px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+:host-context(.row) {
+    div.col-xl-3:nth-child(1) .glass-neo-card { animation-delay: 0.1s; }
+    div.col-xl-3:nth-child(2) .glass-neo-card { animation-delay: 0.2s; }
+    div.col-xl-3:nth-child(3) .glass-neo-card { animation-delay: 0.3s; }
+    div.col-xl-3:nth-child(4) .glass-neo-card { animation-delay: 0.4s; }
+}
+.row > div.col-xl-3:nth-child(1) .glass-neo-card { animation-delay: 0.1s; }
+.row > div.col-xl-3:nth-child(2) .glass-neo-card { animation-delay: 0.2s; }
+.row > div.col-xl-3:nth-child(3) .glass-neo-card { animation-delay: 0.3s; }
+.row > div.col-xl-3:nth-child(4) .glass-neo-card { animation-delay: 0.4s; }

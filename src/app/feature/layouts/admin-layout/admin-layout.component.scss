@@ -1,0 +1,193 @@
+// Variables Minimalistas
+$bg-body: #f7fafc;
+$bg-card: #ffffff;
+$text-primary: #37474f;
+$text-secondary: #78909c;
+$accent-teal: #598c89;
+$shadow-soft: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+$border-radius: 12px;
+
+// Override del gradiente agresivo del header
+.header.bg-gradient-info {
+    background: linear-gradient(180deg, $accent-teal 0%, #41706b 100%) !important;
+    padding-bottom: 6rem !important; // Ajuste para solapamiento
+}
+
+// Estilo de Tarjetas Superiores (Stats)
+.card-stats {
+    background-color: $bg-card;
+    border: none;
+    border-radius: $border-radius;
+    box-shadow: $shadow-soft;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-title {
+        color: $text-secondary;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    .h2 {
+        color: $text-primary;
+        font-size: 1.25rem;
+    }
+
+    // Iconos circulares
+    .icon-shape {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.25rem;
+        
+        // Colores planos y elegantes en lugar de clases bootstrap default
+        &.bg-info { background-color: #e0f7fa !important; color: #00bcd4 !important; }
+        &.bg-success { background-color: #e8f5e9 !important; color: #66bb6a !important; }
+        &.bg-warning { background-color: #fff8e1 !important; color: #ffa726 !important; }
+        &.bg-purple { background-color: #f3e5f5 !important; color: #ab47bc !important; }
+        
+        // Quitar sombras fuertes del icono
+        box-shadow: none !important;
+    }
+    
+    // Hover suave
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px rgba(50, 50, 93, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+}
+
+// Contenedor principal superpuesto
+.container-fluid.mt--7 {
+    margin-top: -5rem !important; // Subir contenido sobre el header
+}
+
+// Tarjeta Principal de Contenido (Router Outlet)
+.card.shadow {
+    border: none;
+    border-radius: $border-radius;
+    box-shadow: $shadow-soft !important;
+    background-color: white;
+    min-height: 80vh; // Altura mínima consistente
+
+    .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid #eceff1;
+        padding: 0.75rem 1.5rem; // Padding reducido
+        display: flex;
+        align-items: center;
+        min-height: 50px;
+        
+        h6 {
+            color: $text-secondary;
+            letter-spacing: 1px;
+        }
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+}
+
+// Ajustes generales de texto "muted" para que no sean tan grises
+.text-muted {
+    color: $text-secondary !important;
+}
+
+// Iconos pequeños de flechas
+.text-success, .text-warning, .text-danger {
+    font-weight: 500;
+}
+
+// --- DYNAMIC HEADER STYLES REFINED ---
+.header-title {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem; // Más pequeño y elegante
+    font-weight: 400;
+    color: #607d8b; // Blue Grey sutil
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+// Estados de Alerta (Aura/Glow Sutil)
+.header-warn {
+    background: rgba(94, 114, 228, 0.03) !important;
+    box-shadow: inset 0 4px 20px rgba(94, 114, 228, 0.08); // Aura interna
+    border-bottom: 1px solid rgba(94, 114, 228, 0.2) !important;
+}
+
+.header-critical {
+    background: rgba(245, 54, 92, 0.03) !important;
+    box-shadow: inset 0 4px 20px rgba(245, 54, 92, 0.1); // Aura interna roja
+    border-bottom: 1px solid rgba(245, 54, 92, 0.2) !important;
+    
+    .header-title { color: #e57373; }
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto; // Empujar a la derecha en Flexbox
+}
+
+// Botones Pastel Personalizados
+.btn-pastel-icon {
+    width: 32px; height: 32px;
+    padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    border: none;
+    transition: all 0.2s;
+    box-shadow: none !important;
+    margin-right: 0.5rem;
+    
+    &.pastel-primary {
+        background: #e3f2fd; color: #1e88e5;
+        &:hover { background: #bbdefb; }
+    }
+    
+    &.pastel-warning {
+        background: #fff3e0; color: #fb8c00;
+        &:hover { background: #ffe0b2; }
+    }
+    
+    &.pastel-success {
+        background: #e8f5e9; color: #679f6a;
+        &:hover { background: #c8e6c9; }
+    }
+    
+    &.active {
+        background: #598c89; color: white;
+        &:hover { background: #598f89; }
+    }
+    
+    i { font-size: 0.85rem; }
+}
+
+.btn-pastel-back {
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: transparent;
+    color: #90a4ae;
+    border: 1px solid #cfd8dc;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    display: flex; align-items: center;
+    transition: all 0.2s;
+    
+    &:hover { 
+        background: #eceff1; 
+        color: #546e7a;
+        border-color: #b0bec5;
+    }
+    
+    i { margin-right: 5px; font-size: 0.8rem; }
+}

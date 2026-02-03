@@ -1,4 +1,265 @@
-/* You can add global styles to this file, and also import other style files */
+// Roboto (pesos específicos)
+@import "@fontsource/roboto/300.css";
+@import "@fontsource/roboto/400.css";
+@import "@fontsource/roboto/500.css";
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// Nunito (Local)
+@import "@fontsource/nunito/300.css";
+@import "@fontsource/nunito/400.css";
+@import "@fontsource/nunito/600.css";
+@import "@fontsource/nunito/700.css";
+
+// Material Icons
+@import "material-icons/iconfont/material-icons.css";
+
+// Global Font
+body {
+    font-family: 'Nunito', sans-serif !important;
+}
+
+/* --- PALETA MODERNA VITAL (Formal pero Fresca) --- */
+// Base: Verde Salvia a Azul Acero (Pastel Elegante)
+$matte-seafoam: #8aaf78;     // Verde Salvia pastel
+$matte-ocean: #6893b4;       // Azul Acero pastel
+
+$matte-dark: #263238;        // Texto principal
+$matte-light: #f5fafd;       // Fondos claros
+
+// Gradiente Fondo Solicitado
+$gradient-vital: linear-gradient(155deg, #8aaf78 0%, #6893b4 100%); 
+
+// Gradiente Botón (Variación un poco más intensa del mismo tono para contraste)
+$gradient-btn: linear-gradient(to right, #7a9e69, #547c9e); 
+
+.bg-pastel-gradient {
+  background: $gradient-vital !important;
+}
+
+/* Animación de entrada global */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translate3d(0, 30px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+// Botones Globales Estilo Mate Sólido (Reemplaza al gradiente)
+.btn-pastel {
+  background: #546e7a; // Azul Gris Sólido Institucional
+  color: white;
+  border: none;
+  border-radius: 6px; // Cuadrado pero amigable
+  padding: 14px 40px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15); // Sombra sutil
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  // Efecto hover de luz sutil
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.05);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:hover {
+    background: #37474f; // Más oscuro para mejor contraste
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    color: #ffffff !important; // Forzar blanco legible
+    &::after { opacity: 1; }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  &:disabled {
+      background: #cfd8dc;
+      box-shadow: none;
+      cursor: not-allowed;
+  }
+}
+
+.custom-input-group {
+    border-radius: 6px; // Radio consistente con botón
+    background: white; 
+    border: 1px solid #b0bec5; // Borde Visible Definido
+    box-shadow: none; // Flat design inicial
+    transition: all 0.3s ease;
+    
+    margin-bottom: 5px;
+
+    &:focus-within {
+        background: white;
+        border-color: #546e7a; // Color activo institucional
+        box-shadow: 0 0 0 3px rgba(84, 110, 122, 0.1); // Focus ring sutil
+    }
+
+    .input-group-text {
+        background: transparent;
+        border: none;
+        color: #78909c; // Iconos grises suaves
+        padding-left: 15px;
+        transition: color 0.3s;
+    }
+    
+    &:focus-within .input-group-text {
+       color: #546e7a; // Icono se activa con el input
+    }
+
+    .form-control {
+        border: none;
+        padding-left: 12px;
+        height: 52px; 
+        color: #37474f;
+        background: transparent;
+        font-size: 1rem;
+        font-weight: 400;
+
+        &::placeholder {
+            color: #b0bec5;
+            font-weight: 400;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+
+    .input-group-append.cursor-pointer {
+        cursor: pointer;
+        z-index: 5;
+        .input-group-text {
+            padding-right: 15px;
+        }
+        &:hover .input-group-text {
+             color: #546e7a;
+        }
+    }
+}
+
+
+
+/* --- MODAL FIXES --- */
+// Ensure modal backdrop is above everything else but below modal content
+.modal-backdrop {
+    z-index: 2040 !important;
+}
+
+// Ensure modal content is above backdrop
+.modal {
+    z-index: 2050 !important;
+}
+
+// Fix for nested modals or multiple backdrops if any
+.modal-backdrop + .modal-backdrop {
+    z-index: 2045 !important;
+}
+
+
+// --- GLOBAL LOADING OVERLAY ---
+.loading-overlay {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    z-index: 9999 !important; // Absolute top
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.5); 
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.loading-card {
+    background: rgba(255, 255, 255, 0.98);
+    padding: 2.5rem 3.5rem; // Slightly larger padding
+    border-radius: 1.5rem;
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    
+    // Animation & Border updates
+    border: 2px solid rgba(115, 157, 115, 0.3); // Pastel Green Base
+    box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15);
+    animation: breathe 3s ease-in-out infinite;
+    
+    .spinner-box {
+        width: 60px; 
+        height: 60px;
+        position: relative;
+        margin-bottom: 1.2rem;
+    }
+
+    .circle-border {
+        width: 100%; 
+        height: 100%;
+        border-radius: 50%;
+        border: 4px solid transparent; 
+        border-top-color: #4f7a4f; // Pastel green
+        border-right-color: #598c89; // Teal accent
+        animation: spin 1s linear infinite;
+    }
+    
+    p { 
+        margin-bottom: 0; 
+        color: #598c89; 
+        font-weight: 700; 
+        letter-spacing: 0.5px;
+        font-size: 0.8rem;
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+}
+
+.blur-content {
+    filter: blur(5px);
+    pointer-events: none;
+    transition: filter 0.3s ease;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+@keyframes breathe {
+    0% { 
+        transform: scale(1); 
+        box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15); 
+        border-color: rgba(119, 221, 119, 0.3); 
+    }
+    50% { 
+        transform: scale(1.05); 
+        box-shadow: 0 30px 60px rgba(119, 221, 119, 0.25); 
+        border-color: rgba(101, 144, 101, 0.8); 
+    }
+    100% { 
+        transform: scale(1); 
+        box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15); 
+        border-color: rgba(129, 170, 129, 0.3); 
+    }
+}

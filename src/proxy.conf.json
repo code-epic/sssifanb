@@ -1,12 +1,12 @@
 {
-    "/v1/api/*": {
-        "target": "https://65.108.62.7",
-        "secure": false,
-        "logLevel": "debug"
-    },
-    "/devel/api/*": {
-        "target": "http://65.108.62.7",
-        "secure": false,
-        "logLevel": "debug"
-    }
+  "/v1/api/*": {
+    "target": "https://localhost",
+    "secure": false,
+    "logLevel": "debug"
+  },
+  "/devel/api/*": {
+    "target": "http://localhost",
+    "secure": false,
+    "logLevel": "debug"
+  }
 }

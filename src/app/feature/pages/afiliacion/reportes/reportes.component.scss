@@ -1,0 +1,283 @@
+$teal-accent: #598c89;
+$text-main: #32325d;
+
+@keyframes floatLogo {
+    0% { transform: translateY(0) scale(1.1) rotate(0deg); }
+    50% { transform: translateY(-4px) scale(1.15) rotate(2deg); }
+    100% { transform: translateY(0) scale(1.1) rotate(0deg); }
+}
+
+// Component Summary Cards - Elegant Teal
+.card-stats-componente {
+    // Background similar to Table Headers (Teal Tint)
+    background-color: rgba(89, 140, 137, 0.08);
+    
+    // Distinct Teal Border
+    border: 1px solid rgba($teal-accent, 0.5); 
+    
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03); 
+    border-radius: 16px; 
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+
+    // Typography & Elegance
+    .card-title {
+        font-family: 'Lato', sans-serif;
+        letter-spacing: 0.5px;
+        color: darken($teal-accent, 5%);
+    }
+    
+    .text-uppercase {
+        letter-spacing: 1px;
+        opacity: 0.8;
+    }
+    
+    &:hover {
+        transform: translateY(-12px);
+        // Darker Teal Gradient directly requested
+        background: linear-gradient(135deg, rgba(89, 140, 137, 0.15) 0%, rgba(89, 140, 137, 0.28) 100%);
+        border-color: $teal-accent;
+        box-shadow: 0 30px 60px rgba(89, 140, 137, 0.25), 0 15px 25px rgba(0,0,0,0.05);
+    }
+    
+    .card-body {
+        position: relative; 
+        z-index: 1;
+        padding: 1.5rem;
+    }
+
+    .img-container {
+        width: 74px; 
+        height: 74px;
+        min-width: 74px;
+        
+        // Glassmorphism / Blur Effect
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 50%; // Ensure it is circular
+        
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05); 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s ease;
+        border: 1px solid rgba($teal-accent, 0.2); 
+        
+        img {
+            max-width: 52px; 
+            max-height: 52px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            transition: all 0.3s ease;
+        }
+    }
+    
+    &:hover .img-container {
+        border-color: rgba(255, 255, 255, 0.8); // Lighter border on dark bg
+        background: rgba(255, 255, 255, 0.15); // More transparent on hover
+        box-shadow: 0 10px 25px rgba(89, 140, 137, 0.3);
+        animation: floatLogo 3s ease-in-out infinite;
+
+        img {
+            filter: drop-shadow(0 6px 12px rgba(89, 140, 137, 0.4));
+        }
+    }
+}
+
+// Table Styles
+.table {
+    thead th {
+        border-top: 0;
+        border-bottom: 2px solid rgba($teal-accent, 0.1);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    tbody td {
+        border-top: 1px solid rgba(233, 236, 239, 0.5);
+        vertical-align: middle;
+        padding: 1rem 1.5rem;
+    }
+}
+
+// Utility
+.bg-teal {
+    background-color: $teal-accent !important;
+}
+
+.text-teal {
+    color: $teal-accent !important;
+}
+
+.font-weight-500 {
+    font-weight: 500 !important;
+}
+
+.badge-dot {
+    margin-right: 0.5rem;
+    i {
+        display: inline-block;
+        width: 0.375rem;
+        height: 0.375rem;
+        border-radius: 50%;
+        vertical-align: middle;
+    }
+}
+
+// Botón Pastel (Matching Admin Layout)
+.btn-pastel-icon {
+    width: 32px; height: 32px;
+    padding: 0;
+    display: inline-flex; 
+    align-items: center; justify-content: center;
+    border-radius: 50%;
+    border: none;
+    transition: all 0.2s;
+    box-shadow: none !important;
+    cursor: pointer;
+    background: transparent;
+    margin-right: 0.5rem; // Added spacing
+
+    &.pastel-primary {
+        background: #e3f2fd !important; color: #1e88e5 !important;
+        &:hover { background: #bbdefb !important; }
+    }
+    
+    &.pastel-warning {
+        background: #fff3e0 !important; color: #fb8c00 !important;
+        &:hover { background: #ffe0b2 !important; }
+    }
+    
+    &.pastel-success {
+        background: #e8f5e9 !important; color: #679f6a !important;
+        &:hover { background: #c8e6c9 !important; }
+    }
+
+    &.active {
+        background: #598c89 !important; color: white !important;
+        &:hover { background: #598f89 !important; }
+    }
+    
+    i { font-size: 0.85rem; }
+}
+
+// Expansion Icons
+.transition-icon {
+    transition: transform 0.3s ease;
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
+}
+
+// Sub-tables / Detail Cards
+.card-segmentacion {
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    background: #ffffff;
+    transition: all 0.2s;
+    
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+        border-color: rgba($teal-accent, 0.3) !important;
+    }
+}
+
+.card-segmentacion-global {
+    @extend .card-segmentacion;
+    background: #ffffff;
+    border: 1px solid rgba($teal-accent, 0.2) !important;
+    border-left: 3px solid $teal-accent !important;
+}
+
+// Table Global Overrides
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    
+    thead th {
+        background-color: rgba(89, 140, 137, 0.12) !important; // Restored Teal Header
+        color: #4a7572 !important; // Darker teal for text
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid rgba(89, 140, 137, 0.2) !important;
+        vertical-align: middle;
+        height: 50px;
+    }
+    
+    // Striped Effect
+    &.table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(89, 140, 137, 0.03); 
+    }
+    
+    &.table-hover tbody tr:hover {
+        background-color: rgba(89, 140, 137, 0.08) !important;
+    }
+}
+
+// Expanded Panel
+.bg-detail-panel {
+    background-color: #f8fafc;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+// Quantity Number Styling
+.text-darker {
+    color: #2d3748 !important; 
+    font-weight: 700;
+    font-size: 0.95rem !important; // Reduced size
+    letter-spacing: -0.2px;
+    font-family: 'Roboto', sans-serif; // Tech look for numbers
+}
+
+// Creative Minimalist Segmentacion Cards
+.card-segmentacion {
+    border: none !important;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(136, 152, 170, 0.08) !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    // Left Indicator
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 3px;
+        background: #cbd5e0; // Neutral default
+        transition: background 0.2s;
+    }
+    
+    // Status-based colors (logic in HTML via classes usually, but here generic teal hover)
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(136, 152, 170, 0.15) !important;
+        
+        &::before {
+            background: $teal-accent;
+        }
+    }
+    
+    .card-body {
+        padding: 0.8rem 1rem !important;
+    }
+}
+
+.card-segmentacion-global {
+    @extend .card-segmentacion;
+    &::before {
+        background: $teal-accent; // Always teal for global
+        width: 4px;
+    }
+}
+
+// Loading Overlay styles inherited from global styles.scss
+
+// Animations inherited from global styles.scss

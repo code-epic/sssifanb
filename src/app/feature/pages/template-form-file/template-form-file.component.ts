@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Subject, tap } from 'rxjs';
 import { COMPONENTS_SHARED, MATERIAL_FORM_MODULE, MATERIAL_MODULES } from 'src/app/core/imports/material/material';
-import { MessageService } from 'src/app/core/services/message/message-service';
+import { MessageService } from 'src/app/core/services/message/message.service';
 import { PerfilService } from 'src/app/core/services/perfil/perfil.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -75,31 +75,31 @@ export class TemplateFormFileComponent {
     this.form.get('test2').setValue(this.fileSize);
   }
 
-  onMultiFileSelected(event: any, isDrag:boolean = false) {
+  onMultiFileSelected(event: any, isDrag: boolean = false) {
     let updatedFileElements = [...this.fileElements];
-    
+
     let files = null;
-    if(isDrag == true) {
+    if (isDrag == true) {
       files = event;
-    }else {
-      files= event.target.files;
+    } else {
+      files = event.target.files;
     }
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const size = this.formatFileSize(file.size, false);
-      updatedFileElements = [...updatedFileElements, { id: uuidv4(), name: file.name, size }]; 
+      updatedFileElements = [...updatedFileElements, { id: uuidv4(), name: file.name, size }];
       console.log("this.fileElements", updatedFileElements);
     }
 
-    this.fileElements = updatedFileElements; 
+    this.fileElements = updatedFileElements;
     this.formMulti.get('file').setValue(null);
     this.formMulti.get('test2').setValue(this.formatFileSize(this.totalSize, true));
 
   }
 
-   //ACTIONS FOR TABLE
-   protected deleteElement(element: any) {
+  //ACTIONS FOR TABLE
+  protected deleteElement(element: any) {
     this.fileElements = this.fileElements.filter(
       (fileElement) => fileElement.id !== element.id
     );

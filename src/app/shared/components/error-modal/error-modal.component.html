@@ -1,0 +1,25 @@
+<div class="modal-header header bg-gradient-danger">
+  <h4 class="modal-title" id="modal-basic-title">Error en la operación</h4>
+</div>
+
+<div class="modal-body">
+  <div class="sql-container">
+    <div class="sql-content">
+        <pre  class="full-query">{{ errorText }}</pre>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer justify-content-between">
+  <button type="button" class="btn btn-secondary" (click)="copyError()">
+    <span class="fa fa-copy"></span>&nbsp;&nbsp;{{ copyButtonText }}
+  </button>
+  <div>
+    <button type="button" class="btn btn-warning mr-1" (click)="reportError()">
+      <span class="fa fa-flag"></span>&nbsp;&nbsp;Reportar Error
+    </button>
+    <button type="button" class="btn btn-pastel-cancel text-white" (click)="activeModal.close('Close click')">
+      <span class="fa fa-times"></span>&nbsp;&nbsp;Cerrar
+    </button>
+  </div>
+</div>

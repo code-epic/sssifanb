@@ -1,0 +1,105 @@
+// Variables para un tema pastel consistente
+$pastel-red-bg: #fff5f5;
+$pastel-red-border: #ffcdd2;
+$dark-red-text: #c53030;
+$light-grey-bg: #f8f9fa;
+$grey-border: #dee2e6;
+$dark-text: #474747;
+
+.modal-header {
+  background-color: $light-grey-bg;
+  border-bottom: 1px solid $grey-border;
+  padding: 1rem 1.5rem;
+
+  .modal-title {
+    color: $dark-text;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .close {
+    font-size: 1.75rem;
+    font-weight: 500;
+    opacity: 0.6;
+    transition: opacity 0.2s ease-in-out;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.modal-body {
+  padding: 0.5rem;
+}
+
+
+
+.modal-footer {
+  background-color: $light-grey-bg;
+  border-top: 1px solid $grey-border;
+  padding: 0.75rem 1.5rem;
+
+  .btn {
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+      // Color primario del tema para el foco
+      box-shadow: 0 0 0 0.2rem rgba(115, 103, 240, 0.25); 
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.sql-container {
+    margin-top: 0.2rem;
+}
+
+.sql-content {
+    background-color: #fed5d1;
+    color: #334155;
+    padding: 0.4rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    border: 0.5px solid #e2e8f1;
+}
+
+.sql-content pre {
+    background-color: transparent !important;
+    color: inherit !important;
+    margin: 0;
+    padding: 0;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 4.5em;
+    /* Aprox 3 líneas */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.sql-content pre.full-query {
+    background-color: #1e293b; /* Dark Slate */
+    color: #e2e8f0; /* Light Gray */
+    padding: 1rem;
+    border-radius: 4px;
+    border: 0.5px dotted #e3bebb;
+    max-height: 350px; /* Limit height but allow more space */
+    overflow-y: auto;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+    display: block; /* Override webkit-box */
+    -webkit-line-clamp: unset; /* Remove clamp */
+}

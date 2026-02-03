@@ -1,0 +1,180 @@
+// Variables
+$primary-teal: #598c89; // Updated to user's preferred teal
+$pastel-green: #77dd77;
+$glass-bg: rgba(255, 255, 255, 0.9);
+$warning-bg: rgba(255, 152, 0, 0.1); 
+$warning-border: rgba(255, 152, 0, 0.3);
+
+.search-wrapper {
+    position: relative;
+    padding: 3rem 0;
+    transition: filter 0.3s ease;
+    
+    // Silueta de fondo sutil
+    &::before {
+        content: '\f3ed'; 
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 20rem;
+        color: rgba(89, 140, 137, 0.03); 
+        z-index: 0;
+        pointer-events: none;
+    }
+}
+
+.title-search {
+    font-weight: 300;
+    color: #37474f;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    
+    strong {
+        font-weight: 700;
+        color: $primary-teal;
+    }
+}
+
+.subtitle-search {
+    color: #78909c;
+    font-size: 0.95rem;
+    margin-bottom: 2.5rem;
+}
+
+// Input Search Moderno
+.custom-input-group {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    background: white;
+    border: 2px solid transparent; // Default border
+
+    &:hover, &.focused {
+        box-shadow: 0 8px 25px rgba(89, 140, 137, 0.15);
+        transform: translateY(-2px);
+        border-color: rgba(89, 140, 137, 0.3);
+    }
+    
+    .input-group-text {
+        background: transparent;
+        border: none;
+        color: $primary-teal;
+        font-size: 1.2rem;
+        padding-left: 1.5rem;
+    }
+
+    input {
+        border: none;
+        background: transparent;
+        height: 60px;
+        font-size: 1.1rem;
+        color: #37474f;
+        padding-left: 1rem;
+        
+        &::placeholder {
+            color: #b0bec5;
+            font-weight: 300;
+        }
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+    
+    .btn-search-append {
+        border-radius: 0 50px 50px 0;
+        padding-right: 1.5rem;
+        cursor: pointer;
+        
+        i {
+            color: #90a4ae;
+            transition: color 0.3s;
+        }
+        
+        &:hover i {
+            color: $primary-teal;
+        }
+    }
+}
+
+// Loading overlay styles inherited from global styles.scss
+
+// Security Warning Badge
+// Security Warning Badge - Minimalist & Modern
+.security-badge-container {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+}
+
+.security-badge {
+    background: rgba(255, 167, 38, 0.03); // Very light orange transparent
+    backdrop-filter: blur(10px); // See background through
+    border-radius: 16px; 
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    max-width: 600px;
+    position: relative;
+    border: 1px solid rgba(255, 167, 38, 0.2); // Orange subtle border
+    box-shadow: 0 4px 15px rgba(230, 81, 0, 0.05); // Orange shadow
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s;
+
+    &:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 167, 38, 0.06);
+        box-shadow: 0 10px 25px rgba(230, 81, 0, 0.08) !important;
+        border-color: rgba(255, 167, 38, 0.3);
+    }
+
+    .badge-icon {
+        flex-shrink: 0;
+        margin-right: 1.5rem;
+        
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px; // Soft square
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        // Gradient for the icon background
+        .bg-gradient-warning {
+            background: linear-gradient(87deg, #fb6340 0, #fbb140 100%);
+        }
+    }
+
+    .security-content {
+        flex-grow: 1;
+        
+        h6 {
+            letter-spacing: 1px;
+        }
+        
+        // Ensure badges look clean
+        .badge {
+            font-weight: 600;
+            background-color: #f6f9fc; // Very light grey
+            color: #8898aa;
+            border: 1px solid #e9ecef; // Definition
+            transition: all 0.2s;
+            
+            &:hover {
+                background-color: #fff;
+                color: $primary-teal;
+                border-color: $primary-teal;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+        }
+    }
+}
+
+// Animations inherited from global styles.scss

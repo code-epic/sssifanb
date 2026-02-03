@@ -1,0 +1,39 @@
+<div class="logout-wrapper">
+  
+  <!-- Fondo Animado Matches Login -->
+  <div class="background-animate"></div>
+
+  <div class="logout-content">
+      
+      <div class="card-logout-modern">
+          
+          <!-- Logo -->
+          <div class="logo-container">
+               <img src="./assets/img/ipsfa/logo.webp" alt="Logo SSSIFANB">
+          </div>
+
+          <h3>Cerrando <strong>Sesión</strong></h3>
+
+          <!-- Icono de Estado -->
+          <ng-container *ngIf="!finalMessage; else successIcon">
+              <div class="spinner-loader"></div>
+          </ng-container>
+          <ng-template #successIcon>
+              <i class="fas fa-check-circle status-icon success mb-3"></i>
+          </ng-template>
+
+          <!-- Mensaje de Estado -->
+          <p class="logout-message">{{ texto || 'Finalizando procesos seguros...' }}</p>
+           
+          <h5 class="text-success font-weight-bold mt-2" *ngIf="finalMessage">
+              {{ finalMessage }}
+          </h5>
+
+      </div>
+      
+       <div class="mt-4 text-center position-relative" style="z-index: 10;">
+          <small class="text-white-50" style="letter-spacing: 1px;">SISTEMA DE SEGURIDAD SOCIAL</small>
+       </div>
+
+  </div>
+</div>

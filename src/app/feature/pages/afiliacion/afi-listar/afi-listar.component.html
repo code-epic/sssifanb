@@ -1,0 +1,73 @@
+<div class="card shadow border-0" *ngIf="militares.length > 0">
+    <div class="card-header border-0 bg-transparent py-3">
+        <h3 class="mb-0 text-muted text-uppercase text-xs font-weight-bold ls-1"><i class="fas fa-list-ul mr-2"></i>Resultados de la Búsqueda <span class="badge badge-pill badge-primary ml-2">{{ militares.length }}</span></h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-items-center table-flush table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col" class="sort"><i class="fas fa-id-card mr-1"></i>Cédula</th>
+                    <th scope="col" class="sort"><i class="fas fa-user mr-1"></i>Nombres y Apellidos</th>
+                    <th scope="col" class="sort"><i class="fas fa-shield-alt mr-1"></i>Comp./Gr.</th>
+                     <th scope="col" class="sort"><i class="fas fa-info-circle mr-1"></i>Situación</th>
+                    <th scope="col" class="sort"><i class="fas fa-calendar-alt mr-1"></i>F. Ingreso</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody class="list">
+                <tr *ngFor="let m of displayedMilitares" class="pointer-row" (click)="selectMilitar(m)">
+                    <td class="py-4">
+                         <span class="text-sm text-mute">{{ m.persona.datobasico.nacionalidad | uppercase }}-{{ m.persona.datobasico.cedula | number:'1.0-0':'es' }}</span>
+                    </td>
+                    <td class="py-4">
+                        <div class="media-body">
+                            <span class="text-sm text-muted">
+                                {{ m.persona.datobasico.nombreprimero }} {{ m.persona.datobasico.apellidoprimero }}
+                            </span>
+                            <small class="text-sm text-muted">
+                                {{ m.persona.datobasico.nombresegundo }} {{ m.persona.datobasico.apellidosegundo }}
+                            </small>
+                        </div>
+                    </td>
+                    <td class="py-4">
+                        <span class="text-sm text-muted">{{ m.componente.abreviatura }}/{{ m.grado.abreviatura }}</span>
+                    </td>
+                  
+                    <td class="py-4">
+                         <span class="badge badge-pill text-uppercase px-3" 
+                              [ngClass]="{
+                                  'badge-success': m.situacion === 'ACT', 
+                                  'badge-warning text-white': m.situacion !== 'ACT' && m.situacion !== 'RCP',
+                                  'badge-rcp': m.situacion === 'RCP'
+                              }">
+                              {{ m.situacion }}
+                        </span>
+                    </td>
+                    <td class="py-4">
+                        <span class="text-muted text-sm">{{ m.fingreso | date:'dd/MM/yyyy' }}</span>
+                    </td>
+                    <td class="text-right py-4">
+                        <button class="btn btn-icon btn-sm btn-secondary hover-arrow shadow-sm" type="button" (click)="selectMilitar(m); $event.stopPropagation()">
+                            <span class="btn-inner--icon"><i class="fas fa-chevron-right text-primary"></i></span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer py-4 bg-transparent d-flex justify-content-end">
+        <ngb-pagination
+            [(page)]="page"
+            [pageSize]="pageSize"
+            [collectionSize]="militares.length"
+            [maxSize]="5"
+            [rotate]="true"
+            [ellipses]="false"
+            [boundaryLinks]="true">
+        </ngb-pagination>
+    </div>
+</div>
+
+<div class="text-center mt-5" *ngIf="militares.length === 0">
+    <p class="text-muted">No se encontraron resultados para su búsqueda.</p>
+</div>

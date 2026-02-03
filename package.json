@@ -3,13 +3,13 @@
   "version": "1.4.0",
   "scripts": {
     "ng": "ng",
-    "start": "NODE_OPTIONS=\"--max-http-header-size=100000\" ng serve --host 0.0.0.0 --port 4202 --proxy-config ./src/proxy.conf.json --prod=false ",
-    "start2": "ng serve --host 0.0.0.0 --port 4202 --proxy-config ./src/proxy.conf.json",
+    "start": "ng serve --host 0.0.0.0  --port 4400 --proxy-config ./src/proxy.conf.json",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
+    "build:prod": "node build.js && ./node_modules/@angular/cli/bin/ng build --configuration production --base-href=\"/sssifanb/\""
   },
   "private": true,
   "dependencies": {
@@ -25,6 +25,8 @@
     "@angular/platform-browser": "^17.3.11",
     "@angular/platform-browser-dynamic": "^17.3.11",
     "@angular/router": "^17.3.11",
+    "@fontsource/nunito": "^5.2.7",
+    "@fontsource/roboto": "^5.2.9",
     "@ng-bootstrap/ng-bootstrap": "16.0.0",
     "@popperjs/core": "^2.11.4",
     "angular-ng-autocomplete": "^2.0.12",
@@ -32,6 +34,8 @@
     "chart.js": "2.9.4",
     "clipboard": "2.0.10",
     "core-js": "3.21.1",
+    "jwt-decode": "^4.0.0",
+    "material-icons": "^1.13.14",
     "ngx-bootstrap": "12.0.0",
     "ngx-clipboard": "15.0.1",
     "ngx-editor": "^14.2.0",

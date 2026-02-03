@@ -1,13 +1,33 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import Swal from 'sweetalert2';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class MessageService {
 
+
+    contenido$ = new EventEmitter<any>();
+    contenido: []
+    estatusText$ = new EventEmitter<string>();
+    estatusText: string = ''
+
+    producto$ = new EventEmitter<any>();
+    producto: []
+
+    buzon$ = new EventEmitter<any>();
+    buzon: string = ''
+
+    progreso$ = new EventEmitter<any>();
+    progreso: any = ''
+
+    finalizacion$ = new EventEmitter<any>();
+    finalizacion: any = ''
+
     public CONFIRM_FILE_MESSAGE = "¿Esta seguro que desea procesar el archivo?";
     public CONFIRM_MULTI_FILE_MESSAGE = "¿Esta seguro que desea procesar el lote de archivos?";
+
+
     constructor() { }
 
     success(message: string, title: string = 'Completado') {
