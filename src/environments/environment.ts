@@ -4,7 +4,7 @@ export const environment = {
   ID: 'ipsfa',
   Url: 'http://localhost',
   API: '/v1/api/',
-  Hash: '3a39a4d2f9869b08b9c2c2d9bad7334f.sse',
+  Hash: '8768b8d1727cb2d1ec9f0a8d8bc45f8b.sse',
   BasePath: 'crud',
   buildDateTime: 'Wed Jan 21 2026 17:56:31 GMT-0400 (Venezuela Time)',
   version: 'Broglie 1.0.1-1b419f3',

@@ -1,16 +1,306 @@
 <div class="row">
-    <div class="col-xl-12">
-        <div class="card shadow">
-            <div class="card-header border-0">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h3 class="mb-0">Tarjeta de Identificación Militar (TIM)</h3>
+    <div class="col-xl-12" style="margin: 0px;">
+        <!-- Tarjeta Principal -->
+
+            
+            <!-- Navegación de Tabuladores Clásicos -->
+            <div class="card-header bg-white border-bottom-0 pt-3 pb-0 px-4">
+                <ul class="nav nav-tabs custom-nav-tabs mb-0" style="border-bottom: 2px solid #e2e8f0;">
+                    <!-- Iteración de Tabs -->
+                    <li class="nav-item" *ngFor="let tab of redDocs">
+                        <a class="nav-link py-3 px-4 shadow-none font-weight-bold d-flex align-items-center"
+                            [class.active]="currentTab === tab.id" (click)="switchTab(tab.id)"
+                            style="cursor: pointer; transition: border-color 0.2s, background-color 0.2s; color: #64748b; border-top: none; border-left: none; border-right: none; margin-bottom: -2px;">
+                            <i class="fas mr-2 icon-tab" [ngClass]="getTabIcon(tab.nomb)"></i>
+                            <span>{{ tab.nomb | titlecase }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" *ngIf="redDocs.length === 0">
+                        <a class="nav-link active py-3 px-4 font-weight-bold d-flex align-items-center" style="border: none; margin-bottom: -2px; color: #64748b;">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Cargando estados...
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Toolbar de Búsqueda y Herramientas -->
+            <div class="bg-white py-3 px-4 d-flex justify-content-between align-items-center flex-wrap" style="border-bottom: 1px solid #f1f5f9;">
+                
+                <div class="d-flex align-items-center mb-2 mb-md-0">
+                    <!-- Checkbox All -->
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="checkAll" [checked]="allSelected" (change)="toggleAll($event)">
+                        <label class="custom-control-label font-weight-bold text-muted cursor-pointer" for="checkAll" style="padding-top: 2px; font-size: 0.85rem;">
+                            Seleccionar todo
+                        </label>
+                    </div>
+
+                    <!-- Botones Lote -->
+                    <div class="border-left pl-3 ml-2 d-flex align-items-center">
+                        <button class="btn btn-sm btn-pastel-icon-circle bg-light text-muted shadow-sm mr-2 tooltip-action border" ngbTooltip="Actualizar Bandeja">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-pastel-icon-circle pastel-success shadow-sm mr-2 tooltip-action" ngbTooltip="Aprobar Seleccionados">
+                            <i class="fas fa-check-double"></i>
+                        </button>
+                        <button class="btn btn-sm btn-pastel-icon-circle pastel-primary shadow-sm tooltip-action" ngbTooltip="Marcar Leídos">
+                            <i class="fas fa-envelope-open-text"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barra de Busqueda y Filtros -->
+                <div class="modern-form-group mb-0 w-auto">
+                    <div class="input-group input-group-sm shadow-sm bg-white" style="border-radius: 8px; border: 1px solid #e2e8f0; position: relative;">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-transparent border-0 text-muted pr-0" style="padding-left: 12px;"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input type="text" class="form-control border-0 shadow-none bg-transparent" placeholder="Buscar por cédula o RIF..." style="min-width: 460px; font-size: 0.85rem; padding-left: 10px;">
+                        
+                        <!-- Configurador Elegante (NgbDropdown) -->
+                        <div class="input-group-append" ngbDropdown placement="bottom-right" [autoClose]="false" #filterDropdown="ngbDropdown">
+                            <button class="btn btn-white shadow-none border-0 text-muted hide-dropdown-caret transition-all" ngbDropdownToggle style="padding-left: 14px; padding-right: 14px; border-left: 1px solid #f1f5f9 !important; background: transparent; height: 100%; border-radius: 0 8px 8px 0;" ngbTooltip="Filtros Adicionales">
+                                <i class="fas fa-sliders-h"></i>
+                            </button>
+                            
+                            <!-- Menú de Filtros -->
+                            <div ngbDropdownMenu class="dropdown-menu-right shadow-lg border-0 p-0 mt-2" style="width: 510px; border-radius: 12px; animation: fadeIn 0.2s ease-out; overflow: hidden;">
+                                
+                                <div class="bg-light px-4 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                    <h6 class="font-weight-600 text-dark mb-0 d-flex align-items-center" style="font-size: 0.85rem; letter-spacing: 0.3px;">
+                                        <i class="fas fa-filter text-muted mr-2"></i> Filtros Avanzados
+                                    </h6>
+                                    <button type="button" class="close text-muted shadow-none p-0 m-0 d-flex align-items-center justify-content-center" aria-label="Close"
+                                        (click)="filterDropdown.close()" style="opacity: 0.5; outline: none; transition: opacity 0.2s; font-size: 1.2rem;">
+                                        <span aria-hidden="true" style="line-height: 1;">&times;</span>
+                                    </button>
+                                </div>
+                                
+                                <div class="p-4 bg-white">
+                                    <div class="modern-form-group mb-4" style="margin-bottom: 1.5rem !important;">
+                                        <label style="font-size: 0.75rem; margin-bottom: 0.3rem;">Rango de Fechas de Recepción</label>
+                                        <div class="row align-items-center">
+                                            <div class="col-6 pr-2">
+                                                <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                                                <small class="text-muted d-block mt-1 font-weight-500" style="font-size: 0.7rem; text-align: center;">Desde (Inicio)</small>
+                                            </div>
+                                            <div class="col-6 pl-2">
+                                                <app-pastel-datepicker iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                                                <small class="text-muted d-block mt-1 font-weight-500" style="font-size: 0.7rem; text-align: center;">Hasta (Cierre)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="modern-form-group mb-3" style="margin-bottom: 1.2rem !important;">
+                                        <label style="font-size: 0.75rem; margin-bottom: 0.3rem;">Componente Militar</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt"></i></span></div>
+                                            <select class="form-control" style="font-size: 0.85rem;">
+                                                <option value="" selected>Todos los Componentes...</option>
+                                                <option value="ejb">Ejército Bolivariano</option>
+                                                <option value="arb">Armada Bolivariana</option>
+                                                <option value="amb">Aviación Militar</option>
+                                                <option value="gnb">Guardia Nacional</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="modern-form-group mb-3" style="margin-bottom: 1.2rem !important;">
+                                        <label style="font-size: 0.75rem; margin-bottom: 0.3rem;">Grado Jerárquico</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star"></i></span></div>
+                                            <select class="form-control" style="font-size: 0.85rem;">
+                                                <option value="" selected>Todos los Grados...</option>
+                                                <option>General / Almirante</option>
+                                                <option>Oficial Superior</option>
+                                                <option>Oficial Subalterno</option>
+                                                <option>Tropa Profesional</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-block font-weight-bold shadow-sm pastel-shadow transition-all" 
+                                        style="background-color: #598c89; color: white; border-radius: 8px; font-size: 0.85rem; padding: 0.5rem;" 
+                                        onmouseover="this.style.transform='translateY(-1px)'" 
+                                        onmouseout="this.style.transform='translateY(0)'"
+                                        (click)="filterDropdown.close()">
+                                        <i class="fas fa-check mr-2"></i>Aplicar Filtros
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="card-body">
-                <p>Módulo TIM</p>
+
+            <!-- Lista de Documentos Iterada -->
+            <div class="card-body p-0 table-responsive" style="flex: 1; overflow-y: auto;">
+                <table class="table table-hover mailbox-table mb-0 align-items-center w-100">
+                    <tbody>
+                        <!-- Fila Generada por *ngFor -->
+                        <tr class="document-row align-items-center" *ngFor="let doc of documentos" [class.selected-row]="selectedDocs[doc.id]">
+                            <!-- Checkbox -->
+                            <td class="px-3 py-2 border-bottom border-light text-center" style="width: 45px;">
+                                <div class="custom-control custom-checkbox ml-2">
+                                    <input type="checkbox" class="custom-control-input" [id]="'chk_' + doc.id" [checked]="selectedDocs[doc.id]" (change)="toggleSelection(doc.id)">
+                                    <label class="custom-control-label cursor-pointer" [for]="'chk_' + doc.id"></label>
+                                </div>
+                            </td>
+                            <!-- Favorito / Destacado -->
+                            <td class="px-2 py-2 border-bottom border-light text-center" style="width: 40px;" (click)="toggleStar(doc)">
+                                <i class="fas fa-star cursor-pointer star-icon transition-all" [ngClass]="doc.star ? 'text-warning' : 'text-light'" ngbTooltip="Destacar"></i>
+                            </td>
+                            <!-- Remitente -->
+                            <td class="px-2 py-2 border-bottom border-light font-weight-600 align-middle pr-3" style="width: 25%; color: #334155;">
+                                <div class="d-flex align-items-center" style="width: 100%;">
+                                    <div class="avatar avatar-sm rounded-circle mr-3 shadow-sm font-weight-bold d-flex align-items-center justify-content-center flex-shrink-0" 
+                                        [ngClass]="doc.bgAvatar" style="font-size: 0.85rem; width: 34px; height: 34px; letter-spacing: 0.5px;">
+                                        {{ doc.avatarChar }}
+                                    </div>
+                                    <span class="text-truncate" style="line-height: 1.5; letter-spacing: -0.2px; padding-top: 1px; flex: 1; min-width: 0;">{{ doc.nombre }}</span>
+                                </div>
+                            </td>
+                            <!-- Asunto y Detalles -->
+                            <td class="px-2 py-2 border-bottom border-light align-middle" style="color: #475569;">
+                                <div class="d-flex align-items-center" style="line-height: 1.5; width: 100%;">
+                                    <span class="badge badge-pill bg-light text-muted border mr-2 font-weight-bold shadow-sm flex-shrink-0" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.65em; transform: translateY(-1px);">{{ doc.rif }}</span>
+                                    <span class="font-weight-600 text-dark flex-shrink-0 text-truncate pr-1" style="font-size: 0.9rem; letter-spacing: -0.2px; max-width: 190px;">{{ doc.tramite }}</span> 
+                                    <span class="text-muted mx-2 flex-shrink-0" style="font-size: 0.6rem; opacity: 0.5;"><i class="fas fa-circle"></i></span> 
+                                    <span class="text-muted text-truncate" style="font-size: 0.85rem; flex: 1; min-width: 0;">{{ doc.detalle }}</span>
+                                </div>
+                            </td>
+                            
+                            <!-- Fecha y Botonera Acciones Combinadas -->
+                            <td class="px-3 py-2 border-bottom border-light text-right align-middle font-weight-500 position-relative" style="width: 150px; color: #94a3b8; font-size: 0.85rem; letter-spacing: 0.2px;">
+                                <span class="date-text transition-all" style="line-height: 1.5; padding-top: 1px; display: inline-block;">{{ doc.fecha }}</span>
+                                <div class="d-flex justify-content-end align-items-center h-100 action-buttons-container position-absolute" style="right: 18px; top: 0; bottom: 0; background: linear-gradient(90deg, transparent 0%, #ffffff 25%); padding-left: 2rem;">
+                                    <button class="btn btn-sm btn-pastel-icon-circle pastel-success shadow-sm ml-1 tooltip-action" ngbTooltip="Aprobar" placement="top" (click)="openAprobarModal(doc.id)">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-pastel-icon-circle pastel-danger shadow-sm ml-1 tooltip-action" ngbTooltip="Rechazar" placement="top" (click)="openRechazarModal(doc.id)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-pastel-icon-circle pastel-warning shadow-sm ml-1 tooltip-action" ngbTooltip="Liberar" placement="top">
+                                        <i class="fas fa-unlock-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Estado Vacío -->
+                <div class="empty-state text-center py-5 my-5" *ngIf="documentos.length === 0">
+                    <div class="empty-icon shadow-sm mx-auto mb-4 d-flex align-items-center justify-content-center"
+                        style="width: 90px; height: 90px; background-color: #f8fafc; border-radius: 50%; border: 1px dashed #cbd5e1;">
+                        <i class="fas fa-folder-open text-muted opacity-50" style="font-size: 2.8rem;"></i>
+                    </div>
+                    <h4 class="font-weight-bold text-dark mb-2">Bandeja Vacía</h4>
+                    <p class="text-muted font-weight-500">No hay documentos pendientes en la pestaña <strong>{{ currentTab }}</strong>.</p>
+                </div>
             </div>
-        </div>
+
+            <!-- Footer Pagination -->
+            <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center mt-auto flex-wrap" style="border-radius: 0 0 12px 12px; border-color: #f1f5f9 !important;">
+                
+                <!-- Contador de Registros -->
+                <div class="text-muted font-weight-500 mb-2 mb-md-0 d-flex align-items-center" style="font-size: 0.85rem;">
+                    <span>Mostrando <strong class="text-dark mx-1">1</strong> al <strong class="text-dark mx-1">10</strong> de <strong class="mx-1 font-weight-bold" style="color: #598c89; font-size: 0.95rem;">{{ documentos.length }}</strong> registros activos en la bandeja.</span>
+                </div>
+
+                <!-- Paginación Elegante (Estilo Pastel Hover Magic) -->
+                <nav aria-label="Mailbox pagination" class="ml-auto">
+                    <ul class="pagination pagination-sm mb-0 align-items-center">
+                        <li class="page-item disabled mr-2">
+                            <a class="page-link shadow-none border-0 text-muted btn-pastel-icon-circle bg-light tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);">
+                                <i class="fas fa-chevron-left" style="font-size: 0.7rem;"></i>
+                            </a>
+                        </li>
+                        <li class="page-item active mr-2">
+                            <a class="page-link shadow-none border-0 font-weight-bold btn-pastel-icon-circle tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);" style="background-color: #598c89; color: white;">1</a>
+                        </li>
+                        <li class="page-item mr-2">
+                            <a class="page-link shadow-none border-0 text-muted btn-pastel-icon-circle bg-light tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);">2</a>
+                        </li>
+                        <li class="page-item mr-2">
+                            <a class="page-link shadow-none border-0 text-muted btn-pastel-icon-circle bg-light tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link shadow-none border-0 text-muted btn-pastel-icon-circle bg-light tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);">
+                                <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+       
     </div>
 </div>
+
+<!-- Modal: Aprobar Documento (Pastel Premium Style) -->
+<ng-template #modalAprobar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-header border-bottom-0 py-3 px-4 d-flex align-items-center bg-white">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle text-success mr-2" style="font-size: 1.3rem;"></i>
+                <h5 class="modal-title font-weight-bold mb-0 text-dark" style="letter-spacing: -0.3px;">Aprobar Trámite</h5>
+            </div>
+            <button type="button" class="close text-muted shadow-none" aria-label="Close"
+                (click)="modal.dismiss('Cross')" style="opacity: 0.5; outline: none;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body p-4 bg-white">
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                ¿Está seguro que desea aprobar el trámite <strong>ID: {{ selectedDocId }}</strong>? Esta acción
+                actualizará el estatus del documento de forma permanente.
+            </p>
+            <div class="modern-form-group mb-0">
+                <label class="text-muted font-weight-bold"
+                    style="font-size: 0.8rem; letter-spacing: 0.5px;">OBSERVACIONES (OPCIONAL)</label>
+                <textarea class="form-control bg-light border-0 shadow-none" rows="3"
+                    placeholder="Indique alguna nota adicional o resolución pertinente..."
+                    style="border-radius: 12px; resize: none; font-size: 0.95rem; padding: 1rem; color: #475569;"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer bg-white border-top-0 pt-0 pb-4 px-4 d-flex justify-content-end">
+            <button type="button" class="btn btn-light shadow-sm mr-2 font-weight-600 px-4" (click)="modal.dismiss('Cancel')" style="border-radius: 8px;">Cancelar</button>
+            <button type="button" class="btn btn-ok pastel-shadow font-weight-600 px-4" (click)="confirmarAprobacion()" style="border-radius: 8px; background-color: #598c89; color: white; border: none;"><i class="fas fa-check mr-2"></i>
+                Confirmar Aprobación</button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Rechazar Documento (Pastel Premium Style) -->
+<ng-template #modalRechazar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-header border-bottom-0 py-3 px-4 d-flex align-items-center bg-white">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-times-circle text-danger mr-2" style="font-size: 1.3rem;"></i>
+                <h5 class="modal-title font-weight-bold mb-0 text-dark" style="letter-spacing: -0.3px;">Rechazar Trámite</h5>
+            </div>
+            <button type="button" class="close text-muted shadow-none" aria-label="Close"
+                (click)="modal.dismiss('Cross')" style="opacity: 0.5; outline: none;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body p-4 bg-white">
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Se dispone a rechazar el trámite <strong>ID: {{ selectedDocId }}</strong>. Por favor, indique el motivo. Esta acción es rígidamente registrada en la bitácora.
+            </p>
+            <div class="modern-form-group mb-0">
+                <label class="text-danger font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">MOTIVO DE
+                    RECHAZO *</label>
+                <textarea class="form-control border shadow-none" rows="3"
+                    placeholder="Describa el motivo detalladamente..."
+                    style="border-radius: 12px; border-color: #e2e8f0 !important; border-width: 2px !important; resize: none; font-size: 0.95rem; padding: 1rem; color: #475569;" required></textarea>
+            </div>
+        </div>
+        <div class="modal-footer bg-white border-top-0 pt-0 pb-4 px-4 d-flex justify-content-end">
+            <button type="button" class="btn btn-light shadow-sm mr-2 font-weight-600 px-4" (click)="modal.dismiss('Cancel')" style="border-radius: 8px;">Cancelar</button>
+            <button type="button" class="btn btn-danger"
+                style="background-color: #ef4444; border-color: #ef4444; border-radius: 8px; font-weight: 600; padding: 0.5rem 1.5rem; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3); transition: all 0.2s;"
+                (click)="confirmarRechazo()" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'"><i class="fas fa-times mr-2"></i> Confirmar Rechazo</button>
+        </div>
+    </div>
+</ng-template>

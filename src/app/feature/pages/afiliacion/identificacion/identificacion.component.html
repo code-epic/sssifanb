@@ -9,8 +9,35 @@
                     <div class="col-lg-9 pr-lg-3">
                         <div class="section-title-wrapper d-flex justify-content-between align-items-center">
                             <h6 class="section-title mb-0"><i class="fas fa-user-circle"></i> Información Personal</h6>
-                            <div class="antiguedad-badge shadow-sm" *ngIf="tiempoServicio">
-                                <i class="fas fa-history"></i> Antigüedad: <span>{{ tiempoServicio }}</span>
+                            <div class="d-flex align-items-center">
+                                <div class="antiguedad-badge shadow-sm mr-2" *ngIf="tiempoServicio">
+                                    <i class="fas fa-history"></i> Antigüedad: <span>{{ tiempoServicio }}</span>
+                                </div>
+                                <!-- Botón de Impresión de Documentos -->
+                                <div class="dropdown" [class.show]="showPrintDropdown" *ngIf="tiempoServicio">
+                                    <button class="btn btn-sm shadow-sm dropdown-toggle-no-caret d-flex align-items-center justify-content-center" type="button" id="printDocsDropdown" (click)="showPrintDropdown = !showPrintDropdown; $event.stopPropagation()" aria-haspopup="true" [attr.aria-expanded]="showPrintDropdown" title="Imprimir Documentos" style="width: 32px; height: 32px; background-color: rgba(89, 140, 137, 0.1); border: 1px solid rgba(89, 140, 137, 0.2); border-radius: 8px; color: #598c89; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.2)'" onmouseout="this.style.backgroundColor='rgba(89, 140, 137, 0.1)'">
+                                        <i class="fas fa-print" style="font-size: 0.9rem;"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right shadow-sm border-0 animated fadeIn" [class.show]="showPrintDropdown" aria-labelledby="printDocsDropdown" style="border-radius: 12px; font-size: 0.9rem; min-width: 220px; padding: 0.5rem 0; box-shadow: 0 10px 25px rgba(89, 140, 137, 0.15) !important; border: 1px solid rgba(89, 140, 137, 0.1) !important;">
+                                        <h6 class="dropdown-header text-verde-titulos font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;"><i class="fas fa-print mr-2" style="width: 20px; text-align: center;"></i>DOCUMENTOS Y REPORTES</h6>
+                                        <div class="dropdown-divider mb-1" style="border-top-color: rgba(89, 140, 137, 0.1);"></div>
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('constancia', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-file-alt mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Constancia
+                                        </a>
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('hoja_ruta', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-map mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Hoja de Ruta
+                                        </a>
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('consultar_netos', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-search-dollar mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Consultar Netos
+                                        </a>
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('constancia_arc', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-file-invoice-dollar mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Constancia de ARC
+                                        </a>
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('hoja_vida', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-address-card mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Hoja de Vida
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row">

@@ -1,0 +1,338 @@
+/* Tabuladores Clásicos (Nav Tabs) */
+.custom-nav-tabs .nav-link {
+    border-bottom: 2px solid transparent !important;
+}
+
+.custom-nav-tabs .nav-link:hover {
+    color: #334155 !important;
+    background-color: #f8fafc;
+    border-bottom: 2px solid #cbd5e1 !important;
+}
+
+.custom-nav-tabs .nav-link.active {
+    color: #598c89 !important;
+    border-bottom: 2px solid #598c89 !important;
+    background-color: transparent;
+}
+
+.badge-verde-pastel {
+    background-color: rgba(89, 140, 137, 0.15);
+    color: #598c89;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.toolbar-btn:hover {
+    background-color: #f1f5f9;
+    color: #475569 !important;
+}
+
+.search-box input:focus {
+    box-shadow: none;
+    background-color: #e2e8f0 !important;
+}
+
+.bulk-action-btn {
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.bulk-action-btn:hover {
+    text-decoration: none;
+    color: #334155 !important;
+    transform: translateY(-1px);
+}
+
+.transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tabla Estilos Modernos y Fluidos */
+.mailbox-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.mailbox-table td {
+    border-top: none !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.document-row {
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #ffffff;
+}
+
+.document-row:hover {
+    background-color: #f8fafc;
+    box-shadow: 0 4px 6px -1px rgba(89, 140, 137, 0.1);
+    z-index: 10;
+    position: relative;
+}
+
+.document-row.selected-row {
+    background-color: rgba(89, 140, 137, 0.04);
+}
+
+.document-row.unread {
+    background-color: white;
+}
+
+.document-row.unread .sender-col, 
+.document-row.unread .subject-col {
+    color: #334155 !important;
+}
+
+.star-icon:hover {
+    color: #fb8c00 !important;
+    transform: scale(1.2);
+}
+
+/* Acciones y Fecha Hover Magic */
+.document-row .date-text {
+    display: inline-block;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.document-row:hover .date-text {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px);
+}
+
+.document-row .action-buttons-container {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.document-row:hover .action-buttons-container {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+/* Efectos Pop-up en Botones Circulares */
+.btn-pastel-icon-circle {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid transparent;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s;
+}
+
+.tooltip-action:hover {
+    transform: scale(1.15);
+    z-index: 10;
+}
+
+/* Pagination Style */
+.page-circle {
+    border-radius: 50% !important;
+    width: 34px;
+    height: 34px;
+    margin: 0 4px;
+    transition: all 0.2s ease;
+}
+
+.page-circle:not(.active):not(.text-light):hover {
+    background-color: #e2e8f0 !important;
+    color: #334155 !important;
+}
+
+/* Custom Checkbox Pastel */
+.custom-control-label::before {
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    background-color: white;
+    transition: all 0.2s ease-in-out;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before {
+    border-color: #598c89;
+    background-color: #598c89;
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 0.2rem rgba(89, 140, 137, 0.25);
+    border-color: #598c89;
+}
+
+/* Colors Classes */
+.pastel-success {
+    color: #598c89;
+    background-color: rgba(89, 140, 137, 0.1);
+    border-color: rgba(89, 140, 137, 0.2);
+}
+
+.pastel-success:hover {
+    background-color: #598c89;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(89, 140, 137, 0.3);
+}
+
+.pastel-danger {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.pastel-danger:hover {
+    background-color: #ef4444;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
+}
+
+.pastel-warning {
+    color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.pastel-warning:hover {
+    background-color: #f59e0b;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3);
+}
+
+.pastel-primary {
+    color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.pastel-primary:hover {
+    background-color: #3b82f6;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dropdown Custom Animado - Reemplazado por NGB Angular */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Helper Classes */
+.hide-dropdown-caret::after {
+    display: none !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bg-pastel-primary { background-color: #e0e7ff; }
+.bg-pastel-success { background-color: #dcfce7; }
+.bg-pastel-warning { background-color: #fef3c7; }
+
+.pastel-shadow {
+    box-shadow: 0 4px 6px -1px rgba(89, 140, 137, 0.2), 0 2px 4px -1px rgba(89, 140, 137, 0.1);
+}
+
+/* Modern Inputs Pattern (Combos & Focus) */
+.modern-form-group {
+    margin-bottom: 1.5rem;
+    
+    label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #525f7f;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .input-group {
+        border-radius: 8px;
+        transition: all 0.25s ease;
+        background-color: #f1f4f8;
+        border: 1px solid #e2e8f0;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.015);
+        overflow: visible;
+
+        &:hover {
+            background-color: #e9ecef;
+            border-color: #cbd5e1;
+        }
+
+        &:focus-within {
+            background-color: #ffffff;
+            border-color: rgba(89, 140, 137, 0.8);
+            box-shadow: 0 0 0 4px rgba(89, 140, 137, 0.15);
+            
+            .input-group-text {
+                color: #598c89;
+            }
+        }
+        
+        .form-control {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            height: 35px;
+            padding-left: 0.75rem;
+            color: #1e293b;
+            font-weight: 500;
+            font-size: 0.85rem;
+
+            &::placeholder {
+                color: #94a3b8;
+                font-weight: 400;
+            }
+
+            &:focus {
+                background: transparent;
+                box-shadow: none;
+            }
+        }
+    }
+
+    select.form-control {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.2em;
+        padding-right: 2.5rem !important;
+    }
+
+    .input-group-prepend .input-group-text,
+    .input-group-append .input-group-text {
+        background: transparent;
+        border: none;
+        color: #64748b;
+        padding-right: 0.25rem;
+        padding-left: 1rem;
+        transition: color 0.2s ease;
+    }
+}

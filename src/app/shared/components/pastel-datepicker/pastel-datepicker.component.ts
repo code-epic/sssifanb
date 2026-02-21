@@ -62,6 +62,8 @@ export class PastelDatepickerComponent implements ControlValueAccessor {
 
     @Input() placeholder: string = 'DD/MM/YYYY';
     @Input() iconClass: string = 'fas fa-calendar-alt';
+    @Input() placement: string = 'bottom-left bottom-right top-left top-right';
+    @Input() container: string | null = 'body';
 
     dateStruct: NgbDateStruct | null = null;
     private focusedAndValued: boolean = false;

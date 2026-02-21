@@ -5,6 +5,8 @@ import { ReportesComponent } from './reportes/reportes.component';
 import { ConfiguracionComponent } from './configuracion/configuracion.component';
 import { TimComponent } from './tim/tim.component';
 import { AfiUsuarioComponent } from './afi-usuario/afi-usuario.component';
+import { IndicadoresComponent } from './indicadores/indicadores.component';
+import { LiberacionesComponent } from './liberaciones/liberaciones.component';
 
 
 const routes: Routes = [
@@ -13,6 +15,8 @@ const routes: Routes = [
     { path: 'reportes', component: ReportesComponent },
     { path: 'configuracion', component: ConfiguracionComponent },
     { path: 'tim', component: TimComponent },
+    { path: 'indicadores', component: IndicadoresComponent },
+    { path: 'liberaciones', component: LiberacionesComponent },
     { path: '', redirectTo: 'identificacion', pathMatch: 'full' }
 ];
 

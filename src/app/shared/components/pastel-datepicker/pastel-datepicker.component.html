@@ -9,7 +9,8 @@
          (ngModelChange)="onDateSelect($event)"
          ngbDatepicker 
          #dp="ngbDatepicker"
-         container="body"
+         [container]="container === 'null' ? null : container"
+         [placement]="placement"
          (click)="dp.toggle()"
          (focus)="onInputFocus($event)"
          (keydown)="onKeyDown($event)"

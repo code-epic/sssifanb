@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LayoutService } from 'src/app/core/services/layout/layout.service';
@@ -19,6 +19,9 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     public currentTab: string = 'militar';
     public moneda: string = 'Bs.';
 
+    // Var to control the pastel printing dropdown menu visibility
+    public showPrintDropdown: boolean = false;
+
     constructor(
         private layoutService: LayoutService,
         private fb: FormBuilder,
@@ -26,6 +29,15 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         private cdr: ChangeDetectorRef,
         private modalService: NgbModal
     ) { }
+
+    @HostListener('document:click', ['$event'])
+    closePrintDropdown(event: MouseEvent) {
+        // Find if target is the print dropdown button
+        const targetElement = event.target as HTMLElement;
+        if (!targetElement.closest('#printDocsDropdown')) {
+            this.showPrintDropdown = false;
+        }
+    }
 
     ngOnInit(): void {
         this.layoutService.triggerScrollToTop();
@@ -371,6 +383,12 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             console.error('Formulario inválido');
             this.identificacionForm.markAllAsTouched();
         }
+    }
+
+    imprimirDocumento(tipo: string, event: Event) {
+        event.preventDefault();
+        console.log('Generar documento:', tipo);
+        // TODO: Implementar lógica de generación y apertura en nueva pestaña
     }
 
     guardarFamiliar() {
