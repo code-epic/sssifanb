@@ -17,6 +17,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     public familiares: any[] = []; // Lista para la tabla
     public familiarForm: FormGroup;
     public currentTab: string = 'militar';
+    public moneda: string = 'Bs.';
 
     constructor(
         private layoutService: LayoutService,
@@ -27,6 +28,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit(): void {
+        this.layoutService.triggerScrollToTop();
+
         this.layoutService.toggleCards(false);
         this.layoutService.updateHeader({
             title: 'Principal / Afiliación: Identificación Militar',
@@ -50,13 +53,22 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
                 const parsedData = this.parseData(afiliadoData);
                 // console.log('Datos Procesados (ready to patch):', parsedData);
 
+                // Calcular Tiempo de Servicio
+                this.tiempoServicio = this.calcularTServicio(parsedData.fingreso, parsedData.fretiro, parsedData.situacion);
+
                 // Procesar Familiares
                 this.familiares = this.processFamiliares(afiliadoData.familiar);
+
+                // Calcular hijos para el input si no venía explicitamente en la data
+                if (parsedData.numerohijos === 0 || !parsedData.numerohijos) {
+                    const cantHijos = this.familiares.filter(f => f.parentesco === 'HIJO' || f.parentesco === 'HIJA').length;
+                    parsedData.numerohijos = cantHijos;
+                }
 
                 if (this.identificacionForm) {
                     try {
                         // 1. Patch Root Fields
-                        ['categoria', 'situacion', 'clase', 'fingreso', 'fascenso', 'componente', 'grado'].forEach(key => {
+                        ['categoria', 'situacion', 'clase', 'fingreso', 'fascenso', 'fretiro', 'nresuelto', 'posicion', 'componente', 'grado', 'numerohijos', 'areconocido', 'mreconocido', 'dreconocido', 'pprof'].forEach(key => {
                             if (parsedData[key] !== undefined) {
                                 this.identificacionForm.get(key)?.setValue(parsedData[key]);
                             }
@@ -133,6 +145,48 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         }).catch(() => { });
     }
 
+    public tiempoServicio: string = '';
+
+    private calcularTServicio(fechaIngresoIso: string, fechaRetiroIso: string, situacion: string): string {
+        if (!fechaIngresoIso) return '';
+
+        const fechaActual = new Date();
+        let annoA = fechaActual.getFullYear();
+        let mesA = fechaActual.getMonth() + 1;
+        let diaA = fechaActual.getDate();
+
+        if (situacion !== "ACT" && fechaRetiroIso) {
+            const fret = fechaRetiroIso.split("-");
+            if (fret.length === 3) {
+                annoA = parseInt(fret[0], 10);
+                mesA = parseInt(fret[1], 10);
+                diaA = parseInt(fret[2], 10);
+            }
+        }
+
+        const f = fechaIngresoIso.split("-");
+        if (f.length !== 3) return '';
+
+        let anoN = parseInt(f[0], 10);
+        let mesN = parseInt(f[1], 10);
+        let diaM = parseInt(f[2], 10);
+
+        let ano = annoA - anoN;
+        let mes = mesA - mesN;
+        let dia = diaA - diaM;
+
+        if (dia < 0) {
+            dia = 30 + dia;
+            mes--;
+        }
+        if (mes < 0) { // Fix bug in original script which did mes <= 0
+            mes = 12 + mes;
+            ano--;
+        }
+
+        return `${ano}A ${mes}M ${dia}D`;
+    }
+
     private parseData(data: any): any {
         return {
             categoria: data.categoria || 'EFE',
@@ -140,8 +194,16 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             clase: data.clase || 'OFI',
             fingreso: this.formatDate(data.fingreso),
             fascenso: this.formatDate(data.fascenso),
+            fretiro: this.formatDate(data.fretiro),
+            nresuelto: data.nresuelto || '',
+            posicion: data.posicion || '',
             componente: data.componente?.abreviatura || '',
             grado: data.grado?.abreviatura || '',
+            numerohijos: data.numerohijos || data.nhijo || 0,
+            areconocido: data.areconocido || 0,
+            mreconocido: data.mreconocido || 0,
+            dreconocido: data.dreconocido || 0,
+            pprof: data.pprof || 0,
 
             persona: {
                 datobasico: {
@@ -221,8 +283,16 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             clase: ['OFI', Validators.required],
             fingreso: ['', Validators.required],
             fascenso: ['', Validators.required],
+            fretiro: [''],
+            nresuelto: [''],
+            posicion: [''],
             componente: ['', Validators.required],
             grado: ['', Validators.required],
+            numerohijos: [''],
+            areconocido: [''],
+            mreconocido: [''],
+            dreconocido: [''],
+            pprof: [''],
 
             // --- PERSONA ---
             persona: this.fb.group({
@@ -309,6 +379,26 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             // Lógica para agregar a la tabla
             this.familiarForm.reset();
         }
+    }
+
+    getGradoBadgePath(): string {
+        const gradoStr = this.identificacionForm?.get('grado')?.value;
+        if (!gradoStr) return '';
+        let badge = String(gradoStr).toLowerCase().trim();
+
+        // Reglas de negocio para normalizar grados a nombres de archivo
+        if (badge === '1er tte') badge = 'ptte';
+        badge = badge.replace(/\//g, '').replace(/\./g, '').replace(/\s+/g, '');
+
+        return `assets/img/ipsfa/grados/${badge}.webp`;
+    }
+
+    getFotoUrl(): string {
+        const cedula = this.identificacionForm?.get('persona.datobasico.cedula')?.value;
+        if (cedula && cedula.toString().trim() !== '') {
+            return `https://app.ipsfa.gob.ve/sssifanb/afiliacion/temp/${cedula}/foto.jpg`;
+        }
+        return 'assets/img/theme/team-4-800x800.jpg'; // Imagen de relleno por defecto si no hay cédula aún
     }
 
     ngOnDestroy(): void {

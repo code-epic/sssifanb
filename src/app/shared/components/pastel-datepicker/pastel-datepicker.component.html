@@ -1,0 +1,19 @@
+<div class="input-group">
+  <div class="input-group-prepend cursor-pointer" (click)="dp.toggle()">
+    <span class="input-group-text"><i class="{{ iconClass }} text-verde-titulos"></i></span>
+  </div>
+  <input class="form-control bs-datepicker-input" 
+         [placeholder]="placeholder" 
+         name="dp" 
+         [(ngModel)]="dateStruct" 
+         (ngModelChange)="onDateSelect($event)"
+         ngbDatepicker 
+         #dp="ngbDatepicker"
+         container="body"
+         (click)="dp.toggle()"
+         (focus)="onInputFocus($event)"
+         (keydown)="onKeyDown($event)"
+         (blur)="onInputBlur()"
+         (input)="onManualInput($event)"
+         autocomplete="off">
+</div>

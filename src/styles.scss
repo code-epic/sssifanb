@@ -93,6 +93,135 @@ $gradient-btn: linear-gradient(to right, #7a9e69, #547c9e);
   }
 }
 
+/* --- PATRONES GLOBALES DE BOTONES MODALES (ESTILO MATE) --- */
+$btn-modal-shadow: 0 3px 5px rgba(50, 50, 93, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+$btn-modal-shadow-hover: 0 7px 14px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+
+%btn-modal-base {
+  border: 0 !important;
+  transition: all 0.2s ease !important;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  
+  &:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: $btn-modal-shadow-hover !important;
+  }
+}
+
+.btn-cancel {
+  @extend %btn-modal-base;
+  background-color: rgba(108, 118, 127, 0.08) !important; 
+  color: #637381 !important; // Un tono más gris oscuro mate
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important; 
+
+  &:hover {
+    color: #454f5b !important; // Aún más oscuro al hover
+    background-color: rgba(99, 115, 129, 0.08) !important; 
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  }
+}
+
+.btn-ok {
+  @extend %btn-modal-base;
+  background: #598c89 !important; // Teal mate sólido
+  color: white !important;
+  box-shadow: $btn-modal-shadow !important;
+  padding-left: 2.5rem !important;
+  padding-right: 2.5rem !important;
+
+  &:hover {
+    background: #4a7775 !important; // Oscurece
+    color: white !important;
+  }
+}
+
+.btn-warn {
+  @extend %btn-modal-base;
+  background: #eb9a44 !important; // Naranja/Amarillo mate
+  color: white !important;
+  box-shadow: $btn-modal-shadow !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+
+  &:hover {
+    background: #d88732 !important; 
+    color: white !important;
+  }
+}
+
+.btn-trash {
+  @extend %btn-modal-base;
+  background: #d95c5c !important; // Rojo mate
+  color: white !important;
+  box-shadow: $btn-modal-shadow !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+
+  &:hover {
+    background: #c24646 !important; 
+    color: white !important;
+  }
+}
+
+/* --- ICONOS CIRCULARES PASTEL (TIPO BARRA DE ACCIÓN) --- */
+.btn-pastel-icon {
+    width: 32px; height: 32px;
+    padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    border: none;
+    transition: all 0.2s ease;
+    box-shadow: none !important;
+    
+    &.pastel-primary {
+        background: #e3f2fd; color: #1e88e5;
+        &:hover { background: #bbdefb; transform: scale(1.05); }
+    }
+    
+    &.pastel-warning {
+        background: #fff3e0; color: #fb8c00;
+        &:hover { background: #ffe0b2; transform: scale(1.05); }
+    }
+    
+    &.pastel-success {
+        background: #e8f5e9; color: #679f6a;
+        &:hover { background: #c8e6c9; transform: scale(1.05); }
+    }
+    
+    &.pastel-danger {
+        background: #feebee; color: #e53935;
+        &:hover { background: #ffcdd2; transform: scale(1.05); }
+    }
+    
+    &.active {
+        background: #598c89; color: white;
+        &:hover { background: #4a7775; }
+    }
+    
+    i { font-size: 0.85rem; }
+}
+
+.btn-pastel-back {
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: transparent;
+    color: #90a4ae;
+    border: 1px solid #cfd8dc;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease;
+    
+    &:hover { 
+        background: #eceff1; 
+        color: #546e7a;
+        transform: translateY(-1px);
+    }
+    
+    i { font-size: 0.8rem; margin-right: 0.3rem; }
+}
+
 .custom-input-group {
     border-radius: 6px; // Radio consistente con botón
     background: white; 

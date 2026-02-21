@@ -78,6 +78,7 @@
                      <div class="modern-form-group">
                         <label>Nacionalidad</label>
                         <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-flag"></i></span></div>
                             <select class="form-control" formControlName="nacionalidad">
                                 <option value="V">V</option>
                                 <option value="E">E</option>
@@ -100,6 +101,7 @@
                     <div class="modern-form-group">
                         <label>Condición</label>
                         <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-medkit"></i></span></div>
                             <select class="form-control" formControlName="situacion">
                                 <option [value]="1">Sano</option>
                                 <option [value]="0">Especial</option>
@@ -147,6 +149,7 @@
                      <div class="modern-form-group">
                         <label>Edad</label>
                         <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-birthday-cake"></i></span></div>
                             <input type="text" class="form-control text-center font-weight-bold" formControlName="edad" readonly>
                         </div>
                      </div>
@@ -155,6 +158,7 @@
                      <div class="modern-form-group">
                         <label>Sexo</label>
                         <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-venus-mars"></i></span></div>
                             <select class="form-control" formControlName="sexo">
                                 <option value="M">Masculino</option>
                                 <option value="F">Femenino</option>
@@ -166,6 +170,7 @@
                      <div class="modern-form-group">
                         <label>Estado Civil</label>
                         <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-heart"></i></span></div>
                             <select class="form-control" formControlName="edocivil">
                                 <option value="S">Soltero(a)</option>
                                 <option value="C">Casado(a)</option>
@@ -205,6 +210,7 @@
                                 <div class="modern-form-group">
                                     <label>Estado</label>
                                     <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-map"></i></span></div>
                                         <select class="form-control" formControlName="estado">
                                             <option value="">Seleccione</option>
                                             <option value="VE-A">Distrito Capital</option>
@@ -222,6 +228,7 @@
                                 <div class="modern-form-group">
                                     <label>Ciudad</label>
                                      <div class="input-group">
+                                         <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-city"></i></span></div>
                                          <input type="text" class="form-control" formControlName="ciudad">
                                      </div>
                                 </div>
@@ -230,6 +237,7 @@
                                 <div class="modern-form-group">
                                     <label>Municipio</label>
                                     <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-building"></i></span></div>
                                         <input type="text" class="form-control" formControlName="municipio">
                                     </div>
                                 </div>
@@ -314,8 +322,6 @@
 </div>
 
 <div class="modal-footer pt-3 pb-3 bg-secondary border-0 rounded-bottom">
-  <button type="button" class="btn btn-outline-secondary border-0 text-muted shadow-sm hover-translate-y" (click)="close()">Cancelar</button>
-  <button type="button" class="btn btn-primary bg-gradient-teal border-0 shadow-lg px-5 hover-translate-y" (click)="save()">
-      <i class="fas fa-save mr-2"></i>Guardar Cambios
-  </button>
+  <button type="button" class="btn btn-cancel" (click)="close()">Cancelar</button>
+  <button type="button" class="btn btn-ok" (click)="save()">Guardar Cambios</button>
 </div>

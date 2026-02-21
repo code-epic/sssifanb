@@ -145,12 +145,13 @@ export class LoginComponent implements OnInit {
                     if (tk.Usuario.token !== undefined && tk.Usuario.token !== null) {
                         this.showTotpSection = true;
                         this.tempAuthToken = this.itk.token;
+                        // Apagar el velo de verificación para dejar escribir el TOTP
+                        this.verifying = false;
                     } else {
+                        // Si va directo, lo mantenemos encendido para que no parpadee al redirigir
                         this.loginService.IniciarSesion(this.itk.token);
                     }
-                    // this.ngxService.stopLoader("loader-login");
-                    // this.verifying = false; // Close loader
-                }, 3000); // 2 seconds for animation
+                }, 2000);
             },
             (e) => {
                 console.log("Error al iniciar sesion desde GDoc")

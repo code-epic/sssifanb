@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common'; // Importante para *ngIf
 import { Router, RouterOutlet } from '@angular/router';
 import { trigger, style, transition, animate } from '@angular/animations';
-import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 import { MessageService } from 'src/app/core/services/message/message.service';
@@ -10,13 +9,14 @@ import { MessageService } from 'src/app/core/services/message/message.service';
 import { GlassCardComponent } from '../../../shared/components/glass-card/glass-card.component';
 
 import { LayoutService, IHeaderConfig } from 'src/app/core/services/layout/layout.service';
+import { AfiliadoService } from 'src/app/core/services/afiliacion/afiliado.service';
 
 @Component({
   selector: 'app-admin-layout',
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
   standalone: true,
-  imports: [CommonModule, SidebarComponent, NavbarComponent, RouterOutlet, FooterComponent, GlassCardComponent],
+  imports: [CommonModule, SidebarComponent, NavbarComponent, RouterOutlet, GlassCardComponent],
   animations: [
     trigger('slideFade', [
       transition(':enter', [
@@ -89,7 +89,8 @@ export class AdminLayoutComponent implements OnInit {
     private msj: MessageService,
     private layoutService: LayoutService,
     private cdr: ChangeDetectorRef,
-    private location: Location
+    private location: Location,
+    private afiliadoService: AfiliadoService
   ) { }
 
   ngOnInit() {
@@ -113,6 +114,29 @@ export class AdminLayoutComponent implements OnInit {
       this.cdr.detectChanges();
     });
 
+    // Suscribirse al evento global de forzar scroll top
+    this.layoutService.scrollToTop$.subscribe(() => {
+      this.doNativeScrollToTop();
+    });
+  }
+
+  doNativeScrollToTop() {
+    // Intento 1: Componente Main Context (Argon Wrapper)
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+      mainContent.scrollTop = 0;
+    }
+    // Intento 2: Tarjeta central contenedora (Si tiene overflow)
+    const cardBody = document.querySelector('.card-body');
+    if (cardBody) {
+      cardBody.scrollTo({ top: 0, behavior: 'smooth' });
+      cardBody.scrollTop = 0;
+    }
+    // Intento 3: Scroll Nativo Global
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }
 
   IrA(url: string) {
@@ -127,6 +151,8 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   goBack() {
+    this.afiliadoService.clearAfiliado(); // 1. Restablecer el logo del sidebar
+    this.layoutService.triggerScrollToTop(); // 2. Despachar el evento de scroll global al contenedor
     this.location.back();
   }
 

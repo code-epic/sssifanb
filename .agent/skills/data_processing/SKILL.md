@@ -1,23 +1,13 @@
 ---
-name: Data Processing & Optimization
-description: Techniques for handling massive file loads and streaming data efficiently.
+name: Processamiento y Optimización de Datos
+description: Técnicas para grandes archivos y flujos streaming.
 ---
 
-# Data Processing & Optimization
+# Procesamiento de Datos
 
-## Massive File Loads
-
-1.  **Chunking**: When uploading large files, implement chunked uploads to avoid browser freezing and server timeouts.
-2.  **Web Workers**: Use Web Workers for parsing or processing large datasets (e.g., CSV/JSON parsing) off the main thread to keep the UI responsive.
-3.  **Validation**: Validate file types and sizes _before_ the upload process begins.
-
-## Streaming Data
-
-1.  **Backpressure**: Handle streams efficiently by respecting backpressure; do not overwhelm the UI with more data than it can render.
-2.  **Virtual Scrolling**: If displaying large lists from a stream, use Virtual Scrolling (e.g., Angular CDK Virtual Scroll) to render only visible items.
-3.  **Observables**: Use RxJS operators (`throttleTime`, `debounceTime`, `buffer`) to control the flow of incoming stream data.
-
-## Memory Management
-
-- Explicitly unsubscribe from data streams when components are destroyed (`ngOnDestroy` or `takeUntilDestroyed`).
-- Avoid large in-memory objects; process data in streams or chunks where possible.
+- **Cargas Masivas (Archivos)**: Implementa "Chunking" (cargas por trozos) para evitar cuelgues del navegador. Valida formato/tamaño localmente antes de subir. Utiliza `Web Workers` si se parsean JSON/CSV inmensos.
+- **Flujos (Streaming)**:
+  - Respeta el `Backpressure` (contrapresión): no ahogues la UI con más datos de los que puede dibujar.
+  - Usa `Virtual Scrolling` (ej. Angular CDK) para renderizar únicamente lo visible.
+  - Regula con operadores RxJS (`throttleTime`, `debounceTime`).
+- **Gestión de Cierre**: Purga observables y limpiezas al destruir componentes (`ngOnDestroy` / `takeUntilDestroyed`). No mantengas macro-objetos en memoria persistente.

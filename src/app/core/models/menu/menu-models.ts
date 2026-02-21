@@ -3,6 +3,7 @@ export interface RouteInfo {
     title: string;
     icon: string;
     class: string;
+    SubMenu?: any[];
 }
 
 

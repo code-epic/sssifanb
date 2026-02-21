@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 export interface IHeaderConfig {
     title: string;
@@ -28,7 +28,17 @@ export class LayoutService {
     });
     headerConfig$ = this.headerConfigSubject.asObservable();
 
+    private scrollToTopSubject = new Subject<void>();
+    scrollToTop$ = this.scrollToTopSubject.asObservable();
+
     constructor() { }
+
+    /**
+     * Dispara un evento global para que el Layout Maestro suba el scroll al inicio absoluto
+     */
+    triggerScrollToTop() {
+        this.scrollToTopSubject.next();
+    }
 
     /**
      * Permite activar o desactivar la visibilidad de las tarjetas del admin layout

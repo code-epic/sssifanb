@@ -7,6 +7,7 @@ import { ReportesComponent } from './reportes/reportes.component';
 import { ConfiguracionComponent } from './configuracion/configuracion.component';
 import { TimComponent } from './tim/tim.component';
 import { AfiUsuarioComponent } from './afi-usuario/afi-usuario.component';
+import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-datepicker/pastel-datepicker.component';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { AfiUsuarioComponent } from './afi-usuario/afi-usuario.component';
         CommonModule,
         AfiliacionRoutingModule,
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        PastelDatepickerComponent
     ]
 })
 export class AfiliacionModule { }

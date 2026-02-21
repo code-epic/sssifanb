@@ -6,9 +6,13 @@
             <!-- SECCIÓN 1: PERSONAL -->
             <div class="card shadow-none border-0 mb-4 bg-transparent">
                 <div class="row">
-                    <div class="col-lg-9 pr-lg-5">
-                        <h6 class="section-title"><i class="fas fa-user-circle"></i>Información Personal</h6>
-                        
+                    <div class="col-lg-9 pr-lg-3">
+                        <div class="section-title-wrapper d-flex justify-content-between align-items-center">
+                            <h6 class="section-title mb-0"><i class="fas fa-user-circle"></i> Información Personal</h6>
+                            <div class="antiguedad-badge shadow-sm" *ngIf="tiempoServicio">
+                                <i class="fas fa-history"></i> Antigüedad: <span>{{ tiempoServicio }}</span>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="modern-form-group">
@@ -43,10 +47,7 @@
                             <div class="col-md-4">
                                 <div class="modern-form-group">
                                     <label>Fecha de Nacimiento</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-calendar-alt"></i></span></div>
-                                        <input type="date" class="form-control" formControlName="fechanacimiento">
-                                    </div>
+                                    <app-pastel-datepicker formControlName="fechanacimiento" iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -78,12 +79,91 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- NUEVA FILA: Hijos, Tiempo Reconocido, Profesionalización -->
+                        <div class="row">
+                            <!-- Cantidad de Hijos -->
+                            <div class="col-md-3">
+                                <div class="modern-form-group">
+                                    <label>Cantidad de Hijos</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-child"></i></span></div>
+                                        <input type="number" class="form-control" placeholder="0" [formControl]="$any(identificacionForm.get('numerohijos'))">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Años, Meses, Días Reconocidos -->
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label>Tiempo Reconocido (A / M / D)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-history"></i></span></div>
+                                        <!-- Años -->
+                                        <input type="number" class="form-control text-center px-1" placeholder="Años" title="Años" [formControl]="$any(identificacionForm.get('areconocido'))">
+                                        <div class="input-group-prepend input-group-append"><span class="input-group-text border-left px-2">A</span></div>
+                                        <!-- Meses -->
+                                        <input type="number" class="form-control text-center px-1 border-left" placeholder="Mes" title="Meses" [formControl]="$any(identificacionForm.get('mreconocido'))">
+                                        <div class="input-group-prepend input-group-append"><span class="input-group-text border-left px-2">M</span></div>
+                                        <!-- Días -->
+                                        <input type="number" class="form-control text-center px-1 border-left" placeholder="Día" title="Días" [formControl]="$any(identificacionForm.get('dreconocido'))">
+                                        <div class="input-group-append"><span class="input-group-text border-left px-2">D</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Porcentaje de Profesionalización -->
+                            <div class="col-md-3">
+                                <div class="modern-form-group">
+                                    <label>Profesionalización</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-graduation-cap"></i></span></div>
+                                        <input type="number" class="form-control" placeholder="0.00" [formControl]="$any(identificacionForm.get('pprof'))">
+                                        <div class="input-group-append"><span class="input-group-text">%</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="col-lg-3">
-                        <div class="avatar-container text-center">
-                            <img src="assets/img/theme/team-4-800x800.jpg" class="rounded-circle shadow mb-3" style="width: 140px; height: 140px; object-fit: cover;">
-                            <button type="button" class="btn btn-sm btn-block btn-outline-success"><i class="fas fa-camera mr-2"></i>Cambiar Foto</button>
+                    <div class="col-lg-3 d-flex flex-column align-items-center justify-content-start">
+                        <!-- Contenedor Foto Pasaporte con tamaño ajustado -->
+                        <div class="avatar-container position-relative shadow-sm mt-2" 
+                             style="border-radius: 8px; width: 100%; max-width: 215px; aspect-ratio: 3/4; background-color: #f8f9fe; margin: 0 auto; box-sizing: border-box;">
+
+                            <!-- Foto Transicionable (object-fit: contain) -->
+                            <img [src]="getFotoUrl()" class="w-100 h-100" id="fotoPrincipal"
+                                 style="object-fit: contain; position: absolute; top: 0; left: 0; z-index: 1; border-radius: 8px; transition: transform 0.3s;">
+                            
+                            <!-- Overlay Clickeable PREMIUM para Modal de Doble Clic -->
+                            <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center" 
+                                 style="top: 0; left: 0; z-index: 3; cursor: pointer; transition: background 0.3s ease; border-radius: 8px;" 
+                                 onmouseover="this.style.background='rgba(255,255,255,0.15)'; document.getElementById('fotoPrincipal').style.transform='scale(1.04)'; this.querySelector('.zoom-hint').style.opacity='1'" 
+                                 onmouseout="this.style.background='transparent'; document.getElementById('fotoPrincipal').style.transform='scale(1)'; this.querySelector('.zoom-hint').style.opacity='0'"
+                                 (dblclick)="triggerModal.click()"
+                                 title="Doble clic para expandir al visualizador">
+                                 
+                                 <div class="zoom-hint d-flex align-items-center justify-content-center" style="opacity: 0; transition: opacity 0.3s ease;">
+                                     <i class="fas fa-search-plus text-white shadow-sm" style="font-size: 2.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></i>
+                                 </div>
+                            </div>
+                            
+                            <!-- Botón oculto real en DOM para garantizar disparo en Angular -->
+                            <button #triggerModal id="btnZoomModal" style="opacity: 0; position: absolute; z-index: -1;" data-toggle="modal" data-target="#modalZoomFoto"></button>
+                            
+                            <!-- Botón inferior circular y minimalista para evitar tapar -->
+                            <div class="position-absolute" style="top: 8px; right: 8px; z-index: 4;">
+                                <button type="button" class="btn btn-sm text-white shadow-sm d-flex align-items-center justify-content-center" 
+                                        style="background: rgba(89, 140, 137, 0.9); border: none; border-radius: 50%; width: 32px; height: 32px; padding: 0;" title="Actualizar Foto">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Grado centrado debajito del marco, fuera de la zona de recorte de la foto -->
+                        <div class="w-100 d-flex justify-content-center mt-3" style="z-index: 3;">
+                                <img *ngIf="getGradoBadgePath()" [src]="getGradoBadgePath()" alt="Grado" 
+                                     style="height: 55px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));" 
+                                     (error)="badgeImg.style.display='none'" #badgeImg>
                         </div>
                     </div>
                 </div>
@@ -98,6 +178,16 @@
             <li class="nav-item">
                 <a class="nav-link" [class.active]="currentTab === 'militar'" (click)="switchTab('militar')">
                     <i class="fas fa-id-badge"></i> Datos Militares
+                </a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link" [class.active]="currentTab === 'sueldo'" (click)="switchTab('sueldo')">
+                    <i class="fas fa-money-bill-wave"></i> Datos Sueldo
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="currentTab === 'antiguedad'" (click)="switchTab('antiguedad')">
+                    <i class="fas fa-piggy-bank"></i> Asignaciones
                 </a>
             </li>
             <li class="nav-item">
@@ -115,6 +205,7 @@
                     <i class="fas fa-ruler-combined"></i> Físicos
                 </a>
             </li>
+           
         </ul>
 
         <!-- Tab Content -->
@@ -123,8 +214,15 @@
                 
                 <!-- MILITAR (Root level fields) -->
                 <div *ngIf="currentTab === 'militar'" class="fade-in">
+                    <!-- Fila 1: Fecha Ingreso, Componente, Grado -->
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
+                            <div class="modern-form-group">
+                                <label>Fecha de Ingreso</label>
+                                <app-pastel-datepicker formControlName="fingreso" iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
                             <div class="modern-form-group">
                                 <label>Componente</label>
                                 <div class="input-group">
@@ -139,7 +237,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="modern-form-group">
                                 <label>Grado / Jerarquía</label>
                                 <div class="input-group">
@@ -149,6 +247,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Fila 2: Categoría, Clasificación, Situación -->
                      <div class="row">
                         <div class="col-md-4">
                             <div class="modern-form-group">
@@ -188,25 +288,296 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Fila 3: Último Ascenso, Retiro, Nro Resolución, Posición -->
                     <div class="row">
-                         <div class="col-md-6">
-                            <div class="modern-form-group">
-                                <label>Fecha de Ingreso</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-calendar-check"></i></span></div>
-                                    <input type="date" class="form-control" formControlName="fingreso">
-                                </div>
-                            </div>
-                         </div>
-                         <div class="col-md-6">
+                         <div class="col-md-3">
                              <div class="modern-form-group">
                                 <label>Fecha Último Ascenso</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-medal"></i></span></div>
-                                    <input type="date" class="form-control" formControlName="fascenso">
-                                </div>
+                                <app-pastel-datepicker formControlName="fascenso" iconClass="fas fa-medal"></app-pastel-datepicker>
                             </div>
                          </div>
+                         <div class="col-md-3">
+                             <div class="modern-form-group">
+                                <label>Fecha de Retiro</label>
+                                <app-pastel-datepicker formControlName="fretiro" iconClass="fas fa-sign-out-alt"></app-pastel-datepicker>
+                            </div>
+                         </div>
+                         <div class="col-md-3">
+                            <div class="modern-form-group">
+                                <label>Nro. Resolución</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-file-alt"></i></span></div>
+                                    <input type="text" class="form-control" placeholder="Ej: 00123" formControlName="nresuelto">
+                                </div>
+                            </div>
+                        </div>
+                         <div class="col-md-3">
+                            <div class="modern-form-group">
+                                <label>Posición en Escalafón</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-sort-numeric-down"></i></span></div>
+                                    <input type="number" class="form-control" placeholder="Posición" formControlName="posicion">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- TAB: DATOS DE SUELDO -->
+                <div *ngIf="currentTab === 'sueldo'" class="fade-in">
+                    
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-3">
+                            <h4 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
+                                Resumen Salarial
+                            </h4>
+                            <button class="btn-pastel-icon pastel-success shadow-sm" type="button" 
+                                    data-toggle="modal" data-target="#modalHistorialSueldo" title="Ver Historial">
+                                <i class="fas fa-history"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 20px;">
+                        <!-- Columna Ingresos Principales (Ledger Card) -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card shadow-sm border-0 h-100 ledger-card" style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-4 px-4" style="border-left: 4px solid #598c89 !important; border-bottom: 1px solid #f4f5f7 !important;">
+                                    <div>
+                                        <h6 class="text-uppercase font-weight-bold mb-1" style="color: #94a3b8; font-size: 0.75rem; letter-spacing: 1.2px;">Ingreso Principal</h6>
+                                        <h4 class="mb-0 font-weight-500" style="color: #64748b; font-size: 1.15rem;">Sueldo Integral</h4>
+                                    </div>
+                                    <h3 class="font-weight-500 mb-0" style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda }} 0.00</h3>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush">
+                                        <!-- Item -->
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-circle mr-3" style="background-color: rgba(89, 140, 137, 0.1); width: 36px; height: 36px;">
+                                                    <i class="fas fa-arrow-up" style="color: #598c89; font-size: 0.85rem;"></i>
+                                                </div>
+                                                <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Sueldo Base</span>
+                                            </div>
+                                            <span class="font-weight-600 tracking-tight" style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <!-- Item -->
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-circle mr-3" style="background-color: rgba(89, 140, 137, 0.1); width: 36px; height: 36px;">
+                                                    <i class="fas fa-chart-bar" style="color: #598c89; font-size: 0.85rem;"></i>
+                                                </div>
+                                                <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Sueldo Mensual</span>
+                                            </div>
+                                            <span class="font-weight-600 tracking-tight" style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <!-- List Divider -->
+                                        <li class="list-group-item text-muted font-weight-500 text-uppercase py-2 px-4" style="background-color: #f8f9fa; font-size: 0.75rem; letter-spacing: 0.5px;">
+                                            <i class="fas fa-layer-group mr-2 opacity-50"></i>Bonificaciones
+                                        </li>
+                                        <!-- Item -->
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-circle mr-3" style="background-color: rgba(64, 101, 98, 0.06); width: 36px; height: 36px;">
+                                                    <i class="fas fa-gift" style="color: #598c89; font-size: 0.85rem;"></i>
+                                                </div>
+                                                <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Bono Fin de Año</span>
+                                            </div>
+                                            <span class="font-weight-600 tracking-tight" style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <!-- Item -->
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-circle mr-3" style="background-color: rgba(251, 140, 0, 0.1); width: 36px; height: 36px;">
+                                                    <i class="fas fa-sun text-warning" style="font-size: 0.85rem;"></i>
+                                                </div>
+                                                <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Bono Vacacional</span>
+                                            </div>
+                                            <span class="font-weight-600 tracking-tight" style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna Primas -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card shadow-sm border-0 h-100 ledger-card" style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom d-flex align-items-center py-4 px-4" style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3" style="width: 38px; height: 38px; background-color: rgba(251, 140, 0, 0.08);">
+                                        <i class="fas fa-award text-warning" style="font-size: 1rem;"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Primas y Compensaciones</h5>
+                                        <small class="font-weight-500 text-uppercase" style="color: #94a3b8; font-size: 0.70rem; letter-spacing: 0.5px;">Ingresos Colaterales</small>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-items-center mb-0 ledger-table">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="font-weight-500 pl-4 border-top-0 py-3" style="font-size: 0.95rem;">Transporte</td>
+                                                    <td class="text-right pr-4 font-weight-600 border-top-0 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">Descendencia</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">Productividad</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">Estabilidad</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">Profesionalización</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                </tr>
+                                                <tr class="bg-light">
+                                                    <td class="font-weight-500 pl-4 py-3 text-muted" style="font-size: 0.95rem;"><i class="fas fa-clock mr-2 opacity-5 mt-1"></i>Años de Servicio</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3 text-muted" style="font-size: 1.05rem;">0</td>
+                                                </tr>
+                                                <tr class="bg-light">
+                                                    <td class="font-weight-500 pl-4 py-3 text-muted" style="font-size: 0.95rem;"><i class="fas fa-times-circle mr-2 opacity-5 mt-1"></i>No Ascenso</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3 text-muted" style="font-size: 1.05rem;">0</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: ASIGNACION DE ANTIGUEDAD -->
+                <div *ngIf="currentTab === 'antiguedad'" class="fade-in">
+
+                    <div class="row mb-4">
+                        <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-3">
+                            <h4 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
+                                Estado de Cuenta Fideicomiso
+                            </h4>
+                             <button class="btn-pastel-icon pastel-success shadow-sm" type="button" 
+                                    data-toggle="modal" data-target="#modalHistorialAntiguedad" title="Ver Historial de Movimientos">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Haberes -->
+                        <div class="col-lg-7 mb-4">
+                            <!-- Hero Banner: Saldo Disponible -->
+                            <div class="card shadow-sm border-0 mb-3 hero-banner-soft" style="border-radius: 12px; overflow: hidden; position: relative; border-left: 4px solid #598c89 !important;">
+                                <i class="fas fa-chart-line" style="position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.03;"></i>
+                                <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center">
+                                    <div style="z-index: 1;">
+                                        <h6 class="text-uppercase font-weight-500 mb-1" style="color: #94a3b8; font-size: 0.70rem; letter-spacing: 0.8px;">Saldo Disponible Total</h6>
+                                        <h3 class="mb-0 font-weight-600" style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda }} 0.00</h3>
+                                    </div>
+                                    <div class="icon-circle shadow-sm" style="width: 42px; height: 42px; background-color: rgba(89, 140, 137, 0.1); z-index: 1;">
+                                        <i class="fas fa-wallet" style="font-size: 1.1rem; color: #598c89;"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Ledger A. de Antigüedad -->
+                            <div class="card shadow-sm border-0 ledger-card" style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center" style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3" style="width: 34px; height: 34px; background-color: rgba(89, 140, 137, 0.1);"><i class="fas fa-coins" style="color: #598c89; font-size: 0.9rem;"></i></div>
+                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Haberes y Depósitos</h6>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Asignación de Antigüedad</span>
+                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Depositado en Banco</span>
+                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Capital en Banco</span>
+                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Fondo de Garantías</span>
+                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Diferencia A.A.</span>
+                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cargas y Egresos -->
+                        <div class="col-lg-5 mb-4">
+                            <!-- Retenciones Card -->
+                            <div class="card shadow-sm border-0 mb-4 ledger-card" style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center" style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3" style="width: 34px; height: 34px; background-color: rgba(244, 67, 54, 0.1);"><i class="fas fa-exclamation-triangle text-danger" style="font-size: 0.9rem;"></i></div>
+                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Cargos y Retenciones</h6>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="text-danger font-weight-500" style="font-size: 0.95rem;"><i class="fas fa-ban mr-2 opacity-75"></i>Embargo</span>
+                                            <span class="text-danger font-weight-600 tracking-tight" style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="text-warning font-weight-500 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;"><i class="fas fa-hand-holding-usd mr-2 opacity-75"></i>Anticipos Otorgados</span>
+                                            <span class="text-warning font-weight-600 tracking-tight" style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Intereses Card -->
+                            <div class="card shadow-sm border-0 ledger-card" style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center" style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3" style="width: 34px; height: 34px; background-color: rgba(251, 140, 0, 0.1);"><i class="fas fa-chart-pie text-warning" style="font-size: 0.9rem;"></i></div>
+                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Intereses Caídos</h6>
+                                </div>
+                                <div class="card-body p-0">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Calculados Anual</span>
+                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Cancelados a la Fecha</span>
+                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-4 border-light">
+                                            <span class="text-warning font-weight-500 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;"><i class="fas fa-balance-scale mr-2 opacity-75"></i>Deuda Restante</span>
+                                            <span class="text-warning font-weight-600 tracking-tight" style="font-size: 1.15rem;">{{ moneda }} 0.00</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metadata Footer Spanning Full Width -->
+                        <div class="col-12 mt-2 mb-4">
+                            <div class="card shadow-sm border-0 ledger-card" style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-body bg-white py-3 px-4 d-flex justify-content-around align-items-center font-weight-500" style="font-size: 0.85rem; color: #94a3b8;">
+                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Últ. Depósito: N/A</span>
+                                    <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: 0.00%</span>
+                                    <span><i class="fas fa-plus-circle mr-2 opacity-50"></i>Días Adicionales: 0</span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -356,10 +727,12 @@
                                  <div class="modern-form-group"><label>Color de Cabello</label>
                                     <div class="input-group"><select class="form-control" formControlName="colorcabello"><option value="">Seleccione...</option><option value="NEGRO">NEGRO</option><option value="CASTAÑO">CASTAÑO</option><option value="RUBIO">RUBIO</option><option value="ROJO">ROJO</option><option value="CANOSO">CANOSO</option></select></div>
                                 </div>
-                            </div>
+                             </div>
                          </div>
                      </div>
                 </div>
+
+
 
             </div>
         </div>
@@ -369,8 +742,8 @@
      <div class="card shadow-none bg-transparent border-0 mb-4">
          <div class="row">
              <div class="col text-right">
-                 <button type="submit" class="btn btn-success shadow-sm">
-                     <i class="fas fa-save mr-2"></i>Guardar Cambios
+                 <button type="submit" class="btn btn-ok">
+                     Guardar Cambios
                  </button>
              </div>
          </div>
@@ -383,7 +756,7 @@
             <h3 class="mb-0 text-dark font-weight-bold">
                 <i class="fas fa-users mr-2 text-verde-titulos"></i>Grupo Familiar
             </h3>
-             <button class="btn btn-sm btn-pastel-icon shadow-sm" style="background-color: rgba(89, 140, 137, 0.15); color: #598c89;" type="button" data-toggle="modal" data-target="#modalFamiliar">
+             <button class="btn-pastel-icon pastel-success shadow-sm" type="button" data-toggle="modal" data-target="#modalFamiliar" title="Agregar Familiar">
                  <i class="fas fa-plus"></i>
              </button>
         </div>
@@ -457,63 +830,182 @@
 
 
 <!-- MODAL FAMILIAR (Needs formGroup binding, keeping same flat form for modal) -->
-<div class="modal fade" id="modalFamiliar" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Registrar Familiar</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+<div class="modal fade" id="modalFamiliar" tabindex="-1" role="dialog" aria-hidden="true" style="background-color: rgba(50, 50, 93, 0.2);">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+      <div class="modal-header border-0 px-4 py-4" style="background-color: #f7fafc;">
+        <h5 class="modal-title font-weight-bold" style="color: #32325d;"><i class="fas fa-user-plus mr-2 text-success opacity-75"></i>Ficha del Familiar</h5>
+        <button class="btn-pastel-icon pastel-danger" type="button" data-dismiss="modal" aria-label="Close" title="Cerrar Ficha">
+            <i class="fas fa-times"></i>
+        </button>
       </div>
-      <div class="modal-body" [formGroup]="familiarForm">
+      <div class="modal-body p-4 bg-white" [formGroup]="familiarForm">
            <div class="row">
-               <div class="col-md-4">
-                    <div class="modern-form-group">
-                        <label>Cédula</label>
-                        <div class="input-group">
-                             <input type="text" class="form-control" placeholder="Cédula" formControlName="cedula">
+               
+               <!-- Columna Foto Institucional (Rectangular) -->
+               <div class="col-lg-3 d-flex flex-column align-items-center border-right pr-4">
+                    <div class="avatar-container position-relative overflow-hidden shadow-sm mb-4 w-100" style="border-radius: 8px; aspect-ratio: 3/4; max-width: 190px;">
+                        <img src="./assets/img/ipsfa/logo.webp " class="w-100 h-100" style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
+                        <div class="avatar-overlay d-flex align-items-end justify-content-center pb-4">
+                            <button type="button" class="btn btn-ok btn-sm rounded-pill px-4" style="backdrop-filter: blur(2px);">
+                                <i class="fas fa-camera mr-2"></i>Capturar
+                            </button>
                         </div>
                     </div>
-               </div>
-                <div class="col-md-4">
-                    <div class="modern-form-group">
-                        <label>Nombres y Apellidos</label>
-                        <div class="input-group">
-                             <input type="text" class="form-control" placeholder="Nombre completo" formControlName="nombres">
-                        </div>
+                    <div class="w-100 mb-3 modern-form-group">
+                        <label class="text-center w-100 d-block">Estatus Vital</label>
+                        <select class="form-control text-center font-weight-bold text-success" style="background-color: rgba(45, 206, 137, 0.05);">
+                            <option value="S">SOBREVIVIENTE</option>
+                            <option value="F">FALLECIDO</option>
+                        </select>
                     </div>
                </div>
-                <div class="col-md-4">
-                    <div class="modern-form-group">
-                        <label>Parentesco</label>
-                        <div class="input-group">
-                             <select class="form-control" formControlName="parentesco">
-                                 <option value="">Seleccione...</option>
-                                 <option value="HIJO">HIJO</option>
-                                 <option value="HIJA">HIJA</option>
-                                 <option value="ESPOSA">ESPOSA</option>
-                                 <option value="ESPOSO">ESPOSO</option>
-                                 <option value="MADRE">MADRE</option>
-                                 <option value="PADRE">PADRE</option>
-                             </select>
+
+               <!-- Columna Formulario de Datos -->
+               <div class="col-lg-9 pl-4">
+                    <h6 class="text-uppercase text-muted font-weight-bold mb-4" style="font-size: 0.8rem; letter-spacing: 1px; border-bottom: 1px solid #eceff1; padding-bottom: 0.5rem;">Información Básica</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Cédula</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-id-card"></i></span></div>
+                                    <input type="text" class="form-control font-weight-bold" placeholder="Cédula" formControlName="cedula">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="modern-form-group">
+                                <label>Nombres y Apellidos</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-edit"></i></span></div>
+                                    <input type="text" class="form-control font-weight-bold text-uppercase" placeholder="Nombre completo" formControlName="nombres">
+                                </div>
+                            </div>
                         </div>
                     </div>
-               </div>
-           </div>
-           <div class="row">
-               <div class="col-md-4">
-                    <div class="modern-form-group">
-                        <label>Fecha Nacimiento</label>
-                        <div class="input-group">
-                             <input type="date" class="form-control" formControlName="fecha_nacimiento">
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Parentesco</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-project-diagram"></i></span></div>
+                                    <select class="form-control font-weight-bold" formControlName="parentesco">
+                                        <option value="">Seleccione...</option>
+                                        <option value="HIJO">HIJO</option>
+                                        <option value="HIJA">HIJA</option>
+                                        <option value="ESPOSA">ESPOSA</option>
+                                        <option value="ESPOSO">ESPOSO</option>
+                                        <option value="MADRE">MADRE</option>
+                                        <option value="PADRE">PADRE</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Fecha Nacimiento</label>
+                                <app-pastel-datepicker formControlName="fecha_nacimiento" iconClass="far fa-calendar-alt"></app-pastel-datepicker>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Condición</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-wheelchair"></i></span></div>
+                                    <select class="form-control font-weight-bold text-danger">
+                                        <option value="N">NINGUNA</option>
+                                        <option value="E">ESPECIAL / MENTAL</option>
+                                        <option value="F">FÍSICA</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-               </div>
-           </div>
+                    
+               </div><!-- fin columna form -->
+               
+           </div><!-- fin row -->
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" (click)="guardarFamiliar()">Guardar</button>
+      <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-between">
+        <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-ok" (click)="guardarFamiliar()">Guardar Expediente</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ZOOM FOTO PRINCIPAL (ELEGANCIA LIGHTBOX) -->
+<div class="modal fade" id="modalZoomFoto" tabindex="-1" role="dialog" aria-hidden="true" style="background-color: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px);">
+  <div class="modal-dialog modal-dialog-centered modal-xl d-flex justify-content-center" role="document">
+    <div class="modal-content border-0 bg-transparent text-center" style="max-width: 900px; box-shadow: none;">
+        
+        <!-- Boton de cierre Premium -->
+        <button type="button" class="close text-white position-absolute" data-dismiss="modal" aria-label="Close" 
+                style="right: -10px; top: -30px; z-index: 10; font-size: 2.2rem; opacity: 0.7; transition: opacity 0.2s; outline: none; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"
+                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+            <i class="fas fa-times-circle"></i>
+        </button>
+        
+        <!-- Carrusel Fotográfico Visualizador -->
+        <div id="carouselFotoExpediente" class="carousel slide" data-ride="carousel" data-interval="false">
+            <div class="carousel-inner position-relative rounded-lg">
+                
+                <!-- Slide Activo (Foto Principal Estilo Polaroid) -->
+                <div class="carousel-item active d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+                    <div class="position-relative d-inline-block">
+                        <!-- Marco Fotográfico Blanco Clásico -->
+                        <div class="bg-white shadow-lg mx-auto" style="padding: 12px 12px 40px 12px; border-radius: 4px; border: 1px solid #e2e8f0; transform: rotate(-1deg);">
+                            <img [src]="getFotoUrl()" class="img-fluid" style="object-fit: contain; max-height: 65vh; max-width: 100%; border: 1px solid #cbd5e1;">
+                            
+                            <!-- El grado se acopla como una calcomanía institucional debajo -->
+                            <div class="position-absolute d-flex justify-content-center w-100" style="bottom: 12px; left: 0;">
+                                <img *ngIf="getGradoBadgePath()" [src]="getGradoBadgePath()" alt="Grado Zoom" 
+                                    style="height: 60px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));" 
+                                    (error)="badgeImgZoom.style.display='none'" #badgeImgZoom>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide Secundario: Documentos PDF/DNI Futuro -->
+                <div class="carousel-item d-flex justify-content-center align-items-center" style="min-height: 50vh;">
+                   <div class="position-relative d-inline-block">
+                       <div class="d-flex align-items-center justify-content-center flex-column shadow-lg" 
+                            style="min-height: 65vh; width: 45vh; max-width: 100%; background: linear-gradient(135deg, #1e293b, #0f172a); padding: 15px; border-radius: 6px; border: 1px solid #334155; transform: rotate(1deg);">
+                            
+                            <div class="d-flex flex-column align-items-center justify-content-center text-muted w-100 h-100" style="border: 2px dashed #475569; border-radius: 8px;">
+                                <i class="fas fa-file-image text-white mb-4" style="font-size: 4.5rem; opacity: 0.25;"></i>
+                                <span class="text-white font-weight-bold" style="opacity: 0.6; font-size: 1.2rem; letter-spacing: 1px;">DOCUMENTOS ANEXOS</span>
+                                <span class="text-white mt-2" style="opacity: 0.4; font-size: 0.9rem;">Área de Escaneos Fotográficos</span>
+                            </div>
+                       </div>
+                   </div>
+                </div>
+
+            </div>
+            
+            <!-- Controles Premium de Vidrio Esmaltado -->
+            <a class="carousel-control-prev" href="#carouselFotoExpediente" role="button" data-slide="prev" style="width: 15%; opacity: 1;">
+                <div class="d-flex justify-content-center align-items-center shadow-lg" 
+                     style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;" 
+                     onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                    <i class="fas fa-chevron-left text-white" style="font-size: 1.5rem; margin-right: 4px;"></i>
+                </div>
+                <span class="sr-only">Anterior</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselFotoExpediente" role="button" data-slide="next" style="width: 15%; opacity: 1;">
+                <div class="d-flex justify-content-center align-items-center shadow-lg" 
+                     style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;" 
+                     onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                    <i class="fas fa-chevron-right text-white" style="font-size: 1.5rem; margin-left: 4px;"></i>
+                </div>
+                <span class="sr-only">Siguiente</span>
+            </a>
+        </div>
+        
     </div>
   </div>
 </div>

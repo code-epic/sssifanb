@@ -22,25 +22,25 @@ $input-border: #e9ecef;
   }
 
   .input-group {
-    border-radius: 0.25rem;
-    transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
-    background-color: #ffffff; 
-    border: 1px solid $input-border;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    background-color: #f1f4f8; // Solid cooler background (kills the paleness)
+    border: 1px solid #e2e8f0; // Distinct structure
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.015); // Subtle inner depth
+    overflow: hidden;
 
     &:hover {
-      border-color: darken($input-border, 10%);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+      background-color: #e9ecef;
+      border-color: #cbd5e1;
     }
 
     &:focus-within {
-      border-color: rgba($teal-accent, 0.6); // Muted Teal border
-      box-shadow: 0 0 0 3px rgba($teal-accent, 0.15); // Muted Teal Glow
-      transform: translateY(-1px);
+      background-color: #ffffff;
+      border-color: rgba($teal-accent, 0.8);
+      box-shadow: 0 0 0 4px rgba($teal-accent, 0.15); // Stronger focus glow
 
       .input-group-text {
-        color: $teal-accent; // Muted Teal Icon
+        color: $teal-accent; 
       }
     }
   }
@@ -49,20 +49,32 @@ $input-border: #e9ecef;
     background: transparent;
     border: none;
     box-shadow: none;
-    height: 2.8rem;
+    height: 3rem; // Slightly taller, solid input
     padding-left: 0.75rem;
-    color: $text-dark;
-    font-weight: 400; // Lighter font in input
+    color: #1e293b; // Much darker text
+    font-weight: 500; // Stronger font weight
     font-size: 0.95rem;
 
     &::placeholder {
-      color: #b0bec5;
-      font-weight: 300;
+      color: #94a3b8; // Darker, substantial placeholder
+      font-weight: 400;
     }
 
     &:focus {
       background: transparent;
       box-shadow: none;
+    }
+    
+    // Esconder flechas (spinners) para type="number"
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      appearance: none; // Added for compatibility
+      margin: 0;
+    }
+    &[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
     }
   }
   
@@ -70,12 +82,11 @@ $input-border: #e9ecef;
   select.form-control {
     appearance: none;
     -webkit-appearance: none;
-    // Update arrow color to match if possible, or keep grey
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23598c89' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1em;
-    padding-right: 2rem !important; 
+    background-position: right 1rem center;
+    background-size: 1.2em;
+    padding-right: 2.5rem !important; 
   }
 
   // Icon Container
@@ -83,16 +94,16 @@ $input-border: #e9ecef;
   .input-group-append .input-group-text {
     background: transparent;
     border: none;
-    color: #ced4da;
+    color: #64748b; // Strong Slate icon, not pale grey
     padding-right: 0.25rem;
-    padding-left: 0.75rem;
+    padding-left: 1rem; // better spacing inwards
     transition: color 0.2s ease;
   }
   
   // Clean up append spacing
   .input-group-append .input-group-text {
       padding-left: 0.5rem;
-      padding-right: 0.75rem;
+      padding-right: 1rem;
   }
 }
 
@@ -146,6 +157,45 @@ $input-border: #e9ecef;
 }
 
 // --- SECTIONS & CARDS ---
+.section-title-wrapper {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 0.75rem;
+
+    .section-title {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+}
+
+.antiguedad-badge {
+    background-color: #f8f9fe;
+    border: 1px solid #eaecf5;
+    color: #8898aa;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px; // Bordes redondeados elegantes
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+
+    i {
+        margin-right: 6px;
+        font-size: 0.85rem;
+        color: $teal-accent; // Icono de reloj en el color primario
+    }
+
+    span {
+        font-weight: 700; 
+        margin-left: 4px;
+        color: $teal-accent; // El número de años destacado
+        letter-spacing: 0px;
+    }
+}
+
 .section-title {
     display: flex;
     align-items: center;
@@ -164,6 +214,7 @@ $input-border: #e9ecef;
         color: $teal-accent;
     }
 }
+
 
 .avatar-container {
     padding: 1rem;
@@ -244,6 +295,122 @@ $input-border: #e9ecef;
             
             i {
                  color: $teal-accent !important; 
+            }
+        }
+    }
+}
+
+// --- ACCOUNTING LEDGER STYLES ---
+.icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.ui-bg-pastel-green { background-color: rgba(45, 206, 137, 0.12); }
+.ui-bg-pastel-blue { background-color: rgba(17, 205, 239, 0.12); }
+.ui-bg-pastel-red { background-color: rgba(245, 54, 92, 0.12); }
+.ui-bg-pastel-orange { background-color: rgba(251, 99, 64, 0.12); }
+
+.ledger-card { 
+    border: 1px solid rgba(0,0,0,0.04) !important; 
+    box-shadow: 0 8px 15px rgba(0,0,0,0.02) !important; 
+    
+    .card-header {
+        background-color: #fcfcfd !important;
+    }
+
+    .list-group-item { 
+        background-color: transparent; 
+        border-color: rgba(0,0,0,0.03) !important;
+        font-size: 0.95rem;
+
+        // Better gray uniform
+        .text-muted { color: #8898aa !important; }
+        .text-dark { color: #32325d !important; }
+    }
+}
+
+.ledger-table {
+    td {
+        color: #525f7f !important;
+        font-size: 0.95rem;
+        border-top: 1px solid rgba(0,0,0,0.03) !important; 
+        padding-top: 0.8rem !important;
+        padding-bottom: 0.8rem !important;
+    }
+    
+    tr:hover td { background-color: rgba(89, 140, 137, 0.03) !important; }
+
+    .bg-light td {
+        background-color: #fcfcfd !important;
+        color: #8898aa !important;
+    }
+    .text-dark { color: #32325d !important; }
+}
+
+.hero-banner-soft {
+    background: linear-gradient(to right, #f4f5f7 0%, #ffffff 100%) !important;
+    border: 1px solid rgba(0,0,0,0.04) !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
+    color: #32325d !important;
+
+    // Sutil watermark in the background
+    i { 
+        color: rgba(89, 140, 137, 0.05) !important; 
+    }
+    
+    h6 { color: #8898aa !important; }
+    h2 { 
+        color: #598c89 !important; // institutional teal instead of neon
+        text-shadow: none !important; 
+    }
+    
+    .icon-circle {
+        background-color: rgba(89, 140, 137, 0.1) !important;
+        i { color: #598c89 !important; opacity: 1 !important; font-size: 1.5rem !important; }
+    }
+}
+
+// --- PROFILE AVATAR HOVER STYLES ---
+.avatar-container {
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    width: 100%;
+    
+    img {
+        transition: transform 0.5s ease;
+    }
+    
+    .avatar-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 2;
+        
+        button {
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+    }
+
+    &:hover {
+        img {
+            transform: scale(1.03);
+        }
+        .avatar-overlay {
+            opacity: 1;
+            
+            button {
+                transform: translateY(0);
             }
         }
     }

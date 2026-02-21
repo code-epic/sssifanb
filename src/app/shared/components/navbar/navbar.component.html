@@ -15,7 +15,7 @@
         </div>
       </li>
 
-      <li class="nav-item" ngbDropdown placement="bottom-right">
+      <li class="nav-item" ngbDropdown placement="bottom-right" >
         <a class="nav-link pr-0" role="button" ngbDropdownToggle>
           <div class="media align-items-center">
             <span class="avatar avatar-sm">
@@ -51,12 +51,12 @@
 
 <ng-template #ChangePassword let-modal>
   <form [formGroup]="changePasswordForm" (ngSubmit)="ChangesPassword()">
-    <div class="modal-header bg-pastel-gradient">
-      <h3 class="modal-title text-white font-weight-bolder" id="myModalLabel160">
-        <i class="ni ni-key-25 mr-2"></i>Seguridad: Cambiar Clave
-      </h3>
-      <button type="button" class="close" (click)="modal.dismiss('Cross click')" aria-label="Close">
-        <span aria-hidden="true" class="text-white">&times;</span>
+    <div class="modal-header border-bottom py-3 px-4" style="background-color: #f8fafc; border-color: #f1f5f9 !important;">
+      <h5 class="modal-title font-weight-600 mb-0" id="myModalLabel160" style="color: #475569; font-size: 1.1rem; letter-spacing: 0.5px;">
+        <i class="ni ni-key-25 mr-2" style="color: #94a3b8;"></i>Seguridad: Cambiar Clave
+      </h5>
+      <button type="button" class="close" (click)="modal.dismiss('Cross click')" aria-label="Close" style="padding: 1rem 1.5rem; margin: -1rem -1.5rem -1rem auto; outline: none;">
+        <span aria-hidden="true" style="color: #94a3b8; font-weight: 300; font-size: 1.5rem;">&times;</span>
       </button>
     </div>
     <div class="modal-body" tabindex="0" ngbAutofocus>
@@ -70,7 +70,7 @@
 
 
       <div class="form-group">
-        <label class="form-label font-weight-bold text-muted">Contraseña Actual</label>
+        <!-- <label class="form-label font-weight-bold text-muted">Contraseña Actual</label> -->
         <div class="input-group input-group-merge custom-input-group">
           <div class="input-group-prepend">
             <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
@@ -87,7 +87,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label font-weight-bold text-muted">Nueva Contraseña</label>
+        <!-- <label class="form-label font-weight-bold text-muted">Nueva Contraseña</label> -->
         <div class="input-group input-group-merge custom-input-group">
           <div class="input-group-prepend">
             <span class="input-group-text"><i class="ni ni-key-25"></i></span>
@@ -123,7 +123,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label font-weight-bold text-muted">Repetir Contraseña</label>
+        <!-- <label class="form-label font-weight-bold text-muted">Repetir Contraseña</label> -->
         <div class="input-group input-group-merge custom-input-group">
           <div class="input-group-prepend">
             <span class="input-group-text"><i class="ni ni-key-25"></i></span>
@@ -152,8 +152,11 @@
           <h6 class="m-0 font-weight-bolder text-dark">Autenticación de Dos Factores (TOTP)</h6>
         </div>
         <div class="custom-control custom-switch">
-          <input type="checkbox" class="custom-control-input" id="totp-switch" (change)="toggleTotp($event)"
-            [checked]="isTotpActive" />
+          <input type="checkbox" class="custom-control-input" id="totp-switch" 
+            name="totpSwitch"
+            [(ngModel)]="isTotpActive" 
+            [ngModelOptions]="{standalone: true}"
+            (ngModelChange)="toggleTotpModel($event)" />
           <label class="custom-control-label" for="totp-switch"></label>
         </div>
       </div>
@@ -194,11 +197,11 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-pastel-save" (click)="ChangesPassword()"
+      <button type="button" class="btn btn-ok" (click)="ChangesPassword()"
         [disabled]="changePasswordForm.invalid || passwordStrengthWidth < 80">
         <i class="fa fa-save mr-2"></i> Cambiar Clave
       </button>
-      <button type="button" class="btn btn-outline-secondary" (click)="modal.close('Accept click')">
+      <button type="button" class="btn btn-cancel" (click)="modal.close('Accept click')">
         <i class="fa fa-times mr-2"></i> Cancelar
       </button>
     </div>

@@ -1,24 +1,13 @@
 ---
-name: Angular Best Practices
-description: Guidelines and standards for Angular development in this project
+name: Mejores Prácticas de Angular
+description: Directrices optimizadas para el desarrollo de Angular.
 ---
 
-# Angular Development Standards
+# Estándares de Angular
 
-## Component Architecture
-
-- **Standalone Components**: This project uses Angular Standalone Components. avoid `NgModules` unless absolutely necessary for legacy integrations.
-- **Change Detection**: Prefer `ChangeDetectionStrategy.OnPush` for performance optimization where possible.
-- **Inputs/Outputs**: Use `input()` and `output()` signals where possible (Angular 17+), or standard `@Input()`/`@Output()` with strict typing.
-
-## Coding Style
-
-- **Strict Typing**: Avoid `any`. Define interfaces in `core/models` or `feature/models`.
-- **Services**: Inject services using `inject()` function or constructor injection. Use `providedIn: 'root'` for singleton services.
-- **RxJS**: Manage subscriptions carefully. Use `AsyncPipe` in templates or `takeUntilDestroyed` operator.
-
-## Directory Structure
-
-- Place new features in `src/app/feature/pages/`.
-- Reusable UI specific to a feature stays in that feature folder.
-- Truly global shared components go in `src/app/shared/`.
+- **Componentes**: Usa `Standalone Components` (sin NgModules explícitos).
+- **Rendimiento**: Emplea `ChangeDetectionStrategy.OnPush`.
+- **Inyección**: Prioriza la función `inject()` sobre constructores. Usa `providedIn: 'root'` para singletons.
+- **Tipado**: Prohibido usar `any`. Usa Interfaces (`PascalCase`). Emplea Señales (`input()`, `output()`) para I/O.
+- **RxJS**: No dejes observables abiertos. Usa `AsyncPipe` en HTML o limpia con `takeUntilDestroyed()`.
+- **Estructura**: `feature/pages` para vistas y `shared/` para componentes/botones genéricos altamente reusables.

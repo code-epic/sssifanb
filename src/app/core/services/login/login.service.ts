@@ -274,6 +274,7 @@ export class LoginService {
 
   public cargarMenu() {
     const menu = this.obtenerMenu();
+    console.log(menu);
     if (menu) {
       // Limpiamos ROUTES antes de llenarlo para evitar duplicados en recargas
       ROUTES.splice(0, ROUTES.length);
@@ -282,7 +283,8 @@ export class LoginService {
           path: e.url,
           title: e.nombre,
           icon: e.icono,
-          class: e.clase
+          class: e.clase,
+          SubMenu: e.SubMenu || []
         });
       });
     }

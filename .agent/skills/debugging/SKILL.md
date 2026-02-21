@@ -1,30 +1,12 @@
 ---
-name: Debugging & Running
-description: How to run, debug, and test the application
+name: Ejecución y Debugging
+description: Uso de CLI, flags y testing.
 ---
 
-# Debugging and Running
+# Comandos de Arranque y Control Local
 
-## Running the Application
-
-- **Development Server**: Run `npm start`.
-  - This runs `ng serve` with a proxy configuration (`src/proxy.conf.json`).
-  - Host: `0.0.0.0` (accessible from network).
-  - Port: `4202`.
-  - Disable production mode.
-- **Alternative Start**: `npm run start2` (similar but maybe different flags/env).
-
-## Proxy Configuration
-
-- The app uses `src/proxy.conf.json` to forward API requests to the backend.
-- Essential for avoiding CORS issues during development.
-- Check this file if API calls fail with 404 or CORS errors locally.
-
-## Testing
-
-- **Unit Tests**: `npm test` (Runs `ng test` / Karma).
-- **E2E Tests**: `npm run e2e` (Protractor).
-
-## Linting
-
-- Run `npm run lint` to check for code style issues.
+- **Levantar Entorno**: `npm start` levanta `ng serve` en `0.0.0.0` puerto `4202`. Inyecta indirectamente desarrollo modo Dev. (Opcional experimental: `npm run start2`).
+- **Proxy de Enrutación (CORS)**: El fichero central vital `src/proxy.conf.json` burla y re-encamina las llamadas de la API local evadiendo CORS de navegador. Modifícalo si ves bloqueos de red 404/CORS.
+- **Validaciones**:
+  - Testing Unitario con Karma: `npm test`
+  - Chequeo de Prácticas/Código (Lint): `npm run lint`

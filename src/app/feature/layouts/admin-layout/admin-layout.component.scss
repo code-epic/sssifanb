@@ -4,11 +4,25 @@ $bg-card: #ffffff;
 $text-primary: #37474f;
 $text-secondary: #78909c;
 $accent-teal: #598c89;
-$shadow-soft: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
 $border-radius: 12px;
+$shadow-soft: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+// Árbol Flexbox Maestro para congelar la pantalla general
+.main-content {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: #e4e8ec; 
+}
 
-// Override del gradiente agresivo del header
+app-navbar {
+    position: relative;
+    z-index: 1050; // Supremacía del Z-Index sobre toda la vista
+    display: block; // Asegurar comportamiento de bloque
+}
+
 .header.bg-gradient-info {
+    flex-shrink: 0; // Garantiza que no se colapse su propio alto
     background: linear-gradient(180deg, $accent-teal 0%, #41706b 100%) !important;
     padding-bottom: 6rem !important; // Ajuste para solapamiento
 }
@@ -47,13 +61,12 @@ $border-radius: 12px;
         border-radius: 50%;
         font-size: 1.25rem;
         
-        // Colores planos y elegantes en lugar de clases bootstrap default
+        // Colores planos y elegantes
         &.bg-info { background-color: #e0f7fa !important; color: #00bcd4 !important; }
         &.bg-success { background-color: #e8f5e9 !important; color: #66bb6a !important; }
         &.bg-warning { background-color: #fff8e1 !important; color: #ffa726 !important; }
         &.bg-purple { background-color: #f3e5f5 !important; color: #ab47bc !important; }
         
-        // Quitar sombras fuertes del icono
         box-shadow: none !important;
     }
     
@@ -64,35 +77,76 @@ $border-radius: 12px;
     }
 }
 
-// Contenedor principal superpuesto
+// Contenedor principal superpuesto convertido en pipeline elástico
 .container-fluid.mt--7 {
-    margin-top: -5rem !important; // Subir contenido sobre el header
+    margin-top: -5rem !important;
+    flex: 1; // Toma todo el espacio sobrante debajo del header
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Rompe el bloqueo de altura intrínseca
+    padding-bottom: 1.5rem;
+    
+    .row {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        margin-bottom: 0;
+        
+        .col-xl-12 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+    }
 }
 
-// Tarjeta Principal de Contenido (Router Outlet)
+// Tarjeta Principal de Contenido
 .card.shadow {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Vital para desatar el estiramiento interno de sus hijos
+
     border: none;
     border-radius: $border-radius;
     box-shadow: $shadow-soft !important;
     background-color: white;
-    min-height: 80vh; // Altura mínima consistente
 
     .card-header {
-        background-color: transparent;
+        flex-shrink: 0; // Mantiene el anclaje perfecto y perpetuo sin usar 'sticky'
+        background-color: white; 
         border-bottom: 1px solid #eceff1;
-        padding: 0.75rem 1.5rem; // Padding reducido
+        padding: 0.75rem 1.5rem;
         display: flex;
         align-items: center;
         min-height: 50px;
+        border-radius: $border-radius $border-radius 0 0;
+        
+        // Sombra muuy delicada
+        box-shadow: 0 4px 15px -5px rgba(50, 50, 93, 0.08); 
+        z-index: 10;
         
         h6 {
             color: $text-secondary;
             letter-spacing: 1px;
+            margin: 0;
         }
     }
 
     .card-body {
+        flex: 1; // Toma todo el relleno restante de la tarjeta
+        overflow-y: auto; // ¡El único scroll de toda la pantalla!
+        overflow-x: hidden;
+        min-height: 0;
         padding: 2rem;
+        
+        /* Custom Scrollbar Elegante */
+        &::-webkit-scrollbar { width: 8px; }
+        &::-webkit-scrollbar-track { background: transparent; }
+        &::-webkit-scrollbar-thumb { background: rgba(89, 140, 137, 0.2); border-radius: 10px; }
+        &::-webkit-scrollbar-thumb:hover { background: rgba(89, 140, 137, 0.4); }
     }
 }
 

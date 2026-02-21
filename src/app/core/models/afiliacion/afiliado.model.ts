@@ -216,6 +216,56 @@ export interface IPension {
     medidajudicial: any[];
     descuentos: any[];
 }
+export interface IDatosSueldo {
+    sueldo_base: number;
+    sueldo_global: number;
+    sueldo_integral: number;
+    bono_fin_ano: number;
+    bono_vacacional: number;
+}
+
+export interface IPrimas {
+    transporte: number;
+    descendencia: number;
+    especial: number;
+    tiempo_servicio: number;
+    no_ascenso: number;
+    profesionalizacion: number;
+    compensacion_especial: number;
+}
+
+export interface IAsignacionAntiguedad {
+    asignacion_antiguedad: number;
+    capital_banco: number;
+    garantias: number;
+    dias_adicionales: number;
+    total_aportados: number;
+    asignacion_depositada: number;
+    saldo_disponible: number;
+    diferencia_AA: number;
+    fecha_ultimo_deposito: string;
+    porcentaje_cancelado: number;
+    embargos: number;
+    anticipos: number;
+    fecha_ultimo_anticipo: string;
+    comision_servicio: number;
+    monto_recuperado: number;
+}
+
+export interface IInteresesCaidos {
+    total_calculados: number;
+    total_cancelados: number;
+    total_adeudado: number;
+    fecha_ultimo_deposito: string;
+    embargo: number;
+}
+
+export interface IFideicomiso {
+    datos_sueldo?: IDatosSueldo;
+    primas?: IPrimas;
+    asignacion_antiguedad?: IAsignacionAntiguedad;
+    intereses_caidos?: IInteresesCaidos;
+}
 
 export interface IAfiliado {
     _id: IMongoOid;
@@ -250,7 +300,7 @@ export interface IAfiliado {
     apppace: boolean;
     appnomina: boolean;
     pension: IPension;
-    fideicomiso: any; // Se puede detallar más según el JSON
+    fideicomiso: IFideicomiso;
     anomalia: any;
     codigocomponente: string;
     numerohistoria: string;

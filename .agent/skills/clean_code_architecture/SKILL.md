@@ -1,32 +1,17 @@
 ---
-name: Clean Code & Architecture
-description: implementation of design patterns and clean code principles.
+name: Código Limpio y Arquitectura
+description: Principios Clean Code y Patrones (óptimo para IA).
 ---
 
-# Clean Code & Design Patterns
+# Código Limpio
 
-## Design Patterns
-
-1.  **Singleton**: Used for core services (`ApiService`, `AuthService`).
-2.  **Observer**: Heavy use of RxJS Observables for state management and event handling.
-3.  **Facade**: Create facade services to abstract complex logic from components.
-4.  **Adapter**: Use adapters to transform API responses into UI-friendly models.
-
-## Clean Code Principles
-
-1.  **SOLID**: strictly adhere to SOLID principles.
-    - **S**: Single Responsibility Principle (Components should just present, Services should handle logic).
-    - **D**: Dependency Injection (Angular's core).
-2.  **DRY (Don't Repeat Yourself)**: Extract common logic into utils or shared services.
-3.  **Naming Conventions**:
-    - Variables: `camelCase`.
-    - Classes/Interfaces: `PascalCase`.
-    - Constants: `UPPER_SNAKE_CASE`.
-    - Observables: Suffix with `$` (e.g., `users$`).
-4.  **Functions**: Small, focused functions. If a function does more than one thing, refactor it.
-5.  **Comments**: Code should be self-documenting. Use comments _only_ for "Why", not "What".
-
-## Directory Organization
-
-- Keep related files together (Component, Template, Styles, Tests).
-- Use "Barrel" files (`index.ts`) sparingly and only for cohesive modules like `models` or `shared/components`.
+- **SOLID & DRY**: Funciones puras orientadas a una sola tarea. Evita código duplicado encapsulando lógicas en utiles (`Utils`). Separación estricta: Componentes pintan UI, Servicios ejecutan lógica/HTTP.
+- **Patrones**:
+  - `Observer / RxJS`: Gestión de eventos asíncronos en todo el flujo.
+  - `Singleton`: Servicios en raíz.
+- **Nomenclatura**:
+  - Variables y funciones: `camelCase`.
+  - Interfaces y Modelos: `PascalCase`.
+  - Constantes: `UPPER_SNAKE_CASE`.
+  - Flujos RxJS / Observables: Siempre añade el sufijo `$` (ej., `dataStream$`).
+- **Comentarios**: Comenta únicamente para explicar _por qué_ se tomó una decisión anómala. No describas lo que ya hace la función.

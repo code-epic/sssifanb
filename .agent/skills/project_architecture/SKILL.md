@@ -1,31 +1,13 @@
 ---
-name: Project Architecture
-description: Overview of the project structure and key architectural patterns
+name: Project Architecture Angular
+description: Árbol de directorios general y patrones espaciales.
 ---
 
-# Project Architecture
+# Arquitectura Front-end (`src/app`)
 
-## Directory Structure `src/app`
-
-- **`core/`**: Singleton services, guards, interceptors, and models.
-  - `services/`: Global services (e.g. `ApiService`, `AuthService`).
-  - `guards/`: Route guards.
-  - `interceptors/`: HTTP interceptors.
-- **`feature/`**: Business features aimed at specific domains.
-  - `pages/`: Page-level components (each subdirectory is a page/feature).
-  - `layouts/`: Layout components (e.g., Sidebar, Navbar).
-- **`shared/`**: Reusable components, directives, and pipes used across multiple features.
-
-## Key Services
-
-- **`ApiService`** (`core/services/api.service.ts`):
-  - Generic wrapper for `HttpClient`.
-  - Handles base URL and authentication tokens (if applicable).
-  - **Note**: Ensure `environment.ts` is correctly configured (`Url`, `BasePath`, `Hash`).
-
-## Environment Configuration
-
-- Environments are located in `src/environments/`.
-- `environment.ts`: Development.
-- `environment.prod.ts`: Production.
-- Key keys: `Url`, `API`, `Hash` (used for constructing API endpoints).
+- **`core/`**: Motor del SPA. Servicios Singleton puros (`ApiService`, `AuthService`), Guards interceptivos de Rutas, Interceptores HTTP Globales y Modelos de Interfaz (Types). Reutilizable en todo el app pero instanciado 1 vez.
+- **`feature/`**: Agrupación por lógica de negocio.
+  - `pages/`: Vistas de ruteo principales.
+  - `layouts/`: Contenedores de cascarón visual (Navbars, Sidebars).
+- **`shared/`**: UI agnóstica de negocio y compartida y atada visualmente (Directivas, Pipes, Botones, Tarjetas).
+- **Entornos (Environments)**: Las llaves API o variables en `src/environments/environment.ts` (`Url`, `API`, `Hash`) mandan sobre las directivas de conexión en red.
