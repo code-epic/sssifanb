@@ -281,6 +281,7 @@
                             <div class="modern-form-group">
                                 <label>Categoría</label>
                                 <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-folder-open text-verde-titulos"></i></span></div>
                                     <select class="form-control" formControlName="categoria">
                                         <option value="EFE">EFECTIVO</option>
                                         <option value="ASI">ASIMILADO</option>
@@ -294,6 +295,7 @@
                             <div class="modern-form-group">
                                 <label>Clasificación</label>
                                 <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-tag text-verde-titulos"></i></span></div>
                                     <select class="form-control" formControlName="clase">
                                         <option value="OFI">OFICIAL DE COMANDO</option>
                                         <option value="OFIT">OFICIAL TECNICO</option>
@@ -306,6 +308,7 @@
                             <div class="modern-form-group">
                                 <label>Situación</label>
                                 <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-info-circle text-verde-titulos"></i></span></div>
                                     <select class="form-control" formControlName="situacion">
                                         <option value="ACT">ACTIVO</option>
                                         <option value="RCP">RESERVA ACTIVA</option>
@@ -608,43 +611,141 @@
                     </div>
                 </div>
 
-                <!-- BANCOS (Nested: persona.datofinanciero) -->
+                <!-- BANCOS (Minimalist & Premium) -->
                 <div *ngIf="currentTab === 'banco'" class="fade-in">
                     <div formGroupName="persona">
                         <div formGroupName="datofinanciero">
-                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="modern-form-group">
-                                        <label>Institución Financiera</label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-university"></i></span></div>
-                                            <select class="form-control" formControlName="institucion">
-                                                <option value="">Seleccione...</option>
-                                                <option value="0102">BANCO DE VENEZUELA</option>
-                                                <option value="0134">BANESCO</option>
-                                                <option value="0105">MERCANTIL</option>
-                                                <option value="0177">BANFANB</option>
-                                            </select>
+                            <div class="row align-items-center">
+                                <!-- Columna de Visualización (Tarjeta Digital Minimalista) -->
+                                <div class="col-lg-5 mb-4 mb-lg-0">
+                                    <div class="bank-card-container">
+                                        <div class="digital-bank-card minimalist shadow-sm" [style.border-top-color]="bancoSeleccionado?.color || '#598c89'">
+                                            <div class="card-content d-flex flex-column justify-content-between h-100 p-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                                    <div class="bank-logo-area">
+                                                        <div *ngIf="bancoSeleccionado" class="bank-logo-wrapper">
+                                                            <img [src]="'assets/img/ipsfa/bancos/' + bancoSeleccionado.code + '.webp'" 
+                                                                 class="img-fluid bank-logo-img" 
+                                                                 [alt]="bancoSeleccionado.name"
+                                                                 onerror="this.src='assets/img/ipsfa/bancos/default.webp'">
+                                                        </div>
+                                                        <div *ngIf="!bancoSeleccionado" class="bank-placeholder-mini">
+                                                            <i class="fas fa-university text-muted opacity-4"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-account-type">
+                                                        <span class="badge-pastel-minimal" [ngClass]="identificacionForm.get('persona.datofinanciero.tipo').value === 'CA' ? 'green' : 'blue'">
+                                                            {{ identificacionForm.get('persona.datofinanciero.tipo').value === 'CA' ? 'CORRIENTE' : 'AHORRO' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-4">
+                                                    <div class="font-small text-muted mb-1" style="font-size: 0.65rem; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 600;">Número de Cuenta</div>
+                                                    <div class="account-number-display-minimal">
+                                                        {{ identificacionForm.get('persona.datofinanciero.cuenta')?.value || '**** **** ** **********' }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="d-flex justify-content-between align-items-end mt-2">
+                                                    <div class="card-holder-info">
+                                                        <div class="font-weight-bold text-dark" style="font-size: 0.8rem; letter-spacing: -0.2px;">
+                                                            {{ identificacionForm.get('persona.datobasico.nombres').value }} {{ identificacionForm.get('persona.datobasico.apellidos').value }}
+                                                        </div>
+                                                        <small class="text-muted" style="font-size: 0.6rem; opacity: 0.7;">Titular del Expediente</small>
+                                                    </div>
+                                                    <i class="fas fa-wifi fa-rotate-90 text-muted opacity-3" style="font-size: 1rem;"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="modern-form-group">
-                                        <label>Tipo de Cuenta</label>
-                                        <div class="input-group">
-                                            <select class="form-control" formControlName="tipo">
-                                                <option value="CA">CORRIENTE</option>
-                                                <option value="AH">AHORRO</option>
-                                            </select>
+
+                                <!-- Columna de Formulario (Compacto y Siguiendo Patrones) -->
+                                <div class="col-lg-7">
+                                    <div class="form-container-minimal p-4 border-0 bg-light-pastel" style="border-radius: 12px;">
+                                        <div class="row">
+                                            <div class="col-12 mb-3">
+                                                <div class="modern-form-group mb-0">
+                                                    <label class="text-uppercase font-weight-bold" style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Número de Cuenta</label>
+                                                    <div class="input-group shadow-sm">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-white border-right-0"><i class="fas fa-barcode text-success"></i></span>
+                                                        </div>
+                                                        <input type="text" 
+                                                            class="form-control border-left-0 font-weight-bold" 
+                                                            style="font-size: 0.95rem; letter-spacing: 1px;"
+                                                            placeholder="0000 0000 00 0000000000" 
+                                                            maxlength="23" 
+                                                            formControlName="cuenta">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <div class="modern-form-group mb-0">
+                                                    <label class="text-uppercase font-weight-bold" style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Institución</label>
+                                                    <div class="input-group shadow-sm">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-white border-right-0"><i class="fas fa-university text-success"></i></span>
+                                                        </div>
+                                                        <select class="form-control border-left-0 font-weight-bold" formControlName="institucion" style="font-size: 0.85rem;">
+                                                            <option value="">Seleccione...</option>
+                                                            <option *ngFor="let b of bancos" [value]="b.code">{{ b.name }}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mb-3">
+                                                <div class="modern-form-group mb-0">
+                                                    <label class="text-uppercase font-weight-bold" style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Tipo de Cuenta</label>
+                                                    <div class="input-group shadow-sm">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-white border-right-0"><i class="fas fa-tags text-success"></i></span>
+                                                        </div>
+                                                        <select class="form-control border-left-0 font-weight-bold" formControlName="tipo" style="font-size: 0.85rem;">
+                                                            <option value="CA">CORRIENTE</option>
+                                                            <option value="AH">AHORRO</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mt-2">
+                                                <button type="button" class="btn-header-action green btn-block py-2 m-0 shadow-sm" 
+                                                    (click)="agregarCuenta()"
+                                                    [disabled]="!identificacionForm.get('persona.datofinanciero.cuenta').value || !identificacionForm.get('persona.datofinanciero.institucion').value">
+                                                    <i class="fas fa-plus-circle mr-2"></i>Vincular a Expediente
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
-                                    <div class="modern-form-group">
-                                        <label>Número de Cuenta</label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-money-check-alt"></i></span></div>
-                                            <input type="text" class="form-control" placeholder="0000-0000-00-0000000000" maxlength="20" formControlName="cuenta">
+                            </div>
+
+                            <!-- Lista de Cuentas (Vista Compacta) -->
+                            <div class="mt-5" *ngIf="cuentasBancarias.length > 0">
+                                <h6 class="text-muted font-weight-bold mb-3" style="font-size: 0.7rem; letter-spacing: 1.2px; text-transform: uppercase;">
+                                    Cuentas Vinculadas <span class="badge badge-pill badge-light-success ml-1">{{ cuentasBancarias.length }}/4</span>
+                                </h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 col-xl-4 mb-3" *ngFor="let cta of cuentasBancarias; let i = index">
+                                        <div class="account-item-minimal d-flex align-items-center">
+                                            <div class="bank-dot-minimal" [style.background-color]="cta.color"></div>
+                                            <div class="flex-grow-1 px-3 py-2 overflow-hidden">
+                                                <div class="text-dark font-weight-bold text-truncate" style="font-size: 0.8rem;">{{ cta.nombreInstitucion }}</div>
+                                                <div class="text-muted" style="font-size: 0.7rem; font-family: 'Roboto Mono'; opacity: 0.8;">{{ cta.cuenta }}</div>
+                                            </div>
+                                            <div class="d-flex pr-2">
+                                                <button class="btn-icon-minimal btn-attach" (click)="adjuntarCertificado(i)" [ngClass]="{'active': cta.archivo}" title="Certificado">
+                                                    <i class="fas" [ngClass]="cta.archivo ? 'fa-check-circle' : 'fa-file-upload'"></i>
+                                                </button>
+                                                <button class="btn-icon-minimal btn-remove" (click)="eliminarCuenta(i)" title="Eliminar">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -659,9 +760,9 @@
                         <!-- DIRECCION -->
                         <div formGroupName="direccion">
                              <div class="row">
-                                 <div class="col-md-4"><div class="modern-form-group"><label>Estado</label><div class="input-group"><select class="form-control" formControlName="estado"><option value="">Seleccione...</option></select></div></div></div>
-                                 <div class="col-md-4"><div class="modern-form-group"><label>Ciudad</label><div class="input-group"><select class="form-control" formControlName="ciudad"><option value="">Seleccione...</option></select></div></div></div>
-                                 <div class="col-md-4"><div class="modern-form-group"><label>Municipio</label><div class="input-group"><select class="form-control" formControlName="municipio"><option value="">Seleccione...</option></select></div></div></div>
+                                 <div class="col-md-4"><div class="modern-form-group"><label>Estado</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-map text-success"></i></span></div><select class="form-control" formControlName="estado"><option value="">Seleccione...</option></select></div></div></div>
+                                 <div class="col-md-4"><div class="modern-form-group"><label>Ciudad</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-city text-success"></i></span></div><select class="form-control" formControlName="ciudad"><option value="">Seleccione...</option></select></div></div></div>
+                                 <div class="col-md-4"><div class="modern-form-group"><label>Municipio</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-map-marker-alt text-success"></i></span></div><select class="form-control" formControlName="municipio"><option value="">Seleccione...</option></select></div></div></div>
                              </div>
                               <div class="row">
                                 <div class="col-md-8">
@@ -737,40 +838,42 @@
                         <div class="row" formGroupName="datofisionomico">
                             <div class="col-md-3">
                                 <div class="modern-form-group"><label>Grupo Sanguíneo</label>
-                                    <div class="input-group"><select class="form-control" formControlName="gruposanguineo"><option value="">Seleccione...</option><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select></div>
+                                    <div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-tint text-danger"></i></span></div><select class="form-control" formControlName="gruposanguineo"><option value="">Seleccione...</option><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select></div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                  <div class="modern-form-group"><label>Color de Piel</label>
-                                    <div class="input-group"><select class="form-control" formControlName="colorpiel"><option value="">Seleccione...</option><option value="MORENA">MORENA</option><option value="BLANCA">BLANCA</option><option value="NEGRA">NEGRA</option></select></div>
+                                    <div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-palette text-warning"></i></span></div><select class="form-control" formControlName="colorpiel"><option value="">Seleccione...</option><option value="MORENA">MORENA</option><option value="BLANCA">BLANCA</option><option value="NEGRA">NEGRA</option></select></div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                  <div class="modern-form-group"><label>Color de Ojos</label>
-                                    <div class="input-group"><select class="form-control" formControlName="colorojos"><option value="">Seleccione...</option><option value="CASTAÑO">CASTAÑO</option><option value="NEGRO">NEGRO</option><option value="AZUL">AZUL</option><option value="VERDE">VERDE</option></select></div>
+                                    <div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-eye text-info"></i></span></div><select class="form-control" formControlName="colorojos"><option value="">Seleccione...</option><option value="CASTAÑO">CASTAÑO</option><option value="NEGRO">NEGRO</option><option value="AZUL">AZUL</option><option value="VERDE">VERDE</option></select></div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                  <div class="modern-form-group"><label>Color de Cabello</label>
-                                    <div class="input-group"><select class="form-control" formControlName="colorcabello"><option value="">Seleccione...</option><option value="NEGRO">NEGRO</option><option value="CASTAÑO">CASTAÑO</option><option value="RUBIO">RUBIO</option><option value="ROJO">ROJO</option><option value="CANOSO">CANOSO</option></select></div>
+                                    <div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-tag text-dark"></i></span></div><select class="form-control" formControlName="colorcabello"><option value="">Seleccione...</option><option value="NEGRO">NEGRO</option><option value="CASTAÑO">CASTAÑO</option><option value="RUBIO">RUBIO</option><option value="ROJO">ROJO</option><option value="CANOSO">CANOSO</option></select></div>
                                 </div>
                              </div>
                          </div>
                      </div>
                 </div>
-
-
-
             </div>
         </div>
-     </div>
-
+    </div>
      <!-- Main Submit Button -->
      <div class="card shadow-none bg-transparent border-0 mb-4">
          <div class="row">
-             <div class="col text-right">
-                 <button type="submit" class="btn btn-ok">
-                     Guardar Cambios
+             <div class="col text-right d-flex justify-content-end align-items-center">
+                 <button type="button" class="btn-header-action blue mr-3 shadow-none" (click)="openModalConsultarNetos(modalConsultarNetos)">
+                     <i class="fas fa-money-bill-wave"></i> Consultar Netos
+                 </button>
+                 <button type="button" class="btn-header-action amber mr-3 shadow-none" (click)="openModalEmitirTIM(modalEmitirTIM)">
+                     <i class="fas fa-id-card"></i> Emitir TIM
+                 </button>
+                 <button type="button" class="btn-header-action teal shadow-none" (click)="openModalConfirmarGuardar(modalConfirmarGuardar)">
+                     <i class="fas fa-save"></i> Guardar Cambios
                  </button>
              </div>
          </div>
@@ -783,7 +886,7 @@
             <h3 class="mb-0 text-dark font-weight-bold">
                 <i class="fas fa-users mr-2 text-verde-titulos"></i>Grupo Familiar
             </h3>
-             <button class="btn-pastel-icon pastel-success shadow-sm" type="button" data-toggle="modal" data-target="#modalFamiliar" title="Agregar Familiar">
+             <button class="btn-pastel-icon pastel-success shadow-sm" type="button" (click)="openModalAgregarFamiliar(modalAgregarFamiliar)" title="Agregar Familiar">
                  <i class="fas fa-plus"></i>
              </button>
         </div>
@@ -1036,3 +1139,213 @@
     </div>
   </div>
 </div>
+
+<!-- Modal: Emitir TIM (Carnetización) -->
+<ng-template #modalEmitirTIM let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            
+            <!-- Icono con Pulso Animado Ámbar -->
+            <div class="icon-confirm-pulse amber">
+                <i class="fas fa-id-card"></i>
+            </div>
+
+            <h4 class="font-weight-bold text-dark mb-2">Emitir TIM</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Indique el motivo para la generación y emisión del Carnet de Identificación Militar (TIM).
+            </p>
+            
+            <div class="modern-form-group mb-5 text-left">
+                <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">MOTIVO DE EMISIÓN DEL CARNET</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-list-ul text-warning"></i></span>
+                    </div>
+                    <select class="form-control" [(ngModel)]="selectedMotivoEmision" [ngModelOptions]="{standalone: true}">
+                        <option value="" selected disabled>Seleccione un motivo...</option>
+                        <option value="INGRESO A LA FANB / GRADUACION">INGRESO A LA FANB / GRADUACION</option>
+                        <option value="CAMBIO DE GRADO (ASCENSO)">CAMBIO DE GRADO (ASCENSO)</option>
+                        <option value="CAMBIO DE SITUACION">CAMBIO DE SITUACION</option>
+                        <option value="VENCIMIENTO">VENCIMIENTO</option>
+                        <option value="DETERIORO">DETERIORO</option>
+                        <option value="EXTRAVIO">EXTRAVIO</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" 
+                    (click)="modal.dismiss('Cancel')" 
+                    style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action amber btn-block m-0 shadow-none" 
+                    (click)="emitirTIM(modal)" 
+                    [disabled]="!selectedMotivoEmision"
+                    style="flex: 1.2; padding: 0.8rem;">
+                    Emitir TIM
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<!-- Modal: Confirmar Guardar Cambios -->
+<ng-template #modalConfirmarGuardar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            
+            <!-- Icono con Pulso Animado -->
+            <div class="icon-confirm-pulse">
+                <i class="fas fa-save"></i>
+            </div>
+
+            <h4 class="font-weight-bold text-dark mb-3">¿Guardar Cambios?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 1rem; line-height: 1.6;">
+                ¿Está seguro que desea guardar los cambios realizados en el expediente del afiliado? Esta acción actualizará la base de datos de forma inmediata.
+            </p>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" 
+                    (click)="modal.dismiss('No')" 
+                    style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
+                    No, Cancelar
+                </button>
+                <button type="button" class="btn-header-action teal btn-block m-0 shadow-none" 
+                    (click)="confirmarGuardado(modal)" 
+                    style="flex: 1; padding: 0.8rem;">
+                    Sí, Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Consultar Netos -->
+<ng-template #modalConsultarNetos let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            
+            <!-- Icono con Pulso Animado Azul -->
+            <div class="icon-confirm-pulse blue">
+                <i class="fas fa-wallet"></i>
+            </div>
+
+            <h4 class="font-weight-bold text-dark mb-3">Consulta de Netos</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Seleccione el periodo de nómina para generar el reporte de saldos netos del afiliado.
+            </p>
+
+            <div class="modern-form-group mb-5 text-left">
+                <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">PERIODO DE NÓMINA</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-calendar-check text-info"></i></span>
+                    </div>
+                    <select class="form-control" [(ngModel)]="selectedNomina" [ngModelOptions]="{standalone: true}">
+                        <option value="" selected disabled>Seleccione una nómina...</option>
+                        <option value="28FEB2026 NOMINA MENSUAL">28FEB2026 NOMINA MENSUAL</option>
+                        <option value="28FEB2026 NOMINA BONO PATRIA">28FEB2026 NOMINA BONO PATRIA</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" 
+                    (click)="modal.dismiss('Cancel')" 
+                    style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action blue btn-block m-0 shadow-none" 
+                    (click)="generarNeto(modal)" 
+                    [disabled]="!selectedNomina"
+                    style="flex: 1; padding: 0.8rem;">
+                    <i class="fas fa-print mr-2"></i>Generar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Agregar Familiar -->
+<ng-template #modalAgregarFamiliar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            
+            <!-- Icono con Pulso Animado Verde -->
+            <div class="icon-confirm-pulse green">
+                <i class="fas fa-user-plus"></i>
+            </div>
+
+            <h4 class="font-weight-bold text-dark mb-2">Agregar Familiar</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.9rem;">
+                Ingrese los datos básicos de identificación para iniciar el registro del nuevo familiar.
+            </p>
+
+            <div class="text-left">
+                <!-- Nacionalidad y Cédula en una fila -->
+                <div class="row">
+                    <div class="col-4">
+                        <div class="modern-form-group mb-4">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.75rem;">NAC.</label>
+                            <div class="input-group">
+                                <select class="form-control" [(ngModel)]="selectedNacionalidadFamiliar" [ngModelOptions]="{standalone: true}">
+                                    <option value="" selected disabled>...</option>
+                                    <option value="V-">V-</option>
+                                    <option value="E-">E-</option>
+                                    <option value="C-">C-</option>
+                                    <option value="D-">D-</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="modern-form-group mb-4">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.75rem;">DOCUMENTO ID / CÉDULA</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-id-card text-success"></i></span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Ej: 12345678" [(ngModel)]="cedulaFamiliar" [ngModelOptions]="{standalone: true}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parentesco Full Width -->
+                <div class="modern-form-group mb-5">
+                    <label class="text-dark font-weight-bold" style="font-size: 0.75rem;">PARENTESCO</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-users text-success"></i></span>
+                        </div>
+                        <select class="form-control" [(ngModel)]="selectedParentescoFamiliar" [ngModelOptions]="{standalone: true}">
+                            <option value="" selected disabled>Seleccione el parentesco...</option>
+                            <option value="HIJO">HIJO / HIJA</option>
+                            <option value="ESPOSA">ESPOSA / ESPOSO</option>
+                            <option value="PADRE">PADRE / MADRE</option>
+                            <option value="CONCUBINA">CONCUBINA / CONCUBINO</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" 
+                    (click)="modal.dismiss('Cancel')" 
+                    style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action green btn-block m-0 shadow-none" 
+                    (click)="continuarRegistroFamiliar(modal)" 
+                    [disabled]="!selectedNacionalidadFamiliar || !cedulaFamiliar || !selectedParentescoFamiliar"
+                    style="flex: 1.2; padding: 0.8rem;">
+                    Continuar Registro <i class="fas fa-chevron-right ml-2" style="font-size: 0.7rem;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+

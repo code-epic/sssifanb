@@ -146,10 +146,6 @@
                                     <label class="custom-control-label cursor-pointer" [for]="'chk_' + doc.id"></label>
                                 </div>
                             </td>
-                            <!-- Favorito / Destacado -->
-                            <td class="px-2 py-2 border-bottom border-light text-center" style="width: 40px;" (click)="toggleStar(doc)">
-                                <i class="fas fa-star cursor-pointer star-icon transition-all" [ngClass]="doc.star ? 'text-warning' : 'text-light'" ngbTooltip="Destacar"></i>
-                            </td>
                             <!-- Remitente -->
                             <td class="px-2 py-2 border-bottom border-light font-weight-600 align-middle pr-3" style="width: 25%; color: #334155;">
                                 <div class="d-flex align-items-center" style="width: 100%;">

@@ -1,0 +1,186 @@
+// Variables de Colores
+$pastel-teal: #598c89;
+$pastel-red-light: #feebee;
+$pastel-red-dark: #e53935;
+
+.liberaciones-container {
+    padding: 2.5rem;
+    background-color: #f8fafc;
+    min-height: calc(100vh - 100px);
+}
+
+// Panel Principal
+.liberacion-card {
+    background: white;
+    border-radius: 28px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+    border: 1px solid #edf2f7;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 120px;
+        height: 4px;
+        background: $pastel-teal;
+        border-radius: 0 0 4px 4px;
+    }
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    h4 {
+        color: #2d4a41;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        i { color: $pastel-teal; margin-right: 0.75rem; }
+    }
+}
+
+// Estructura de Formulario (Shared Pattern)
+.modern-form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+        font-size: 0.75rem; 
+        font-weight: 700;
+        color: #8fa09b;
+        margin-bottom: 0.6rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    .input-group {
+        border-radius: 12px;
+        transition: all 0.25s ease;
+        background-color: transparent;
+        border: 1px solid #e0e6e4;
+        overflow: hidden;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+
+        &:focus-within {
+            background-color: #ffffff;
+            border-color: $pastel-teal;
+            box-shadow: 0 0 0 4px rgba($pastel-teal, 0.08);
+            .input-group-text { color: $pastel-teal; }
+        }
+    }
+
+    .form-control {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        height: 48px;
+        padding-left: 0.75rem;
+        color: #3e5c52;
+        font-weight: 600;
+        font-size: 0.9rem;
+
+        &::placeholder { color: #b2c2bc; }
+    }
+
+    textarea.form-control {
+        height: auto;
+        padding-top: 0.75rem;
+    }
+
+    select.form-control {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238fa09b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.1rem;
+        padding-right: 2.5rem !important;
+    }
+
+    .input-group-text {
+        background: transparent;
+        border: none;
+        color: #b2c2bc;
+        padding-left: 1.25rem;
+        padding-right: 0.25rem;
+        font-size: 1rem;
+    }
+}
+
+// Info Box (TIM Data)
+.tim-data-panel {
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px dashed #e2e8f0;
+    
+    .data-item {
+        margin-bottom: 1rem;
+        &:last-child { margin-bottom: 0; }
+        
+        span {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.2rem;
+        }
+        strong {
+            font-size: 0.85rem;
+            color: #3e5c52;
+            font-weight: 700;
+        }
+    }
+}
+
+// Modal Styles (From Identification)
+@keyframes pulse-circle {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(89, 140, 137, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(89, 140, 137, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(89, 140, 137, 0); }
+}
+
+.icon-confirm-pulse {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(89, 140, 137, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: $pastel-teal;
+    font-size: 2.5rem;
+    animation: pulse-circle 2s infinite;
+    border: 2px solid rgba(89, 140, 137, 0.2);
+}
+
+.btn-header-action {
+    border-radius: 14px;
+    padding: 0.75rem 2rem;
+    font-weight: 800;
+    font-size: 0.85rem;
+    transition: all 0.25s ease;
+    border: none;
+    
+    &.teal {
+        background: $pastel-teal;
+        color: white;
+        &:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(89, 140, 137, 0.2); }
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

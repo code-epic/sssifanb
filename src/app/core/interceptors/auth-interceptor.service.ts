@@ -60,6 +60,7 @@ export class AuthInterceptorService implements HttpInterceptor {
   private procesarPeticion(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((err: HttpErrorResponse) => {
+
         switch (err.status) {
           case 401:
             this.cerrar(err.error.msj || 'Sesión expirada');
@@ -71,7 +72,7 @@ export class AuthInterceptorService implements HttpInterceptor {
             if (!err.error.msj) {
               this.cerrar('Acceso denegado');
             } else {
-              console.error('Error 403:', err);
+              this.TimeOut(err.error.msj);
             }
 
             break;
@@ -104,4 +105,24 @@ export class AuthInterceptorService implements HttpInterceptor {
       }
     });
   }
+
+
+  TimeOut(msj: string) {
+    Swal.fire({
+      title: "Información",
+      text: msj,
+      icon: "info",
+      showCancelButton: false,
+      confirmButtonColor: "#3085d6",
+      confirmButtonText: "Aceptar",
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.error('Error 403:', msj);
+      }
+    });
+  }
+
+
 }

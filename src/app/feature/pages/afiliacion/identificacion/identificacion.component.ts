@@ -22,6 +22,34 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     // Var to control the pastel printing dropdown menu visibility
     public showPrintDropdown: boolean = false;
 
+    public selectedMotivoEmision: string = '';
+    public selectedNomina: string = '';
+
+    // Add Family Member Modal Data
+    public selectedNacionalidadFamiliar: string = '';
+    public cedulaFamiliar: string = '';
+    public selectedParentescoFamiliar: string = '';
+
+    // Bancos Data
+    public bancos: any[] = [
+        { code: '0102', name: 'BANCO DE VENEZUELA', color: '#b91c1c' },
+        { code: '0134', name: 'BANESCO', color: '#16a34a' },
+        { code: '0105', name: 'MERCANTIL', color: '#1d4ed8' },
+        { code: '0177', name: 'BANFANB', color: '#15803d' },
+        { code: '0108', name: 'PROVINCIAL', color: '#1e40af' },
+        { code: '0163', name: 'BANCO DEL TESORO', color: '#be123c' },
+        { code: '0175', name: 'BICENTENARIO', color: '#991b1b' },
+        { code: '0191', name: 'BNC', color: '#1e293b' },
+        { code: '0172', name: 'BANCAMIGA', color: '#0369a1' },
+        { code: '0114', name: 'BANCARIBE', color: '#0369a1' },
+        { code: '0115', name: 'EXTERIOR', color: '#1d4ed8' },
+        { code: '0151', name: 'FONDO COMÚN', color: '#ca8a04' },
+        { code: '0174', name: 'BANPLUS', color: '#0f172a' },
+        { code: '0157', name: 'DEL SUR', color: '#15803d' }
+    ];
+    public bancoSeleccionado: any = null;
+    public cuentasBancarias: any[] = [];
+
     constructor(
         private layoutService: LayoutService,
         private fb: FormBuilder,
@@ -369,6 +397,79 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             parentesco: ['', Validators.required],
             fecha_nacimiento: ['', Validators.required]
         });
+
+        // Listener para formateo de cuenta bancaria y detección de banco
+        const cuentaControl = this.identificacionForm.get('persona.datofinanciero.cuenta');
+        cuentaControl?.valueChanges.subscribe(val => {
+            if (val) {
+                const clean = val.replace(/\D/g, '').substring(0, 20);
+                const formatted = this.applyMask(clean);
+                if (val !== formatted) {
+                    cuentaControl.setValue(formatted, { emitEvent: false });
+                }
+
+                // Detectar banco
+                if (clean.length >= 4) {
+                    const bCode = clean.substring(0, 4);
+                    this.detectarBanco(bCode);
+                } else {
+                    this.bancoSeleccionado = null;
+                }
+            } else {
+                this.bancoSeleccionado = null;
+            }
+        });
+    }
+
+    public agregarCuenta() {
+        const form = this.identificacionForm.get('persona.datofinanciero');
+        if (form && form.get('cuenta')?.value && form.get('institucion')?.value) {
+            const nuevaCuenta = {
+                institucion: form.get('institucion')?.value,
+                nombreInstitucion: this.bancoSeleccionado?.name || 'OTRA',
+                tipo: form.get('tipo')?.value,
+                cuenta: form.get('cuenta')?.value,
+                color: this.bancoSeleccionado?.color || '#64748b',
+                archivo: null
+            };
+            this.cuentasBancarias.push(nuevaCuenta);
+
+            // Limpiar campos para nueva entrada
+            form.get('cuenta')?.setValue('');
+            form.get('institucion')?.setValue('');
+            this.bancoSeleccionado = null;
+        }
+    }
+
+    public eliminarCuenta(index: number) {
+        this.cuentasBancarias.splice(index, 1);
+    }
+
+    public adjuntarCertificado(index: number) {
+        // Simulación de adjuntar archivo
+        console.log('Adjuntando certificado para la cuenta:', this.cuentasBancarias[index].cuenta);
+        this.cuentasBancarias[index].archivo = 'Certificado_Bancario.pdf';
+    }
+
+    private applyMask(val: string): string {
+        if (!val) return '';
+        let res = '';
+        for (let i = 0; i < val.length; i++) {
+            if (i === 4 || i === 8 || i === 10) res += '-';
+            res += val[i];
+        }
+        return res;
+    }
+
+    private detectarBanco(code: string) {
+        const banco = this.bancos.find(b => b.code === code);
+        if (banco) {
+            this.bancoSeleccionado = banco;
+            this.identificacionForm.get('persona.datofinanciero.institucion')?.setValue(code, { emitEvent: false });
+        } else {
+            this.bancoSeleccionado = { code, name: 'OTRA INSTITUCIÓN', color: '#64748b' };
+            this.identificacionForm.get('persona.datofinanciero.institucion')?.setValue('', { emitEvent: false });
+        }
     }
 
     switchTab(tab: string) {
@@ -421,5 +522,62 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.layoutService.toggleCards(true);
+    }
+
+    openModalEmitirTIM(content: any) {
+        this.selectedMotivoEmision = '';
+        this.modalService.open(content, { centered: true, size: 'md', backdrop: 'static' });
+    }
+
+    emitirTIM(modal: any) {
+        if (!this.selectedMotivoEmision) {
+            return;
+        }
+        console.log('Emitiendo TIM con motivo:', this.selectedMotivoEmision);
+        modal.close();
+    }
+
+    openModalConfirmarGuardar(content: any) {
+        this.modalService.open(content, { centered: true, size: 'md', backdrop: 'static' });
+    }
+
+    confirmarGuardado(modal: any) {
+        console.log('Guardando cambios del afiliado...');
+        // Aquí se llamaría al método que realmente envía el formulario
+        // this.onSubmit(); 
+        modal.close();
+    }
+
+    openModalConsultarNetos(content: any) {
+        this.selectedNomina = '';
+        this.modalService.open(content, { centered: true, size: 'md', backdrop: 'static' });
+    }
+
+    generarNeto(modal: any) {
+        if (!this.selectedNomina) return;
+        console.log('Generando Neto para la nómina:', this.selectedNomina);
+        // Lógica de impresión/generación PDF
+        modal.close();
+    }
+
+    openModalAgregarFamiliar(content: any) {
+        this.selectedNacionalidadFamiliar = '';
+        this.cedulaFamiliar = '';
+        this.selectedParentescoFamiliar = '';
+        this.modalService.open(content, { centered: true, size: 'md', backdrop: 'static' });
+    }
+
+    continuarRegistroFamiliar(modal: any) {
+        if (!this.selectedNacionalidadFamiliar || !this.cedulaFamiliar || !this.selectedParentescoFamiliar) return;
+
+        console.log('Iniciando registro de familiar:', {
+            nacionalidad: this.selectedNacionalidadFamiliar,
+            cedula: this.cedulaFamiliar,
+            parentesco: this.selectedParentescoFamiliar
+        });
+
+        // Aquí se procedería a abrir el modal de detalles (MdlFamiliarComponent) 
+        // o a cargar la data inicial para el registro completo.
+        modal.close();
     }
 }

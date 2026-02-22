@@ -1,0 +1,404 @@
+// Variables de Colores Pastel Personalizados
+$pastel-green-soft: #e8f5e9;
+$pastel-green-dark: #679f6a;
+$pastel-green-sea: #8aaf78;
+$pastel-blue-soft: #e3f2fd;
+$pastel-blue-dark: #1e88e5;
+$pastel-orange-soft: #fff3e0;
+$pastel-orange-dark: #fb8c00;
+$pastel-red-soft: #feebee;
+$pastel-red-dark: #e53935;
+$pastel-teal: #598c89;
+
+.indicadores-container {
+    padding: 2.5rem;
+    background-color: #f8fafc;
+    min-height: calc(100vh - 100px);
+}
+
+// Hero Summary Card - Minimalist Premium Version
+.hero-summary {
+    background: white;
+    border-radius: 28px;
+    padding: 2.5rem;
+    color: #1e293b;
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #edf2f7;
+
+    // Watermark decorativo (Minimalista)
+    &::before {
+        content: '\f201'; // fa-chart-line
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        right: -20px;
+        bottom: -30px;
+        font-size: 10rem;
+        color: rgba($pastel-teal, 0.03);
+        transform: rotate(-10deg);
+        pointer-events: none;
+    }
+
+    // Acento superior premium
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 120px;
+        height: 4px;
+        background: $pastel-teal;
+        border-radius: 0 0 4px 4px;
+    }
+
+    .hero-info {
+        z-index: 1;
+        h1 { 
+            font-size: 2.2rem; 
+            font-weight: 800; // Softer weight
+            color: #2d4a41; // Forest Green (Softer than black)
+            letter-spacing: -1px; 
+            margin-bottom: 0.25rem;
+            // Removed aggressive gradient
+        }
+        p { color: #8fa09b; font-weight: 500; font-size: 0.9rem; margin-bottom: 0; }
+    }
+
+    .hero-stats-mini {
+        gap: 3.5rem;
+        z-index: 1;
+        display: flex;
+        
+        .hero-stat-item {
+            text-align: right;
+            span { 
+                display: block; 
+                font-size: 0.65rem; 
+                font-weight: 700; 
+                color: #a0b1ab; 
+                text-transform: uppercase; 
+                letter-spacing: 1.2px; 
+                margin-bottom: 0.25rem;
+            }
+            strong { 
+                font-size: 1.8rem; 
+                font-weight: 800; 
+                color: #3e5c52; // Deep Sage Green
+                font-family: 'Nunito', sans-serif;
+                line-height: 1;
+            }
+        }
+    }
+}
+
+// Estilos de Tarjetas de Estadísticas - Minimalist Version
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 20px;
+    border: 1px solid #e8f0ed; // Border with green hint
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.015);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 130px;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 25%;
+        height: 50%;
+        width: 3px; // Thinner
+        border-radius: 0 4px 4px 0;
+        transition: all 0.3s ease;
+    }
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(45, 74, 65, 0.05);
+        border-color: #ccd9d5;
+    }
+
+    .stat-header {
+        align-items: center;
+        margin-bottom: 0.5rem;
+        display: flex;
+    }
+
+    .stat-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        
+        i { font-size: 1.1rem; opacity: 0.7; }
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #8fa09b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .stat-content {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-top: auto;
+
+        .stat-value {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #3e5c52; // Deep Sage
+            margin: 0;
+            letter-spacing: -1px;
+        }
+    }
+
+    .stat-trend {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 3px 7px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    &.issued { &::before { background: $pastel-blue-dark; } i { color: $pastel-blue-dark; } }
+    &.rejected { &::before { background: $pastel-red-dark; } i { color: $pastel-red-dark; } }
+    &.released { &::before { background: $pastel-green-dark; } i { color: $pastel-green-dark; } }
+    &.printed { &::before { background: $pastel-orange-dark; } i { color: $pastel-orange-dark; } }
+}
+
+// Panel de Filtros Moderno
+.filter-panel {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    border: 1px solid #eef2f1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+
+    .filter-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        
+        h5 { 
+            font-size: 1rem; 
+            font-weight: 700; 
+            color: #3e5c52; 
+            margin: 0;
+            i { color: $pastel-teal; margin-right: 0.6rem; opacity: 0.8; }
+        }
+    }
+}
+
+// Estructura Unificada de Formulario
+.modern-form-group {
+    margin-bottom: 2rem; // Increased for better spacing
+
+    label {
+        font-size: 0.75rem; 
+        font-weight: 700;
+        color: #8fa09b; // Sage Gray
+        margin-bottom: 0.75rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    // Estilo base para el contenedor de entrada
+    .input-group {
+        border-radius: 12px;
+        transition: all 0.25s ease;
+        background-color: transparent !important; // Vuelvele transparente como pidió el usuario
+        border: 1px solid #e0e6e4 !important;
+        overflow: hidden;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+
+        &:focus-within {
+            background-color: #ffffff !important;
+            border-color: $pastel-teal !important;
+            box-shadow: 0 0 0 4px rgba($pastel-teal, 0.08) !important;
+            .input-group-text { color: $pastel-teal !important; }
+        }
+    }
+
+    // Fix para app-pastel-datepicker: eliminar la caja sólida y usar transparencia
+    ::ng-deep app-pastel-datepicker {
+        display: block;
+        width: 100%;
+        
+        .input-group {
+            background-color: transparent !important;
+            border: 1px solid #e0e6e4 !important;
+            border-radius: 12px !important;
+            box-shadow: none !important;
+            min-height: 48px;
+
+            &:focus-within {
+                background-color: #ffffff !important;
+                border-color: $pastel-teal !important;
+                box-shadow: 0 0 0 4px rgba($pastel-teal, 0.05) !important;
+            }
+        }
+    }
+
+    .form-control {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        height: 48px !important;
+        padding-left: 0.75rem !important;
+        color: #3e5c52 !important;
+        font-weight: 600 !important;
+        font-size: 0.88rem !important;
+
+        &::placeholder { color: #b2c2bc; }
+    }
+
+    // Fix específico para el buscador/input que no es datepicker
+    input.form-control {
+        width: 100%;
+    }
+
+    select.form-control {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238fa09b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1.1rem;
+        padding-right: 2.5rem !important;
+    }
+
+    ::ng-deep .input-group-text, .input-group-text {
+        background: transparent !important;
+        border: none !important;
+        color: #b2c2bc !important;
+        padding-left: 1rem !important;
+        padding-right: 0.25rem !important;
+        font-size: 0.95rem !important;
+    }
+}
+
+// Tabla de Detalles
+.details-table-wrapper {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.custom-table {
+    margin-bottom: 0;
+    
+    thead th {
+        background: #f8fafc;
+        border: none;
+        color: #64748b;
+        font-weight: 800;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 1.25rem 1.5rem;
+    }
+
+    tbody tr {
+        transition: all 0.2s ease;
+        &:hover {
+            background-color: #f8fafc;
+            td { color: #0f172a; }
+        }
+
+        td {
+            padding: 1.25rem 1.5rem;
+            vertical-align: middle;
+            color: #475569;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f1f5f9;
+            font-weight: 500;
+        }
+    }
+}
+
+// Botones Circulares
+.btn-circular {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px; // Squircle style
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+
+    &:hover {
+        transform: scale(1.1);
+        background: $pastel-green-soft;
+        color: $pastel-green-dark;
+        border-color: transparent;
+        box-shadow: 0 10px 15px -3px rgba($pastel-green-dark, 0.1);
+    }
+    
+    &.btn-danger-soft:hover {
+        background: $pastel-red-soft;
+        color: $pastel-red-dark;
+    }
+
+    i { font-size: 0.9rem; }
+}
+
+.badge-pastel {
+    padding: 0.4rem 0.8rem;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    
+    &.bg-issued { background: $pastel-blue-soft; color: $pastel-blue-dark; }
+    &.bg-rejected { background: $pastel-red-soft; color: $pastel-red-dark; }
+    &.bg-released { background: $pastel-green-soft; color: $pastel-green-dark; }
+    &.bg-printed { background: $pastel-orange-soft; color: $pastel-orange-dark; }
+}
+
+// Animaciones
+.fade-in {
+    animation: fadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

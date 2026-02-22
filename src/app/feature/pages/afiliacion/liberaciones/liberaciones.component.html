@@ -1,16 +1,160 @@
-<div class="row">
-    <div class="col-xl-12">
-        <div class="card shadow">
-            <div class="card-header border-0">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h3 class="mb-0">Liberaciones</h3>
+<!-- Tarjeta Principal de Liberación -->
+
+<div class="section-header">
+    <h4><i class="fas fa-unlock-alt"></i> Gestión de Liberación de TIM</h4>
+    <p class="text-muted" style="font-size: 0.85rem;">Complete los datos para procesar la liberación del documento
+        de identificación.</p>
+</div>
+
+<form [formGroup]="liberacionForm">
+    <div class="row">
+        <!-- Columna Izquierda: Datos del Afiliado -->
+        <div class="col-lg-7">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Cédula de Identidad</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Ej: 12345678" formControlName="cedula">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Motivo de Liberación</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-exclamation-triangle"></i></span>
+                            </div>
+                            <select class="form-control" formControlName="tipo_liberacion">
+                                <option value="">Seleccione motivo...</option>
+                                <option value="extra">Extravío</option>
+                                <option value="falla">Falla de Impresión</option>
+                                <option value="rechazo">Rechazo</option>
+                                <option value="otros">Otros</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="card-body">
-                <p>Módulo Liberaciones</p>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Nombres</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Nombres del afiliado"
+                                formControlName="nombres">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Apellidos</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Apellidos del afiliado"
+                                formControlName="apellidos">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modern-form-group">
+                <label>Descripción del Evento</label>
+                <div class="input-group">
+                    <div class="input-group-prepend align-items-start pt-3">
+                        <span class="input-group-text"><i class="fas fa-edit"></i></span>
+                    </div>
+                    <textarea class="form-control" rows="4" 
+                        style="min-height: 135px;" 
+                        placeholder="Detalle exhaustivamente las razones de la liberación..."
+                        formControlName="descripcion"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Datos del TIM Actual -->
+        <div class="col-lg-5">
+            <div class="tim-data-panel">
+                <h6 class="mb-4" style="color: #598c89; font-weight: 800; font-size: 0.8rem;">
+                    <i class="fas fa-microchip mr-2"></i>DATOS TÉCNICOS DEL TIM ACTUAL
+                </h6>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <div class="data-item">
+                            <span>Código TIM</span>
+                            <strong>{{ timData.codigo }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="data-item">
+                            <span>Estatus</span>
+                            <strong class="text-warning">POR LIBERAR</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-item mb-3">
+                    <span>Fecha de Emisión Exacta</span>
+                    <strong>{{ timData.fecha }}</strong>
+                </div>
+
+                <div class="data-item mb-3">
+                    <span>Emitido por</span>
+                    <strong>{{ timData.emisor }}</strong>
+                </div>
+
+                <div class="data-item mb-3">
+                    <span>Componente Militar</span>
+                    <strong>{{ timData.componente }}</strong>
+                </div>
+
+                <div class="data-item">
+                    <span>Grado Jerárquico</span>
+                    <strong>{{ timData.grado }}</strong>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-end">
+                <button type="button" class="btn-header-action teal" (click)="openConfirmModal(confirmModal)">
+                    <i class="fas fa-unlock"></i> Procesar Liberación
+                </button>
             </div>
         </div>
     </div>
-</div>
+</form>
+
+
+
+<!-- Modal de Confirmación Estilo Identificacion -->
+<ng-template #confirmModal let-modal>
+    <div class="modal-body text-center py-5">
+        <div class="icon-confirm-pulse">
+            <i class="fas fa-unlock-alt"></i>
+        </div>
+        <h3 class="font-weight-800 mb-2" style="color: #2d4a41;">¿Confirmar Liberación?</h3>
+        <p class="text-muted px-4 mb-4">
+            Esta acción liberará el TIM actual del afiliado <strong>{{ liberacionForm.value.nombres }} {{
+                liberacionForm.value.apellidos }}</strong>.
+            Esta operación quedará registrada en la bitácora del sistema.
+        </p>
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-cancel px-4 mr-3" (click)="modal.dismiss()">
+                Cancelar
+            </button>
+            <button type="button" class="btn btn-ok px-4" (click)="confirmarLiberacion(modal)">
+                Sí, Liberar TIM
+            </button>
+        </div>
+    </div>
+</ng-template>

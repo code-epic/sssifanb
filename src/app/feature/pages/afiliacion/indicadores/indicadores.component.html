@@ -1,16 +1,243 @@
-<div class="row">
-    <div class="col-xl-12">
-        <div class="card shadow">
-            <div class="card-header border-0">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h3 class="mb-0">Indicadores de Afiliación</h3>
+<!-- Hero Header Section (Premium Minimalist) -->
+<div class="hero-summary fade-in">
+    <div class="hero-info">
+        <h1 class="mb-1">Indicadores TIM</h1>
+        <p>Control de gestión y estadísticas de emisión nacional.</p>
+    </div>
+    <div class="hero-stats-mini">
+        <div class="hero-stat-item">
+            <span>Total Procesados</span>
+            <strong>3,285</strong>
+        </div>
+        <div class="hero-stat-item">
+            <span>Efectividad</span>
+            <strong>98.5%</strong>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Detalladas (Minimalistas) -->
+<div class="stats-grid">
+    <div class="stat-card fade-in issued" style="animation-delay: 0.1s;">
+        <div class="stat-header">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <span class="stat-label">Emitidos</span>
+        </div>
+        <div class="stat-content">
+            <h3 class="stat-value">1,250</h3>
+            <div class="stat-trend" style="color: #1e88e5; background: #e3f2fd;">
+                <i class="fas fa-arrow-up"></i> 12%
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card fade-in rejected" style="animation-delay: 0.2s;">
+        <div class="stat-header">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <span class="stat-label">Rechazados</span>
+        </div>
+        <div class="stat-content">
+            <h3 class="stat-value">45</h3>
+            <div class="stat-trend" style="color: #e53935; background: #feebee;">
+                <i class="fas fa-arrow-down"></i> 5%
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card fade-in released" style="animation-delay: 0.3s;">
+        <div class="stat-header">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-unlock-alt"></i>
+            </div>
+            <span class="stat-label">Liberados</span>
+        </div>
+        <div class="stat-content">
+            <h3 class="stat-value">890</h3>
+            <div class="stat-trend" style="color: #679f6a; background: #e8f5e9;">
+                <i class="fas fa-arrow-up"></i> 8%
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card fade-in printed" style="animation-delay: 0.4s;">
+        <div class="stat-header">
+            <div class="stat-icon-wrapper">
+                <i class="fas fa-print"></i>
+            </div>
+            <span class="stat-label">Impresos</span>
+        </div>
+        <div class="stat-content">
+            <h3 class="stat-value">1,100</h3>
+            <div class="stat-trend" style="color: #fb8c00; background: #fff3e0;">
+                <i class="fas fa-arrow-up"></i> 15%
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Panel de Filtros Moderno (Inspirado en Identificacion) -->
+<div class="filter-panel fade-in" style="animation-delay: 0.5s;">
+    <form [formGroup]="filterForm">
+        <div class="filter-header">
+            <h5><i class="fas fa-filter"></i> Filtros de Segmentación</h5>
+            <div class="d-flex align-items-center">
+                <button type="button" class="btn btn-sm btn-link text-muted font-weight-bold mr-3" style="text-decoration: none; font-size: 0.75rem;" (click)="filterForm.reset()">Limpiar Filtros</button>
+                <button type="submit" class="btn btn-ok px-4 py-2" style="border-radius: 14px; font-size: 0.85rem; font-weight: 800; background: #598c89 !important;">
+                    <i class="fas fa-layer-group mr-2"></i>Actualizar Vista
+                </button>
+            </div>
+        </div>
+
+        <!-- Fila 1: Temporalidad y Búsqueda Directa -->
+        <div class="row mb-4">
+            <div class="col-lg-3">
+                <div class="modern-form-group">
+                    <label>Fecha Desde</label>
+                    <app-pastel-datepicker iconClass="fas fa-calendar-alt" placeholder="Desde" formControlName="desde"></app-pastel-datepicker>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="modern-form-group">
+                    <label>Fecha Hasta</label>
+                    <app-pastel-datepicker iconClass="fas fa-calendar-check" placeholder="Hasta" formControlName="hasta"></app-pastel-datepicker>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="modern-form-group">
+                    <label>Origen (Oficina / Usuario / Sucursal)</label>
+                    <div class="input-group flex-nowrap">
+                         <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-search-location"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Escriba aquí para buscar origen..." formControlName="origen">
                     </div>
                 </div>
             </div>
-            <div class="card-body">
-                <p>Módulo Indicadores</p>
+        </div>
+
+        <!-- Fila 2: Segmentación por Rango Militar -->
+        <div class="row">
+            <div class="col-lg-6">
+                 <div class="modern-form-group">
+                    <label>Componente Militar</label>
+                    <div class="input-group flex-nowrap">
+                         <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                        </div>
+                        <select class="form-control" formControlName="componente">
+                            <option value="">Todos los componentes...</option>
+                            <option *ngFor="let comp of componentes" [value]="comp.id">{{ comp.nombre }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="modern-form-group">
+                    <label>Grado Jerárquico</label>
+                    <div class="input-group flex-nowrap">
+                         <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-star"></i></span>
+                        </div>
+                        <select class="form-control" formControlName="grado">
+                            <option value="">Todos los grados...</option>
+                            <option *ngFor="let grado of grados" [value]="grado">{{ grado }}</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
+    </form>
+</div>
+
+<!-- Tabla de Detalles -->
+<div class="details-table-wrapper fade-in" style="animation-delay: 0.6s;">
+    <table class="table custom-table">
+        <thead>
+            <tr>
+                <th style="width: 140px;">Cédula</th>
+                <th>Afiliado</th>
+                <th>Componente / Grado</th>
+                <th style="width: 120px;">Fecha</th>
+                <th style="width: 150px;">Código TIM</th>
+                <th style="width: 130px;">Estatus</th>
+                <th class="text-center" style="width: 120px;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let doc of documentos">
+                <td class="font-weight-bold" style="color: #1e293b; font-family: 'Roboto', sans-serif;">{{ doc.cedula }}
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar avatar-xs rounded-circle bg-light text-muted mr-3 d-flex align-items-center justify-content-center font-weight-bold"
+                            style="width: 32px; height: 32px; font-size: 0.75rem; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            {{ doc.nombre.charAt(0) }}
+                        </div>
+                        <div>
+                            <div class="font-weight-bold" style="color: #334155; line-height: 1;">{{ doc.nombre }}</div>
+                            <small class="text-muted font-weight-500" style="font-size: 0.7rem;">Titular TIM</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div style="line-height: 1.3;">
+                        <div class="font-weight-bold" style="font-size: 0.75rem; color: #64748b;">{{ doc.componente }}
+                        </div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: #475569;">{{ doc.grado }}</div>
+                    </div>
+                </td>
+                <td class="text-muted font-weight-600" style="font-size: 0.8rem;">{{ doc.fecha }}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-barcode mr-2 text-muted opacity-50"></i>
+                        <span class="font-weight-bold"
+                            style="color: #598c89; font-size: 0.8rem; letter-spacing: 0.5px;">{{ doc.codigo }}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge-pastel font-weight-bold" [ngClass]="getStatusClass(doc.estatus)">
+                        {{ getStatusLabel(doc.estatus) }}
+                    </span>
+                </td>
+                <td class="text-center">
+                    <button class="btn-circular" ngbTooltip="Ver Detalles">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-circular ml-2 btn-danger-soft" ngbTooltip="Historial">
+                        <i class="fas fa-history"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Paginación Premium -->
+    <div class="px-4 py-4 bg-light d-flex justify-content-between align-items-center"
+        style="border-top: 1px solid #f1f5f9;">
+        <div class="text-muted font-weight-bold"
+            style="font-size: 0.7rem; letter-spacing: 0.5px; text-transform: uppercase;">
+            Mostrando <strong class="text-dark">1 a 5</strong> de <strong class="text-dark">2,540</strong> registros
+            encontrados
+        </div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled mr-2"><a class="page-link border-0 shadow-sm"
+                        style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"
+                        href="#"><i class="fas fa-chevron-left"></i></a></li>
+                <li class="page-item active mr-2"><a class="page-link border-0 shadow-sm font-weight-bold"
+                        style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #598c89;"
+                        href="#">1</a></li>
+                <li class="page-item mr-2"><a class="page-link border-0 shadow-sm font-weight-bold bg-white text-muted"
+                        style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"
+                        href="#">2</a></li>
+                <li class="page-item"><a class="page-link border-0 shadow-sm bg-white text-muted"
+                        style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"
+                        href="#"><i class="fas fa-chevron-right"></i></a></li>
+            </ul>
+        </nav>
     </div>
 </div>

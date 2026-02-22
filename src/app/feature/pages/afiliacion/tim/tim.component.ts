@@ -74,9 +74,9 @@ export class TimComponent implements OnInit {
     // --- MAILBOX UI INTERACTION METHODS ---
 
     public documentos: any[] = [
-        { id: '1', nombre: 'TPG C.A.', rif: 'J40014047', tramite: 'Solicitud TIM Entrada', detalle: 'Registro conformado esperando validación de firmas...', fecha: '13 Nov, 08:49', star: false, bgAvatar: 'bg-pastel-primary text-primary', avatarChar: 'T' },
-        { id: '2', nombre: 'AGROPECUARIA DON PASTOR C.A', rif: 'J41147774', tramite: 'Revisión de Documentación', detalle: 'Revisión técnica y legal en proceso interno...', fecha: '25 Sep, 17:47', star: true, bgAvatar: 'bg-pastel-success text-success', avatarChar: 'A' },
-        { id: '3', nombre: 'CONSTRUCTORA CLOMAT C.A.', rif: 'J09028146', tramite: 'Verificación de Datos Personales', detalle: 'A la espera de confirmación de huellas dactilares...', fecha: '25 Sep, 17:39', star: false, bgAvatar: 'bg-pastel-warning text-warning', avatarChar: 'C' }
+        { id: '1', nombre: 'CARLOS EDUARDO PEREZ', rif: 'V-12345678', tramite: 'INGRESO', detalle: 'GUARDIA NACIONAL BOLIVARIANA', fecha: '13 Nov, 08:49', star: false, bgAvatar: 'bg-pastel-primary text-primary', avatarChar: 'T' },
+        { id: '2', nombre: 'MARIA GONZALES', rif: 'V-87654321', tramite: 'CAMBIO', detalle: 'EJERCITO BOLIVARIANO', fecha: '25 Sep, 17:47', star: true, bgAvatar: 'bg-pastel-success text-success', avatarChar: 'A' },
+        { id: '3', nombre: 'JUAN PEREZ', rif: 'V-12345678', tramite: 'EXTRAVIO', detalle: 'AVIACION MILITAR BOLIVARIANA', fecha: '25 Sep, 17:39', star: false, bgAvatar: 'bg-pastel-warning text-warning', avatarChar: 'C' }
     ];
 
     public selectedDocs: { [key: string]: boolean } = {};
