@@ -1,4 +1,4 @@
-<div class="table-responsive bg-white {{ config?.containerClass || 'rounded-lg shadow-sm border' }}" [ngStyle]="!config?.containerClass ? {'border-color': 'rgba(89,140,137,0.15)', 'border-radius': '16px', 'overflow': 'visible'} : {'overflow': 'visible'}">
+<div class="bg-white {{ config?.containerClass || 'rounded-lg shadow-sm border' }}" [ngStyle]="!config?.containerClass ? {'border-color': 'rgba(89,140,137,0.15)', 'border-radius': '16px', 'overflow': 'visible'} : {'overflow': 'visible'}">
     <table class="table custom-table align-middle mb-0 {{ config?.tableClass || '' }}">
         <thead class="bg-light-soft sticky-top" *ngIf="!config?.hideHeader">
             <tr>
@@ -49,6 +49,7 @@
                 <td *ngFor="let col of config?.columns; let first = first; let last = last" 
                     [class.ps-4]="!config?.selectable && first"
                     [ngClass]="col.cssClass || ''"
+                    [style.position]="(last && config?.hoverActions) ? 'relative' : 'static'"
                     [style.text-align]="col.align || 'left'">
                     
                     <!-- Text Type -->
@@ -85,7 +86,7 @@
                         <div class="action-buttons-container-dynamic d-flex justify-content-end align-items-center h-100">
                             <button *ngFor="let act of config!.actions" 
                                     [ngClass]="act.buttonClass || 'btn-circular ml-2'"
-                                    [ngbTooltip]="act.tooltip"
+                                    [ngbTooltip]="act.tooltip" container="body"
                                     (click)="onAction(act.name, row); $event.stopPropagation()">
                                 <i [ngClass]="['fas', act.icon, act.iconColorClass || '']"></i>
                             </button>
@@ -99,7 +100,7 @@
                     <div class="d-flex justify-content-end align-items-center h-100">
                         <button *ngFor="let act of config!.actions" 
                                 [ngClass]="act.buttonClass || 'btn-circular ml-2'"
-                                [ngbTooltip]="act.tooltip"
+                                [ngbTooltip]="act.tooltip" container="body"
                                 (click)="onAction(act.name, row); $event.stopPropagation()">
                             <i [ngClass]="['fas', act.icon, act.iconColorClass || '']"></i>
                         </button>

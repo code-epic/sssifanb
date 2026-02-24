@@ -13,6 +13,8 @@ import { ReportesComponent } from './reportes/reportes.component';
 
 import { NgbDropdownModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-datepicker/pastel-datepicker.component';
+import { DynamicTableComponent } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
+import { MailboxLayoutComponent } from 'src/app/shared/components/mailbox-layout/mailbox-layout.component';
 
 @NgModule({
     declarations: [
@@ -31,7 +33,9 @@ import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-date
         ReactiveFormsModule,
         NgbDropdownModule,
         NgbModalModule,
-        PastelDatepickerComponent
+        PastelDatepickerComponent,
+        DynamicTableComponent,
+        MailboxLayoutComponent
     ]
 })
 export class PrestacionesModule { }

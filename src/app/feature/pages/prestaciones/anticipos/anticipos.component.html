@@ -1,20 +1,442 @@
-<div class="prestaciones-container fade-in">
-    <div class="hero-summary mb-4">
-        <div class="hero-info">
-            <h1>Anticipos de Prestaciones</h1>
-            <p>Gestión y procesamiento de solicitudes de anticipos.</p>
-        </div>
-        <div class="hero-stats-mini">
-            <div class="hero-stat-item">
-                <span>Pendientes</span>
-                <strong>0</strong>
+<!-- MAIN VIEW: MAILBOX LAYOUT -->
+<app-mailbox-layout #mailboxLayout *ngIf="!isNewAnticipoView" [tabs]="workflowTabs" [currentTabId]="currentTabId"
+    [isLoadingTabs]="isLoadingData" [showToolbar]="true" [allSelected]="allSelected"
+    [searchPlaceholder]="'Buscar por cédula o código...'" (search)="onMailboxSearch($event)"
+    (tabSwitch)="onMailboxTabSwitch($event)" (refresh)="onMailboxRefresh()" (selectAll)="onMailboxSelectAll($event)">
+
+    <ng-container toolbar-actions>
+        <button class="btn btn-pastel-icon-circle mr-2 fade-in tooltip-action btn-nuevo-pastel" 
+            (click)="toggleView()" ngbTooltip="Nuevo Anticipo">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="btn btn-pastel-icon-circle fade-in tooltip-action btn-csv-emerald" 
+            (click)="mostrarConfirmacionCSV()" ngbTooltip="Exportar CSV">
+            <i class="fas fa-file-excel"></i>
+        </button>
+    </ng-container>
+
+    <!-- FILTROS INYECTADOS EN EL NGB-DROPDOWN DEL MAILBOX -->
+    <ng-container mailbox-filters>
+        <div class="modern-form-group">
+            <label>Rango de Fechas</label>
+            <div class="row align-items-center">
+                <div class="col-6 pr-2">
+                    <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                </div>
+                <div class="col-6 pl-2">
+                    <app-pastel-datepicker iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                </div>
             </div>
         </div>
+        
+        <div class="modern-form-group">
+            <label>Componente Militar</label>
+            <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt text-verde-titulos"></i></span></div>
+                <select class="form-control" style="font-size: 0.85rem;">
+                    <option value="" selected>Todos los Componentes...</option>
+                    <option value="ejb">Ejército Bolivariano</option>
+                    <option value="arb">Armada Bolivariana</option>
+                    <option value="amb">Aviación Militar</option>
+                    <option value="gnb">Guardia Nacional</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="modern-form-group mb-1">
+            <label>Grado Jerárquico</label>
+            <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star text-verde-titulos"></i></span></div>
+                <select class="form-control" style="font-size: 0.85rem;">
+                    <option value="" selected>Todos los Grados...</option>
+                    <option>General / Almirante</option>
+                    <option>Oficial Superior</option>
+                    <option>Oficial Subalterno</option>
+                    <option>Tropa Profesional</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-end mt-4 pt-2" style="border-top: 1px solid #f1f5f9;">
+            <button class="btn btn-light shadow-sm font-weight-bold px-4 mr-2" 
+                style="border-radius: 8px; font-size: 0.85rem; padding: 0.5rem; color: #64748b;" 
+                (click)="mailboxLayout.filterDropdown.close()">
+                Cancelar
+            </button>
+            <button class="btn font-weight-bold shadow-sm transition-all px-4"
+                style="background-color: #598c89; color: white; border-radius: 8px; font-size: 0.85rem; padding: 0.5rem;"
+                onmouseover="this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.transform='translateY(0)'"
+                (click)="mailboxLayout.filterDropdown.close()">Aplicar Filtros
+            </button>
+        </div>
+    </ng-container>
+
+    <!-- BODY MAILBOX (LA TABLA DINÁMICA) -->
+    <ng-container mailbox-body>
+        <app-dynamic-table [config]="pendingTableConfig" [data]="pendingTableData"
+            (actionClicked)="onPendingTableAction($event)">
+        </app-dynamic-table>
+    </ng-container>
+</app-mailbox-layout>
+
+<!-- SECONDARY VIEW: NEW ANTICIPO FORM & HISTORY -->
+<div class="new-anticipo-view fade-in" *ngIf="isNewAnticipoView">
+
+    <!-- HEADER VOLVER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-2 px-2">
+        <h4 class="mb-0 text-dark font-weight-bold" style="letter-spacing: -0.5px;">Gestión de Anticipos</h4>
+        <button class="btn shadow-sm font-weight-600 px-4 rounded-pill bg-white border text-dark"
+            style="border-color: #cbd5e1 !important;" (click)="toggleView()">
+            <i class="fas fa-arrow-left mr-2" style="color: #5eaaa8;"></i> Volver a Bandeja
+        </button>
     </div>
 
-    <div class="card shadow-sm border-0" style="border-radius: 20px;">
-        <div class="card-body p-4">
-            <p class="text-muted">Módulo de Anticipos en desarrollo...</p>
+   
+
+    <div class="row px-3">
+        <div class="col-md-4">
+            <div class="modern-form-group">
+                <label>Cédula de Identidad</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-id-card"></i></span></div>
+                    <input type="text" class="form-control" placeholder="Ej. 12345678" [(ngModel)]="searchCedula" (keyup.enter)="buscarMilitar()">
+                    <div class="input-group-append p-1">
+                        <button class="btn btn-header-action teal shadow-none m-0 d-flex align-items-center justify-content-center" 
+                            style="border-radius: 6px; padding: 0 1.2rem; height: 100%; border: none;" type="button" (click)="buscarMilitar()">
+                            <i class="fas fa-search m-0" style="font-size: 0.9rem;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Campos de solo lectura -->
+        <div class="col-md-6">
+            <div class="modern-form-group">
+                <label>Nombres y Apellidos</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.nombres || ''" readonly>
+                </div>
+            </div>
+        </div>
+
+         <div class="col-md-2">
+            <div class="modern-form-group mb-0">
+                <label>Sexo</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-venus-mars text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.sexo || ''" readonly>
+                </div>
+            </div>
+        </div>
+        
+       
+    </div>
+
+
+    <!-- <div class="row px-3 mt-1">
+        
+        
+        <div class="col-md-3">
+            <div class="modern-form-group mb-0">
+                <label>Último Ascenso</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-medal text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.fechaAscenso || ''" readonly>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="modern-form-group mb-0">
+                <label>Fecha de Nacimiento</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-birthday-cake text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.fechaNacimiento || ''" readonly>
+                </div>
+            </div>
+        </div>
+        
+       
+    </div> -->
+
+    <div class="row px-3">
+        <div class="col-md-3">
+            <div class="modern-form-group mb-0">
+                <label>Fecha de Ingreso</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-calendar-alt text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.fechaIngreso || ''" readonly>
+                </div>
+            </div>
+        </div>
+         <div class="col-md-5">
+            <div class="modern-form-group">
+                <label>Componente</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.componente || ''" readonly>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="modern-form-group">
+                <label>Grado</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.grado || ''" readonly>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+
+
+    <div class="text-right mt-5 mb-4 px-3" *ngIf="militarData">
+        <button class="btn btn-header-action teal shadow-sm px-5" (click)="solicitarAnticipo()">
+            <i class="fas fa-check-circle mr-2"></i> Solicitar Anticipo
+        </button>
+    </div>
+
+    <!-- CARD: Histórico de Solicitudes (Aparece al consultar cédula) -->
+    <div class="card shadow-sm border-0 fade-in" style="border-radius: 20px; background: rgba(255, 255, 255, 0.95);"
+        *ngIf="militarData">
+        <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4 d-flex align-items-center">
+            <div class="icon-circle shadow-sm rounded-circle d-flex align-items-center justify-content-center text-white mr-3"
+                style="width: 44px; height: 44px; background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);">
+                <i class="fas fa-history"></i>
+            </div>
+            <div>
+                <h6 class="mb-0 text-dark font-weight-bold">Histórico de Anticipos</h6>
+                <small class="text-muted">{{ militarData.nombres }}</small>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <app-dynamic-table [config]="historyTableConfig" [data]="historyTableData">
+            </app-dynamic-table>
         </div>
     </div>
 </div>
+
+
+<!-- Modal: CSV -->
+<ng-template #modalCSV let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Exportar a CSV?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Desea generar y descargar el listado de Anticipos Pendientes en formato CSV para su análisis?
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action shadow-none w-100" style="background-color: #f1fdf6; color: #10b981; border: 1px solid #d1fae5;" (click)="confirmarCSV()">
+                    Generar CSV
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Aprobar Documento (Pastel Premium Style) -->
+<ng-template #modalAprobar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse teal">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Aprobar Anticipo?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Está seguro que desea aprobar el anticipo de <strong>{{ selectedMilitar?.nombre }}</strong>? Esta acción actualizará el estatus formalmente.
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action teal shadow-none w-100" (click)="confirmarAprobacion()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Rechazar Documento (Pastel Premium Style) -->
+<ng-template #modalRechazar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse red">
+                <i class="fas fa-times"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Rechazar Anticipo?</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Se dispone a rechazar el anticipo de <strong>{{ selectedMilitar?.nombre }}</strong>. Esta acción quedará en bitácora.
+            </p>
+            
+            <div class="modern-form-group mb-4 text-left">
+                <label class="text-danger font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">MOTIVO DE RECHAZO *</label>
+                <textarea class="form-control border shadow-none" rows="2"
+                    placeholder="Describa el motivo detalladamente..."
+                    style="border-radius: 12px; border-color: #e2e8f0 !important; border-width: 2px !important; resize: none; font-size: 0.95rem; padding: 1rem; color: #475569;" required></textarea>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action red shadow-none w-100" (click)="confirmarRechazo()">
+                    Rechazar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Confirmar y Detallar Nuevo Anticipo -->
+<ng-template #modalSolicitar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <!-- Encabezado con Ícono y Título -->
+        <div class="modal-body p-4 bg-white">
+            <div class="d-flex align-items-center mb-4 pb-2" style="border-bottom: 1px solid #f1f5f9;">
+                <div class="icon-circle shadow-sm rounded-circle d-flex align-items-center justify-content-center text-white mr-3"
+                    style="width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);">
+                    <i class="fas fa-hand-holding-usd text-lg"></i>
+                </div>
+                <div class="w-100">
+                    <h5 class="mb-0 text-dark font-weight-bold">Determinar Nuevo Anticipo</h5>
+                    <small class="text-muted d-block mt-1">{{ militarData?.nombres }} | C.I. {{ militarData?.cedula }}</small>
+                </div>
+                <button type="button" class="close ml-auto m-0 p-0 text-muted shadow-none h-100 d-flex align-items-start" aria-label="Close" (click)="modal.dismiss()" style="outline: none;">
+                    <span aria-hidden="true" style="font-size: 1.75rem;">&times;</span>
+                </button>
+            </div>
+
+            <!-- Fila 1: Garantías y Capital en Banco -->
+            <div class="row px-2">
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Garantías</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-file-contract text-verde-titulos"></i></span></div>
+                            <input type="text" class="form-control text-dark font-weight-bold" value="Bs. 25,000.00" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Capital en Banco</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-university text-verde-titulos"></i></span></div>
+                            <input type="text" class="form-control text-dark font-weight-bold" value="Bs. 10,000.00" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 2: Anticipos Anteriores y Asignación Depositada -->
+            <div class="row px-2">
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Anticipos Acumulados</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-history text-verde-titulos"></i></span></div>
+                            <input type="text" class="form-control text-dark font-weight-bold" value="Bs. 5,000.00" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label>Asignación Depositada</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-piggy-bank text-verde-titulos"></i></span></div>
+                            <input type="text" class="form-control text-dark font-weight-bold" value="Bs. 3,500.00" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 3: Medidas Judiciales Activas y Motivo -->
+            <div class="row px-2 mt-2">
+                <div class="col-md-4">
+                    <div class="modern-form-group">
+                        <label>M/J Activas</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-gavel text-danger"></i></span></div>
+                            <input type="text" class="form-control font-weight-bold" style="color: #ef4444;" value="0.00" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="modern-form-group">
+                        <label>Motivo del Anticipo</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-list-ul text-verde-titulos"></i></span></div>
+                            <select class="form-control text-dark font-weight-500">
+                                <option value="" selected disabled>Seleccione un Motivo...</option>
+                                <option value="1">Adquisición de Vivienda</option>
+                                <option value="2">Reparación de Vivienda</option>
+                                <option value="3">Gastos Médicos Mayores</option>
+                                <option value="4">Educación</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 4: Cálculos Automáticos (Porcentaje / Monto) -->
+            <div class="row px-2 mt-2">
+                <div class="col-sm-12 text-muted mb-3"><small class="font-weight-600 pl-1"><i class="fas fa-calculator mr-1"></i> Calculadora (Determine el Descuento via Porcentaje o Monto Fijo)</small></div>
+                <div class="col-md-6">
+                    <div class="modern-form-group mb-0">
+                        <label>Cálculo por Porcentaje (%)</label>
+                        <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" style="font-size: 1.15rem; border: none; color: #0f172a;">
+                            <div class="input-group-append p-1">
+                                <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 
+                                        style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button">
+                                    <i class="fas fa-percent"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group mb-0">
+                        <label>Cálculo por Monto (Bs.)</label>
+                        <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" style="font-size: 1.15rem; border: none; color: #0f172a;">
+                            <div class="input-group-append p-1">
+                                <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 
+                                        style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button">
+                                    <i class="fas fa-coins"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Separador -->
+            <div class="my-4" style="border-top: 1px dashed #e2e8f0;"></div>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-end align-items-center mt-2 px-2">
+                <button type="button" class="btn btn-light shadow-sm font-weight-bold px-4 mr-3" style="border-radius: 8px; color: #64748b;" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-header-action teal shadow-sm px-5 m-0" (click)="procesarSolicitud()">
+                    <i class="fas fa-check-double mr-2"></i> Procesar Anticipo
+                </button>
+            </div>
+            
+        </div>
+    </div>
+</ng-template>

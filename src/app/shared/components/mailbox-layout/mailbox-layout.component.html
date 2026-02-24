@@ -1,0 +1,79 @@
+<div class="row">
+    <div class="col-xl-12" style="margin: 0px; padding: 0px;">
+        <!-- Wrapper principal sin marco ni padding excedente (Se asume envuelto por un Grid Item o Card) -->
+        <div class="mailbox-layout-wrapper d-flex flex-column h-100 bg-transparent w-100">
+            
+            <!-- Pestañas (Tabs) dinámicas -->
+            <div class="pt-2 pb-0 px-2" style="background-color: transparent; border-radius: 12px 12px 0 0; position: relative; z-index: 105;">
+                <ul class="nav nav-tabs custom-nav-tabs mb-0" style="border-bottom: 2px solid transparent;">
+                    <li class="nav-item d-flex" *ngFor="let tab of tabs">
+                        <a class="nav-link w-100"
+                            [class.active]="currentTabId === tab.id" 
+                            (click)="onTabClick(tab.id)">
+                            <i class="fas icon-tab" [ngClass]="getTabIcon(tab.nomb || tab.nombre)"></i>
+                            <span>{{ (tab.nomb || tab.nombre) | titlecase }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item d-flex" *ngIf="tabs.length === 0 || isLoadingTabs">
+                        <a class="nav-link w-100 disabled text-muted" style="cursor: default;">
+                            <i class="fas" [ngClass]="isLoadingTabs ? 'fa-spinner fa-spin' : 'fa-folder-open'"></i> 
+                            <span>{{ isLoadingTabs ? 'Cargando estados...' : 'Bandeja Principal' }}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Toolbar de Búsqueda y Herramientas (Opcional vía Input) -->
+            <div class="bg-white py-3 px-3 d-flex justify-content-between align-items-center flex-wrap toolbar-wrapper shadow-sm" *ngIf="showToolbar" style="border-bottom: 1px solid #f1f5f9; position: relative; z-index: 104;">
+                
+                <div class="d-flex align-items-center mb-2 mb-md-0" style="margin-left: 0px;">
+                    <!-- Botones Generales -->
+                    <div class="d-flex align-items-center">
+                        <ng-content select="[toolbar-actions]"></ng-content>
+                        <button class="btn btn-sm btn-pastel-icon-circle ml-2 tooltip-action btn-refresh-soft-blue" style="width: 36px; height: 36px;" (click)="onRefresh()" ngbTooltip="Actualizar Bandeja" container="body">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barra de Búsqueda central con Filtros Integrados -->
+                <div class="modern-form-group mb-0 w-auto">
+                    <div class="input-group shadow-sm bg-white" style="border-radius: 8px; border: 1px solid rgba(89,140,137,0.2); position: relative; height: 38px;">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-transparent border-0 text-muted pr-0" style="padding-left: 14px;"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input type="text" class="form-control border-0 shadow-none bg-transparent" 
+                               [placeholder]="searchPlaceholder" 
+                               [(ngModel)]="searchTerm" 
+                               (ngModelChange)="onSearchSubmit()"
+                               style="min-width: 440px; font-size: 0.95rem; padding-left: 12px; height: 100%;">
+                        
+                        <!-- Configurador Elegante (NgbDropdown) -->
+                        <div class="input-group-append" ngbDropdown placement="bottom-right" [autoClose]="false" #filterDropdown="ngbDropdown" *ngIf="hasFilters">
+                            <button class="btn btn-white shadow-none border-0 text-muted transition-all" ngbDropdownToggle 
+                            style="padding-left: 14px; padding-right: 14px; border-left: 1px solid #f1f5f9 !important; background: transparent; height: 100%; border-radius: 0 8px 8px 0;" ngbTooltip="Filtros Adicionales" container="body">
+                                <i class="fas fa-sliders-h"></i>
+                            </button>
+                            
+                            <!-- Menú de Filtros (Inyectado por el Componente Hijo) -->
+                            <div ngbDropdownMenu class="dropdown-menu-right shadow-lg border-0 p-0 dropdown-menu-caret animate-dropdown-in" 
+                            style="width: 510px; border-radius: 12px; overflow: visible;">   
+                                <div class="p-4 bg-white" style="border-radius: 12px; border: none; overflow: hidden;">
+                                    <ng-content select="[mailbox-filters]"></ng-content>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- El Body inyectado desde el Componente Hijo (Tabla o Formulario) -->
+            <div class="d-flex flex-column wrapper-body-content pt-3" style="flex: 1; overflow-y: auto;">
+                <div class="px-2 pb-2">
+                    <ng-content select="[mailbox-body]"></ng-content>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>

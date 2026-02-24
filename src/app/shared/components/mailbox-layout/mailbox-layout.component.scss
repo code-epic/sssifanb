@@ -1,0 +1,131 @@
+    /* Mailbox Layout Styles */
+.toolbar-wrapper {
+    .tooltip-action {
+      transition: background-color 0.2s, color 0.2s, transform 0.2s;
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+}
+  
+/* ------------- TABS MODERNAS MAILBOX ------------- */
+.custom-nav-tabs {
+    border-bottom: 2px solid #eaecf5 !important;
+    display: flex;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+    
+    .nav-item {
+      margin-right: 0.5rem;
+      cursor: pointer;
+    }
+  
+    .nav-link {
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: #8898aa !important;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 1rem 1.25rem;
+      transition: all 0.3s ease;
+      background: transparent !important;
+      
+      i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+        vertical-align: text-bottom;
+        color: #adb5bd;
+        transition: color 0.3s ease;
+      }
+  
+      &:hover {
+        color: #598c89 !important;
+        i { color: #598c89; }
+      }
+  
+      &.active, &:active {
+        color: #598c89 !important;
+        border-bottom-color: #598c89;
+        font-weight: 600;
+        
+        i {
+            color: #598c89;
+        }
+      }
+    }
+}
+
+/* Botones Circulares puros */
+::ng-deep .btn-pastel-icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50% !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background-color: #ffffff;
+    
+    &:hover {
+        transform: translateY(-2px) scale(1.05);
+    }
+    
+    &.pastel-success {
+        background-color: #f1fdf6;
+        color: #10b981;
+        border: 1px solid #d1fae5;
+        &:hover { background-color: #d1fae5; color: #059669; }
+    }
+    
+    &.pastel-danger {
+        background-color: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fee2e2;
+        &:hover { background-color: #fee2e2; color: #dc2626; }
+    }
+}
+
+.btn-refresh-soft-blue {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    color: #3b82f6 !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    &:hover {
+        background-color: #3b82f6 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2) !important;
+    }
+}
+
+/* Caret Customization for NgbDropdownMenu */
+.dropdown-menu-caret {
+    margin-top: 10px;
+    &::before {
+        content: "";
+        position: absolute;
+        top: -8px;
+        right: 20px;
+        border-width: 0 8px 8px 8px;
+        border-style: solid;
+        border-color: transparent transparent #ffffff transparent;
+        z-index: 10;
+    }
+    &::after {
+        content: "";
+        position: absolute;
+        top: -9px;
+        right: 19px;
+        border-width: 0 9px 9px 9px;
+        border-style: solid;
+        border-color: transparent transparent rgba(0,0,0,0.05) transparent;
+        z-index: 9;
+    }
+}
+
+/* Base Wrapper Z-Index Fix */
+.wrapper-body-content {
+    position: relative;
+    z-index: 1;
+}
