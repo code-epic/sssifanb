@@ -7,15 +7,19 @@ import { CalculadoraComponent } from './calculadora/calculadora.component';
 import { ConceptosComponent } from './conceptos/conceptos.component';
 import { PatriaComponent } from './patria/patria.component';
 import { RetroactivosComponent } from './retroactivos/retroactivos.component';
+import { CalculosComponent } from './calculos/calculos.component';
 
 import { NgbDropdownModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-datepicker/pastel-datepicker.component';
+import { DynamicTableComponent } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
 
 @NgModule({
     declarations: [
         CalculadoraComponent,
         ConceptosComponent,
         PatriaComponent,
-        RetroactivosComponent
+        RetroactivosComponent,
+        CalculosComponent
     ],
     imports: [
         CommonModule,
@@ -23,7 +27,9 @@ import { NgbDropdownModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
         FormsModule,
         ReactiveFormsModule,
         NgbDropdownModule,
-        NgbModalModule
+        NgbModalModule,
+        PastelDatepickerComponent,
+        DynamicTableComponent
     ]
 })
 export class NominaModule { }

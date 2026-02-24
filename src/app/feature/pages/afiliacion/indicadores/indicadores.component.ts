@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LayoutService } from 'src/app/core/services/layout/layout.service';
+import { DynamicTableConfig } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
 
 @Component({
     selector: 'app-afi-indicadores',
@@ -47,6 +48,7 @@ export class IndicadoresComponent implements OnInit {
 
     ngOnInit(): void {
         this.initForm();
+        this.procesarTablaDocumentos();
         this.layoutService.triggerScrollToTop();
 
         this.layoutService.toggleCards(false);
@@ -56,6 +58,76 @@ export class IndicadoresComponent implements OnInit {
             alertSeverity: 1,
             showAlertsIcon: true
         });
+    }
+
+    // -- CONFIGURACIÓN PARA TABLA DINÁMICA --
+    public tableConfig: DynamicTableConfig = {
+        selectable: false,
+        rowClickable: true,
+        showPagination: true,
+        pageSize: 5,
+        columns: [
+            { key: 'cedulaFormat', header: 'Cédula', type: 'html', width: '140px' },
+            { key: 'afiliadoFormat', header: 'Afiliado', type: 'html' },
+            { key: 'gradoFormat', header: 'Componente / Grado', type: 'html' },
+            { key: 'fechaFormat', header: 'Fecha', type: 'html', width: '120px' },
+            { key: 'codigoFormat', header: 'Código TIM', type: 'html', width: '150px' },
+            { key: 'estatusFormat', header: 'Estatus', type: 'html', width: '130px' }
+        ],
+        actions: [
+            { name: 'ver', icon: 'fa-eye', tooltip: 'Ver Detalles' },
+            { name: 'historial', icon: 'fa-history', tooltip: 'Historial', buttonClass: 'btn-danger-soft' }
+        ]
+    };
+
+    public tableData: any[] = [];
+
+    private procesarTablaDocumentos(): void {
+        this.tableData = this.documentos.map(doc => {
+            return {
+                ...doc,
+                cedulaFormat: `<span class="font-weight-bold" style="color: #1e293b; font-family: 'Roboto', sans-serif;">${doc.cedula}</span>`,
+                afiliadoFormat: `
+                    <div class="d-flex align-items-center">
+                        <div class="avatar avatar-xs rounded-circle bg-light text-muted mr-3 d-flex align-items-center justify-content-center font-weight-bold"
+                            style="width: 32px; height: 32px; font-size: 0.75rem; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            ${doc.nombre.charAt(0)}
+                        </div>
+                        <div>
+                            <div class="font-weight-bold" style="color: #334155; line-height: 1;">${doc.nombre}</div>
+                            <small class="text-muted font-weight-500" style="font-size: 0.7rem;">Titular TIM</small>
+                        </div>
+                    </div>
+                `,
+                gradoFormat: `
+                    <div style="line-height: 1.3;">
+                        <div class="font-weight-bold" style="font-size: 0.75rem; color: #64748b;">${doc.componente}</div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: #475569;">${doc.grado}</div>
+                    </div>
+                `,
+                fechaFormat: `<span class="text-muted font-weight-600" style="font-size: 0.8rem;">${doc.fecha}</span>`,
+                codigoFormat: `
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-barcode mr-2 text-muted opacity-50"></i>
+                        <span class="font-weight-bold" style="color: #598c89; font-size: 0.8rem; letter-spacing: 0.5px;">${doc.codigo}</span>
+                    </div>
+                `,
+                estatusFormat: `
+                    <span class="badge-pastel font-weight-bold ${this.getStatusClass(doc.estatus)}">
+                        ${this.getStatusLabel(doc.estatus)}
+                    </span>
+                `
+            };
+        });
+    }
+
+    onTableAction(event: any) {
+        // Handle actions inside the table if necessary.
+        console.log('Action triggered:', event.actionName, event.row);
+    }
+
+    onRowClicked(row: any) {
+        console.log('Row clicked:', row);
     }
 
     private initForm() {

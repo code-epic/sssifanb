@@ -11,7 +11,7 @@ import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-date
 import { IndicadoresComponent } from './indicadores/indicadores.component';
 import { LiberacionesComponent } from './liberaciones/liberaciones.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-
+import { DynamicTableComponent } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
 
 @NgModule({
     declarations: [
@@ -29,7 +29,8 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
         FormsModule,
         ReactiveFormsModule,
         PastelDatepickerComponent,
-        NgbDropdownModule
+        NgbDropdownModule,
+        DynamicTableComponent
     ]
 })
 export class AfiliacionModule { }

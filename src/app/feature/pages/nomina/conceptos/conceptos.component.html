@@ -1,25 +1,261 @@
-<div class="nomina-container fade-in">
-    <div class="hero-summary mb-4">
-        <div class="hero-info">
-            <h1>Gestión de Conceptos</h1>
-            <p>Configuración y definición de conceptos salariales y deducciones.</p>
-        </div>
-        <div class="hero-stats-mini">
-            <div class="hero-stat-item">
-                <i class="fa fa-tags text-teal fa-2x"></i>
+<!-- Custom Tabs Header -->
+<ul class="nav nav-tabs custom-tabs fade-in border-0 mb-4 d-flex align-items-center" id="conceptosTabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'libreria'" (click)="activeTab = 'libreria'">
+            <i class="fa fa-layer-group" style="font-size: 1.1rem; margin-right: 12px;"></i> Librería de Conceptos
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'mantenimiento'" (click)="activeTab = 'mantenimiento'">
+            <i class="fa fa-code-branch" style="font-size: 1.1rem; margin-right: 12px;"></i> Mantenimiento de Fórmula
+        </a>
+    </li>
+    
+    <!-- Botón alineado a los tabs -->
+    <li class="nav-item ms-auto text-end" *ngIf="activeTab === 'libreria'">
+        <button class="btn-pastel-icon pastel-success shadow-none" type="button" (click)="nuevoConcepto()" title="Nuevo Concepto">
+            <i class="fas fa-plus"></i>
+        </button>
+    </li>
+</ul>
+
+<!-- Tabs Content Wrapper -->
+<div class="tab-content fade-in mt-2" id="conceptosTabsContent">
+
+    <!-- ============================================== -->
+    <!-- TAB 1: LIBRERÍA DE CONCEPTOS (INVENTARIO)      -->
+    <!-- ============================================== -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'libreria'" [class.active]="activeTab === 'libreria'" id="libreria" role="tabpanel">
+
+            <div class="table-responsive" style="border-radius: 12px; min-height: 480px; overflow-y: visible;">
+                <app-dynamic-table 
+                    [config]="tableConfig" 
+                    [data]="tableData"
+                    (rowClicked)="onRowClicked($event)" 
+                    (actionClicked)="onTableAction($event, modalConfirmarEliminar)">
+                </app-dynamic-table>
             </div>
-        </div>
+      
     </div>
 
-    <div class="card shadow-sm border-0" style="border-radius: 20px;">
-        <div class="card-body p-4 text-center">
-            <div class="empty-state py-5">
-                <div class="icon-circle bg-light-teal mb-4 mx-auto" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: #e0f2f1;">
-                    <i class="fa fa-tags fa-3x text-teal"></i>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: MANTENIMIENTO / EDICION                 -->
+    <!-- ============================================== -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'mantenimiento'" [class.active]="activeTab === 'mantenimiento'" id="mantenimiento" role="tabpanel">
+        
+       
+            <!-- Formulario Principal -->
+            <div class="col-lg-12">
+                   
+
+                    <form [formGroup]="formConcepto" (ngSubmit)="confirmarGuardar(modalConfirmarGuardar)">
+                        
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="modern-form-group">
+                                    <label>CÓDIGO ALFANUMÉRICO</label>
+                                    <div class="input-group custom-input-group shadow-none">
+                                        <div class="input-group-prepend"><span class="input-group-text ps-3 pe-2"><i class="fa fa-barcode"></i></span></div>
+                                        <input type="text" formControlName="codigo" class="form-control" placeholder="Ej: P002" style="text-transform: uppercase;" [readonly]="editando">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="modern-form-group">
+                                    <label>DESCRIPCIÓN COMERCIAL</label>
+                                    <div class="input-group custom-input-group shadow-none">
+                                        <div class="input-group-prepend"><span class="input-group-text ps-3 pe-2"><i class="fa fa-font"></i></span></div>
+                                        <input type="text" formControlName="descripcion" class="form-control" placeholder="Nombre descriptivo para la retención o asignación">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rust Embedded Editor Pastel Green -->
+                        <div class="modern-form-group mb-4 mt-2">
+                            <label class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-primary-teal" style="font-size: 0.8rem;"><i class="fab fa-rust me-1"></i> EXPRESIÓN DE CÁLCULO (RUST EMBEDDED)</span>
+                                <button type="button" class="btn btn-sm" title="Ver Diccionario" (click)="abrirModalVariables(modalVariables)" style="background: rgba(89,140,137,0.1); color: #598c89; border-radius: 8px; font-weight: 700;">
+                                    <i class="fa fa-book-open me-1"></i> VER DICCIONARIO
+                                </button>
+                            </label>
+                            
+                            <div class="rust-editor-wrapper">
+                                <!-- Barra superior del editor -->
+                                <div class="editor-header w-100 px-3 py-2 d-flex justify-content-between align-items-center font-monospace" style="font-size: 0.8rem;">
+                                    <span><i class="fa fa-terminal me-2"></i>src/kernel/formulas.rs</span>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge shadow-sm px-2 py-1 cursor-pointer" (click)="insertarOperador('+')">+</span>
+                                        <span class="badge shadow-sm px-2 py-1 cursor-pointer" (click)="insertarOperador('-')">-</span>
+                                        <span class="badge shadow-sm px-2 py-1 cursor-pointer" (click)="insertarOperador('*')">*</span>
+                                        <span class="badge shadow-sm px-2 py-1 cursor-pointer" (click)="insertarOperador('/')">/</span>
+                                        <span class="badge shadow-sm px-2 py-1 cursor-pointer" (click)="insertarOperador('(')">(</span>
+                                        <span class="badge shadow-sm px-2 py-1 cursor-pointer" (click)="insertarOperador(')')">)</span>
+                                    </div>
+                                </div>
+                                <!-- Area de texto pastel -->
+                                <textarea formControlName="formula" class="form-control editor-body font-monospace p-4" rows="4" 
+                                          placeholder="// Defina la expresión matemática aquí utilizando las variables del diccionario..." 
+                                          style="resize: none; border: none;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label>PARTIDA PRESUPUESTARIA</label>
+                                    <div class="input-group custom-input-group shadow-none">
+                                        <div class="input-group-prepend"><span class="input-group-text ps-3 pe-2"><i class="fa fa-file-invoice"></i></span></div>
+                                        <input type="text" formControlName="partida" class="form-control font-monospace" placeholder="X-XX-XX-XX-X">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label>CUENTA CONTABLE</label>
+                                    <div class="input-group custom-input-group shadow-none">
+                                        <div class="input-group-prepend"><span class="input-group-text ps-3 pe-2"><i class="fa fa-calculator"></i></span></div>
+                                        <input type="text" formControlName="cuenta" class="form-control font-monospace" placeholder="100-20-30">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label>CLASE FINANCIERA (TIPO)</label>
+                                    <div class="input-group custom-input-group shadow-none">
+                                        <div class="input-group-prepend"><span class="input-group-text ps-3 pe-2"><i class="fa fa-balance-scale"></i></span></div>
+                                        <select formControlName="tipo" class="form-control fw-bold text-dark">
+                                            <option [value]="1">ASIGNACIÓN REGULAR</option>
+                                            <option [value]="0">DEDUCCIÓN DE LEY</option>
+                                            <option [value]="2">OTRAS ASIGNACIONES</option>
+                                            <option [value]="3">OTRAS DEDUCCIONES</option>
+                                            <option [value]="98">AHORROS</option>
+                                            <option [value]="99">OPERACIÓN INDIVIDUAL</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="modern-form-group">
+                                    <label>ESTADO OPERATIVO</label>
+                                    <div class="input-group custom-input-group shadow-none">
+                                        <div class="input-group-prepend"><span class="input-group-text ps-3 pe-2"><i class="fa fa-power-off"></i></span></div>
+                                        <select formControlName="estatus" class="form-control fw-bold text-dark">
+                                            <option [value]="1">ACTIVO Y VIGENTE</option>
+                                            <option [value]="0">INACTIVO HISTÓRICO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4 pt-3 border-top" style="border-top-color: rgba(89,140,137,0.1) !important;">
+                            <div class="col-12 d-flex justify-content-end align-items-center">
+                                <button type="button" class="btn-header-action shadow-none me-3" style="background: #f1f5f9; color: #718096; border: 1px solid transparent;" *ngIf="editando" (click)="nuevoConcepto()">
+                                    <i class="fa fa-times me-2"></i> CANCELAR EDICIÓN
+                                </button>
+                                <button type="submit" [disabled]="formConcepto.invalid" class="btn-header-action teal shadow-none">
+                                    <i class="fa fa-cloud-upload-alt me-2"></i> COMPILAR Y REGISTRAR
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <h3 class="fw-bold">Módulo en Desarrollo</h3>
-                <p class="text-muted">La gestión de conceptos permitirá definir fórmulas y reglas para cada ítem de pago.</p>
+       
+  
+    </div>
+
+</div>
+
+
+<!-- ============================================== -->
+<!-- MODALES DEL SISTEMA                            -->
+<!-- ============================================== -->
+
+
+<!-- Modal: Diccionario de Variables -->
+<ng-template #modalVariables let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background: #fafdfc;">
+        <div class="modal-header border-0 px-4 pt-4 pb-1 align-items-center">
+            <h5 class="modal-title text-dark font-weight-bold d-flex align-items-center m-0" style="font-size: 1.05rem;">
+                <i class="fa fa-book-open text-primary-teal mr-2 opacity-75"></i> Diccionario de Expresiones
+            </h5>
+            <button type="button" class="close text-muted" aria-label="Close" style="opacity: 0.5; box-shadow: none;" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body p-4 bg-transparent" style="max-height: 60vh; overflow-y: auto;">
+            <p class="text-muted mb-4 small fw-bold">// Entorno de variables disponibles para inyección en el Kernel.</p>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-6" *ngFor="let item of dicVariables">
+                    <div class="digital-bank-card minimalist p-3 d-flex align-items-center justify-content-start" 
+                         style="cursor: pointer; min-height: 70px; transition: transform 0.2s; border: 1px solid rgba(89,140,137,0.15); border-radius: 14px; background: white;"
+                         (click)="insertarVariable(item.id)">
+                        <div class="icon-circle me-3" style="width: 38px; height: 38px; flex-shrink: 0; background-color: rgba(89, 140, 137, 0.1); display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                            <i class="fa {{item.icon}}" style="color: #598c89; font-size: 0.95rem;"></i>
+                        </div>
+                        <div class="text-truncate w-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-primary-teal font-monospace fw-bold" style="font-size: 0.85rem;">{{item.id}}</span>
+                            </div>
+                            <small class="text-muted d-block opacity-75 fw-bold" style="font-size: 0.70rem; color: #718096 !important;">// {{item.label}}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</ng-template>
+
+
+<!-- Modal: Confirmar Guardar -->
+<ng-template #modalConfirmarGuardar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse green mb-4 mt-2">
+                <i class="fas fa-save"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-3">¿Autorizar Sincronización?</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+                La función introducida será transpilada en el Kernel de Nómina para ejecuciones inmediatas.
+            </p>
+            <div class="d-flex justify-content-center align-items-center px-3" style="gap: 12px;">
+                <button type="button" class="btn-header-action gray shadow-none" (click)="modal.dismiss('No')" style="flex: 1;">
+                    <i class="fas fa-times"></i> Detener
+                </button>
+                <button type="button" class="btn-header-action teal shadow-none" (click)="registrarConcepto(modal)" style="flex: 1;">
+                    <i class="fas fa-check"></i> Compilar y Aplicar
+                </button>
             </div>
         </div>
     </div>
-</div>
+</ng-template>
+
+<!-- Modal: Confirmar Eliminar -->
+<ng-template #modalConfirmarEliminar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse red mb-4 mt-2">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-3">¿Remover de Librería?</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+                ¿Está seguro de destruir esta función matemática? Se detendrá su flujo de cálculo operativo.
+            </p>
+            <div class="d-flex justify-content-center align-items-center px-3" style="gap: 12px;">
+                <button type="button" class="btn-header-action gray shadow-none" (click)="modal.dismiss('No')" style="flex: 1;">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn-header-action red shadow-none" (click)="eliminarConcepto(modal)" style="flex: 1;">
+                    <i class="fas fa-trash-alt"></i> Sí, Destruir
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>

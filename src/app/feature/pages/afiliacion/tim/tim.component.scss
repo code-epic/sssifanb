@@ -54,173 +54,87 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Tabla Estilos Modernos y Fluidos */
-.mailbox-table {
-    border-collapse: separate;
-    border-spacing: 0;
-    table-layout: fixed;
-    width: 100%;
-}
+/* Tabla Estilos Modernos y Fluidos (Aplicados profundamente para DynamicTable) */
+::ng-deep {
+    .mailbox-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+        width: 100%;
+    }
 
-.mailbox-table td {
-    border-top: none !important;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    .mailbox-table td {
+        border-top: none !important;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-.document-row {
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    background-color: #ffffff;
-}
+    /* Efectos Pop-up en Botones Circulares */
+    .btn-pastel-icon-circle {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: white;
+        border: 1px solid transparent;
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s;
+    }
 
-.document-row:hover {
-    background-color: #f8fafc;
-    box-shadow: 0 4px 6px -1px rgba(89, 140, 137, 0.1);
-    z-index: 10;
-    position: relative;
-}
+    .tooltip-action:hover {
+        transform: scale(1.15);
+        z-index: 10;
+    }
 
-.document-row.selected-row {
-    background-color: rgba(89, 140, 137, 0.04);
-}
+    /* Colors Classes */
+    .pastel-success {
+        color: #598c89 !important;
+        background-color: rgba(89, 140, 137, 0.1) !important;
+        border-color: rgba(89, 140, 137, 0.2) !important;
+    }
 
-.document-row.unread {
-    background-color: white;
-}
+    .pastel-success:hover {
+        background-color: #598c89 !important;
+        color: white !important;
+        box-shadow: 0 4px 6px -1px rgba(89, 140, 137, 0.3) !important;
+    }
 
-.document-row.unread .sender-col, 
-.document-row.unread .subject-col {
-    color: #334155 !important;
-}
+    .pastel-danger {
+        color: #ef4444 !important;
+        background-color: rgba(239, 68, 68, 0.1) !important;
+        border-color: rgba(239, 68, 68, 0.2) !important;
+    }
 
-.star-icon:hover {
-    color: #fb8c00 !important;
-    transform: scale(1.2);
-}
+    .pastel-danger:hover {
+        background-color: #ef4444 !important;
+        color: white !important;
+        box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3) !important;
+    }
 
-/* Acciones y Fecha Hover Magic */
-.document-row .date-text {
-    display: inline-block;
-    opacity: 1;
-    transform: translateX(0);
-}
+    .pastel-warning {
+        color: #f59e0b !important;
+        background-color: rgba(245, 158, 11, 0.1) !important;
+        border-color: rgba(245, 158, 11, 0.2) !important;
+    }
 
-.document-row:hover .date-text {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(10px);
-}
+    .pastel-warning:hover {
+        background-color: #f59e0b !important;
+        color: white !important;
+        box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3) !important;
+    }
 
-.document-row .action-buttons-container {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    .pastel-primary {
+        color: #3b82f6 !important;
+        background-color: rgba(59, 130, 246, 0.1) !important;
+        border-color: rgba(59, 130, 246, 0.2) !important;
+    }
 
-.document-row:hover .action-buttons-container {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-}
-
-/* Efectos Pop-up en Botones Circulares */
-.btn-pastel-icon-circle {
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background-color: white;
-    border: 1px solid transparent;
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s;
-}
-
-.tooltip-action:hover {
-    transform: scale(1.15);
-    z-index: 10;
-}
-
-/* Pagination Style */
-.page-circle {
-    border-radius: 50% !important;
-    width: 34px;
-    height: 34px;
-    margin: 0 4px;
-    transition: all 0.2s ease;
-}
-
-.page-circle:not(.active):not(.text-light):hover {
-    background-color: #e2e8f0 !important;
-    color: #334155 !important;
-}
-
-/* Custom Checkbox Pastel */
-.custom-control-label::before {
-    border-radius: 4px;
-    border: 1px solid #cbd5e1;
-    background-color: white;
-    transition: all 0.2s ease-in-out;
-}
-
-.custom-control-input:checked ~ .custom-control-label::before {
-    border-color: #598c89;
-    background-color: #598c89;
-}
-
-.custom-control-input:focus ~ .custom-control-label::before {
-    box-shadow: 0 0 0 0.2rem rgba(89, 140, 137, 0.25);
-    border-color: #598c89;
-}
-
-/* Colors Classes */
-.pastel-success {
-    color: #598c89;
-    background-color: rgba(89, 140, 137, 0.1);
-    border-color: rgba(89, 140, 137, 0.2);
-}
-
-.pastel-success:hover {
-    background-color: #598c89;
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(89, 140, 137, 0.3);
-}
-
-.pastel-danger {
-    color: #ef4444;
-    background-color: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.2);
-}
-
-.pastel-danger:hover {
-    background-color: #ef4444;
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
-}
-
-.pastel-warning {
-    color: #f59e0b;
-    background-color: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.2);
-}
-
-.pastel-warning:hover {
-    background-color: #f59e0b;
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3);
-}
-
-.pastel-primary {
-    color: #3b82f6;
-    background-color: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.2);
-}
-
-.pastel-primary:hover {
-    background-color: #3b82f6;
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+    .pastel-primary:hover {
+        background-color: #3b82f6 !important;
+        color: white !important;
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3) !important;
+    }
 }
 
 .icon-circle {

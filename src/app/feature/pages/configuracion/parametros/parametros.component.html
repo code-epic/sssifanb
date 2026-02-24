@@ -1,25 +1,247 @@
 <div class="configuracion-container fade-in">
-    <div class="hero-summary mb-4">
-        <div class="hero-info">
-            <h1>Parámetros del Sistema</h1>
-            <p>Configuración global de variables y constantes operativas.</p>
-        </div>
-        <div class="hero-stats-mini">
-            <div class="hero-stat-item">
-                <i class="fa fa-cogs text-red fa-2x"></i>
+    <!-- Hero Summary (Premium Pastel Green Theme) -->
+    <div class="hero-summary mb-4 position-relative overflow-hidden">
+        <div class="hero-bg-accent"></div>
+        <div class="hero-info d-flex align-items-center position-relative z-index-1">
+            <div class="hero-icon-box mr-4">
+                <i class="fas fa-sliders-h"></i>
             </div>
+            <div>
+                <h1 class="mb-1" style="font-size: 1.6rem; color: #1e293b; font-weight: 800; letter-spacing: -0.5px;">
+                    Gestor de Parámetros
+                </h1>
+                <p class="text-muted mb-0" style="font-size: 0.95rem; font-weight: 500;">
+                    Configuración de firmas, rutas, escudos y variables dinámicas del ecosistema.
+                </p>
+            </div>
+        </div>
+        <div class="hero-actions position-relative z-index-1">
+            <button class="btn-header-action teal shadow-none" (click)="abrirModalParametro(modalConfigParametro)">
+                <i class="fas fa-plus-circle"></i> Nuevo Parámetro
+            </button>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0" style="border-radius: 20px;">
-        <div class="card-body p-4 text-center">
-            <div class="empty-state py-5">
-                <div class="icon-circle bg-light-red mb-4 mx-auto" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: #ffebee;">
-                    <i class="fa fa-sliders-h fa-3x text-red"></i>
-                </div>
-                <h3 class="fw-bold">Módulo en Desarrollo</h3>
-                <p class="text-muted">Gestión técnica de parámetros globales para el funcionamiento del ecosistema.</p>
-            </div>
+    <!-- Filter Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4 px-1 fade-in-up" style="animation-delay: 0.1s;">
+        <div class="filter-pills d-flex align-items-center" style="gap: 10px;">
+            <button class="btn-pill" [class.active]="currentFilter === 'TODOS'" (click)="currentFilter = 'TODOS'">Todos</button>
+            <button class="btn-pill" [class.active]="currentFilter === 'CARGO'" (click)="currentFilter = 'CARGO'">Cargos & Firmas</button>
+            <button class="btn-pill" [class.active]="currentFilter === 'SISTEMA'" (click)="currentFilter = 'SISTEMA'">Rutas & Sistema</button>
+            <button class="btn-pill" [class.active]="currentFilter === 'TEXTO'" (click)="currentFilter = 'TEXTO'">Textos & Motivos</button>
+            <button class="btn-pill" [class.active]="currentFilter === 'IMAGEN'" (click)="currentFilter = 'IMAGEN'">Imágenes & Escudos</button>
+        </div>
+        <div class="search-box position-relative" style="width: 300px;">
+            <i class="fas fa-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%); font-size: 0.9rem;"></i>
+            <input type="text" class="form-control custom-search-input pl-5" placeholder="Buscar clave o valor..." (input)="searchTerm = $event.target.value">
+        </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="card shadow-sm border-0 fade-in-up" style="border-radius: 20px; animation-delay: 0.2s;">
+        <div class="table-responsive">
+            <table class="table align-items-center table-flush modern-table mb-0">
+                <thead class="thead-light-pastel">
+                    <tr>
+                        <th class="ps-4">Identificador (Clave)</th>
+                        <th>Tipo</th>
+                        <th>Valor Asignado</th>
+                        <th>Actualización</th>
+                        <th class="text-center">Adjunto</th>
+                        <th class="text-right pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let param of parametrosFiltrados; let i = index" class="fade-in-down" [style.animation-delay]="(i * 0.05) + 's'">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-shape icon-sm rounded-circle text-primary-teal mr-3 shadow-none bg-teal-pastel">
+                                    <i class="fas {{ param.tipo === 'CARGO' ? 'fa-user-tie' : (param.tipo === 'IMAGEN' ? 'fa-image' : 'fa-code') }}"></i>
+                                </div>
+                                <div>
+                                    <div class="font-weight-bold text-dark" style="font-size: 0.9rem; font-family: 'Roboto', sans-serif;">{{ param.identificador }}</div>
+                                    <small class="text-muted d-block text-truncate" style="max-width: 250px;">{{ param.descripcion }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-dot badge-success">
+                                <i class="bg-success"></i> {{ param.tipo }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="font-weight-600 text-dark">{{ param.valor }}</span>
+                            <div *ngIf="param.detalles" class="text-muted" style="font-size: 0.75rem;">
+                                {{ param.detalles.cedula }} | {{ param.detalles.cargo }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-muted" style="font-size: 0.85rem;"><i class="far fa-clock mr-1"></i> {{ param.fechaAcutalizacion }}</span>
+                        </td>
+                        <td class="text-center">
+                            <i *ngIf="param.tieneImagen" class="fas fa-file-image text-primary-teal" style="font-size: 1.2rem;" ngbTooltip="Tiene archivo adjunto"></i>
+                            <span *ngIf="!param.tieneImagen" class="text-muted" style="font-size: 0.8rem;">-</span>
+                        </td>
+                        <td class="text-right pe-4">
+                            <button class="btn-circular text-primary-teal" ngbTooltip="Editar Parámetro" (click)="abrirModalParametro(modalConfigParametro, param)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-circular text-danger ml-2" ngbTooltip="Eliminar" (click)="abrirModalEliminar(modalEliminarParametro, param)">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="parametrosFiltrados.length === 0">
+                        <td colspan="6" class="text-center py-4 text-muted">No se encontraron parámetros que coincidan con la búsqueda.</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+<!-- Elegance Modal: Configurar Parámetro (Dynamic Variable Form) -->
+<ng-template #modalConfigParametro let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <h4 class="font-weight-bold text-dark mb-2">Configuración de Parámetro</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Edición de variables globales dinámicas del ecosistema.
+            </p>
+            
+            <form [formGroup]="formParametro">
+                <div class="row text-left">
+                    <!-- Tipo de Variable -->
+                    <div class="col-md-5">
+                        <div class="modern-form-group">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">CONTEXTO DEL PARÁMETRO</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-layer-group text-primary-teal"></i></span>
+                                </div>
+                                <select class="form-control" formControlName="tipoVariable">
+                                    <option value="CARGO">Cargo / Autoridad (Firmas)</option>
+                                    <option value="SISTEMA">Directorio / Ruta de Sistema</option>
+                                    <option value="TEXTO">Texto Redactado / Motivo</option>
+                                    <option value="IMAGEN">Escudo / Imagen / Membrete</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Clave / Identificador -->
+                    <div class="col-md-7">
+                        <div class="modern-form-group">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">CLAVE (IDENTIFICADOR ÚNICO)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-key text-primary-teal"></i></span>
+                                </div>
+                                <input type="text" class="form-control" formControlName="identificador" placeholder="Ej: PRESIDENTE_INSTITUTO">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row text-left">
+                    <!-- Valor Principal -->
+                    <div class="col-md-12">
+                        <div class="modern-form-group">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">VALOR PRINCIPAL</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-pencil-alt text-primary-teal"></i></span>
+                                </div>
+                                <input type="text" class="form-control" formControlName="valorPrincipal" placeholder="Nombre completo, ruta, o texto clave...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campos Místicos: Sólo si es CARGO -->
+                <div class="dynamic-box bg-light-soft p-3 rounded-lg mb-4 text-left" *ngIf="formParametro.get('tipoVariable')?.value === 'CARGO'" style="background-color: #f8f9fe; border: 1px dashed #e2e8f0;">
+                    <h6 class="text-uppercase text-muted font-weight-bold mb-3" style="font-size: 0.75rem; letter-spacing: 1px;"><i class="fas fa-id-badge mr-1"></i> Atributos Extra de Autoridad</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="modern-form-group mb-0">
+                                <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">CÉDULA</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-id-card text-primary-teal"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" formControlName="cedula" placeholder="V-00.000.000">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="modern-form-group mb-0">
+                                <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">RANGO / TÍTULO EXACTO</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-star text-primary-teal"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" formControlName="cargoExtra" placeholder="Gral. de División / Presidente...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descripción del Parámetro -->
+                <div class="row text-left">
+                    <div class="col-md-12">
+                      <div class="modern-form-group mb-4">
+                          <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">DESCRIPCIÓN (FINALIDAD)</label>
+                          <textarea class="form-control p-3" formControlName="descripcion" rows="2" placeholder="Describa brevemente en qué módulos tiene impacto este parámetro..." style="height: auto; border: 1px solid #e2e8f0; border-radius: 8px; resize: none;"></textarea>
+                      </div>
+                    </div>
+                </div>
+
+                <!-- Uploader Minimalista para Firmas/Escudos -->
+                <div class="premium-uploader-minimal p-4 text-center mt-2 cursor-pointer mb-5 text-left" *ngIf="formParametro.get('tipoVariable')?.value === 'CARGO' || formParametro.get('tipoVariable')?.value === 'IMAGEN'">
+                    <div class="uploader-icon-box mx-auto mb-3" style="width: 60px; height: 60px; background: rgba(89, 140, 137, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-cloud-upload-alt text-primary-teal" style="font-size: 1.8rem;"></i>
+                    </div>
+                    <h6 class="font-weight-bold text-dark mb-1 text-center">Cargar Archivo Asociado</h6>
+                    <p class="text-muted mb-0 text-center" style="font-size: 0.8rem;">Arrastre aquí la firma digitalizada (.png), escudo o documento. <br> Máx 2MB.</p>
+                </div>
+
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="button" class="btn btn-cancel mr-3" (click)="modal.dismiss('Cancel')">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-ok" (click)="guardarParametro(modal)">
+                        Guardar Parámetro
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal Confirmación de Eliminación -->
+<ng-template #modalEliminarParametro let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            
+            <!-- Icono de Advertencia Estático -->
+            <div class="mx-auto mb-4" style="width: 70px; height: 70px; background-color: rgba(217, 92, 92, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #d95c5c; font-size: 2rem; border: 1px solid rgba(217, 92, 92, 0.15);">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            
+            <h4 class="font-weight-bold text-dark mb-2">¿Eliminar Parámetro?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                Está a punto de borrar el identificador <strong>{{ parametroSeleccionado?.identificador }}</strong>. Esta acción podría afectar el funcionamiento de uno o más módulos.
+            </p>
+
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-cancel mr-3" (click)="modal.dismiss('Cancel')">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-trash" (click)="confirmarEliminacion(modal)">
+                    Sí, Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+

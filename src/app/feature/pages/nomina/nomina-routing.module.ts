@@ -4,12 +4,14 @@ import { CalculadoraComponent } from './calculadora/calculadora.component';
 import { ConceptosComponent } from './conceptos/conceptos.component';
 import { PatriaComponent } from './patria/patria.component';
 import { RetroactivosComponent } from './retroactivos/retroactivos.component';
+import { CalculosComponent } from './calculos/calculos.component';
 
 const routes: Routes = [
     { path: 'calculadora', component: CalculadoraComponent },
     { path: 'conceptos', component: ConceptosComponent },
     { path: 'patria', component: PatriaComponent },
     { path: 'retroactivos', component: RetroactivosComponent },
+    { path: 'calculos', component: CalculosComponent },
     { path: '', redirectTo: 'calculadora', pathMatch: 'full' }
 ];
 

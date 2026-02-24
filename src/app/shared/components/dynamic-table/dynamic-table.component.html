@@ -1,0 +1,144 @@
+<div class="table-responsive bg-white {{ config?.containerClass || 'rounded-lg shadow-sm border' }}" [ngStyle]="!config?.containerClass ? {'border-color': 'rgba(89,140,137,0.15)', 'border-radius': '16px', 'overflow': 'visible'} : {'overflow': 'visible'}">
+    <table class="table custom-table align-middle mb-0 {{ config?.tableClass || '' }}">
+        <thead class="bg-light-soft sticky-top" *ngIf="!config?.hideHeader">
+            <tr>
+                <!-- Selection Header -->
+                <th *ngIf="config?.selectable" class="text-center" style="width: 45px; padding-left: 1.5rem;">
+                    <label class="custom-checkbox-wrapper mb-0">
+                        <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleAll()">
+                        <span class="checkmark"><i class="fas fa-check"></i></span>
+                    </label>
+                </th>
+
+                <!-- Dynamic Headers -->
+                <th *ngFor="let col of config?.columns; let first = first" 
+                    [class.ps-4]="!config?.selectable && first"
+                    [class.sortable]="col.sortable"
+                    [style.text-align]="col.align || 'left'"
+                    [style.width]="col.width"
+                    (click)="sortBy(col)">
+                    {{ col.header }}
+                    <span *ngIf="col.sortable" class="sort-icon ml-1" 
+                          [class.active]="sortColumn === col.key"
+                          [class.asc]="sortColumn === col.key && sortDirection === 'asc'"
+                          [class.desc]="sortColumn === col.key && sortDirection === 'desc'">
+                       <i class="fas" [ngClass]="{'fa-sort': sortColumn !== col.key, 'fa-sort-up': sortColumn === col.key && sortDirection === 'asc', 'fa-sort-down': sortColumn === col.key && sortDirection === 'desc'}"></i>
+                    </span>
+                </th>
+
+                <!-- Actions Header -->
+                <th *ngIf="config?.actions && config!.actions!.length > 0" class="text-right pe-4">Acciones</th>
+            </tr>
+        </thead>
+        <tbody [ngClass]="{'hover-actions-table': config?.hoverActions}">
+            <tr *ngFor="let row of paginatedData; let i = index" class="fade-in-down" [style.animation-delay]="(i * 0.05) + 's'"
+                [style.cursor]="config?.rowClickable ? 'pointer' : 'default'"
+                (click)="onRowClick(row)">
+                
+                <!-- Selection Checkbox -->
+                <td *ngIf="config?.selectable" class="text-center ps-4" style="width: 45px;">
+                    <label class="custom-checkbox-wrapper mb-0" (click)="$event.stopPropagation()">
+                        <input type="checkbox" [checked]="selectedRows.has(row)" (change)="toggleRow(row)">
+                        <span class="checkmark"><i class="fas fa-check"></i></span>
+                    </label>
+                </td>
+
+                <!-- Dynamic Data -->
+                <td *ngFor="let col of config?.columns; let first = first" 
+                    [class.ps-4]="!config?.selectable && first"
+                    [ngClass]="col.cssClass || ''"
+                    [style.text-align]="col.align || 'left'">
+                    
+                    <!-- Text Type -->
+                    <ng-container *ngIf="!col.type || col.type === 'text'">
+                        <span class="font-weight-600 custom-text-col" style="color: #475569; font-size: 0.85rem;" *ngIf="!col.isCustomHTML">{{ row[col.key] }}</span>
+                        <div *ngIf="col.isCustomHTML" [innerHTML]="row[col.key]"></div>
+                    </ng-container>
+
+                    <!-- HTML Type -->
+                    <ng-container *ngIf="col.type === 'html'">
+                        <div [innerHTML]="row[col.key]" style="display: inline-block;"></div>
+                    </ng-container>
+
+                    <!-- Currency Type -->
+                    <ng-container *ngIf="col.type === 'currency'">
+                        <span class="font-weight-600 text-primary-teal" style="font-size: 0.95rem;">Bs. {{ row[col.key] | number:'1.2-2' }}</span>
+                    </ng-container>
+
+                     <!-- Date Type -->
+                     <ng-container *ngIf="col.type === 'date'">
+                        <span class="text-muted font-weight-500" style="font-size: 0.85rem;"><i class="far fa-calendar-alt mr-1"></i> {{ row[col.key] | date:'dd/MM/yyyy' }}</span>
+                    </ng-container>
+
+                    <!-- Badge Type -->
+                    <ng-container *ngIf="col.type === 'badge'">
+                        <span class="badge badge-table" [ngClass]="row[col.badgeColorKey || ''] || 'badge-teal'">
+                            <i *ngIf="row[col.iconKey || '']" class="fas {{ row[col.iconKey || ''] }} mr-1"></i> 
+                            {{ row[col.key] }}
+                        </span>
+                    </ng-container>
+
+                </td>
+
+                <!-- Actions -->
+                <td *ngIf="config?.actions && config!.actions!.length > 0" class="text-right pe-4 position-relative">
+                    <div [class.action-buttons-container-dynamic]="config?.hoverActions" class="d-flex justify-content-end align-items-center h-100">
+                        <button *ngFor="let act of config!.actions" 
+                                [ngClass]="act.buttonClass || 'btn-circular ml-2'"
+                                [ngbTooltip]="act.tooltip"
+                                (click)="onAction(act.name, row); $event.stopPropagation()">
+                            <i [ngClass]="['fas', act.icon, act.iconColorClass || '']"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- No records -->
+            <tr *ngIf="paginatedData.length === 0">
+                <td [attr.colspan]="getColspan()" class="text-center py-5 text-muted">
+                    <i class="fas fa-folder-open mb-3" style="font-size: 2.5rem; color: #cbd5e1;"></i><br>
+                    <span class="font-weight-500">No hay registros para mostrar.</span>
+                </td>
+            </tr>
+
+            <!-- Footer for Totals -->
+            <tr *ngIf="hasTotals() && paginatedData.length > 0" class="table-footer-totals bg-light-soft">
+                <td *ngIf="config?.selectable"></td>
+                <td *ngFor="let col of config?.columns; let first = first" 
+                    [class.ps-4]="!config?.selectable && first"
+                    [style.text-align]="col.align || 'left'">
+                    
+                    <span *ngIf="col.totalize && col.type === 'currency'" class="text-primary-teal font-weight-bold" style="font-size: 0.95rem;">
+                        Bs. {{ totals[col.key] | number:'1.2-2' }}
+                    </span>
+                    <span *ngIf="col.totalize && col.type !== 'currency'" class="font-weight-bold text-dark">
+                        {{ totals[col.key] | number:'1.2-2' }}
+                    </span>
+                    <!-- Label for total -->
+                    <span *ngIf="!col.totalize && first" class="text-uppercase text-muted font-weight-bold" style="letter-spacing: 1px; font-size: 0.75rem;">
+                        Totales Evaluados
+                    </span>
+                </td>
+                <td *ngIf="config?.actions && config!.actions!.length > 0"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination Footer -->
+<div class="d-flex justify-content-between align-items-center mt-3 px-2 fade-in" *ngIf="config?.showPagination && processedData.length > 0">
+    <div class="text-muted" style="font-size: 0.85rem; font-weight: 500;">
+        Mostrando <strong class="text-primary-teal">{{ (page - 1) * pageSize + 1 }}</strong> a 
+        <strong class="text-primary-teal">{{ Math.min(page * pageSize, processedData.length) }}</strong> de 
+        <strong class="text-dark">{{ processedData.length }}</strong> registros
+    </div>
+    <ngb-pagination 
+        [(page)]="page" 
+        [pageSize]="pageSize" 
+        [collectionSize]="processedData.length"
+        [maxSize]="3"
+        [rotate]="true"
+        (pageChange)="onPageChange($event)"
+        class="custom-pagination">
+    </ngb-pagination>
+</div>

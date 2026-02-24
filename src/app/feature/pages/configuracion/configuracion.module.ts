@@ -8,6 +8,7 @@ import { TasaBcvComponent } from './tasa-bcv/tasa-bcv.component';
 import { DirectivasComponent } from './directivas/directivas.component';
 
 import { NgbDropdownModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-datepicker/pastel-datepicker.component';
 
 @NgModule({
     declarations: [
@@ -21,7 +22,8 @@ import { NgbDropdownModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
         FormsModule,
         ReactiveFormsModule,
         NgbDropdownModule,
-        NgbModalModule
+        NgbModalModule,
+        PastelDatepickerComponent
     ]
 })
 export class ConfiguracionModule { }

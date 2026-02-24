@@ -134,56 +134,15 @@
             </div>
 
             <!-- Lista de Documentos Iterada -->
-            <div class="card-body p-0 table-responsive" style="flex: 1; overflow-y: auto;">
-                <table class="table table-hover mailbox-table mb-0 align-items-center w-100">
-                    <tbody>
-                        <!-- Fila Generada por *ngFor -->
-                        <tr class="document-row align-items-center" *ngFor="let doc of documentos" [class.selected-row]="selectedDocs[doc.id]">
-                            <!-- Checkbox -->
-                            <td class="px-3 py-2 border-bottom border-light text-center" style="width: 45px;">
-                                <div class="custom-control custom-checkbox ml-2">
-                                    <input type="checkbox" class="custom-control-input" [id]="'chk_' + doc.id" [checked]="selectedDocs[doc.id]" (change)="toggleSelection(doc.id)">
-                                    <label class="custom-control-label cursor-pointer" [for]="'chk_' + doc.id"></label>
-                                </div>
-                            </td>
-                            <!-- Remitente -->
-                            <td class="px-2 py-2 border-bottom border-light font-weight-600 align-middle pr-3" style="width: 25%; color: #334155;">
-                                <div class="d-flex align-items-center" style="width: 100%;">
-                                    <div class="avatar avatar-sm rounded-circle mr-3 shadow-sm font-weight-bold d-flex align-items-center justify-content-center flex-shrink-0" 
-                                        [ngClass]="doc.bgAvatar" style="font-size: 0.85rem; width: 34px; height: 34px; letter-spacing: 0.5px;">
-                                        {{ doc.avatarChar }}
-                                    </div>
-                                    <span class="text-truncate" style="line-height: 1.5; letter-spacing: -0.2px; padding-top: 1px; flex: 1; min-width: 0;">{{ doc.nombre }}</span>
-                                </div>
-                            </td>
-                            <!-- Asunto y Detalles -->
-                            <td class="px-2 py-2 border-bottom border-light align-middle" style="color: #475569;">
-                                <div class="d-flex align-items-center" style="line-height: 1.5; width: 100%;">
-                                    <span class="badge badge-pill bg-light text-muted border mr-2 font-weight-bold shadow-sm flex-shrink-0" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.65em; transform: translateY(-1px);">{{ doc.rif }}</span>
-                                    <span class="font-weight-600 text-dark flex-shrink-0 text-truncate pr-1" style="font-size: 0.9rem; letter-spacing: -0.2px; max-width: 190px;">{{ doc.tramite }}</span> 
-                                    <span class="text-muted mx-2 flex-shrink-0" style="font-size: 0.6rem; opacity: 0.5;"><i class="fas fa-circle"></i></span> 
-                                    <span class="text-muted text-truncate" style="font-size: 0.85rem; flex: 1; min-width: 0;">{{ doc.detalle }}</span>
-                                </div>
-                            </td>
-                            
-                            <!-- Fecha y Botonera Acciones Combinadas -->
-                            <td class="px-3 py-2 border-bottom border-light text-right align-middle font-weight-500 position-relative" style="width: 150px; color: #94a3b8; font-size: 0.85rem; letter-spacing: 0.2px;">
-                                <span class="date-text transition-all" style="line-height: 1.5; padding-top: 1px; display: inline-block;">{{ doc.fecha }}</span>
-                                <div class="d-flex justify-content-end align-items-center h-100 action-buttons-container position-absolute" style="right: 18px; top: 0; bottom: 0; background: linear-gradient(90deg, transparent 0%, #ffffff 25%); padding-left: 2rem;">
-                                    <button class="btn btn-sm btn-pastel-icon-circle pastel-success shadow-sm ml-1 tooltip-action" ngbTooltip="Aprobar" placement="top" (click)="openAprobarModal(doc.id)">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-pastel-icon-circle pastel-danger shadow-sm ml-1 tooltip-action" ngbTooltip="Rechazar" placement="top" (click)="openRechazarModal(doc.id)">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-pastel-icon-circle pastel-warning shadow-sm ml-1 tooltip-action" ngbTooltip="Liberar" placement="top">
-                                        <i class="fas fa-unlock-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="card-body p-0 d-flex flex-column" style="flex: 1; overflow-y: auto;">
+                <div class="px-3 pb-3">
+                    <app-dynamic-table
+                        [config]="tableConfig"
+                        [data]="tableData"
+                        (actionClicked)="onTableAction($event)"
+                        (selectionChanged)="onRowSelection($event)">
+                    </app-dynamic-table>
+                </div>
                 
                 <!-- Estado Vacío -->
                 <div class="empty-state text-center py-5 my-5" *ngIf="documentos.length === 0">
@@ -194,40 +153,6 @@
                     <h4 class="font-weight-bold text-dark mb-2">Bandeja Vacía</h4>
                     <p class="text-muted font-weight-500">No hay documentos pendientes en la pestaña <strong>{{ currentTab }}</strong>.</p>
                 </div>
-            </div>
-
-            <!-- Footer Pagination -->
-            <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center mt-auto flex-wrap" style="border-radius: 0 0 12px 12px; border-color: #f1f5f9 !important;">
-                
-                <!-- Contador de Registros -->
-                <div class="text-muted font-weight-500 mb-2 mb-md-0 d-flex align-items-center" style="font-size: 0.85rem;">
-                    <span>Mostrando <strong class="text-dark mx-1">1</strong> al <strong class="text-dark mx-1">10</strong> de <strong class="mx-1 font-weight-bold" style="color: #598c89; font-size: 0.95rem;">{{ documentos.length }}</strong> registros activos en la bandeja.</span>
-                </div>
-
-                <!-- Paginación Elegante (Estilo Pastel Hover Magic) -->
-                <nav aria-label="Mailbox pagination" class="ml-auto">
-                    <ul class="pagination pagination-sm mb-0 align-items-center">
-                        <li class="page-item disabled mr-2">
-                            <a class="page-link shadow-none border-0 text-muted btn-pastel-icon-circle bg-light tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);">
-                                <i class="fas fa-chevron-left" style="font-size: 0.7rem;"></i>
-                            </a>
-                        </li>
-                        <li class="page-item active mr-2">
-                            <a class="page-link shadow-none border-0 font-weight-bold btn-pastel-icon-circle tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);" style="background-color: #598c89; color: white;">1</a>
-                        </li>
-                        <li class="page-item mr-2">
-                            <a class="page-link shadow-none border-0 text-muted btn-pastel-icon-circle bg-light tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);">2</a>
-                        </li>
-                        <li class="page-item mr-2">
-                            <a class="page-link shadow-none border-0 text-muted btn-pastel-icon-circle bg-light tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link shadow-none border-0 text-muted btn-pastel-icon-circle bg-light tooltip-action d-flex align-items-center justify-content-center" href="javascript:void(0);">
-                                <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
        
     </div>

@@ -227,10 +227,25 @@ $icon-muted: #90a4ae;        // Color de icono normal
     }
 }
 
-// Navbar Background Softening (Glass Sidebar)
+// Navbar Background Softening (Premium Glass & Alfa Theme)
 .bg-glass-sidebar {
-    background-color: rgba(255, 255, 255, 0.92) !important; // No 100% blanco
-    backdrop-filter: blur(10px); // Efecto blur si hay fondo detrás
-    -webkit-backdrop-filter: blur(10px);
-    border-right: 1px solid rgba(0,0,0,0.05); // Borde sutil
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(242, 249, 246, 0.88) 100%) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-right: 1px solid rgba(89, 140, 137, 0.08);
+
+    // Marca de agua (Icono Alfa) en el fondo
+    &::after {
+        content: '\f3ed'; // Código de fa-shield-alt (Escudo)
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: fixed; // Fijamos al viewport, no altera el scroll del nav
+        bottom: -30px;
+        left: -40px; // Alineado a la izquierda para no salirse del sidebar
+        font-size: 280px;
+        color: rgba(89, 140, 137, 0.03); // Opacidad ultra tenue del 3%
+        z-index: -1;
+        transform: rotate(-15deg);
+        pointer-events: none;
+    }
 }

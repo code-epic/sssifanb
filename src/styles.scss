@@ -300,6 +300,16 @@ $btn-modal-shadow-hover: 0 7px 14px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0,
     z-index: 2045 !important;
 }
 
+// Ensure NgbDatepicker dropdown is above modals
+ngb-datepicker {
+    z-index: 3000 !important;
+}
+
+.ngb-dp-container {
+    z-index: 3000 !important;
+}
+
+
 
 // --- GLOBAL LOADING OVERLAY ---
 .loading-overlay {
@@ -390,5 +400,78 @@ $btn-modal-shadow-hover: 0 7px 14px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0,
         transform: scale(1); 
         box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15); 
         border-color: rgba(129, 170, 129, 0.3); 
+    }
+}
+// --- CONFIRMATION MODAL ANIMATIONS ---
+@keyframes pulse-circle {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(89, 140, 137, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(89, 140, 137, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(89, 140, 137, 0); }
+}
+
+@keyframes pulse-circle-blue {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(52, 152, 219, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+
+@keyframes pulse-circle-green {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(46, 204, 113, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+}
+
+@keyframes pulse-circle-amber {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(235, 154, 68, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(235, 154, 68, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(235, 154, 68, 0); }
+}
+
+@keyframes pulse-circle-red {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(217, 92, 92, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(217, 92, 92, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(217, 92, 92, 0); }
+}
+
+.icon-confirm-pulse {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(89, 140, 137, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: #598c89;
+    font-size: 1.5rem;
+    animation: pulse-circle 2s infinite;
+    border: 2px solid rgba(89, 140, 137, 0.2);
+
+    &.blue {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+        border-color: rgba(52, 152, 219, 0.2);
+        animation: pulse-circle-blue 2s infinite;
+    }
+
+    &.green {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+        border-color: rgba(46, 204, 113, 0.2);
+        animation: pulse-circle-green 2s infinite;
+    }
+
+    &.amber {
+        background-color: rgba(235, 154, 68, 0.1);
+        color: #eb9a44;
+        border-color: rgba(235, 154, 68, 0.2);
+        animation: pulse-circle-amber 2s infinite;
+    }
+
+    &.red {
+        background-color: rgba(217, 92, 92, 0.1);
+        color: #d95c5c;
+        border-color: rgba(217, 92, 92, 0.2);
+        animation: pulse-circle-red 2s infinite;
     }
 }

@@ -16,66 +16,94 @@
     </div>
 </div>
 
-<!-- Estadísticas Detalladas (Minimalistas) -->
+<!-- Estadísticas Detalladas (Premium Soft Cards) -->
 <div class="stats-grid">
-    <div class="stat-card fade-in issued" style="animation-delay: 0.1s;">
-        <div class="stat-header">
-            <div class="stat-icon-wrapper">
-                <i class="fas fa-id-card"></i>
+    <!-- Emitidos -->
+    <div class="stat-card card-blue fade-in pointer h-100 d-flex flex-column position-relative overflow-hidden" style="animation-delay: 0.1s;">
+        <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+            <div>
+                <h3 class="stat-value text-primary-blue mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">1,250</h3>
+                <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Emitidos</span>
             </div>
-            <span class="stat-label">Emitidos</span>
-        </div>
-        <div class="stat-content">
-            <h3 class="stat-value">1,250</h3>
-            <div class="stat-trend" style="color: #1e88e5; background: #e3f2fd;">
-                <i class="fas fa-arrow-up"></i> 12%
+            <div class="icon-circle bg-light-blue" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-id-card text-primary-blue" style="font-size: 1.4rem;"></i>
             </div>
         </div>
+        
+        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+            <div class="d-flex align-items-center" style="background: rgba(59, 130, 246, 0.05); padding: 4px 10px; border-radius: 8px;">
+                <span class="text-primary-blue mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> 12%</span>
+                <span class="text-primary-blue" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Tendencia</span>
+            </div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15);"></div>
+        </div>
+        <i class="fas fa-id-card position-absolute card-watermark" style="font-size: 7rem; color: rgba(59,130,246,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
     </div>
 
-    <div class="stat-card fade-in rejected" style="animation-delay: 0.2s;">
-        <div class="stat-header">
-            <div class="stat-icon-wrapper">
-                <i class="fas fa-times-circle"></i>
+    <!-- Rechazados -->
+    <div class="stat-card card-red fade-in pointer h-100 d-flex flex-column position-relative overflow-hidden" style="animation-delay: 0.2s;">
+        <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+            <div>
+                <h3 class="stat-value text-red mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">45</h3>
+                <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Rechazados</span>
             </div>
-            <span class="stat-label">Rechazados</span>
-        </div>
-        <div class="stat-content">
-            <h3 class="stat-value">45</h3>
-            <div class="stat-trend" style="color: #e53935; background: #feebee;">
-                <i class="fas fa-arrow-down"></i> 5%
+            <div class="icon-circle bg-light-red" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-times-circle text-red" style="font-size: 1.4rem;"></i>
             </div>
         </div>
+        
+        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+            <div class="d-flex align-items-center" style="background: rgba(239, 68, 68, 0.05); padding: 4px 10px; border-radius: 8px;">
+                <span class="text-danger mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-arrow-down"></i> 5%</span>
+                <span class="text-danger" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Tendencia</span>
+            </div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.15);"></div>
+        </div>
+        <i class="fas fa-times-circle position-absolute card-watermark" style="font-size: 7rem; color: rgba(239,68,68,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
     </div>
 
-    <div class="stat-card fade-in released" style="animation-delay: 0.3s;">
-        <div class="stat-header">
-            <div class="stat-icon-wrapper">
-                <i class="fas fa-unlock-alt"></i>
+    <!-- Liberados -->
+    <div class="stat-card card-teal fade-in pointer h-100 d-flex flex-column position-relative overflow-hidden" style="animation-delay: 0.3s;">
+        <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+            <div>
+                <h3 class="stat-value text-primary-teal mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">890</h3>
+                <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Liberados</span>
             </div>
-            <span class="stat-label">Liberados</span>
-        </div>
-        <div class="stat-content">
-            <h3 class="stat-value">890</h3>
-            <div class="stat-trend" style="color: #679f6a; background: #e8f5e9;">
-                <i class="fas fa-arrow-up"></i> 8%
+            <div class="icon-circle bg-light-teal" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-unlock-alt text-primary-teal" style="font-size: 1.4rem;"></i>
             </div>
         </div>
+        
+        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+             <div class="d-flex align-items-center" style="background: rgba(89, 140, 137, 0.05); padding: 4px 10px; border-radius: 8px;">
+                <span class="text-primary-teal mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> 8%</span>
+                <span class="text-primary-teal" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Tendencia</span>
+            </div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #598c89; box-shadow: 0 0 0 3px rgba(89,140,137,0.15);"></div>
+        </div>
+        <i class="fas fa-unlock-alt position-absolute card-watermark" style="font-size: 7rem; color: rgba(89,140,137,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
     </div>
 
-    <div class="stat-card fade-in printed" style="animation-delay: 0.4s;">
-        <div class="stat-header">
-            <div class="stat-icon-wrapper">
-                <i class="fas fa-print"></i>
+    <!-- Impresos -->
+    <div class="stat-card card-amber fade-in pointer h-100 d-flex flex-column position-relative overflow-hidden" style="animation-delay: 0.4s;">
+        <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+            <div>
+                <h3 class="stat-value text-amber mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">1,100</h3>
+                <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Impresos</span>
             </div>
-            <span class="stat-label">Impresos</span>
-        </div>
-        <div class="stat-content">
-            <h3 class="stat-value">1,100</h3>
-            <div class="stat-trend" style="color: #fb8c00; background: #fff3e0;">
-                <i class="fas fa-arrow-up"></i> 15%
+            <div class="icon-circle bg-light-amber" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-print text-amber" style="font-size: 1.4rem;"></i>
             </div>
         </div>
+        
+        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+            <div class="d-flex align-items-center" style="background: rgba(245, 158, 11, 0.05); padding: 4px 10px; border-radius: 8px;">
+                <span class="text-amber mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> 15%</span>
+                <span class="text-amber" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Tendencia</span>
+            </div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.15);"></div>
+        </div>
+        <i class="fas fa-print position-absolute card-watermark" style="font-size: 7rem; color: rgba(245,158,11,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
     </div>
 </div>
 
@@ -155,89 +183,10 @@
 
 <!-- Tabla de Detalles -->
 <div class="details-table-wrapper fade-in" style="animation-delay: 0.6s;">
-    <table class="table custom-table">
-        <thead>
-            <tr>
-                <th style="width: 140px;">Cédula</th>
-                <th>Afiliado</th>
-                <th>Componente / Grado</th>
-                <th style="width: 120px;">Fecha</th>
-                <th style="width: 150px;">Código TIM</th>
-                <th style="width: 130px;">Estatus</th>
-                <th class="text-center" style="width: 120px;">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let doc of documentos">
-                <td class="font-weight-bold" style="color: #1e293b; font-family: 'Roboto', sans-serif;">{{ doc.cedula }}
-                </td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <div class="avatar avatar-xs rounded-circle bg-light text-muted mr-3 d-flex align-items-center justify-content-center font-weight-bold"
-                            style="width: 32px; height: 32px; font-size: 0.75rem; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                            {{ doc.nombre.charAt(0) }}
-                        </div>
-                        <div>
-                            <div class="font-weight-bold" style="color: #334155; line-height: 1;">{{ doc.nombre }}</div>
-                            <small class="text-muted font-weight-500" style="font-size: 0.7rem;">Titular TIM</small>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <div style="line-height: 1.3;">
-                        <div class="font-weight-bold" style="font-size: 0.75rem; color: #64748b;">{{ doc.componente }}
-                        </div>
-                        <div style="font-size: 0.85rem; font-weight: 600; color: #475569;">{{ doc.grado }}</div>
-                    </div>
-                </td>
-                <td class="text-muted font-weight-600" style="font-size: 0.8rem;">{{ doc.fecha }}</td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-barcode mr-2 text-muted opacity-50"></i>
-                        <span class="font-weight-bold"
-                            style="color: #598c89; font-size: 0.8rem; letter-spacing: 0.5px;">{{ doc.codigo }}</span>
-                    </div>
-                </td>
-                <td>
-                    <span class="badge-pastel font-weight-bold" [ngClass]="getStatusClass(doc.estatus)">
-                        {{ getStatusLabel(doc.estatus) }}
-                    </span>
-                </td>
-                <td class="text-center">
-                    <button class="btn-circular" ngbTooltip="Ver Detalles">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn-circular ml-2 btn-danger-soft" ngbTooltip="Historial">
-                        <i class="fas fa-history"></i>
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- Paginación Premium -->
-    <div class="px-4 py-4 bg-light d-flex justify-content-between align-items-center"
-        style="border-top: 1px solid #f1f5f9;">
-        <div class="text-muted font-weight-bold"
-            style="font-size: 0.7rem; letter-spacing: 0.5px; text-transform: uppercase;">
-            Mostrando <strong class="text-dark">1 a 5</strong> de <strong class="text-dark">2,540</strong> registros
-            encontrados
-        </div>
-        <nav>
-            <ul class="pagination pagination-sm mb-0">
-                <li class="page-item disabled mr-2"><a class="page-link border-0 shadow-sm"
-                        style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"
-                        href="#"><i class="fas fa-chevron-left"></i></a></li>
-                <li class="page-item active mr-2"><a class="page-link border-0 shadow-sm font-weight-bold"
-                        style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #598c89;"
-                        href="#">1</a></li>
-                <li class="page-item mr-2"><a class="page-link border-0 shadow-sm font-weight-bold bg-white text-muted"
-                        style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"
-                        href="#">2</a></li>
-                <li class="page-item"><a class="page-link border-0 shadow-sm bg-white text-muted"
-                        style="border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;"
-                        href="#"><i class="fas fa-chevron-right"></i></a></li>
-            </ul>
-        </nav>
-    </div>
+    <app-dynamic-table 
+        [config]="tableConfig" 
+        [data]="tableData"
+        (rowClicked)="onRowClicked($event)" 
+        (actionClicked)="onTableAction($event)">
+    </app-dynamic-table>
 </div>

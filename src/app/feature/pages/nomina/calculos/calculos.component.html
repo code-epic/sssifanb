@@ -1,0 +1,420 @@
+<!-- Header Section: Nómina Hero -->
+<div class="hero-summary fade-in-up">
+    <div class="d-flex align-items-center">
+        <div class="hero-icon-box mr-4">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+        <div class="hero-info">
+            <h1 class="mb-1">Cálculos de Nómina</h1>
+            <p>Generación y procesamiento integral de pagos <span class="badge-pastel-green">Sector Militar • IPSFA</span></p>
+        </div>
+    </div>
+    <div class="hero-stats-mini">
+        <div class="hero-stat-item border-right pr-4">
+            <span>Última Generación</span>
+            <div class="d-flex align-items-center justify-content-end">
+                <i class="fas fa-calendar-check mr-2 text-pastel-green" style="font-size: 0.8rem;"></i>
+                <strong>15 Oct 2026</strong>
+            </div>
+        </div>
+        <div class="hero-stat-item">
+            <span>Estado del Motor</span>
+            <div class="d-flex align-items-center justify-content-end">
+                <div class="status-pulse-green mr-2"></div>
+                <strong class="text-pastel-green">Sincronizado</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Process selection Grid -->
+<div class="stats-grid mt-4">
+    <!-- RCP -->
+    <div class="stat-card card-teal fade-in pointer h-100 d-flex flex-column position-relative overflow-hidden" style="animation-delay: 0.1s;" (click)="abrirModalCalculo(modalPrepararNomina, 'RCP', 'Retirados con Pensión')">
+        <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+            <div>
+                <h3 class="stat-value text-primary-teal mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">42,500</h3>
+                <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Personas (RCP)</span>
+            </div>
+            <div class="icon-circle bg-light-teal" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user-shield text-primary-teal" style="font-size: 1.4rem;"></i>
+            </div>
+        </div>
+        
+        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+            <div class="d-flex align-items-center" style="background: rgba(239, 68, 68, 0.05); padding: 4px 10px; border-radius: 8px;">
+                <span class="text-danger mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-pause-circle"></i> 12</span>
+                <span class="text-danger" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Paralizados</span>
+            </div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #598c89; box-shadow: 0 0 0 3px rgba(89,140,137,0.15);"></div>
+        </div>
+        <i class="fas fa-user-shield position-absolute card-watermark" style="font-size: 7rem; color: rgba(89,140,137,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
+    </div>
+
+    <!-- FCP -->
+    <div class="stat-card card-blue fade-in pointer h-100 d-flex flex-column position-relative overflow-hidden" style="animation-delay: 0.2s;" (click)="abrirModalCalculo(modalPrepararNomina, 'FCP', 'Pensionados Sobrevivientes')">
+        <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+            <div>
+                <h3 class="stat-value text-primary-teal mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">18,200</h3>
+                <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Personas (FCP)</span>
+            </div>
+            <div class="icon-circle bg-light-blue" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-heartbeat text-primary-blue" style="font-size: 1.4rem;"></i>
+            </div>
+        </div>
+        
+        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+            <div class="d-flex align-items-center" style="background: rgba(239, 68, 68, 0.05); padding: 4px 10px; border-radius: 8px;">
+                <span class="text-danger mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-pause-circle"></i> 5</span>
+                <span class="text-danger" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Paralizados</span>
+            </div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15);"></div>
+        </div>
+        <i class="fas fa-heartbeat position-absolute card-watermark" style="font-size: 7rem; color: rgba(59,130,246,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
+    </div>
+
+    <!-- PG -->
+    <div class="stat-card card-purple fade-in pointer h-100 d-flex flex-column position-relative overflow-hidden" style="animation-delay: 0.3s;" (click)="abrirModalCalculo(modalPrepararNomina, 'PG', 'Pensiones de Gracia')">
+        <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+            <div>
+                <h3 class="stat-value text-primary-teal mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">4,850</h3>
+                <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Personas (PG)</span>
+            </div>
+            <div class="icon-circle bg-light-purple" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-hand-holding-heart text-purple" style="font-size: 1.4rem;"></i>
+            </div>
+        </div>
+        
+        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+             <div class="d-flex align-items-center" style="background: rgba(100, 116, 139, 0.04); padding: 4px 10px; border-radius: 8px;">
+                <span class="text-muted mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-check-circle"></i> 0</span>
+                <span class="text-muted" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Paralizados</span>
+            </div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.15);"></div>
+        </div>
+        <i class="fas fa-hand-holding-heart position-absolute card-watermark" style="font-size: 7rem; color: rgba(168,85,247,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
+    </div>
+
+    <!-- I -->
+    <div class="stat-card card-amber fade-in pointer h-100 d-flex flex-column position-relative overflow-hidden" style="animation-delay: 0.4s;" (click)="abrirModalCalculo(modalPrepararNomina, 'I', 'Discapacitados e Invalidez')">
+        <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+            <div>
+                <h3 class="stat-value text-primary-teal mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">1,280</h3>
+                <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Personas (INV)</span>
+            </div>
+            <div class="icon-circle bg-light-amber" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-wheelchair text-amber" style="font-size: 1.4rem;"></i>
+            </div>
+        </div>
+        
+        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+            <div class="d-flex align-items-center" style="background: rgba(100, 116, 139, 0.04); padding: 4px 10px; border-radius: 8px;">
+                <span class="text-muted mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-check-circle"></i> 0</span>
+                <span class="text-muted" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Paralizados</span>
+            </div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.15);"></div>
+        </div>
+        <i class="fas fa-wheelchair position-absolute card-watermark" style="font-size: 7rem; color: rgba(245,158,11,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
+    </div>
+</div>
+
+<!-- Main Table Area -->
+<div class="details-table-wrapper mt-5 border-0 fade-in bg-white shadow-sm" style="animation-delay: 0.5s; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;">
+    <app-dynamic-table 
+        [config]="nominaTableConfig" 
+        [data]="nominaData"
+        (actionClicked)="onTableAction($event, modalConfirmarCerrar)">
+    </app-dynamic-table>
+    
+    <!-- Lote Actions (Bottom Footer) -->
+    <div class="d-flex justify-content-end align-items-center px-4 py-4 bg-white" style="gap: 15px; border-top: 1px solid rgba(0,0,0,0.04);">
+        <button type="button" class="btn-header-action amber shadow-none" (click)="openModal(modalConfirmarRechazoLote)">
+            <i class="fas fa-times-circle"></i> Rechazar Lote
+        </button>
+        <button type="button" class="btn-header-action teal shadow-none" (click)="openModal(modalConfirmarAprobacionLote)">
+            <i class="fas fa-check-double"></i> Aprobar Lote
+        </button>
+    </div>
+</div>
+
+<!-- Modal: Confirmar Cerrar Nómina -->
+<ng-template #modalConfirmarCerrar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse amber">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Cerrar Nómina?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                Esta acción bloqueará cualquier modificación adicional sobre este proceso. ¿Está seguro que desea cerrar la nómina seleccionada?
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action amber shadow-none w-100" (click)="modal.close('Cerrar')">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Confirmar Rechazo Lote -->
+<ng-template #modalConfirmarRechazoLote let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse amber">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Rechazar Lote?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                El lote de registros será marcado como no procesable. Esta acción es reversible pero requiere auditoría.
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action amber shadow-none w-100" (click)="modal.close('Rechazar')">
+                    Rechazar Lote
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Confirmar Aprobación Lote -->
+<ng-template #modalConfirmarAprobacionLote let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse teal">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Aprobar Lote?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                Se procederá a la validación final del lote para su integración con el sistema financiero.
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action teal shadow-none w-100" (click)="modal.close('Aprobar')">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+
+<!-- Modal: Asistente Preparar Nómina (Minimalista Elegante) -->
+<ng-template #modalPrepararNomina let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; background: #ffffff;">
+        <!-- Header Minimalista -->
+        <div class="modal-header-minimal d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <div class="icon-circle mr-3 bg-light-teal" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-microchip text-primary-teal" style="font-size: 1.2rem;"></i>
+                </div>
+                <div class="modal-title-box">
+                    <h5 class="m-0">{{ tipoCalculoTitle }}</h5>
+                    <small>Motor de Cálculo • {{ tipoCalculoCodigo }}</small>
+                </div>
+            </div>
+            <button type="button" class="close" aria-label="Close" style="opacity: 0.3; transition: opacity 0.2s;" (mouseenter)="$event.target.style.opacity=1" (mouseleave)="$event.target.style.opacity=0.3" (click)="modal.dismiss()">
+                <i class="fas fa-times" style="font-size: 1rem;"></i>
+            </button>
+        </div>
+
+        <div class="modal-body p-0">
+            <!-- Stepper Indicators (Ultra Minimalist) -->
+            <div class="d-flex justify-content-center align-items-center stepper-ultra-minimal py-4 border-bottom bg-light-soft" style="background: rgba(248, 250, 252, 0.5);">
+                <div class="d-flex align-items-center pointer stepper-item" [class.active]="pasoActual === 1" (click)="pasoActual = 1">
+                    <span class="step-label">1. Configuración</span>
+                </div>
+                <div class="d-flex align-items-center pointer stepper-item" [class.active]="pasoActual === 2" [class.disabled]="pasoActual < 2" (click)="pasoActual >= 2 ? pasoActual = 2 : null">
+                    <span class="step-label">2. Conceptos</span>
+                </div>
+                <div class="d-flex align-items-center pointer stepper-item" [class.active]="pasoActual === 3" [class.disabled]="pasoActual < 3" (click)="pasoActual >= 3 ? pasoActual = 3 : null">
+                    <span class="step-label">3. Archivos</span>
+                </div>
+                <div class="d-flex align-items-center pointer stepper-item" [class.active]="pasoActual === 4" [class.disabled]="pasoActual < 4" (click)="pasoActual >= 4 ? pasoActual = 4 : null">
+                    <span class="step-label">4. Ejecución</span>
+                </div>
+            </div>
+
+            <!-- Paso 1: Configuración (Heredando Estilos Identificacion) -->
+            <div class="fade-in p-4 px-5" *ngIf="pasoActual === 1">
+                <form [formGroup]="formDirectiva">
+                    <!-- Row 1: Tipo y Forma de Pago -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Tipo de Nómina</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-tag"></i></span></div>
+                                    <select class="form-control" formControlName="tipoNomina">
+                                        <option value="0">NOMINA MENSUAL</option>
+                                        <option value="1">RETRIBUCION ESPECIAL</option>
+                                        <option value="2">BONO RECREACIONAL</option>
+                                        <option value="4">AGUINALDOS</option>
+                                        <option value="6">PAGO ESPECIAL (BONO)</option>
+                                        <option value="7">DIFERENCIA DE SUELDO</option>
+                                        <option value="8">DIFERENCIA DE BONO</option>
+                                        <option value="9">DIFERENCIA DE RETRIBUCION ESPECIAL</option>
+                                        <option value="10">NOMINA DE RETROACTIVOS</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Forma de Pago</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-coins"></i></span></div>
+                                    <select class="form-control" formControlName="formaPago">
+                                        <option value="0">MENSUAL</option>
+                                        <option value="1">QUINCENAL</option>
+                                        <option value="2">CATORCENAL</option>
+                                        <option value="3">SEMANAL</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Directiva (70%) y Mes (30%) -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="modern-form-group">
+                                <label>Seleccionar Directiva</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-scroll"></i></span></div>
+                                    <select class="form-control" formControlName="directiva">
+                                        <option value="">Seleccione el decreto/directiva</option>
+                                        <option value="D-2026-001">Decreto Presidencial 2026-001</option>
+                                        <option value="D-2025-012">Ajuste Salarial Diciembre 2025</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Mes a Liquidar</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-calendar-alt"></i></span></div>
+                                    <select class="form-control" formControlName="mes">
+                                        <option value="0">ENERO</option><option value="1">FEBRERO</option>
+                                        <option value="2">MARZO</option><option value="3">ABRIL</option>
+                                        <option value="4">MAYO</option><option value="5">JUNIO</option>
+                                        <option value="6">JULIO</option><option value="7">AGOSTO</option>
+                                        <option value="8">SEPTIEMBRE</option><option value="9">OCTUBRE</option>
+                                        <option value="10">NOVIEMBRE</option><option value="11">DICIEMBRE</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Fechas -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Fecha Inicio de Vigencia</label>
+                                <app-pastel-datepicker formControlName="fechaInicio" iconClass="fas fa-calendar-day" [container]="'body'"></app-pastel-datepicker>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Fecha Fin de Vigencia</label>
+                                <app-pastel-datepicker formControlName="fechaFin" iconClass="fas fa-calendar-check" [container]="'body'"></app-pastel-datepicker>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Paso 2: Conceptos -->
+            <div class="fade-in p-4 px-5" *ngIf="pasoActual === 2">
+                <div class="alert bg-light-soft d-flex align-items-center mb-4" style="border-radius: 12px; background: rgba(89, 140, 137, 0.04); color: #598c89; border: 1px solid rgba(89, 140, 137, 0.1);">
+                    <i class="fas fa-shield-alt mr-3" style="font-size: 1.2rem;"></i>
+                    <span style="font-size: 0.85rem; font-weight: 600;">Conceptos activos en la directiva seleccionada. Puede excluir conceptos específicos desmarcando la casilla lateral.</span>
+                </div>
+                
+                <div class="concepts-table-wrapper" style="border-radius: 14px;">
+                    <app-dynamic-table 
+                        [config]="conceptosTableConfig" 
+                        [data]="conceptosData"
+                        (selectionChanged)="onConceptosSelected($event)">
+                    </app-dynamic-table>
+                </div>
+            </div>
+
+            <!-- Paso 3: Extra (Archivos) - Con Simulación de Carga -->
+            <div class="fade-in p-4 px-5" *ngIf="pasoActual === 3">
+                <div class="text-center mb-4">
+                    <h6 class="font-weight-bold text-dark mb-1">Carga de Lotes Externos</h6>
+                    <p class="text-muted" style="font-size: 0.82rem;">Incorpore deducciones de terceros (Cajas de Ahorro, Seguros, Judiciales)</p>
+                </div>
+                
+                <div class="premium-uploader-minimal d-flex flex-column align-items-center justify-content-center p-5 mb-2" 
+                     [class.loading]="cargandoArchivos"
+                     (click)="!cargandoArchivos ? simularCargaArchivos() : null">
+                    
+                    <ng-container *ngIf="!cargandoArchivos">
+                        <div class="icon-circle mb-3 bg-white shadow-sm" style="width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-cloud-upload-alt text-primary-teal" style="font-size: 1.4rem;"></i>
+                        </div>
+                        <span class="font-weight-bold text-dark mb-1" style="font-size: 0.95rem;">Seleccionar archivos TXT/CSV</span>
+                        <span class="text-muted" style="font-size: 0.75rem;">O arrastre los archivos para procesarlos</span>
+                    </ng-container>
+
+                    <ng-container *ngIf="cargandoArchivos">
+                        <div class="spinner-border text-primary-teal mb-3" role="status" style="width: 3rem; height: 3rem; border-width: 0.25rem;"></div>
+                        <span class="font-weight-bold text-primary-teal">Analizando Estructura de Lotes...</span>
+                        <small class="text-muted">Espere un momento</small>
+                    </ng-container>
+                </div>
+                <div class="text-center">
+                    <button type="button" class="btn btn-link text-muted font-weight-bold" style="font-size: 0.75rem; text-decoration: none;" (click)="pasoActual = 4">Omitir carga e ir al final</button>
+                </div>
+            </div>
+
+             <!-- Paso 4: Procesar -->
+             <div class="fade-in p-4 px-5 text-center" *ngIf="pasoActual === 4">
+                <div class="icon-confirm-pulse teal mt-3 mb-4 mx-auto" style="width: 80px; height: 80px; font-size: 2.22rem;">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h5 class="font-weight-bold text-dark mb-2">Liquidación Lista</h5>
+                <p class="text-muted mx-auto mb-5" style="font-size: 0.9rem; max-width: 420px; line-height: 1.6;">
+                    Se ha validado la directiva y los conceptos. El sistema está listo para ejecutar el proceso de cálculo completo para 
+                    <strong class="text-primary-teal">{{ tipoCalculoTitle }}</strong>.
+                </p>
+                
+                <div class="alert bg-light-soft border-0 mb-4" style="background: rgba(245, 158, 11, 0.05); color: #b45309; border-radius: 12px; font-size: 0.8rem;">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Una vez iniciado, este proceso afectará las tablas de historial de pagos.
+                </div>
+            </div>
+
+            <!-- Footer con Línea Separadora Minimalista -->
+            <div class="modal-footer-minimal d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-header-action gray shadow-none" 
+                        *ngIf="pasoActual > 1 && pasoActual < 4" (click)="pasoActual = pasoActual - 1">
+                    <i class="fas fa-chevron-left mr-2"></i> Volver
+                </button>
+                <div class="ml-auto">
+                    <button type="button" class="btn btn-header-action teal shadow-none" 
+                            *ngIf="pasoActual < 3" (click)="pasoActual = pasoActual + 1">
+                        Siguiente <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                    <button type="button" class="btn-header-action teal shadow-none px-4" 
+                            *ngIf="pasoActual === 4" (click)="simularEjecucion(modal)">
+                        <i class="fas fa-play mr-2" style="font-size: 0.8rem;"></i> Iniciar Cálculo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+

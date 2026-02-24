@@ -101,12 +101,12 @@ export class PastelDatepickerComponent implements ControlValueAccessor {
         this.onTouched = fn;
     }
 
-    onDateSelect(date: NgbDateStruct) {
-        if (date) {
+    onDateSelect(date: NgbDateStruct | null) {
+        if (date && date.year && date.month && date.day) {
             const y = date.year;
             const m = padNumber(date.month);
             const d = padNumber(date.day);
-            this.onChange(`${y}-${m}-${d}`); // Enviamos formato estándar a Angular form
+            this.onChange(`${y}-${m}-${d}`);
         } else {
             this.onChange(null);
         }

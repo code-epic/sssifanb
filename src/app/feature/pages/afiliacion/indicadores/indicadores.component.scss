@@ -97,100 +97,72 @@ $pastel-teal: #598c89;
     }
 }
 
-// Estilos de Tarjetas de Estadísticas - Minimalist Version
+// ----------------------------------------------------------------------------
+// GRID CARDS (STATISTICS) - Smooth elegant style
+// ----------------------------------------------------------------------------
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
 
 .stat-card {
-    background: white;
+    background: #ffffff;
+    border-radius: 16px;
     padding: 1.5rem;
-    border-radius: 20px;
-    border: 1px solid #e8f0ed; // Border with green hint
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.015);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+    border: 1px solid rgba(89, 140, 137, 0.15);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 130px;
-
-    &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 25%;
-        height: 50%;
-        width: 3px; // Thinner
-        border-radius: 0 4px 4px 0;
-        transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    transform: translateZ(0); /* Forzar recorte por hardware durante la animación */
+    
+    .card-watermark {
+        transition: all 0.4s ease;
     }
-
+    .icon-circle {
+        transition: all 0.4s ease;
+    }
+    
     &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 20px rgba(45, 74, 65, 0.05);
-        border-color: #ccd9d5;
-    }
-
-    .stat-header {
-        align-items: center;
-        margin-bottom: 0.5rem;
-        display: flex;
-    }
-
-    .stat-icon-wrapper {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 12px;
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(89, 140, 137, 0.08);
+        border-color: rgba(89, 140, 137, 0.15);
+        background: #ffffff;
         
-        i { font-size: 1.1rem; opacity: 0.7; }
-    }
-
-    .stat-label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: #8fa09b;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .stat-content {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        margin-top: auto;
-
-        .stat-value {
-            font-size: 2.1rem;
-            font-weight: 800;
-            color: #3e5c52; // Deep Sage
-            margin: 0;
-            letter-spacing: -1px;
+        .card-watermark {
+            animation: floatWatermark 3s ease-in-out infinite;
+        }
+        .icon-circle {
+            animation: pulseSoft 2s infinite;
         }
     }
 
-    .stat-trend {
-        font-size: 0.65rem;
-        font-weight: 700;
-        padding: 3px 7px;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    &.issued { &::before { background: $pastel-blue-dark; } i { color: $pastel-blue-dark; } }
-    &.rejected { &::before { background: $pastel-red-dark; } i { color: $pastel-red-dark; } }
-    &.released { &::before { background: $pastel-green-dark; } i { color: $pastel-green-dark; } }
-    &.printed { &::before { background: $pastel-orange-dark; } i { color: $pastel-orange-dark; } }
+    &.card-teal { background: rgba(89, 140, 137, 0.06); }
+    &.card-blue { background: rgba(59, 130, 246, 0.06); }
+    &.card-purple { background: rgba(168, 85, 247, 0.06); }
+    &.card-amber { background: rgba(245, 158, 11, 0.06); }
+    &.card-red { background: rgba(239, 68, 68, 0.06); }
 }
+
+// Pastel Backgrounds
+.bg-light-teal { background-color: rgba(89, 140, 137, 0.1); }
+.text-primary-teal { color: #598c89 !important; }
+
+.bg-light-blue { background-color: rgba(59, 130, 246, 0.1); }
+.text-primary-blue { color: #3b82f6 !important; }
+
+.bg-light-purple { background-color: rgba(168, 85, 247, 0.1); }
+.text-purple { color: #a855f7 !important; }
+
+.bg-light-amber { background-color: rgba(245, 158, 11, 0.1); }
+.text-amber { color: #f59e0b !important; }
+
+.bg-light-red { background-color: rgba(239, 68, 68, 0.1); }
+.text-red { color: #ef4444 !important; }
+
 
 // Panel de Filtros Moderno
 .filter-panel {
@@ -393,12 +365,35 @@ $pastel-teal: #598c89;
     &.bg-printed { background: $pastel-orange-soft; color: $pastel-orange-dark; }
 }
 
-// Animaciones
+// Animaciones (Suaves, sin los desplazamientos largos de antes)
 .fade-in {
-    animation: fadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+.fade-in-down {
+    animation: fadeInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatWatermark {
+    0% { transform: rotate(-15deg) translateY(0px) scale(1); }
+    50% { transform: rotate(-15deg) translateY(-8px) scale(1.02); }
+    100% { transform: rotate(-15deg) translateY(0px) scale(1); }
+}
+
+@keyframes pulseSoft {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
