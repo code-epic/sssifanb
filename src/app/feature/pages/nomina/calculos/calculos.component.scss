@@ -12,13 +12,13 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes floatWatermark {
@@ -31,6 +31,12 @@
     0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
     50% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+@keyframes uploaderPulse {
+    0% { border-color: rgba(89, 140, 137, 0.3); background: #fcfdfe; }
+    50% { border-color: rgba(89, 140, 137, 0.8); background: rgba(89, 140, 137, 0.05); }
+    100% { border-color: rgba(89, 140, 137, 0.3); background: #fcfdfe; }
 }
 
 .pointer {
@@ -463,42 +469,67 @@
     margin-bottom: 2rem;
 
     label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #525f7f;
-        margin-bottom: 0.5rem;
-        text-transform: none;
-        letter-spacing: normal;
+        font-size: 0.9rem; 
+        font-weight: 700;
+        color: #526484;
+        margin-bottom: 0.6rem;
         display: block;
+        letter-spacing: -0.2px;
     }
 
     .input-group {
-        border-radius: 10px;
+        border-radius: 12px;
         transition: all 0.25s ease;
         background-color: #f1f4f8;
         border: 1px solid #e2e8f0;
-        overflow: hidden;
+        overflow: hidden; // Critical for rounded corners
 
         &:focus-within {
             background-color: #ffffff;
-            border-color: rgba(89, 140, 137, 0.6);
+            border-color: #598c89;
             box-shadow: 0 0 0 4px rgba(89, 140, 137, 0.1);
+        }
+    }
 
-            .input-group-text { color: #598c89; }
+    .input-group-prepend {
+        display: flex;
+        background: transparent;
+        border: none;
+
+        .input-group-text {
+            background: transparent !important;
+            border: none !important;
+            color: #598c89 !important;
+            padding-left: 1.15rem;
+            padding-right: 0.45rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+
+            i { 
+                display: inline-block;
+                width: auto;
+                height: auto;
+            }
         }
     }
 
     .form-control {
-        background: transparent;
-        border: none;
-        box-shadow: none;
-        height: 3.2rem;
-        padding-left: 0.75rem;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        height: 3.5rem;
+        padding-left: 0.5rem;
         color: #1e293b;
-        font-weight: 500;
+        font-weight: 600;
         font-size: 0.95rem;
 
-        &:focus { background: transparent; box-shadow: none; }
+        &:focus { 
+            background: transparent !important;
+            box-shadow: none !important;
+        }
         
         &::placeholder {
             color: #94a3b8;
@@ -506,25 +537,50 @@
         }
     }
 
-    // Custom Select Arrow refined
+    // Custom Select Arrow refined for maximum compatibility
     select.form-control {
-        appearance: none;
-        -webkit-appearance: none;
-        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
-        background-size: 1.1em;
-        padding-right: 2.5rem !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23598c89' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 1.25rem center !important;
+        background-size: 1.2rem !important;
+        padding-right: 3rem !important;
+        cursor: pointer;
+        
+        &::-ms-expand {
+            display: none;
+        }
     }
 
-    .input-group-prepend .input-group-text {
-        background: transparent;
-        border: none;
-        color: #64748b;
-        padding-left: 1rem;
-        padding-right: 0.25rem;
-        font-size: 1rem;
+    ::ng-deep app-pastel-datepicker {
+        display: block;
+        width: 100%;
+        
+        .input-group {
+            background-color: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            min-height: auto;
+            overflow: visible;
+
+            .input-group-text {
+                padding-left: 1.15rem;
+                color: #598c89 !important;
+            }
+            .form-control {
+                padding-left: 0.5rem;
+                height: 3.5rem !important;
+            }
+        }
     }
+}
+
+/* Forzar Stacking Context alto para el calendario */
+::ng-deep .ngb-dp-container, ::ng-deep ngb-datepicker {
+    z-index: 10000 !important;
 }
 
 // ----------------------------------------------------------------------------
@@ -550,6 +606,11 @@
     border-top: 1px solid rgba(0,0,0,0.04) !important;
     padding: 1.25rem 1.75rem;
     background: #ffffff;
+}
+
+/* Permitir que elementos como el datepicker sobresalgan del modal sin recortarse */
+::ng-deep .modal-content, ::ng-deep .modal-body {
+    overflow: visible !important;
 }
 
 .stepper-ultra-minimal {
@@ -623,6 +684,7 @@
     border-radius: 20px;
     background: #fcfdfe;
     transition: all 0.3s ease;
+    min-height: 220px;
     
     &:hover {
         border-color: #598c89;
@@ -632,6 +694,11 @@
     &.loading {
         border-style: solid;
         animation: uploaderPulse 2s infinite;
+        cursor: wait;
+    }
+
+    .premium-progress-wrapper {
+        animation: fadeIn 0.4s ease-out;
     }
 }
 

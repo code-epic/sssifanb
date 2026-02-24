@@ -17,6 +17,7 @@ export class CalculosComponent implements OnInit {
   public tipoCalculoCodigo: string = '';
   public tipoCalculoTitle: string = '';
   public cargandoArchivos: boolean = false;
+  public progresoCarga: number = 0;
 
   constructor(
     private layoutService: LayoutService,
@@ -83,10 +84,25 @@ export class CalculosComponent implements OnInit {
 
   simularCargaArchivos() {
     this.cargandoArchivos = true;
-    setTimeout(() => {
-      this.cargandoArchivos = false;
-      this.pasoActual = 4;
-    }, 2000);
+    this.progresoCarga = 0;
+
+    const interval = setInterval(() => {
+      this.progresoCarga += Math.floor(Math.random() * 15) + 5;
+      if (this.progresoCarga >= 100) {
+        this.progresoCarga = 100;
+        clearInterval(interval);
+        setTimeout(() => {
+          this.cargandoArchivos = false;
+          this.pasoActual = 4;
+        }, 500);
+      }
+    }, 200);
+  }
+
+  triggerFileSelect(input: HTMLInputElement) {
+    if (!this.cargandoArchivos) {
+      input.click();
+    }
   }
 
   // == DYNAMIC TABLE CONF && MOCK DATA ==

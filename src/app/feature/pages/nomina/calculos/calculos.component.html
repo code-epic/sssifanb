@@ -322,13 +322,13 @@
                         <div class="col-md-6">
                             <div class="modern-form-group">
                                 <label>Fecha Inicio de Vigencia</label>
-                                <app-pastel-datepicker formControlName="fechaInicio" iconClass="fas fa-calendar-day" [container]="'body'"></app-pastel-datepicker>
+                                <app-pastel-datepicker formControlName="fechaInicio" iconClass="fas fa-calendar-day"></app-pastel-datepicker>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="modern-form-group">
                                 <label>Fecha Fin de Vigencia</label>
-                                <app-pastel-datepicker formControlName="fechaFin" iconClass="fas fa-calendar-check" [container]="'body'"></app-pastel-datepicker>
+                                <app-pastel-datepicker formControlName="fechaFin" iconClass="fas fa-calendar-check"></app-pastel-datepicker>
                             </div>
                         </div>
                     </div>
@@ -358,9 +358,11 @@
                     <p class="text-muted" style="font-size: 0.82rem;">Incorpore deducciones de terceros (Cajas de Ahorro, Seguros, Judiciales)</p>
                 </div>
                 
+                <input type="file" #fileInput style="display: none;" (change)="simularCargaArchivos()" accept=".txt,.csv">
+                
                 <div class="premium-uploader-minimal d-flex flex-column align-items-center justify-content-center p-5 mb-2" 
                      [class.loading]="cargandoArchivos"
-                     (click)="!cargandoArchivos ? simularCargaArchivos() : null">
+                     (click)="triggerFileSelect(fileInput)">
                     
                     <ng-container *ngIf="!cargandoArchivos">
                         <div class="icon-circle mb-3 bg-white shadow-sm" style="width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
@@ -371,9 +373,22 @@
                     </ng-container>
 
                     <ng-container *ngIf="cargandoArchivos">
-                        <div class="spinner-border text-primary-teal mb-3" role="status" style="width: 3rem; height: 3rem; border-width: 0.25rem;"></div>
-                        <span class="font-weight-bold text-primary-teal">Analizando Estructura de Lotes...</span>
-                        <small class="text-muted">Espere un momento</small>
+                        <div class="spinner-border text-primary-teal mb-3" role="status" style="width: 2.5rem; height: 2.5rem; border-width: 0.2rem;"></div>
+                        <span class="font-weight-bold text-primary-teal mb-2">Analizando Estructura de Lotes...</span>
+                        
+                        <div class="premium-progress-wrapper w-75 mb-2">
+                            <div class="progress-info d-flex justify-content-between mb-1">
+                                <span class="text-muted" style="font-size: 0.7rem; font-weight: 700;">PROCESANDO</span>
+                                <span class="text-primary-teal font-weight-bold" style="font-size: 0.75rem;">{{ progresoCarga }}%</span>
+                            </div>
+                            <div class="progress shadow-sm" style="height: 6px; border-radius: 10px; background-color: rgba(89, 140, 137, 0.1);">
+                                <div class="progress-bar bg-primary-teal progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" 
+                                     [style.width.%]="progresoCarga"></div>
+                            </div>
+                        </div>
+
+                        <small class="text-muted">Espere un momento, por favor</small>
                     </ng-container>
                 </div>
                 <div class="text-center">

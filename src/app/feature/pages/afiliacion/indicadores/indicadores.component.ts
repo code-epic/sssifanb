@@ -66,6 +66,9 @@ export class IndicadoresComponent implements OnInit {
         rowClickable: true,
         showPagination: true,
         pageSize: 5,
+        hoverActions: true,
+        tableClass: 'mailbox-table w-100',
+        containerClass: 'p-0 border-0 shadow-none',
         columns: [
             { key: 'cedulaFormat', header: 'Cédula', type: 'html', width: '140px' },
             { key: 'afiliadoFormat', header: 'Afiliado', type: 'html' },
@@ -75,8 +78,8 @@ export class IndicadoresComponent implements OnInit {
             { key: 'estatusFormat', header: 'Estatus', type: 'html', width: '130px' }
         ],
         actions: [
-            { name: 'ver', icon: 'fa-eye', tooltip: 'Ver Detalles' },
-            { name: 'historial', icon: 'fa-history', tooltip: 'Historial', buttonClass: 'btn-danger-soft' }
+            { name: 'ver', icon: 'fa-eye', tooltip: 'Ver Detalles', buttonClass: 'btn-pastel-icon-circle ml-2' },
+            { name: 'historial', icon: 'fa-history', tooltip: 'Historial', buttonClass: 'btn-pastel-icon-circle pastel-danger ml-2' }
         ]
     };
 

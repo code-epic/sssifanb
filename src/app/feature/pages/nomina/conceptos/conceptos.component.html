@@ -27,14 +27,13 @@
     <!-- ============================================== -->
     <div class="tab-pane fade" [class.show]="activeTab === 'libreria'" [class.active]="activeTab === 'libreria'" id="libreria" role="tabpanel">
 
-            <div class="table-responsive" style="border-radius: 12px; min-height: 480px; overflow-y: visible;">
+            
                 <app-dynamic-table 
                     [config]="tableConfig" 
                     [data]="tableData"
                     (rowClicked)="onRowClicked($event)" 
                     (actionClicked)="onTableAction($event, modalConfirmarEliminar)">
                 </app-dynamic-table>
-            </div>
       
     </div>
 

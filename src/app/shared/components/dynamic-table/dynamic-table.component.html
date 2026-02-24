@@ -11,8 +11,9 @@
                 </th>
 
                 <!-- Dynamic Headers -->
-                <th *ngFor="let col of config?.columns; let first = first" 
+                <th *ngFor="let col of config?.columns; let first = first; let last = last" 
                     [class.ps-4]="!config?.selectable && first"
+                    [class.text-right]="last && (config?.actions && config!.actions!.length > 0)"
                     [class.sortable]="col.sortable"
                     [style.text-align]="col.align || 'left'"
                     [style.width]="col.width"
@@ -27,7 +28,8 @@
                 </th>
 
                 <!-- Actions Header -->
-                <th *ngIf="config?.actions && config!.actions!.length > 0" class="text-right pe-4">Acciones</th>
+                <!-- Actions Header (only if not using hover actions) -->
+                <th *ngIf="config?.actions && config!.actions!.length > 0 && !config?.hoverActions" class="text-right pe-4">Acciones</th>
             </tr>
         </thead>
         <tbody [ngClass]="{'hover-actions-table': config?.hoverActions}">
@@ -36,7 +38,7 @@
                 (click)="onRowClick(row)">
                 
                 <!-- Selection Checkbox -->
-                <td *ngIf="config?.selectable" class="text-center ps-4" style="width: 45px;">
+                <td *ngIf="config?.selectable" class="text-center" style="width: 45px; padding-left: 1.5rem;">
                     <label class="custom-checkbox-wrapper mb-0" (click)="$event.stopPropagation()">
                         <input type="checkbox" [checked]="selectedRows.has(row)" (change)="toggleRow(row)">
                         <span class="checkmark"><i class="fas fa-check"></i></span>
@@ -44,7 +46,7 @@
                 </td>
 
                 <!-- Dynamic Data -->
-                <td *ngFor="let col of config?.columns; let first = first" 
+                <td *ngFor="let col of config?.columns; let first = first; let last = last" 
                     [class.ps-4]="!config?.selectable && first"
                     [ngClass]="col.cssClass || ''"
                     [style.text-align]="col.align || 'left'">
@@ -78,11 +80,23 @@
                         </span>
                     </ng-container>
 
+                    <!-- Embedded Hover Actions -->
+                    <ng-container *ngIf="last && config?.hoverActions && config?.actions && config!.actions!.length > 0">
+                        <div class="action-buttons-container-dynamic d-flex justify-content-end align-items-center h-100">
+                            <button *ngFor="let act of config!.actions" 
+                                    [ngClass]="act.buttonClass || 'btn-circular ml-2'"
+                                    [ngbTooltip]="act.tooltip"
+                                    (click)="onAction(act.name, row); $event.stopPropagation()">
+                                <i [ngClass]="['fas', act.icon, act.iconColorClass || '']"></i>
+                            </button>
+                        </div>
+                    </ng-container>
+
                 </td>
 
-                <!-- Actions -->
-                <td *ngIf="config?.actions && config!.actions!.length > 0" class="text-right pe-4 position-relative">
-                    <div [class.action-buttons-container-dynamic]="config?.hoverActions" class="d-flex justify-content-end align-items-center h-100">
+                <!-- Separate Actions Column (only if not using hover actions) -->
+                <td *ngIf="config?.actions && config!.actions!.length > 0 && !config?.hoverActions" class="text-right pe-4 position-relative">
+                    <div class="d-flex justify-content-end align-items-center h-100">
                         <button *ngFor="let act of config!.actions" 
                                 [ngClass]="act.buttonClass || 'btn-circular ml-2'"
                                 [ngbTooltip]="act.tooltip"

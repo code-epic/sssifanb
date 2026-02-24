@@ -191,16 +191,31 @@ export class ReportesComponent implements OnInit, AfterViewInit {
                 }).join(separator);
             }).join('\n');
 
-        const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        if (link.download !== undefined) {
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', filename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        // Adaptación para Sandra Sandbox Bridge
+        const csvBase64 = btoa(unescape(encodeURIComponent("\ufeff" + csvContent)));
+        const csvDataUri = `data:text/csv;base64,${csvBase64}`;
+
+        if (window.parent && window !== window.parent) {
+            window.parent.postMessage({
+                type: 'OPEN_CSV',
+                payload: {
+                    fileName: filename,
+                    data: csvDataUri
+                }
+            }, '*');
+        } else {
+            // Fallback para cuando no corre dentro de Sandra
+            const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
     }
 

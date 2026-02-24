@@ -66,14 +66,14 @@ export class ConceptosComponent implements OnInit {
         selectable: false,
         rowClickable: true,
         showPagination: true,
-        pageSize: 10,
         columns: [
-            { key: 'codigoFormat', header: 'Código', sortable: true, type: 'html', width: '15%' },
-            { key: 'descripcionFormat', header: 'Descripción', sortable: true, type: 'html', width: '50%' },
-            { key: 'tipoFormat', header: 'Tipo', sortable: true, type: 'html', width: '15%', align: 'center' }
+            { key: 'codigoFormat', header: 'Código', sortable: true, type: 'html', width: '10%' },
+            { key: 'descripcionFormat', header: 'Concepto / Denominación', sortable: true, type: 'html', width: '35%' },
+            { key: 'contabilidadFormat', header: 'Plan Contable / Partida', sortable: true, type: 'html', width: '35%' },
+            { key: 'tipoFormat', header: 'Tipo', sortable: true, type: 'html', width: '15%', align: 'right' }
         ],
         actions: [
-            { name: 'eliminar', icon: 'fa-trash-alt', tooltip: 'Eliminar Concepto', buttonClass: 'btn-danger-soft pastel-warning shadow-none' }
+            { name: 'eliminar', icon: 'fa-trash-alt', tooltip: 'Eliminar', buttonClass: 'btn btn-sm btn-pastel-icon-circle pastel-warning shadow-sm ml-1 tooltip-action' }
         ]
     };
 
@@ -99,8 +99,14 @@ export class ConceptosComponent implements OnInit {
                 ...m,
                 codigoFormat: `<span class="fw-bold text-dark font-monospace" style="font-size: 0.95rem;">${m.codigo}</span>`,
                 descripcionFormat: `
-                    <div class="fw-bold fs-6 text-dark opacity-75">${m.descripcion}</div>
-                    <small class="text-primary-teal fw-bold d-block mt-1 font-monospace"><i class="fa fa-file-invoice me-1"></i> Partida: ${m.partida} | C.C: ${m.cuenta}</small>
+                    <div class="fw-bold text-dark" style="font-size: 0.9rem; letter-spacing: -0.2px;">${m.descripcion}</div>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;"><i class="fa fa-microchip me-1 opacity-50"></i> Kernel Ref: RustExpr</small>
+                `,
+                contabilidadFormat: `
+                    <div class="d-flex flex-column">
+                        <span class="text-primary-teal fw-bold" style="font-size: 0.8rem;"><i class="fa fa-file-invoice me-1"></i> Partida: ${m.partida}</span>
+                        <span class="text-muted font-monospace mt-1" style="font-size: 0.75rem;"><i class="fa fa-calculator me-1"></i> C.C: ${m.cuenta}</span>
+                    </div>
                 `,
                 tipoFormat: `<span class="badge font-monospace px-3 py-2" style="border-radius: 8px; ${tipoBadge}">${tipoText}</span>`
             };
@@ -122,6 +128,7 @@ export class ConceptosComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.layoutService.toggleCards(false);
         this.layoutService.updateHeader({
             title: 'Nómina / Gestión de Conceptos',
             showBackButton: true,

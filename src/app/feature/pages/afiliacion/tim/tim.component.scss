@@ -59,7 +59,7 @@
     .mailbox-table {
         border-collapse: separate;
         border-spacing: 0;
-        table-layout: fixed;
+        table-layout: auto;
         width: 100%;
     }
 
@@ -134,6 +134,48 @@
         background-color: #3b82f6 !important;
         color: white !important;
         box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3) !important;
+    }
+
+}
+
+/* Standardized Checkbox Styles */
+.custom-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+
+    input {
+        display: none;
+    }
+
+    .checkmark {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(89, 140, 137, 0.3);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+
+        i {
+            font-size: 10px;
+            color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    }
+
+    input:checked + .checkmark {
+        background: #598c89;
+        border-color: #598c89;
+        box-shadow: 0 4px 6px rgba(89, 140, 137, 0.2);
+
+        i {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 }
 
@@ -248,5 +290,54 @@
         padding-right: 0.25rem;
         padding-left: 1rem;
         transition: color 0.2s ease;
+    }
+}
+
+/* Dropdown Caret & Animations */
+.dropdown-menu-caret {
+    position: relative;
+    overflow: visible !important;
+    margin-top: 42px !important;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: 18px;
+        width: 16px;
+        height: 16px;
+        background: white;
+        transform: rotate(45deg);
+        border-left: 1px solid rgba(0,0,0,0.02);
+        border-top: 1px solid rgba(0,0,0,0.02);
+        z-index: -1;
+        box-shadow: -3px -3px 5px rgba(0,0,0,0.05);
+    }
+}
+
+.animate-dropdown-in {
+    animation: animateDropdownIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes animateDropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.btn-cancel-pastel {
+    background-color: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+    &:hover {
+        background-color: #f1f5f9;
+        color: #475569;
+        transform: translateY(-1px);
     }
 }
