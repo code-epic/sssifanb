@@ -1,7 +1,14 @@
 ---
 name: Git Synchronization
-description: Estándar para agregar, commitear y hacer push de cambios en el proyecto SSS IFANB.
+description: Estándar para agregar, commitear y hacer push de cambios en el proyecto SSSIFANB.
+model: Gemini Flash (Optimizado para latencia y costo)
 ---
+
+# 🤖 Agent Model Optimization
+
+// Este Skill está optimizado para ejecutarse bajo el modelo **Gemini Flash**.
+// Se recomienda al usuario asegurar que el agente esté operando en este modelo
+// para garantizar la máxima velocidad de respuesta en tareas de sincronización.
 
 # 🛡️ Git Synchronization Skill
 

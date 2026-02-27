@@ -1,13 +1,365 @@
-<div class="prestaciones-container fade-in">
-    <div class="hero-summary mb-4">
-        <div class="hero-info">
-            <h1>Medidas Judiciales</h1>
-            <p>Gestión de retenciones y medidas por orden judicial.</p>
+<!-- MAIN VIEW: MAILBOX LAYOUT -->
+<app-mailbox-layout #mailboxLayout *ngIf="!isNewRecordView" [tabs]="workflowTabs" [currentTabId]="currentTabId"
+    [isLoadingTabs]="isLoadingData" [showToolbar]="true" [allSelected]="allSelected"
+    [searchPlaceholder]="'Buscar por cédula o expediente...'"
+    (search)="onMailboxSearch($event)" (tabSwitch)="onMailboxTabSwitch($event)" (refresh)="loadData()">
+
+    <ng-container toolbar-actions>
+        <button class="btn btn-pastel-icon-circle mr-2 tooltip-action btn-nuevo-pastel shadow-sm" 
+            (click)="toggleView()" ngbTooltip="Nueva Medida Judicial">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="btn btn-pastel-icon-circle tooltip-action btn-csv-emerald shadow-sm" 
+            (click)="exportarCSV()" ngbTooltip="Exportar Registro">
+            <i class="fas fa-file-excel"></i>
+        </button>
+    </ng-container>
+
+    <!-- Contenido Principal: Tabla Dinámica -->
+    <div mailbox-body class="fade-in">
+        <app-dynamic-table [config]="mainTableConfig" [data]="mainTableData"
+            (actionClick)="onActionClick($event)"></app-dynamic-table>
+    </div>
+
+    <!-- FILTROS INYECTADOS -->
+    <ng-container mailbox-filters>
+        <div class="p-2" style="min-width: 350px;">
+            <div class="modern-form-group mb-3">
+                <label>Rango de Entrega</label>
+                <div class="row align-items-center">
+                    <div class="col-6 pr-1">
+                        <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                    </div>
+                    <div class="col-6 pl-1">
+                        <app-pastel-datepicker iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modern-form-group mb-4">
+                <label>Tipo de Retención</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-filter text-verde-titulos"></i></span></div>
+                    <select class="form-control">
+                        <option value="">Todas las categorías...</option>
+                        <option value="1">Antigüedad (Principal)</option>
+                        <option value="2">Intereses de Mora</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between pt-2">
+                <button class="btn btn-header-action gray px-4 py-2 mr-2"
+                    (click)="mailboxLayout.filterDropdown.close()">
+                    Cancelar
+                </button>
+                <button class="btn btn-header-action teal px-4 py-2" (click)="mailboxLayout.filterDropdown.close()">
+                    Aplicar Filtros
+                </button>
+            </div>
+        </div>
+    </ng-container>
+</app-mailbox-layout>
+
+<!-- VISTA: Nueva Medida Judicial (Mirroring Anticipo) -->
+<div *ngIf="isNewRecordView">
+    
+    <!-- HEADER VOLVER (Pattern Anticipos) -->
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-2 px-2">
+        <h4 class="mb-0 text-dark font-weight-bold" style="letter-spacing: -0.5px;">Gestión de Medidas Judiciales</h4>
+        <button class="btn shadow-sm font-weight-600 px-4 rounded-pill bg-white border text-dark"
+            style="border-color: #cbd5e1 !important;" (click)="toggleView()">
+            <i class="fas fa-arrow-left mr-2" style="color: #5eaaa8;"></i> Volver a Bandeja
+        </button>
+    </div>
+
+    <div class="row px-3">
+        <div class="col-md-4">
+            <div class="modern-form-group">
+                <label>Cédula de Identidad</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-id-card"></i></span></div>
+                    <input type="text" class="form-control" placeholder="Ej. 12345678" [(ngModel)]="searchCedula" (keyup.enter)="buscarMilitar()">
+                    <div class="input-group-append p-1">
+                        <button class="btn btn-header-action teal shadow-none m-0 d-flex align-items-center justify-content-center" 
+                            style="border-radius: 6px; padding: 0 1.2rem; height: 100%; border: none;" type="button" (click)="buscarMilitar()">
+                            <i class="fas fa-search m-0" style="font-size: 0.9rem;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="modern-form-group">
+                <label>Nombres y Apellidos</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.nombres || ''" readonly>
+                </div>
+            </div>
+        </div>
+
+         <div class="col-md-2">
+            <div class="modern-form-group">
+                <label>Sexo</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-venus-mars text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.sexo || ''" readonly>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="card shadow-sm border-0" style="border-radius: 20px;">
-        <div class="card-body p-4">
-            <p class="text-muted">Módulo de Medidas Judiciales en desarrollo...</p>
+
+    <div class="row px-3" *ngIf="militarData">
+        <div class="col-md-3">
+            <div class="modern-form-group">
+                <label>Fecha de Ingreso</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-calendar-alt text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.fechaIngreso || ''" readonly>
+                </div>
+            </div>
+        </div>
+         <div class="col-md-5">
+            <div class="modern-form-group">
+                <label>Componente</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.componente || ''" readonly>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="modern-form-group">
+                <label>Grado</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.grado || ''" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-right mt-5 mb-4 px-3" *ngIf="militarData">
+        <button class="btn btn-header-action teal shadow-sm px-5" (click)="solicitarMedida()">
+            <i class="fas fa-check-circle mr-2"></i> Registrar Nueva Medida
+        </button>
+    </div>
+
+    <!-- CARD: Histórico de Medidas (Mirror Anticipo Style) -->
+    <div class="card shadow-sm border-0 fade-in mt-4" style="border-radius: 20px; background: rgba(255, 255, 255, 0.95);"
+        *ngIf="militarData">
+        <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4 d-flex align-items-center">
+            <div class="icon-circle shadow-sm rounded-circle d-flex align-items-center justify-content-center text-white mr-3"
+                style="width: 44px; height: 44px; background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);">
+                <i class="fas fa-history"></i>
+            </div>
+            <div>
+                <h6 class="mb-0 text-dark font-weight-bold">Histórico de Medidas Judiciales</h6>
+                <small class="text-muted">{{ militarData.nombres }}</small>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <app-dynamic-table [config]="historyTableConfig" [data]="historyTableData">
+            </app-dynamic-table>
         </div>
     </div>
 </div>
+
+<!-- Modal: Registro Step-by-Step (Mirroring Anticipo Modal Design) -->
+<ng-template #modalSolicitar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-4 bg-white">
+            <!-- Header (Pattern Anticipos) -->
+            <div class="d-flex align-items-center mb-0 pb-3" style="border-bottom: 1px solid #f1f5f9;">
+                <div class="icon-circle shadow-sm rounded-circle d-flex align-items-center justify-content-center text-white mr-3"
+                    style="width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);">
+                    <i class="fas fa-gavel text-lg"></i>
+                </div>
+                <div class="w-100">
+                    <h5 class="mb-0 text-dark font-weight-bold">Determinación de Medida Judicial</h5>
+                    <small class="text-muted d-block mt-1">{{ militarData?.nombres }} | C.I. {{ militarData?.cedula }}</small>
+                </div>
+                <button type="button" class="close ml-auto m-0 p-0 text-muted shadow-none d-flex align-items-start" aria-label="Close" (click)="modal.dismiss()" style="outline: none;">
+                    <span aria-hidden="true" style="font-size: 1.75rem;">&times;</span>
+                </button>
+            </div>
+
+            <!-- Stepper (Simple & Clean) -->
+            <div class="stepper-mini mt-2">
+                <div class="step-item" [class.active]="currentModalStep === 1" (click)="currentModalStep = 1">Origen</div>
+                <div class="step-item" [class.active]="currentModalStep === 2" [class.disabled]="currentModalStep < 2" (click)="currentModalStep >= 2 ? currentModalStep = 2 : null">Economía</div>
+                <div class="step-item" [class.active]="currentModalStep === 3" [class.disabled]="currentModalStep < 3" (click)="currentModalStep >= 3 ? currentModalStep = 3 : null">Autoridad</div>
+                <div class="step-item" [class.active]="currentModalStep === 4" [class.disabled]="currentModalStep < 4" (click)="currentModalStep >= 4 ? currentModalStep = 4 : null">Beneficiario</div>
+            </div>
+
+            <!-- Wizard Content (Anticipos Style Inputs) -->
+            <div class="fade-in mt-3">
+                <!-- Paso 1 -->
+                <div *ngIf="currentModalStep === 1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Número de Oficio</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-file-alt text-verde-titulos"></i></span></div>
+                                    <input type="text" class="form-control" placeholder="Ej: OF-001">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Expediente</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-folder text-verde-titulos"></i></span></div>
+                                    <input type="text" class="form-control" placeholder="Ej: EXP-2024">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div *ngIf="currentModalStep === 2">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Porcentaje (%)</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-percent text-verde-titulos"></i></span></div>
+                                    <input type="number" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="modern-form-group">
+                                <label>Monto Estimado (Bs)</label>
+                                <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                                    <input type="text" class="form-control font-weight-bold" style="font-size: 1.15rem; border: none; color: #0f172a;" placeholder="0,00">
+                                    <div class="input-group-append p-1">
+                                        <button class="btn btn-header-action teal shadow-none m-0 px-4" style="border-radius: 6px; border: none; height: 100%;" type="button">
+                                            <i class="fas fa-calculator m-0"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div *ngIf="currentModalStep === 3">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="modern-form-group">
+                                <label>Juzgado / Institución</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-university text-verde-titulos"></i></span></div>
+                                    <input type="text" class="form-control" placeholder="Nombre de la institución">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 4 -->
+                <div *ngIf="currentModalStep === 4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="modern-form-group">
+                                <label>Nombre del Beneficiario</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-check text-verde-titulos"></i></span></div>
+                                    <input type="text" class="form-control font-weight-bold">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Cédula</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text text-muted">V-</span></div>
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Separador (Pattern Anticipos) -->
+            <div class="my-4" style="border-top: 1px dashed #e2e8f0;"></div>
+
+            <!-- Botones (Pattern Anticipos) -->
+            <div class="d-flex justify-content-end align-items-center mt-2 px-2">
+                <button type="button" class="btn btn-light shadow-sm font-weight-bold px-4 mr-3" style="border-radius: 8px; color: #64748b;" 
+                        *ngIf="currentModalStep === 1" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-header-action gray mr-3 px-4 shadow-none" 
+                        *ngIf="currentModalStep > 1" (click)="prevStep()">
+                    <i class="fas fa-chevron-left mr-2"></i> Anterior
+                </button>
+                
+                <button type="button" class="btn btn-header-action teal shadow-sm px-5 m-0" 
+                        *ngIf="currentModalStep < 4" (click)="nextStep()">
+                    Siguiente <i class="fas fa-chevron-right ml-2"></i>
+                </button>
+                <button type="button" class="btn btn-header-action teal shadow-sm px-5 m-0" 
+                        *ngIf="currentModalStep === 4" (click)="procesarSolicitud()">
+                    <i class="fas fa-check-double mr-2"></i> Procesar Registro
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: CSV (Mirroring Anticipos Colors & Style) -->
+<ng-template #modalCSV let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Exportar a CSV?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Desea generar y descargar el listado de Medidas Judiciales en formato CSV para su análisis?
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action shadow-none w-100" 
+                    style="background-color: #f1fdf6; color: #10b981; border: 1px solid #d1fae5;" (click)="confirmarCSV()">
+                    Generar CSV
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Aprobar/Ejecutar Documento (Mirroring Anticipos) -->
+<ng-template #modalAprobar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse teal">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Ejecutar Medida Judicial?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Está seguro que desea ejecutar formalmente la medida de <strong>{{ selectedRecord?.nombre }}</strong>? Esta acción actualizará su estatus en el sistema.
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action teal shadow-none w-100" (click)="confirmarEjecucion()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
