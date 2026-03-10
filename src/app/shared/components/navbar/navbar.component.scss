@@ -7,14 +7,14 @@ $text-dark: #37474f;
 // Navbar Container
 .navbar.navbar-top {
     // Aseguramos que se superponga correctamente sobre el gradiente del layout
-    box-shadow: none; 
+    box-shadow: none;
 }
 
 // User Profile & Avatar
 .media {
     cursor: pointer;
     transition: opacity 0.3s ease;
-    
+
     &:hover {
         opacity: 0.9;
     }
@@ -35,20 +35,21 @@ $text-dark: #37474f;
         object-fit: contain;
         padding: 2px;
     }
-    
+
     // Icono Blanco Flotante
     i {
         font-size: 2rem; // Grande y visible
         color: rgba(255, 255, 255, 0.9); // Blanco casi puro
-        text-shadow: 0 2px 4px rgba(0,0,0,0.2); // Sombra de texto para contraste
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); // Sombra de texto para contraste
         transition: all 0.3s ease;
     }
 
     &:hover {
         transform: scale(1.1);
+
         i {
             color: #ffffff; // Blanco puro al hover
-            text-shadow: 0 0 10px rgba(255,255,255,0.6); // Glow tenue
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6); // Glow tenue
         }
     }
 }
@@ -57,44 +58,67 @@ $text-dark: #37474f;
     font-family: 'Roboto', sans-serif;
     font-weight: 500;
     letter-spacing: 0.5px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 // --- RELOJ GLASS (Estilo Login) ---
 .clock-glass-container {
-    margin-right: 2rem;
+    margin-right: 1.5rem;
     display: flex;
     align-items: center;
 }
 
 .clock-glass {
-    background: $glass-bg;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: $glass-border;
-    border-radius: 50px; // Cápsula
-    padding: 6px 18px;
-    
-    color: white;
-    font-family: 'Roboto Mono', monospace;
-    font-size: 0.9rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 8px 24px; // Incrementado ligeramente para balancear con el shield
+
+    color: rgba(255, 255, 255, 0.95);
+    font-family: 'Fira Code', 'Roboto Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.8px;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08), inset 0 0 10px rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     align-items: center;
 
     i {
-        margin-right: 8px;
-        font-size: 1rem;
-        opacity: 0.8;
+        margin-right: 10px;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.7);
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+    }
+
+    .clock-date {
+        font-weight: 500;
+        opacity: 0.85;
+        text-transform: uppercase;
+    }
+
+    .clock-separator {
+        opacity: 0.4;
+        font-weight: 300;
+        font-size: 0.7rem;
+    }
+
+    .clock-time {
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
     }
 
     &:hover {
-        background: rgba(255, 255, 255, 0.25);
-        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+
+        .clock-time {
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+        }
     }
 }
 
@@ -107,7 +131,7 @@ $text-dark: #37474f;
     padding: 0.5rem 0 !important;
     margin-top: 10px !important;
     overflow: hidden;
-    
+
     // Glassmorphism sutil para el dropdown tambien (opcional, aqui dejamos blanco solido para legibilidad)
     background: #ffffff !important;
 
@@ -138,7 +162,8 @@ $text-dark: #37474f;
             transition: color 0.2s;
         }
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
             background-color: #f0f7f7 !important; // Fondo teal muy palido
             color: $primary-teal !important;
 

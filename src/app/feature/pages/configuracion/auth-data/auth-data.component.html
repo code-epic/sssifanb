@@ -1,0 +1,159 @@
+<!-- Custom Tabs Header -->
+<ul class="nav nav-tabs custom-nav-tabs fade-in border-0 mb-4 d-flex align-items-center" id="authTabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'listado'"
+            (click)="activeTab = 'listado'">
+            <i class="fa fa-list-ul" style="font-size: 1.1rem; margin-right: 12px;"></i> Gestor de Autorizaciones
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'mantenimiento'"
+            (click)="activeTab = 'mantenimiento'">
+            <i class="fa fa-shield-alt" style="font-size: 1.1rem; margin-right: 12px;"></i>
+            {{ editando ? 'Editar Autorización' : 'Nueva Autorización' }}
+        </a>
+    </li>
+
+    <!-- Botón alineado a los tabs -->
+    <li class="nav-item ms-auto text-end" *ngIf="activeTab === 'listado'">
+        <button class="btn-pastel-icon pastel-success shadow-none" type="button" (click)="nuevaAutorizacion()"
+            title="Nueva Autorización">
+            <i class="fas fa-plus"></i>
+        </button>
+    </li>
+</ul>
+
+<!-- Tabs Content Wrapper -->
+<div class="tab-content fade-in mt-2" id="authTabsContent">
+
+    <!-- TAB 1: LISTADO DE AUTORIZACIONES -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'listado'" [class.active]="activeTab === 'listado'">
+        <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+            <app-dynamic-table [config]="tableConfig" [data]="tableData" (rowClicked)="onRowClicked($event)"
+                (actionClicked)="onTableAction($event)">
+            </app-dynamic-table>
+        </div>
+    </div>
+
+    <!-- TAB 2: FORMULARIO DE MANTENIMIENTO -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'mantenimiento'"
+        [class.active]="activeTab === 'mantenimiento'">
+        <div class="card border-0 shadow-sm p-lg-5 p-4" style="border-radius: 20px; background: white;">
+            <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
+
+                <h6 class="heading-small mb-4 font-weight-800 text-primary-teal">
+                    <i class="fas fa-id-card mr-2 scale-110"></i> IDENTIFICACIÓN DEL MILITAR
+                </h6>
+
+                <div class="row px-1 mb-4">
+                    <div class="col-md-4">
+                        <div class="modern-form-group"
+                            [class.has-danger]="authForm.get('cedula').invalid && authForm.get('cedula').touched">
+                            <label>Cédula de Identidad</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                </div>
+                                <input type="text" formControlName="cedula" class="form-control"
+                                    placeholder="V-00000000">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group"
+                            [class.has-danger]="authForm.get('nombre').invalid && authForm.get('nombre').touched">
+                            <label>Nombres</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                                <input type="text" formControlName="nombre" class="form-control"
+                                    placeholder="Ej. Juan Carlos">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group"
+                            [class.has-danger]="authForm.get('apellido').invalid && authForm.get('apellido').touched">
+                            <label>Apellidos</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                                <input type="text" formControlName="apellido" class="form-control"
+                                    placeholder="Ej. Pérez García">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-5" />
+
+                <h6 class="heading-small mb-4 font-weight-800 text-primary-teal">
+                    <i class="fas fa-layer-group mr-2 scale-110"></i> JERARQUÍA Y NIVEL DE ACCESO
+                </h6>
+
+                <div class="row px-1 mb-4">
+                    <div class="col-md-4">
+                        <div class="modern-form-group"
+                            [class.has-danger]="authForm.get('componente').invalid && authForm.get('componente').touched">
+                            <label>Componente Especial</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-university"></i></span>
+                                </div>
+                                <select formControlName="componente" class="form-control">
+                                    <option value="" disabled>Seleccione...</option>
+                                    <option *ngFor="let item of componentes" [value]="item">{{ item }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group"
+                            [class.has-danger]="authForm.get('grado').invalid && authForm.get('grado').touched">
+                            <label>Grado Militar</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-medal"></i></span>
+                                </div>
+                                <select formControlName="grado" class="form-control">
+                                    <option value="" disabled>Seleccione...</option>
+                                    <option *ngFor="let item of grados" [value]="item">{{ item }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group"
+                            [class.has-danger]="authForm.get('nivel').invalid && authForm.get('nivel').touched">
+                            <label>Nivel de Autorización</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                </div>
+                                <select formControlName="nivel" class="form-control">
+                                    <option *ngFor="let item of niveles" [value]="item.value">{{ item.label }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top">
+                    <button type="button" class="btn btn-header-action amber mr-3 shadow-none"
+                        (click)="activeTab = 'listado'">
+                        <i class="fas fa-times-circle"></i> CANCELAR
+                    </button>
+                    <button type="submit" class="btn btn-header-action teal shadow-none">
+                        <i class="fas fa-check-double"></i> {{ editando ? 'ACTUALIZAR PERMISOS' : 'GUARDAR AUTORIZACIÓN'
+                        }}
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>

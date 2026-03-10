@@ -1,0 +1,230 @@
+/* ------------- TABS MODERNAS COMO ANTICIPOS ------------- */
+.custom-nav-tabs {
+    border-bottom: 2px solid #eaecf5 !important;
+    display: flex;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+
+    .nav-item {
+        margin-right: 0.5rem;
+        cursor: pointer;
+    }
+
+    .nav-link {
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #8898aa !important;
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 1rem 1.25rem;
+        transition: all 0.3s ease;
+        background: transparent !important;
+
+        i {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+            vertical-align: text-bottom;
+            color: #adb5bd;
+            transition: color 0.3s ease;
+        }
+
+        &:hover {
+            color: #598c89 !important;
+
+            i {
+                color: #598c89;
+            }
+        }
+
+        &.active,
+        &:active {
+            color: #598c89 !important;
+            border-bottom-color: #598c89;
+            font-weight: 600;
+
+            i {
+                color: #598c89;
+            }
+        }
+    }
+}
+
+.custom-pills {
+    .nav-link {
+        border-radius: 8px;
+        color: #64748b;
+        font-weight: 500;
+        margin-right: 8px;
+        transition: all 0.2s;
+
+        &:hover {
+            background-color: #f1f5f9;
+        }
+
+        &.active {
+            background-color: #598c89;
+            color: white;
+            box-shadow: 0 4px 6px rgba(89, 140, 137, 0.2);
+        }
+    }
+}
+
+.rust-editor-wrapper {
+    background-color: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+
+    .editor-header {
+        background-color: #f1f5f9;
+        border-bottom: 1px solid #e2e8f0;
+        color: #64748b;
+
+        .badge {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            transition: all 0.2s;
+
+            &:hover {
+                background-color: #e2e8f0;
+                transform: translateY(-1px);
+            }
+        }
+    }
+
+    .editor-body {
+        background-color: transparent !important;
+        color: #0f172a;
+        font-size: 0.95rem;
+        line-height: 1.6;
+
+        &:focus {
+            box-shadow: none;
+            outline: none;
+        }
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* BOTONES MODAL ACTION                                                       */
+/* -------------------------------------------------------------------------- */
+.btn-header-action {
+    border-radius: 10px;
+    padding: 0.65rem 1.8rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.3px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    cursor: pointer;
+
+    i {
+        margin-right: 8px;
+        font-size: 0.9rem;
+    }
+
+    &.teal {
+        background-color: rgba(89, 140, 137, 0.1);
+        border-color: rgba(89, 140, 137, 0.2);
+        color: #598c89;
+
+        &:hover {
+            background-color: rgba(89, 140, 137, 0.25);
+            border-color: rgba(89, 140, 137, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(89, 140, 137, 0.12);
+        }
+    }
+
+    &.red {
+        background-color: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+
+        &:hover {
+            background-color: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.12);
+        }
+    }
+
+    &.gray {
+        background-color: rgba(108, 118, 127, 0.08);
+        border-color: transparent;
+        color: #637381;
+
+        &:hover {
+            background-color: rgba(108, 118, 127, 0.15);
+            transform: translateY(-1px);
+        }
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* CIRCULOS PULSANTES (ICON CONFIRM)                                          */
+/* -------------------------------------------------------------------------- */
+.icon-confirm-pulse {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.22rem;
+    border: 2px solid transparent;
+
+    &.teal {
+        background-color: rgba(89, 140, 137, 0.1);
+        color: #598c89;
+        border-color: rgba(89, 140, 137, 0.2);
+        animation: pulse-circle-teal 2s infinite;
+    }
+
+    &.red {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.2);
+        animation: pulse-circle-red 2s infinite;
+    }
+}
+
+@keyframes pulse-circle-teal {
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(89, 140, 137, 0.4);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(89, 140, 137, 0);
+    }
+
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(89, 140, 137, 0);
+    }
+}
+
+@keyframes pulse-circle-red {
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}

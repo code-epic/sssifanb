@@ -1,25 +1,449 @@
-<div class="configuracion-container fade-in">
-    <div class="hero-summary mb-4">
-        <div class="hero-info">
-            <h1>Directivas Generales</h1>
-            <p>Configuración de normativas y reglas institucionales.</p>
-        </div>
-        <div class="hero-stats-mini">
-            <div class="hero-stat-item">
-                <i class="fa fa-file-contract text-red fa-2x"></i>
-            </div>
+<!-- Custom Tabs Header -->
+<ul class="nav nav-tabs custom-nav-tabs fade-in border-0 mb-4 d-flex align-items-center" id="directivasTabs"
+    role="tablist">
+    <li class="nav-item">
+        <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'libreria'"
+            (click)="activeTab = 'libreria'">
+            <i class="fa fa-folder-open" style="font-size: 1.1rem; margin-right: 12px;"></i> Gestor de
+            Directivas
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'mantenimiento'"
+            (click)="activeTab = 'mantenimiento'">
+            <i class="fa fa-sliders-h" style="font-size: 1.1rem; margin-right: 12px;"></i>
+            Mantenimiento de Directiva
+        </a>
+    </li>
+
+    <!-- Botón alineado a los tabs -->
+    <li class="nav-item ms-auto text-end" *ngIf="activeTab === 'libreria'">
+        <button class="btn-pastel-icon pastel-success shadow-none" type="button" (click)="nuevaDirectiva()"
+            title="Nueva Directiva">
+            <i class="fas fa-plus"></i>
+        </button>
+    </li>
+</ul>
+
+<!-- Tabs Content Wrapper -->
+<div class="tab-content fade-in mt-2" id="directivasTabsContent">
+
+    <!-- ============================================== -->
+    <!-- TAB 1: GESTOR DE DIRECTIVAS                    -->
+    <!-- ============================================== -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'libreria'" [class.active]="activeTab === 'libreria'">
+        <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+            <app-dynamic-table [config]="tableConfig" [data]="tableData" (rowClicked)="onRowClicked($event)"
+                (actionClicked)="onTableAction($event, modalClonarDirectiva, modalEliminarDirectiva)">
+            </app-dynamic-table>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0" style="border-radius: 20px;">
-        <div class="card-body p-4 text-center">
-            <div class="empty-state py-5">
-                <div class="icon-circle bg-light-red mb-4 mx-auto" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: #ffebee;">
-                    <i class="fa fa-shield-alt fa-3x text-red"></i>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: MANTENIMIENTO / EDICIÓN                 -->
+    <!-- ============================================== -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'mantenimiento'"
+        [class.active]="activeTab === 'mantenimiento'">
+
+        <form [formGroup]="formDirectiva">
+            <div class="row px-3 mb-4">
+                <div class="col-md-3">
+                    <div class="modern-form-group">
+                        <label>Código Directiva</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                        class="fas fa-barcode text-verde-titulos"></i></span></div>
+                            <input type="text" formControlName="codigo" class="form-control text-dark font-weight-bold"
+                                placeholder="DIR-XXXX">
+                        </div>
+                    </div>
                 </div>
-                <h3 class="fw-bold">Módulo en Desarrollo</h3>
-                <p class="text-muted">Administración de directivas base que afectan a múltiples procesos del sistema.</p>
+                <div class="col-md-9">
+                    <div class="modern-form-group">
+                        <label>Nombre / Motivo</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                        class="fas fa-file-contract text-verde-titulos"></i></span></div>
+                            <input type="text" formControlName="nombre" class="form-control text-dark font-weight-bold"
+                                placeholder="Nombre descriptivo de la directiva">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row px-3 mb-4 align-items-center">
+                <div class="col-md-3">
+                    <div class="modern-form-group mb-0">
+                        <label>Fecha de Inicio</label>
+                        <app-pastel-datepicker></app-pastel-datepicker>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="modern-form-group mb-0">
+                        <label>Fecha de Fin</label>
+                        <app-pastel-datepicker></app-pastel-datepicker>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row px-3 mb-4">
+                <div class="col-md-4">
+                    <div class="modern-form-group mb-0">
+                        <label>Salario Mínimo</label>
+                        <div class="input-group shadow-sm"
+                            style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                            <input type="number" formControlName="salario_minimo"
+                                class="form-control font-weight-bold bg-transparent" placeholder="0.00"
+                                style="font-size: 1.15rem; border: none; color: #0f172a;">
+                            <div class="input-group-append p-1">
+                                <button
+                                    class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4"
+                                    style="background-color: #598c89; height: 100%; border-radius: 6px !important;"
+                                    type="button">
+                                    <i class="fas fa-coins mr-2"></i> Bs.
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="modern-form-group mb-0">
+                        <label>Unidad Tributaria</label>
+                        <div class="input-group shadow-sm"
+                            style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                            <input type="number" formControlName="unidad_tributaria"
+                                class="form-control font-weight-bold bg-transparent" placeholder="0.00"
+                                style="font-size: 1.15rem; border: none; color: #0f172a;">
+                            <div class="input-group-append p-1">
+                                <button
+                                    class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4"
+                                    style="background-color: #598c89; height: 100%; border-radius: 6px !important;"
+                                    type="button">
+                                    <i class="fas fa-file-invoice mr-2"></i> U.T.
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="modern-form-group mb-0">
+                        <label>% Aumento</label>
+                        <div class="input-group shadow-sm"
+                            style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
+                            <input type="number" formControlName="porcentaje"
+                                class="form-control font-weight-bold bg-transparent" placeholder="0.00"
+                                style="font-size: 1.15rem; border: none; color: #0f172a;">
+                            <div class="input-group-append p-1">
+                                <button
+                                    class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4"
+                                    style="background-color: #598c89; height: 100%; border-radius: 6px !important;"
+                                    type="button">
+                                    <i class="fas fa-percent"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABULADOR Y PRIMAS (SUB-TABS) -->
+            <div class="mt-4 pt-4 px-3" style="border-top: 1px solid #e2e8f0;">
+                <ul class="nav nav-pills custom-pills fade-in mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link cursor-pointer d-flex align-items-center"
+                            [class.active]="activeSubTab === 'tabulador'" (click)="activeSubTab = 'tabulador'">
+                            <i class="fas fa-table mr-2"></i> Tabulador
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link cursor-pointer d-flex align-items-center"
+                            [class.active]="activeSubTab === 'primas'" (click)="activeSubTab = 'primas'">
+                            <i class="fas fa-layer-group mr-2"></i> Primas
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade" [class.show]="activeSubTab === 'tabulador'"
+                        [class.active]="activeSubTab === 'tabulador'">
+                        <div class="p-5 text-center bg-light" style="border-radius: 16px; border: 1px dashed #cbd5e1;">
+                            <i class="fas fa-table fa-3x mb-3 text-muted" style="opacity: 0.5;"></i>
+                            <h5 class="font-weight-bold text-dark">Vista del Tabulador de Sueldos</h5>
+                            <p class="text-muted">Aún no se ha cargado un tabulador para esta directiva.</p>
+                        </div>
+                        <div class="text-right mt-3">
+                            <button class="btn btn-header-action teal shadow-sm px-4">
+                                <i class="fas fa-save mr-2"></i> Actualizar Tabulador
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" [class.show]="activeSubTab === 'primas'"
+                        [class.active]="activeSubTab === 'primas'">
+                        <form [formGroup]="formPrima">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="modern-form-group">
+                                        <label>Primas Actuales</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="fas fa-list-ul text-verde-titulos"></i></span></div>
+                                            <select formControlName="primaid" class="form-control fw-bold text-dark">
+                                                <option value="0X">Seleccione Prima de Directiva...</option>
+                                                <option value="1">Prima Compensatoria</option>
+                                                <option value="2">Prima de Profesionalización</option>
+                                                <option value="3">Prima de Antigüedad</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="modern-form-group">
+                                        <label>Nombre de la Prima</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="fas fa-signature text-verde-titulos"></i></span></div>
+                                            <input type="text" formControlName="prima_nombre"
+                                                class="form-control text-dark font-weight-bold"
+                                                placeholder="Nombre descriptivo">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Rust Embedded Editor Pastel Green -->
+                                <div class="col-md-12 mb-4 mt-2">
+                                    <div class="modern-form-group">
+                                        <label class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="text-primary-teal"
+                                                style="font-size: 0.85rem; font-weight: bold;"><i
+                                                    class="fab fa-rust mr-2 text-primary-teal"></i> FORMULA DE CÁLCULO
+                                                (RUST EMBEDDED)</span>
+                                            <button type="button" class="btn btn-sm" title="Ver Diccionario"
+                                                (click)="abrirModalVariables(modalVariables)"
+                                                style="background: rgba(89,140,137,0.1); color: #598c89; border-radius: 8px; font-weight: 700; padding: 4px 12px; font-size: 0.8rem;">
+                                                <i class="fa fa-book-open mr-1"></i> VER DICCIONARIO
+                                            </button>
+                                        </label>
+
+                                        <div class="rust-editor-wrapper">
+                                            <!-- Barra superior del editor -->
+                                            <div class="editor-header w-100 px-3 py-2 d-flex justify-content-between align-items-center font-monospace"
+                                                style="font-size: 0.8rem;">
+                                                <span><i class="fa fa-terminal mr-2"></i>src/kernel/formulas.rs</span>
+                                                <div class="d-flex">
+                                                    <span
+                                                        class="badge shadow-sm px-2 py-1 cursor-pointer mx-1 d-flex align-items-center justify-content-center"
+                                                        style="width: 24px;" (click)="insertarOperador('+')">+</span>
+                                                    <span
+                                                        class="badge shadow-sm px-2 py-1 cursor-pointer mx-1 d-flex align-items-center justify-content-center"
+                                                        style="width: 24px;" (click)="insertarOperador('-')">-</span>
+                                                    <span
+                                                        class="badge shadow-sm px-2 py-1 cursor-pointer mx-1 d-flex align-items-center justify-content-center"
+                                                        style="width: 24px;" (click)="insertarOperador('*')">*</span>
+                                                    <span
+                                                        class="badge shadow-sm px-2 py-1 cursor-pointer mx-1 d-flex align-items-center justify-content-center"
+                                                        style="width: 24px;" (click)="insertarOperador('/')">/</span>
+                                                    <span
+                                                        class="badge shadow-sm px-2 py-1 cursor-pointer mx-1 d-flex align-items-center justify-content-center"
+                                                        style="width: 24px;" (click)="insertarOperador('(')">(</span>
+                                                    <span
+                                                        class="badge shadow-sm px-2 py-1 cursor-pointer mx-1 d-flex align-items-center justify-content-center"
+                                                        style="width: 24px;" (click)="insertarOperador(')')">)</span>
+                                                </div>
+                                            </div>
+                                            <!-- Area de texto pastel -->
+                                            <textarea formControlName="formula"
+                                                class="form-control editor-body font-monospace p-4" rows="4"
+                                                placeholder="// Defina la expresión matemática aquí utilizando las variables del diccionario..."
+                                                spellcheck="false" style="resize: none; border: none;"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="modern-form-group">
+                                        <label>Estructura Presupuestaria</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="fas fa-sitemap text-verde-titulos"></i></span></div>
+                                            <input type="text" formControlName="estructura"
+                                                class="form-control font-monospace" placeholder="X-XX-XX-XX-X">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="modern-form-group">
+                                        <label>Cuenta Presupuestaria</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="fas fa-piggy-bank text-verde-titulos"></i></span></div>
+                                            <input type="text" formControlName="cuenta"
+                                                class="form-control font-monospace" placeholder="100-20-30">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="modern-form-group">
+                                        <label>Partida Presupuestaria</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="fas fa-file-invoice text-verde-titulos"></i></span></div>
+                                            <input type="text" formControlName="partida"
+                                                class="form-control font-monospace" placeholder="X-XX-XX-XX-X">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MODIFIED BUTTONS -->
+                            <div class="d-flex justify-content-end align-items-center mt-4 pt-4 border-top">
+                                <button type="button" class="btn btn-header-action shadow-none mr-3"
+                                    style="background: #f1f5f9; color: #718096; border: 1px solid transparent;"
+                                    (click)="nuevaDirectiva()">
+                                    <i class="fa fa-times mr-2"></i> CANCELAR
+                                </button>
+                                <button type="button" class="btn btn-header-action red shadow-none mr-3">
+                                    <i class="fas fa-ban mr-2"></i> ANULAR
+                                </button>
+                                <button type="button" class="btn btn-header-action teal shadow-none">
+                                    <i class="fas fa-save mr-2"></i> GUARDAR PRIMA
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- ============================================== -->
+<!-- MODALES DEL SISTEMA                            -->
+<!-- ============================================== -->
+
+<!-- Modal: Diccionario de Variables -->
+<ng-template #modalVariables let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background: #fafdfc;">
+        <div class="modal-header border-0 px-4 pt-4 pb-1 align-items-center">
+            <h5 class="modal-title font-weight-bold text-dark d-flex align-items-center m-0"
+                style="font-size: 1.05rem;">
+                <i class="fas fa-book-open text-primary-teal mr-2 opacity-75"></i> Diccionario de Expresiones
+            </h5>
+            <button type="button" class="close text-muted" aria-label="Close"
+                style="opacity: 0.5; box-shadow: none; outline: none;" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body p-4 bg-transparent" style="max-height: 60vh; overflow-y: auto;">
+            <p class="text-muted mb-4 small font-weight-bold">// Entorno de variables disponibles para inyección en el
+                Kernel.</p>
+
+            <div class="row">
+                <div class="col-md-6 mb-3" *ngFor="let item of dicVariables">
+                    <div class="digital-bank-card minimalist p-3 d-flex align-items-center justify-content-start"
+                        style="cursor: pointer; min-height: 70px; transition: transform 0.2s; border: 1px solid rgba(89,140,137,0.15); border-radius: 14px; background: white;"
+                        (click)="insertarVariable(item.id)">
+                        <div class="icon-circle mr-3"
+                            style="width: 38px; height: 38px; flex-shrink: 0; background-color: rgba(89, 140, 137, 0.1); display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                            <i class="fas {{item.icon}}" style="color: #598c89; font-size: 0.95rem;"></i>
+                        </div>
+                        <div class="text-truncate w-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-primary-teal font-monospace font-weight-bold"
+                                    style="font-size: 0.85rem;">{{item.id}}</span>
+                            </div>
+                            <small class="text-muted d-block opacity-75 font-weight-bold"
+                                style="font-size: 0.70rem; color: #718096 !important;">// {{item.label}}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</ng-template>
+
+
+<!-- Modal: Confirmar Clonación -->
+<ng-template #modalClonarDirectiva let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 bg-white text-center">
+            <div class="icon-confirm-pulse teal">
+                <i class="fas fa-copy"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">Clonar Directiva</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Creará una copia exacta de la directiva, permitiéndole crear una nueva iteración.
+            </p>
+
+            <div class="modern-form-group text-left" style="margin-bottom: 1rem;">
+                <label>Directiva Copia Origen</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i
+                                class="fas fa-file text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold"
+                        value="DIR-2023 - Incremento Salarial 2023" readonly>
+                </div>
+            </div>
+
+            <div class="modern-form-group text-left" style="margin-bottom: 1rem;">
+                <label>Número/Código de la Nueva Directiva *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i
+                                class="fas fa-barcode text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control font-weight-bold" placeholder="DIR-2024">
+                </div>
+            </div>
+
+            <div class="modern-form-group text-left mb-4">
+                <label>Motivo de la Creación *</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i
+                                class="fas fa-comment text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control" placeholder="Incremento Presidencial 2024">
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn btn-header-action gray mr-3 shadow-none w-100"
+                    (click)="modal.dismiss('No')">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-header-action teal shadow-none w-100"
+                    (click)="modal.dismiss('Yes')">
+                    Clonar Directiva
+                </button>
             </div>
         </div>
     </div>
-</div>
+</ng-template>
+
+<!-- Modal: Confirmar Eliminar -->
+<ng-template #modalEliminarDirectiva let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse red">
+                <i class="fas fa-times"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Anular Directiva?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Está seguro de anular esta directiva? Se detendrá su uso operativo en el sistema.
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn btn-header-action gray mr-3 shadow-none w-100"
+                    (click)="modal.dismiss('No')">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-header-action red shadow-none w-100"
+                    (click)="modal.dismiss('Yes')">
+                    Sí, Anular
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>

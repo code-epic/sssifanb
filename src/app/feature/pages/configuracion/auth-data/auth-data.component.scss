@@ -1,0 +1,263 @@
+/* ------------- TABS MODERNAS (Patrón Directivas/TIM) ------------- */
+.custom-nav-tabs {
+    border-bottom: 2px solid #eaecf5 !important;
+    display: flex;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+
+    .nav-item {
+        margin-right: 0.5rem;
+        cursor: pointer;
+    }
+
+    .nav-link {
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #8898aa !important;
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 1rem 1.25rem;
+        transition: all 0.3s ease;
+        background: transparent !important;
+
+        i {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+            vertical-align: text-bottom;
+            color: #adb5bd;
+            transition: color 0.3s ease;
+        }
+
+        &:hover {
+            color: #598c89 !important;
+
+            i {
+                color: #598c89;
+            }
+        }
+
+        &.active {
+            color: #598c89 !important;
+            border-bottom-color: #598c89;
+            font-weight: 600;
+
+            i {
+                color: #598c89;
+            }
+        }
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* MODERN FORM GROUPS (Estilo TIM - Pill Inputs & Combos)                      */
+/* -------------------------------------------------------------------------- */
+.modern-form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #7c8db5;
+        /* Color gris azulado del TIM */
+        margin-bottom: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding-left: 5px;
+    }
+
+    .input-group {
+        background-color: #eff3f6;
+        /* Background exacto del TIM */
+        border: 1px solid #e1e8ed;
+        border-radius: 10px;
+        /* Rectangular con bordes sutiles estilo Directivas */
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        min-height: 42px;
+
+        .input-group-prepend {
+            .input-group-text {
+                background: transparent;
+                border: none;
+                color: #5eaaa8;
+                /* Teal suave */
+                padding-left: 1.25rem;
+                padding-right: 0.5rem;
+                font-size: 0.95rem;
+
+                /* Separador vertical sutil como en el mockup */
+                border-right: 1px solid rgba(200, 210, 220, 0.5);
+                margin-right: 5px;
+                height: 24px;
+                align-self: center;
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        .form-control {
+            border: none;
+            background: transparent;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2d3748;
+            padding: 0.6rem 1.25rem;
+            height: 100%;
+
+            &::placeholder {
+                color: #94a3b8;
+                font-weight: 500;
+                opacity: 0.7;
+            }
+
+            &:focus {
+                box-shadow: none;
+                outline: none;
+            }
+        }
+
+        /* Estilo específico para SELECT */
+        select.form-control {
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c8db5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='7 15 12 20 17 15'%3e%3c/polyline%3e%3cpolyline points='7 9 12 4 17 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1.2rem center;
+            background-size: 0.9rem;
+            padding-right: 2.5rem !important;
+        }
+
+        &:hover {
+            background-color: #e9eff3;
+            border-color: #d1dae1;
+        }
+
+        &:focus-within {
+            background-color: #ffffff;
+            border-color: #5eaaa8;
+            box-shadow: 0 0 0 4px rgba(94, 170, 168, 0.12);
+        }
+    }
+}
+
+/* Errores con estilo TIM */
+.has-danger {
+    .input-group {
+        border-color: #fca5a5 !important;
+        background-color: #fef2f2;
+    }
+
+    .input-group-text {
+        color: #f87171 !important;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* ELEMENTOS COMPLEMENTARIOS                                                  */
+/* -------------------------------------------------------------------------- */
+.text-primary-teal {
+    color: #598c89 !important;
+}
+
+.btn-header-action {
+    border-radius: 12px;
+    padding: 0.65rem 2.2rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-transform: uppercase;
+
+    i {
+        margin-right: 10px;
+        font-size: 0.95rem;
+    }
+
+    &.teal {
+        background-color: rgba(94, 146, 144, 0.08);
+        border-color: rgba(94, 146, 144, 0.2);
+        color: #5e9290;
+
+        &:hover {
+            background-color: rgba(94, 146, 144, 0.15);
+            border-color: rgba(94, 146, 144, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(94, 146, 144, 0.1);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    &.amber {
+        background-color: rgba(235, 154, 68, 0.08);
+        border-color: rgba(235, 154, 68, 0.2);
+        color: #eb9a44;
+
+        &:hover {
+            background-color: rgba(235, 154, 68, 0.15);
+            border-color: rgba(235, 154, 68, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(235, 154, 68, 0.1);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    &.gray {
+        background-color: rgba(108, 118, 127, 0.06);
+        color: #637381;
+        border-color: transparent;
+
+        &:hover {
+            background-color: rgba(108, 118, 127, 0.12);
+            transform: translateY(-1px);
+        }
+    }
+}
+
+.btn-pastel-icon.pastel-success {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    /* Perfectamente circular */
+    background-color: #e8f5f4;
+    /* Fondo verde muy claro del screenshot */
+    color: #5e9290;
+    border: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+
+    &:hover {
+        background-color: #5e9290;
+        color: white;
+        transform: scale(1.1) rotate(90deg);
+        box-shadow: 0 5px 15px rgba(94, 146, 144, 0.2);
+    }
+}
+
+.heading-small {
+    font-size: 0.72rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #598c89 !important;
+    opacity: 0.9;
+}
+
+hr {
+    border-top: 1.5px dashed #e2e8f0;
+}

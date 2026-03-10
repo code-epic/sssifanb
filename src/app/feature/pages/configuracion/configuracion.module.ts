@@ -6,15 +6,19 @@ import { ConfiguracionRoutingModule } from './configuracion-routing.module';
 import { ParametrosComponent } from './parametros/parametros.component';
 import { TasaBcvComponent } from './tasa-bcv/tasa-bcv.component';
 import { DirectivasComponent } from './directivas/directivas.component';
+import { AuthDataComponent } from './auth-data/auth-data.component';
 
 import { NgbDropdownModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-datepicker/pastel-datepicker.component';
+
+import { DynamicTableComponent } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
 
 @NgModule({
     declarations: [
         ParametrosComponent,
         TasaBcvComponent,
-        DirectivasComponent
+        DirectivasComponent,
+        AuthDataComponent
     ],
     imports: [
         CommonModule,
@@ -23,7 +27,8 @@ import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-date
         ReactiveFormsModule,
         NgbDropdownModule,
         NgbModalModule,
-        PastelDatepickerComponent
+        PastelDatepickerComponent,
+        DynamicTableComponent
     ]
 })
 export class ConfiguracionModule { }

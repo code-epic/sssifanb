@@ -19,78 +19,88 @@ body {
 
 /* --- PALETA MODERNA VITAL (Formal pero Fresca) --- */
 // Base: Verde Salvia a Azul Acero (Pastel Elegante)
-$matte-seafoam: #8aaf78;     // Verde Salvia pastel
-$matte-ocean: #6893b4;       // Azul Acero pastel
+$matte-seafoam: #8aaf78; // Verde Salvia pastel
+$matte-ocean: #6893b4; // Azul Acero pastel
 
-$matte-dark: #263238;        // Texto principal
-$matte-light: #f5fafd;       // Fondos claros
+$matte-dark: #263238; // Texto principal
+$matte-light: #f5fafd; // Fondos claros
 
 // Gradiente Fondo Solicitado
-$gradient-vital: linear-gradient(155deg, #8aaf78 0%, #6893b4 100%); 
+$gradient-vital: linear-gradient(155deg, #8aaf78 0%, #6893b4 100%);
 
 // Gradiente Botón (Variación un poco más intensa del mismo tono para contraste)
-$gradient-btn: linear-gradient(to right, #7a9e69, #547c9e); 
+$gradient-btn: linear-gradient(to right, #7a9e69, #547c9e);
 
 .bg-pastel-gradient {
-  background: $gradient-vital !important;
+    background: $gradient-vital !important;
 }
 
 /* Animación de entrada global */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translate3d(0, 30px, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
+    from {
+        opacity: 0;
+        transform: translate3d(0, 30px, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
 }
 
 .fade-in-up {
-  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 // Botones Globales Estilo Mate Sólido (Reemplaza al gradiente)
 .btn-pastel {
-  background: #546e7a; // Azul Gris Sólido Institucional
-  color: white;
-  border: none;
-  border-radius: 6px; // Cuadrado pero amigable
-  padding: 14px 40px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.15); // Sombra sutil
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
+    background: #546e7a; // Azul Gris Sólido Institucional
+    color: white;
+    border: none;
+    border-radius: 6px; // Cuadrado pero amigable
+    padding: 14px 40px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15); // Sombra sutil
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 
-  // Efecto hover de luz sutil
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255,255,255,0.05);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
+    // Efecto hover de luz sutil
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
 
-  &:hover {
-    background: #37474f; // Más oscuro para mejor contraste
-    transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
-    color: #ffffff !important; // Forzar blanco legible
-    &::after { opacity: 1; }
-  }
+    &:hover {
+        background: #37474f; // Más oscuro para mejor contraste
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        color: #ffffff !important; // Forzar blanco legible
 
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  &:disabled {
-      background: #cfd8dc;
-      box-shadow: none;
-      cursor: not-allowed;
-  }
+        &::after {
+            opacity: 1;
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &:disabled {
+        background: #cfd8dc;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
 }
 
 /* --- PATRONES GLOBALES DE BOTONES MODALES (ESTILO MATE) --- */
@@ -98,108 +108,137 @@ $btn-modal-shadow: 0 3px 5px rgba(50, 50, 93, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08
 $btn-modal-shadow-hover: 0 7px 14px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
 
 %btn-modal-base {
-  border: 0 !important;
-  transition: all 0.2s ease !important;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  
-  &:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: $btn-modal-shadow-hover !important;
-  }
+    border: 0 !important;
+    transition: all 0.2s ease !important;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+
+    &:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: $btn-modal-shadow-hover !important;
+    }
 }
 
 .btn-cancel {
-  @extend %btn-modal-base;
-  background-color: rgba(108, 118, 127, 0.08) !important; 
-  color: #637381 !important; // Un tono más gris oscuro mate
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important; 
+    @extend %btn-modal-base;
+    background-color: rgba(108, 118, 127, 0.08) !important;
+    color: #637381 !important; // Un tono más gris oscuro mate
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
 
-  &:hover {
-    color: #454f5b !important; // Aún más oscuro al hover
-    background-color: rgba(99, 115, 129, 0.08) !important; 
-    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-  }
+    &:hover {
+        color: #454f5b !important; // Aún más oscuro al hover
+        background-color: rgba(99, 115, 129, 0.08) !important;
+        box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    }
 }
 
 .btn-ok {
-  @extend %btn-modal-base;
-  background: #598c89 !important; // Teal mate sólido
-  color: white !important;
-  box-shadow: $btn-modal-shadow !important;
-  padding-left: 2.5rem !important;
-  padding-right: 2.5rem !important;
-
-  &:hover {
-    background: #4a7775 !important; // Oscurece
+    @extend %btn-modal-base;
+    background: #598c89 !important; // Teal mate sólido
     color: white !important;
-  }
+    box-shadow: $btn-modal-shadow !important;
+    padding-left: 2.5rem !important;
+    padding-right: 2.5rem !important;
+
+    &:hover {
+        background: #4a7775 !important; // Oscurece
+        color: white !important;
+    }
 }
 
 .btn-warn {
-  @extend %btn-modal-base;
-  background: #eb9a44 !important; // Naranja/Amarillo mate
-  color: white !important;
-  box-shadow: $btn-modal-shadow !important;
-  padding-left: 1.5rem !important;
-  padding-right: 1.5rem !important;
-
-  &:hover {
-    background: #d88732 !important; 
+    @extend %btn-modal-base;
+    background: #eb9a44 !important; // Naranja/Amarillo mate
     color: white !important;
-  }
+    box-shadow: $btn-modal-shadow !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+
+    &:hover {
+        background: #d88732 !important;
+        color: white !important;
+    }
 }
 
 .btn-trash {
-  @extend %btn-modal-base;
-  background: #d95c5c !important; // Rojo mate
-  color: white !important;
-  box-shadow: $btn-modal-shadow !important;
-  padding-left: 1.5rem !important;
-  padding-right: 1.5rem !important;
-
-  &:hover {
-    background: #c24646 !important; 
+    @extend %btn-modal-base;
+    background: #d95c5c !important; // Rojo mate
     color: white !important;
-  }
+    box-shadow: $btn-modal-shadow !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+
+    &:hover {
+        background: #c24646 !important;
+        color: white !important;
+    }
 }
 
 /* --- ICONOS CIRCULARES PASTEL (TIPO BARRA DE ACCIÓN) --- */
 .btn-pastel-icon {
-    width: 32px; height: 32px;
+    width: 32px;
+    height: 32px;
     padding: 0;
-    display: inline-flex; align-items: center; justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
     border: none;
     transition: all 0.2s ease;
     box-shadow: none !important;
-    
+
     &.pastel-primary {
-        background: #e3f2fd; color: #1e88e5;
-        &:hover { background: #bbdefb; transform: scale(1.05); }
+        background: #e3f2fd;
+        color: #1e88e5;
+
+        &:hover {
+            background: #bbdefb;
+            transform: scale(1.05);
+        }
     }
-    
+
     &.pastel-warning {
-        background: #fff3e0; color: #fb8c00;
-        &:hover { background: #ffe0b2; transform: scale(1.05); }
+        background: #fff3e0;
+        color: #fb8c00;
+
+        &:hover {
+            background: #ffe0b2;
+            transform: scale(1.05);
+        }
     }
-    
+
     &.pastel-success {
-        background: #e8f5e9; color: #679f6a;
-        &:hover { background: #c8e6c9; transform: scale(1.05); }
+        background: #e8f5e9;
+        color: #679f6a;
+
+        &:hover {
+            background: #c8e6c9;
+            transform: scale(1.05);
+        }
     }
-    
+
     &.pastel-danger {
-        background: #feebee; color: #e53935;
-        &:hover { background: #ffcdd2; transform: scale(1.05); }
+        background: #feebee;
+        color: #e53935;
+
+        &:hover {
+            background: #ffcdd2;
+            transform: scale(1.05);
+        }
     }
-    
+
     &.active {
-        background: #598c89; color: white;
-        &:hover { background: #4a7775; }
+        background: #598c89;
+        color: white;
+
+        &:hover {
+            background: #4a7775;
+        }
     }
-    
-    i { font-size: 0.85rem; }
+
+    i {
+        font-size: 0.85rem;
+    }
 }
 
 .btn-pastel-back {
@@ -210,25 +249,30 @@ $btn-modal-shadow-hover: 0 7px 14px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0,
     border: 1px solid #cfd8dc;
     padding: 0.3rem 1rem;
     border-radius: 20px;
-    display: inline-flex; align-items: center; justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.2s ease;
-    
-    &:hover { 
-        background: #eceff1; 
+
+    &:hover {
+        background: #eceff1;
         color: #546e7a;
         transform: translateY(-1px);
     }
-    
-    i { font-size: 0.8rem; margin-right: 0.3rem; }
+
+    i {
+        font-size: 0.8rem;
+        margin-right: 0.3rem;
+    }
 }
 
 .custom-input-group {
     border-radius: 6px; // Radio consistente con botón
-    background: white; 
+    background: white;
     border: 1px solid #b0bec5; // Borde Visible Definido
     box-shadow: none; // Flat design inicial
     transition: all 0.3s ease;
-    
+
     margin-bottom: 5px;
 
     &:focus-within {
@@ -244,15 +288,15 @@ $btn-modal-shadow-hover: 0 7px 14px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0,
         padding-left: 15px;
         transition: color 0.3s;
     }
-    
+
     &:focus-within .input-group-text {
-       color: #546e7a; // Icono se activa con el input
+        color: #546e7a; // Icono se activa con el input
     }
 
     .form-control {
         border: none;
         padding-left: 12px;
-        height: 52px; 
+        height: 52px;
         color: #37474f;
         background: transparent;
         font-size: 1rem;
@@ -273,11 +317,13 @@ $btn-modal-shadow-hover: 0 7px 14px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0,
     .input-group-append.cursor-pointer {
         cursor: pointer;
         z-index: 5;
+
         .input-group-text {
             padding-right: 15px;
         }
+
         &:hover .input-group-text {
-             color: #546e7a;
+            color: #546e7a;
         }
     }
 }
@@ -296,7 +342,7 @@ $btn-modal-shadow-hover: 0 7px 14px rgba(50, 50, 93, 0.15), 0 3px 6px rgba(0, 0,
 }
 
 // Fix for nested modals or multiple backdrops if any
-.modal-backdrop + .modal-backdrop {
+.modal-backdrop+.modal-backdrop {
     z-index: 2045 !important;
 }
 
@@ -313,17 +359,17 @@ ngb-datepicker {
 
 // --- GLOBAL LOADING OVERLAY ---
 .loading-overlay {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
     z-index: 9999 !important; // Absolute top
-    display: flex; 
+    display: flex;
     flex-direction: column;
-    align-items: center; 
+    align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.5); 
+    background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -332,36 +378,36 @@ ngb-datepicker {
     background: rgba(255, 255, 255, 0.98);
     padding: 2.5rem 3.5rem; // Slightly larger padding
     border-radius: 1.5rem;
-    display: flex; 
+    display: flex;
     flex-direction: column;
     align-items: center;
-    
+
     // Animation & Border updates
     border: 2px solid rgba(115, 157, 115, 0.3); // Pastel Green Base
     box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15);
     animation: breathe 3s ease-in-out infinite;
-    
+
     .spinner-box {
-        width: 60px; 
+        width: 60px;
         height: 60px;
         position: relative;
         margin-bottom: 1.2rem;
     }
 
     .circle-border {
-        width: 100%; 
+        width: 100%;
         height: 100%;
         border-radius: 50%;
-        border: 4px solid transparent; 
+        border: 4px solid transparent;
         border-top-color: #4f7a4f; // Pastel green
         border-right-color: #598c89; // Teal accent
         animation: spin 1s linear infinite;
     }
-    
-    p { 
-        margin-bottom: 0; 
-        color: #598c89; 
-        font-weight: 700; 
+
+    p {
+        margin-bottom: 0;
+        color: #598c89;
+        font-weight: 700;
         letter-spacing: 0.5px;
         font-size: 0.8rem;
         animation: pulse 1.5s infinite ease-in-out;
@@ -375,62 +421,133 @@ ngb-datepicker {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
 }
 
 @keyframes breathe {
-    0% { 
-        transform: scale(1); 
-        box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15); 
-        border-color: rgba(119, 221, 119, 0.3); 
+    0% {
+        transform: scale(1);
+        box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15);
+        border-color: rgba(119, 221, 119, 0.3);
     }
-    50% { 
-        transform: scale(1.05); 
-        box-shadow: 0 30px 60px rgba(119, 221, 119, 0.25); 
-        border-color: rgba(101, 144, 101, 0.8); 
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 30px 60px rgba(119, 221, 119, 0.25);
+        border-color: rgba(101, 144, 101, 0.8);
     }
-    100% { 
-        transform: scale(1); 
-        box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15); 
-        border-color: rgba(129, 170, 129, 0.3); 
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 20px 50px rgba(89, 140, 137, 0.15);
+        border-color: rgba(129, 170, 129, 0.3);
     }
 }
+
 // --- CONFIRMATION MODAL ANIMATIONS ---
 @keyframes pulse-circle {
-    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(89, 140, 137, 0.4); }
-    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(89, 140, 137, 0); }
-    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(89, 140, 137, 0); }
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(89, 140, 137, 0.4);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(89, 140, 137, 0);
+    }
+
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(89, 140, 137, 0);
+    }
 }
 
 @keyframes pulse-circle-blue {
-    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
-    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(52, 152, 219, 0); }
-    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(52, 152, 219, 0);
+    }
+
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+    }
 }
 
 @keyframes pulse-circle-green {
-    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
-    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(46, 204, 113, 0); }
-    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(46, 204, 113, 0);
+    }
+
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+    }
 }
 
 @keyframes pulse-circle-amber {
-    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(235, 154, 68, 0.4); }
-    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(235, 154, 68, 0); }
-    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(235, 154, 68, 0); }
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(235, 154, 68, 0.4);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(235, 154, 68, 0);
+    }
+
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(235, 154, 68, 0);
+    }
 }
 
 @keyframes pulse-circle-red {
-    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(217, 92, 92, 0.4); }
-    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(217, 92, 92, 0); }
-    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(217, 92, 92, 0); }
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(217, 92, 92, 0.4);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 20px rgba(217, 92, 92, 0);
+    }
+
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(217, 92, 92, 0);
+    }
 }
 
 .icon-confirm-pulse {
@@ -473,5 +590,40 @@ ngb-datepicker {
         color: #d95c5c;
         border-color: rgba(217, 92, 92, 0.2);
         animation: pulse-circle-red 2s infinite;
+    }
+}
+
+.text-primary-teal {
+    color: #598c89 !important;
+}
+
+/* --- OVERRIDE SWEETALERT Z-INDEX --- */
+.swal2-container {
+    z-index: 10000 !important; // Por encima de todo, incluso de modales y tauris
+}
+
+.pastel-swal-popup {
+    font-family: 'Nunito', sans-serif !important;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+}
+
+.rounded-30 {
+    border-radius: 30px !important;
+}
+
+@keyframes pulse-rose {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(214, 139, 139, 0.4);
+    }
+
+    70% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 6px rgba(214, 139, 139, 0);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(214, 139, 139, 0);
     }
 }

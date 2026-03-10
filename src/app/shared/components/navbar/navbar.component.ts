@@ -11,6 +11,8 @@ import { IAPICore } from 'src/app/core/models/api/api-model';
 import { ApiService } from 'src/app/core/services/api.service';
 import { UtilService } from 'src/app/core/services/util/util.service';
 import { environment } from 'src/environments/environment';
+import { SecurityQueueService } from 'src/app/core/services/util/security-queue.service';
+import { map } from 'rxjs/operators';
 
 import { DOCUMENT, CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -82,6 +84,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   public isTotpSecretCopied: boolean = false;
   public isTotpActive: boolean = false;
   public booleanIsSidenav = false;
+  public securityRequests$;
+  public securityCount$;
 
   public xAPI: IAPICore = {
     funcion: '',
@@ -99,9 +103,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private sha256: Sha256Service,
     private modalService: NgbModal,
     private cdr: ChangeDetectorRef,
+    private securityQueue: SecurityQueueService,
     @Inject(DOCUMENT) private document: Document
   ) {
     this.location = location;
+    this.securityRequests$ = this.securityQueue.queue$;
+    this.securityCount$ = this.securityQueue.queue$.pipe(map(q => q.length));
   }
 
   ngOnInit() {
@@ -121,6 +128,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.correo = this.loginService.Usuario.correo
 
 
+  }
+
+  getElapsedTime(timestamp: number): string {
+    const diff = Math.floor((new Date().getTime() - timestamp) / 1000);
+    if (diff < 60) return `${diff}s`;
+    const mins = Math.floor(diff / 60);
+    const secs = diff % 60;
+    return `${mins}m ${secs}s`;
   }
 
   initForm() {

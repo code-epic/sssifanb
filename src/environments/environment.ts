@@ -10,7 +10,7 @@ export const environment = {
   version: 'Broglie 1.0.1-1b419f3',
   fecha: '2025-04-12 05:08:00',
   coleciones: {
-    CONTADORES: 'wkf_ipsfa_2026'
+    CONTADORES: 'wkf_sssifanb'
   },
   funcion: {
     master: 'CCEC_CMaestro',

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderService, NgxUiLoaderModule } from 'ngx-ui-loader';
 import { ApiService } from '../../../../core/services/api.service';
@@ -12,6 +12,8 @@ import { Router } from '@angular/router';
 import { LayoutService } from 'src/app/core/services/layout/layout.service';
 import { IAfiliado } from 'src/app/core/models/afiliacion/afiliado.model';
 import { AfiListarComponent } from '../../afiliacion/afi-listar/afi-listar.component';
+import { SecurityQueueService } from 'src/app/core/services/util/security-queue.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-buscador',
@@ -20,8 +22,9 @@ import { AfiListarComponent } from '../../afiliacion/afi-listar/afi-listar.compo
   standalone: true,
   imports: [NgxUiLoaderModule, FormsModule, NgClass, NgIf, MatTabGroup, MatTab, MatTabLabel, MatIcon, NgFor, DecimalPipe, AfiListarComponent]
 })
-export class BuscadorComponent implements OnInit {
+export class BuscadorComponent implements OnInit, OnDestroy {
 
+  private securitySub: Subscription;
   public focus: boolean = true;
   public buscar: string = '';
   public isLoading: boolean = false;
@@ -35,7 +38,8 @@ export class BuscadorComponent implements OnInit {
     private modalService: NgbModal,
     public loginService: LoginService,
     private ngxService: NgxUiLoaderService,
-    private afiliadoService: AfiliadoService
+    private afiliadoService: AfiliadoService,
+    private securityQueue: SecurityQueueService
   ) { }
 
   ngOnInit(): void {
@@ -58,6 +62,15 @@ export class BuscadorComponent implements OnInit {
         sessionStorage.removeItem('buscador_session');
       }
     }
+
+    // Escuchar si la petición se minimiza para liberar el UI siempre
+    this.securitySub = this.securityQueue.minimized$.subscribe(() => {
+      this.isLoading = false;
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.securitySub) this.securitySub.unsubscribe();
   }
 
   // Sanitization / Validation
@@ -152,3 +165,4 @@ export class BuscadorComponent implements OnInit {
     this.modalService.open(content, { size: 'lg' });
   }
 }
+
