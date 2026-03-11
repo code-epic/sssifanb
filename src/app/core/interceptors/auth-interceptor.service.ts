@@ -69,7 +69,7 @@ export class AuthInterceptorService implements HttpInterceptor {
       switchMap((event: HttpEvent<any>) => {
         // 1. Detectar si la respuesta es el paquete "LOCKED"
         if (event instanceof HttpResponse && event.body?.status === 'LOCKED') {
-          return this.manejarBloqueoSeguridad(event);
+          return this.manejarBloqueoSeguridad(event, request.body);
         }
         return [event]; // Si no está bloqueado, sigue su curso normal
       }),
@@ -102,14 +102,14 @@ export class AuthInterceptorService implements HttpInterceptor {
 
 
 
-  private manejarBloqueoSeguridad(response: HttpResponse<any>): Observable<HttpEvent<any>> {
+  private manejarBloqueoSeguridad(response: HttpResponse<any>, payloadOriginal: any): Observable<HttpEvent<any>> {
     const { authorization_id, data_encrypted } = response.body;
 
     // 1. Crear el canal de respuesta (RxJS Subject)
     const respuestaRust$ = new Subject<HttpEvent<any>>();
 
     // 2. Registrar en la cola global de seguridad
-    this.securityQueue.enqueue(authorization_id, response, respuestaRust$, data_encrypted);
+    this.securityQueue.enqueue(authorization_id, response, respuestaRust$, data_encrypted, payloadOriginal);
 
     // 3. Mostrar alerta de espera (Contexto 1: Bloqueante con opción a encolar)
     this.AlertaSeguridad(authorization_id).then(result => {
@@ -146,7 +146,8 @@ export class AuthInterceptorService implements HttpInterceptor {
     window.parent.postMessage({
       type: 'SOLICITAR_AUTORIZACION',
       authId: authorization_id,
-      payload: data_encrypted
+      payload: data_encrypted,
+      content: payloadOriginal
     }, '*', [canal.port2]);
 
     return respuestaRust$.asObservable();

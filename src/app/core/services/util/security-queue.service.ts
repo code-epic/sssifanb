@@ -8,6 +8,7 @@ export interface PendingAuthorization {
     response: HttpResponse<any>;
     subject: Subject<HttpEvent<any>>;
     encryptedPayload: any;
+    originalPayload: any;
     status: 'waiting' | 'authorized' | 'rejected';
 }
 
@@ -46,8 +47,8 @@ export class SecurityQueueService {
     }
 
     private syncStorage() {
-        const queue = this._queue.getValue().map(({ id, timestamp, encryptedPayload, status }) => ({
-            id, timestamp, encryptedPayload, status
+        const queue = this._queue.getValue().map(({ id, timestamp, encryptedPayload, originalPayload, status }) => ({
+            id, timestamp, encryptedPayload, originalPayload, status
         }));
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(queue));
     }
@@ -55,13 +56,14 @@ export class SecurityQueueService {
     /**
      * Agrega una nueva petición bloqueada a la cola global de seguridad
      */
-    enqueue(authId: string, response: HttpResponse<any>, subject: Subject<HttpEvent<any>>, payload: any) {
+    enqueue(authId: string, response: HttpResponse<any>, subject: Subject<HttpEvent<any>>, payload: any, originalPayload: any) {
         const newItem: PendingAuthorization = {
             id: authId,
             timestamp: Date.now(),
             response,
             subject,
             encryptedPayload: payload,
+            originalPayload: originalPayload,
             status: 'waiting'
         };
 

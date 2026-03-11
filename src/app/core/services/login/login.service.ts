@@ -92,7 +92,7 @@ export class LoginService {
       deviceContext = btoa(JSON.stringify(context));
     }
 
-    return from(this.sha256.EncryptDeviceContext(deviceContext, environment.Hash.slice(-32))).pipe(
+    return from(this.sha256.EncryptDeviceContext(deviceContext, environment.Hash.slice(0, 32))).pipe(
       switchMap(encodeDeviceContext => {
         const timestamp = new Date().getTime().toString();
         const headers = new HttpHeaders({
@@ -107,6 +107,7 @@ export class LoginService {
           nombre: user,
           clave: clave,
         };
+
         return this.apiService.post<IToken>('wusuario/loginV2', usuario, undefined, headers);
       })
     );
@@ -200,7 +201,9 @@ export class LoginService {
 
       progressCallback('¡Hasta pronto!');
       await this.utils.sleep(1200); // Pequeña pausa para que el usuario lea el mensaje final.
-      this.router.navigate(['/login']);
+      this.router.navigate(['/']).then(() => {
+        window.location.reload();
+      });
     }
   }
 
@@ -212,7 +215,7 @@ export class LoginService {
 
     // Esto SIEMPRE debe ejecutarse para garantizar el cierre de sesión en el cliente.
     sessionStorage.clear();
-    localStorage.clear();
+    // localStorage.clear();
 
   }
 
