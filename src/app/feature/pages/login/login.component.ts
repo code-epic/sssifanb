@@ -61,6 +61,7 @@ export class LoginComponent implements OnInit {
 
     public version = "1.0.0";
     public fecha = "";
+    public time: Date = new Date();
 
     // Estado para la animación de entrada
     public introFinished = false;
@@ -100,14 +101,8 @@ export class LoginComponent implements OnInit {
     formattedDate: string = '';
 
     updateTime() {
-        const currentDate = new Date();
-        const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-        const day = this.pad(currentDate.getDate());
-        const month = months[currentDate.getMonth()];
-        const year = currentDate.getFullYear().toString().substr(-2);
-        const time = currentDate.toTimeString().split(' ')[0];
-        this.formattedDate = `${day}${month}${year} ${time}`;
-        this.fecha = currentDate.getFullYear().toString();
+        this.time = new Date();
+        this.fecha = this.time.getFullYear().toString();
     }
 
     pad(num: number): string {

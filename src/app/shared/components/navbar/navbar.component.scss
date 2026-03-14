@@ -178,3 +178,40 @@ $text-dark: #37474f;
         border-top: 1px solid #eceff1;
     }
 }
+
+// --- ESTADOS DE LA COLA DE SEGURIDAD ---
+.bg-authorized {
+    background-color: #f4faf6 !important; // Verde mente pastel muy claro
+    border-color: #e2f2e9 !important;
+    &:hover {
+        background-color: #effcf4 !important;
+    }
+}
+
+.badge-success-light {
+    background-color: #e2f2e9;
+    color: #6ab089; // Verde salvia elegante
+    font-weight: 700;
+}
+
+.text-authorized {
+    color: #6ab089 !important;
+    letter-spacing: 0.5px;
+}
+
+.bg-hover-light:hover {
+    background-color: #f8fafc;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); opacity: 1; }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+@keyframes pulse-rose {
+    0% { box-shadow: 0 0 0 0 rgba(214, 139, 139, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(214, 139, 139, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(214, 139, 139, 0); }
+}

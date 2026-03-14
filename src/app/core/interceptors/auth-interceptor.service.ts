@@ -1,5 +1,5 @@
 
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { from, Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
@@ -23,7 +23,8 @@ export class AuthInterceptorService implements HttpInterceptor {
   constructor(
     private _login: LoginService,
     private sha256: Sha256Service,
-    private securityQueue: SecurityQueueService
+    private securityQueue: SecurityQueueService,
+    private zone: NgZone
   ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -121,25 +122,47 @@ export class AuthInterceptorService implements HttpInterceptor {
 
     // 4. Crear puente con App Principal (Tauri/Rust)
     const canal = new MessageChannel();
+
+    /**
+     * Función unificada para procesar la liberación (desde puerto o global)
+     */
+    const procesarLiberacion = (data: any) => {
+      this.zone.run(() => {
+        if (data.error) {
+          this.securityQueue.reject(authorization_id, data.error);
+          if (Swal.isVisible()) {
+            Swal.fire({
+              title: 'Autorización Denegada',
+              text: 'El supervisor ha rechazado la solicitud.',
+              icon: 'error',
+              confirmButtonText: 'Cerrar',
+              customClass: { confirmButton: 'btn btn-header-action red px-4' }
+            });
+          }
+        } else {
+          // Rust envía la información en 'data' según el contrato
+          let payload = data.data !== undefined ? data.data : data.payload;
+
+          // Si el payload es un string que parece JSON, lo parseamos
+          if (payload && typeof payload === 'string' && (payload.trim().startsWith('{') || payload.trim().startsWith('['))) {
+            try {
+              payload = JSON.parse(payload);
+            } catch (e) {
+              console.warn('No se pudo parsear el payload como JSON:', e);
+            }
+          }
+
+          this.securityQueue.resolve(authorization_id, payload);
+          if (Swal.isVisible()) {
+            Swal.close();
+          }
+        }
+      });
+    };
+
+    // Escucha por el PUERTO PRIVADO (Tiempo real)
     canal.port1.onmessage = (mensaje) => {
-      if (mensaje.data.error) {
-        this.securityQueue.reject(authorization_id, mensaje.data.error);
-        if (Swal.isVisible()) {
-          Swal.fire({
-            title: 'Autorización Denegada',
-            text: 'El supervisor ha rechazado la solicitud.',
-            icon: 'error',
-            confirmButtonText: 'Cerrar',
-            customClass: { confirmButton: 'btn btn-header-action red px-4' }
-          });
-        }
-      } else {
-        // Éxito: El canal de Rust devolvió el payload limpio
-        this.securityQueue.resolve(authorization_id, mensaje.data.payload);
-        if (Swal.isVisible()) {
-          Swal.close();
-        }
-      }
+      procesarLiberacion(mensaje.data);
     };
 
     // 5. Notificar a RUST (vía App Principal)
@@ -147,7 +170,7 @@ export class AuthInterceptorService implements HttpInterceptor {
       type: 'SOLICITAR_AUTORIZACION',
       authId: authorization_id,
       payload: data_encrypted,
-      content: payloadOriginal
+      content: typeof payloadOriginal === 'object' ? JSON.stringify(payloadOriginal, null, 2) : payloadOriginal
     }, '*', [canal.port2]);
 
     return respuestaRust$.asObservable();

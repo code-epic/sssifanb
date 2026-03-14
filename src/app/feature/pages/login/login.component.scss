@@ -226,37 +226,68 @@ $input-border: #cfd8dc;
 }
 
 // Reloj Flotante Estilizado
-// Reloj Flotante Estilo Glass
+// Reloj Flotante Estilizado Premium
 .clock-floating {
     position: absolute;
-    top: -60px; // Más espacio para la cápsula
+    top: -65px; 
     right: 0;
     
-    // Glassmorphism Capsule
-    background: rgba(255, 255, 255, 0.15); // Transparencia cristalina
-    backdrop-filter: blur(10px); // Efecto borroso de fondo
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3); // Borde brillante sutil
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15); // Sombra suave
+    // Superior Glassmorphism Capsule
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 30px rgba(0, 50, 60, 0.15), inset 0 0 10px rgba(255, 255, 255, 0.05);
     
-    padding: 8px 20px;
-    border-radius: 50px; // Forma de píldora/cápsula
+    padding: 10px 25px;
+    border-radius: 50px;
     
     color: #ffffff;
-    font-family: 'Roboto Mono', monospace; // Mantenemos monospaced para la hora
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: 1px;
+    font-family: 'Fira Code', 'Roboto Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.8px;
     
+    display: flex;
+    align-items: center;
     opacity: 0;
     animation: fadeInDown 1s ease-out 0.5s forwards;
     
-    // Brillo sutil en hover
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: default;
+
+    i {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.7);
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+    }
+
+    .clock-date {
+        font-weight: 500;
+        opacity: 0.9;
+        text-transform: uppercase;
+    }
+
+    .clock-separator {
+        opacity: 0.4;
+        font-weight: 300;
+        font-size: 0.75rem;
+    }
+
+    .clock-time {
+        font-weight: 800;
+        letter-spacing: 1.2px;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+
     &:hover {
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.22);
         border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+
+        .clock-time {
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+        }
     }
 }
 

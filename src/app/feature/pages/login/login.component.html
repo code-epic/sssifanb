@@ -10,7 +10,10 @@
         
         <!-- Reloj Flotante (Fuera de la tarjeta, arriba derecha) -->
         <div class="clock-floating">
-            {{ formattedDate }}
+            <i class="ni ni-time-alarm mr-2"></i>
+            <span class="clock-date">{{ time | date: 'ddMMMyy' : '' : 'es' | uppercase }}</span>
+            <span class="clock-separator mx-2">|</span>
+            <span class="clock-time">{{ time | date: 'hh:mm:ss a' }}</span>
         </div>
 
         <!-- Logo siempre visible en la parte superior -->

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { HttpEvent, HttpResponse } from '@angular/common/http';
 
@@ -10,6 +10,8 @@ export interface PendingAuthorization {
     encryptedPayload: any;
     originalPayload: any;
     status: 'waiting' | 'authorized' | 'rejected';
+    minimized?: boolean; // Indica si el usuario cerró el modal de espera
+    decryptedData?: any; // Almacenamos el resultado para tickets diferidos
 }
 
 @Injectable({
@@ -25,8 +27,25 @@ export class SecurityQueueService {
 
     private STORAGE_KEY = 'sss_security_queue_v1';
 
-    constructor() {
+    constructor(private zone: NgZone) {
         this.hydrate();
+        this.listenToParent();
+    }
+
+    /**
+     * Escucha permanente de mensajes del padre (Rust/Tauri)
+     */
+    private listenToParent() {
+        window.addEventListener('message', (event) => {
+            const msg = event.data;
+            if (msg && msg.type === 'AUTORIZACION_APROBADA') {
+                console.log(`📡 Mensaje global recibido para: ${msg.authId}`);
+                this.zone.run(() => {
+                    const payload = msg.data !== undefined ? msg.data : msg.payload;
+                    this.resolve(msg.authId, payload);
+                });
+            }
+        });
     }
 
     private hydrate() {
@@ -37,7 +56,7 @@ export class SecurityQueueService {
                 const restored = metadata.map(m => ({
                     ...m,
                     subject: new Subject<HttpEvent<any>>(),
-                    status: 'waiting'
+                    status: m.status || 'waiting'
                 }));
                 this._queue.next(restored);
             } catch (e) {
@@ -47,8 +66,8 @@ export class SecurityQueueService {
     }
 
     private syncStorage() {
-        const queue = this._queue.getValue().map(({ id, timestamp, encryptedPayload, originalPayload, status }) => ({
-            id, timestamp, encryptedPayload, originalPayload, status
+        const queue = this._queue.getValue().map(({ id, timestamp, encryptedPayload, originalPayload, status, minimized, decryptedData }) => ({
+            id, timestamp, encryptedPayload, originalPayload, status, minimized, decryptedData
         }));
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(queue));
     }
@@ -64,7 +83,8 @@ export class SecurityQueueService {
             subject,
             encryptedPayload: payload,
             originalPayload: originalPayload,
-            status: 'waiting'
+            status: 'waiting',
+            minimized: false
         };
 
         const currentQueue = this._queue.getValue();
@@ -77,23 +97,68 @@ export class SecurityQueueService {
      * Notifica que el usuario ha minimizado la alerta y desea continuar
      */
     notifyMinimized(authId: string) {
+        const currentQueue = this._queue.getValue();
+        const normalizedId = (authId || "").toLowerCase();
+        const item = currentQueue.find(i => (i.id || "").toLowerCase() === normalizedId);
+        if (item) {
+            item.minimized = true;
+            this.syncStorage();
+        }
         this._minimized.next(authId);
     }
 
-    /**
-     * Resuelve una petición de la cola cuando Rust devuelve la data limpia
-     */
     resolve(authId: string, decryptedPayload: any) {
         const currentQueue = this._queue.getValue();
-        const item = currentQueue.find(i => i.id === authId);
+        const normalizedId = (authId || "").toLowerCase();
+        const item = currentQueue.find(i => (i.id || "").toLowerCase() === normalizedId);
 
         if (item) {
-            if (item.response && item.subject) {
+            console.log(`Resolviendo petición ${item.id}. Minimizada: ${item.minimized}`);
+            
+            // Si el item tiene un subject, significa que Angular está esperando activamente
+            if (!item.minimized && item.response && item.subject) {
                 const nuevaRespuesta = item.response.clone({ body: decryptedPayload });
                 item.subject.next(nuevaRespuesta);
                 item.subject.complete();
+                this.removeFromQueue(item.id);
+            } 
+            else {
+                // Caso Ticket persistente
+                const updatedQueue = currentQueue.map(i => 
+                    (i.id || "").toLowerCase() === normalizedId 
+                    ? { ...i, status: 'authorized' as const, decryptedData: decryptedPayload } 
+                    : i
+                );
+                this._queue.next(updatedQueue);
+                this.syncStorage();
             }
-            this.removeFromQueue(authId);
+        } else {
+            console.warn(`No se encontró la petición ${authId} en la cola local`);
+        }
+    }
+
+    /**
+     * El usuario hace clic en un ticket resuelto para aplicar la respuesta
+     */
+    applyResolution(authId: string) {
+        const currentQueue = this._queue.getValue();
+        const normalizedId = (authId || "").toLowerCase();
+        const item = currentQueue.find(i => (i.id || "").toLowerCase() === normalizedId);
+
+        if (item && item.status === 'authorized' && item.decryptedData) {
+            if (item.response && item.subject) {
+                const nuevaRespuesta = item.response.clone({ body: item.decryptedData });
+                item.subject.next(nuevaRespuesta);
+                item.subject.complete();
+            }
+            
+            window.parent.postMessage({
+                id: 'TAREA_ATENDIDA',
+                authorization_id: item.id,
+                timestamp: Date.now()
+            }, '*');
+
+            this.removeFromQueue(item.id);
         }
     }
 
@@ -102,11 +167,13 @@ export class SecurityQueueService {
      */
     reject(authId: string, error: any) {
         const currentQueue = this._queue.getValue();
-        const item = currentQueue.find(i => i.id === authId);
+        const normalizedId = (authId || "").toLowerCase();
+        const item = currentQueue.find(i => (i.id || "").toLowerCase() === normalizedId);
 
         if (item) {
+            console.error(`Petición ${item.id} rechazada por seguridad:`, error);
             item.subject.error(error);
-            this.removeFromQueue(authId);
+            this.removeFromQueue(item.id);
         }
     }
 
@@ -118,5 +185,15 @@ export class SecurityQueueService {
 
     getQueueCount() {
         return this._queue.getValue().length;
+    }
+
+    /**
+     * Solicita al padre el estado actual de una autorización (Sincronización Manual)
+     */
+    syncWithParent(authId: string) {
+        window.parent.postMessage({
+            type: 'CONSULTAR_ESTADO_AUTORIZACION',
+            authId: authId
+        }, '*');
     }
 }

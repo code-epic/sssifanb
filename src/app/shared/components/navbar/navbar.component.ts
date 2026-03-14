@@ -138,6 +138,22 @@ export class NavbarComponent implements OnInit, OnDestroy {
     return `${mins}m ${secs}s`;
   }
 
+  /**
+   * Aplica la resolución de un ticket autorizado.
+   * Esto cerrará el proceso pendiente y notificará a la aplicación padre.
+   */
+  applyResolution(authId: string) {
+    this.securityQueue.applyResolution(authId);
+    this.utilservice.AlertMini('top-end', 'success', 'Tarea procesada exitosamente', 2000);
+  }
+
+  /**
+   * Solicita al padre el estado actual del ticket
+   */
+  syncWithParent(authId: string) {
+    this.securityQueue.syncWithParent(authId);
+  }
+
   initForm() {
     this.changePasswordForm = this.fb.group({
       clave: ['', Validators.required],
