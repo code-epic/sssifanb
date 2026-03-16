@@ -4,7 +4,7 @@
         <div class="mailbox-layout-wrapper d-flex flex-column h-100 bg-transparent w-100">
             
             <!-- Pestañas (Tabs) dinámicas -->
-            <div class="pt-2 pb-0 px-2" style="background-color: transparent; border-radius: 12px 12px 0 0; position: relative; z-index: 105;">
+            <div class="pt-2 pb-0 px-2 blur-sensitive" [class.active-blur]="isBlurActive" style="background-color: transparent; border-radius: 12px 12px 0 0; position: relative; z-index: 105;">
                 <ul class="nav nav-tabs custom-nav-tabs mb-0" style="border-bottom: 2px solid transparent;">
                     <li class="nav-item d-flex" *ngFor="let tab of tabs">
                         <a class="nav-link w-100"

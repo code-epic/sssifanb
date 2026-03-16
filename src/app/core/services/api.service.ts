@@ -83,7 +83,7 @@ export class ApiService {
 
         // Regla: si el endpoint inicia con 'crud' o 'fnx' y NO contiene ya el hash, lo anexamos.
         // Se asume que estos endpoints requieren la firma del hash.
-        if ((cleanEndpoint.startsWith('crud') || cleanEndpoint.startsWith('fnx')) && !cleanEndpoint.includes(environment.Hash)) {
+        if ((cleanEndpoint.startsWith('crud')) && !cleanEndpoint.includes(environment.Hash)) {
             url += ':' + environment.Hash;
         }
 
@@ -162,50 +162,114 @@ export class ApiService {
      * @param endpoint Endpoint relativo
      * @param body Cuerpo de datos
      */
-    public async postStream<T>(endpoint: string, body: unknown): Promise<T> {
-        const url = this._resolveUrl(endpoint);
-        const token = sessionStorage.getItem('token'); // Ajustar según almacenamiento real
+    // public async postStream<T>(endpoint: string, body: unknown): Promise<T> {
+    //     const url = this._resolveUrl(endpoint);
+    //     const token = sessionStorage.getItem('token'); // Ajustar según almacenamiento real
 
-        const headers: Record<string, string> = {
-            'Content-Type': 'application/json'
-        };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
+    //     const headers: Record<string, string> = {
+    //         'Content-Type': 'application/json'
+    //     };
+    //     if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    //     try {
+    //         const response = await fetch(url, {
+    //             method: 'POST',
+    //             headers: headers,
+    //             body: JSON.stringify(body)
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP Stream Error: ${response.status}`);
+    //         }
+
+    //         const reader = response.body?.getReader();
+    //         if (!reader) throw new Error('Response body is not readable');
+
+    //         const decoder = new TextDecoder();
+    //         let jsonAccumulator = '';
+
+    //         // Lectura del stream
+    //         let chunkCount = 0;
+    //         while (true) {
+    //             const { done, value } = await reader.read();
+    //             if (done) break;
+    //             chunkCount++;
+    //             console.log(`[Stream] Received chunk #${chunkCount}, size: ${value.length} bytes`);
+    //             jsonAccumulator += decoder.decode(value, { stream: true });
+    //         }
+    //         console.log(`[Stream] Finished. Total chunks: ${chunkCount}. Total size: ${jsonAccumulator.length} chars.`);
+
+    //         // Parseo final del JSON completo
+    //         return JSON.parse(jsonAccumulator) as T;
+
+    //     } catch (error) {
+    //         console.error('Stream processing failed:', error);
+    //         throw error;
+    //     }
+    // }
+
+
+    public async postStream<T>(endpoint: string, body: unknown, onRow: (row: T) => void): Promise<void> {
+        console.log(`[ApiService] Inciando stream para: ${endpoint}`);
+        const url = this._resolveUrl(endpoint);
 
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: headers,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                },
                 body: JSON.stringify(body)
             });
 
+            console.log(`[ApiService] Respuesta Recibida: ${response.status} ${response.statusText}`);
+
             if (!response.ok) {
-                throw new Error(`HTTP Stream Error: ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(`HTTP Error ${response.status}: ${errorText}`);
             }
 
-            const reader = response.body?.getReader();
-            if (!reader) throw new Error('Response body is not readable');
+            if (!response.body) {
+                throw new Error('El cuerpo de la respuesta está vacío (no hay stream).');
+            }
 
+            const reader = response.body.getReader();
             const decoder = new TextDecoder();
-            let jsonAccumulator = '';
+            let partialChunk = '';
+            let rowCount = 0;
 
-            // Lectura del stream
-            let chunkCount = 0;
             while (true) {
                 const { done, value } = await reader.read();
-                if (done) break;
-                chunkCount++;
-                console.log(`[Stream] Received chunk #${chunkCount}, size: ${value.length} bytes`);
-                jsonAccumulator += decoder.decode(value, { stream: true });
-            }
-            console.log(`[Stream] Finished. Total chunks: ${chunkCount}. Total size: ${jsonAccumulator.length} chars.`);
+                if (done) {
+                    console.log(`[ApiService] Stream finalizado. Total filas: ${rowCount}`);
+                    break;
+                }
 
-            // Parseo final del JSON completo
-            return JSON.parse(jsonAccumulator) as T;
+                // Concatenamos con lo que quedó del chunk anterior
+                const chunk = partialChunk + decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+
+                // El último elemento es lo que queda incompleto para el siguiente ciclo
+                partialChunk = lines.pop() || '';
+
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine) {
+                        try {
+                            const row = JSON.parse(trimmedLine) as T;
+                            rowCount++;
+                            onRow(row);
+                        } catch (e) {
+                            console.error("[ApiService] Error parseando JSON en línea:", trimmedLine, e);
+                        }
+                    }
+                }
+            }
 
         } catch (error) {
-            console.error('Stream processing failed:', error);
+            console.error('[ApiService] Fallo en postStream:', error);
             throw error;
         }
     }
-
 }

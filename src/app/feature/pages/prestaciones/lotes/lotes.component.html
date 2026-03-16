@@ -5,133 +5,148 @@
         <!-- SECCIÓN: APORTE DE CAPITAL (Lote) -->
         <div class="fade-in" *ngIf="currentTabId === 'aporte'">
 
-            <div class="row px-3 py-2">
-                <div class="col-md-3">
-                    <div class="modern-form-group">
-                        <label>Fecha de Proceso</label>
-                        <app-pastel-datepicker></app-pastel-datepicker>
+            <div class="blur-sensitive" [class.active-blur]="isDisplayingLogs">
+                <div class="row px-3 py-2">
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>Fecha de Proceso</label>
+                            <app-pastel-datepicker></app-pastel-datepicker>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="modern-form-group">
-                        <label>Directiva de Sueldos</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend"><span class="input-group-text"><i
-                                        class="fas fa-file-invoice-dollar text-primary-teal"></i></span></div>
-                            <select class="form-control fw-bold text-dark" [(ngModel)]="selectDirectiva">
-                                <option value="0">SELECCIONAR DIRECTIVA...</option>
-                                <option value="1">DIR-2023 - Incremento Presidencial</option>
-                                <option value="2">DIR-2022 - Ajuste Ordinario</option>
-                            </select>
+                    <div class="col-md-6">
+                        <div class="modern-form-group">
+                            <label>Directiva de Sueldos</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                            class="fas fa-file-invoice-dollar text-primary-teal"></i></span></div>
+                                <select class="form-control fw-bold text-dark" [(ngModel)]="selectDirectiva">
+                                    <option value="0">SELECCIONAR DIRECTIVA...</option>
+                                    <option value="1">DIR-2023 - Incremento Presidencial</option>
+                                    <option value="2">DIR-2022 - Ajuste Ordinario</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>Situación Militar</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                            class="fas fa-user-clock text-primary-teal"></i></span></div>
+                                <select class="form-control fw-bold text-dark" [(ngModel)]="selectSituacion">
+                                    <option value="201">Activo</option>
+                                    <option value="203">Finiquito</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="modern-form-group">
-                        <label>Situación Militar</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend"><span class="input-group-text"><i
-                                        class="fas fa-user-clock text-primary-teal"></i></span></div>
-                            <select class="form-control fw-bold text-dark" [(ngModel)]="selectSituacion">
-                                <option value="201">Activo</option>
-                                <option value="203">Finiquito</option>
-                            </select>
+
+                <div class="row px-3 py-2">
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>Aporte Desde</label>
+                            <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>Aporte Hasta</label>
+                            <app-pastel-datepicker iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>Componente</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                            class="fas fa-shield-alt text-primary-teal"></i></span></div>
+                                <select class="form-control fw-bold text-dark" [(ngModel)]="selectComponente">
+                                    <option value="99">Todos</option>
+                                    <option value="ejb">Ejército</option>
+                                    <option value="arb">Armada</option>
+                                    <option value="amb">Aviación</option>
+                                    <option value="gnb">Guardia Nacional</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>Grado</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                            class="fas fa-star text-primary-teal"></i></span></div>
+                                <select class="form-control fw-bold text-dark" [(ngModel)]="selectGrado">
+                                    <option value="99">Todos los grados</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row px-3 py-2">
-                <div class="col-md-3">
-                    <div class="modern-form-group">
-                        <label>Aporte Desde</label>
-                        <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="modern-form-group">
-                        <label>Aporte Hasta</label>
-                        <app-pastel-datepicker iconClass="fas fa-calendar-check"></app-pastel-datepicker>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="modern-form-group">
-                        <label>Componente</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend"><span class="input-group-text"><i
-                                        class="fas fa-shield-alt text-primary-teal"></i></span></div>
-                            <select class="form-control fw-bold text-dark" [(ngModel)]="selectComponente">
-                                <option value="99">Todos</option>
-                                <option value="ejb">Ejército</option>
-                                <option value="arb">Armada</option>
-                                <option value="amb">Aviación</option>
-                                <option value="gnb">Guardia Nacional</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="modern-form-group">
-                        <label>Grado</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend"><span class="input-group-text"><i
-                                        class="fas fa-star text-primary-teal"></i></span></div>
-                            <select class="form-control fw-bold text-dark" [(ngModel)]="selectGrado">
-                                <option value="99">Todos los grados</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- OVERLAY OSCURO PARA FOCO TOTAL -->
+            <div class="terminal-overlay" *ngIf="isDisplayingLogs" (click)="dismissTerminal()"></div>
 
             <!-- TERMINAL LOGS (RUST STYLE) -->
-            <div class="px-3 mb-4 mt-2">
-                <div class="rust-editor-wrapper" [class.opacity-50]="isLoadingData">
+            <div class="px-3 mb-4 mt-2 terminal-container-stable">
+                <div class="rust-editor-wrapper" [class.highlight-terminal]="isDisplayingLogs">
                     <div class="editor-header w-100 px-3 py-2 d-flex justify-content-between align-items-center font-monospace"
                         style="font-size: 0.8rem;">
-                        <span><i class="fa fa-terminal mr-2"></i>src/kernel/batch_processor.rs</span>
+                        <span><i class="fa fa-terminal mr-2"></i>src/kernel/calculo</span>
                         <div class="d-flex align-items-center">
-                            <span class="mr-2 text-muted" *ngIf="isLoadingData"><i
-                                    class="fas fa-circle-notch fa-spin"></i> PROCESANDO...</span>
-                            <span class="badge badge-success shadow-none border-0" style="font-size: 0.65rem;">KERNEL
-                                v2.6</span>
+                            <span class="mr-3 text-muted" *ngIf="isLoadingData">
+                                <i class="fas fa-circle-notch fa-spin"></i> PROCESANDO...
+                            </span>
+                            <span class="mr-3 text-success font-weight-bold" *ngIf="!isLoadingData && isDisplayingLogs">
+                                <i class="fas fa-check-circle"></i> COMPLETO
+                            </span>
+                            <span class="badge badge-success shadow-none border-0 mr-3"
+                                style="font-size: 0.65rem;">KERNEL v2.6</span>
+                            <button class="btn btn-sm btn-link text-muted p-0" (click)="dismissTerminal()"
+                                title="Ocultar Visor">
+                                <i class="fas fa-times" style="font-size: 1rem;"></i>
+                            </button>
                         </div>
                     </div>
-                    <textarea class="form-control editor-body font-monospace p-4" rows="6" [value]="logContent" readonly
+                    <textarea class="form-control editor-body font-monospace p-4" [value]="logContent" readonly
                         style="resize: none; border: none; font-size: 0.85rem;"></textarea>
                 </div>
             </div>
 
-            <!-- ACTIONS FOOTER LOTE -->
-            <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top px-3">
-                <button type="button" class="btn btn-header-action shadow-none mr-3 px-5"
-                    style="background: #f1f5f9; color: #718096; border: 1px solid transparent;">
-                    <i class="fas fa-times mr-2"></i> SALIR
-                </button>
-                <button type="button" class="btn btn-header-action teal shadow-none mr-3 px-5"
-                    (click)="prepararIndices()" [disabled]="isLoadingData">
-                    <i class="fas fa-cog mr-2" [class.fa-spin]="isLoadingData"></i> PREPARAR ÍNDICES
-                </button>
-                <button type="button" class="btn btn-header-action teal shadow-none px-5" (click)="abrirModalGenerar()"
-                    [disabled]="isLoadingData">
-                    <i class="fas fa-subscript mr-2"></i> GENERAR CÁLCULOS
-                </button>
-            </div>
-
-            <!-- TABLA DE PENDIENTES (HISTORICO RECIENTE) -->
-            <div class="mt-5 px-1">
-                <div class="d-flex align-items-center mb-3 px-2">
-                    <div class="icon-circle shadow-sm rounded-circle d-flex align-items-center justify-content-center text-white mr-3"
-                        style="width: 38px; height: 38px; background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);">
-                        <i class="fas fa-history" style="font-size: 0.9rem;"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0 text-dark font-weight-bold">Lotes Procesados Recientemente</h6>
-                        <small class="text-muted">Historial de ejecuciones en el servidor Sandra</small>
-                    </div>
+            <div class="blur-sensitive" [class.active-blur]="isDisplayingLogs">
+                <!-- ACTIONS FOOTER LOTE -->
+                <div class="d-flex justify-content-end align-items-center mt-5 pt-4 border-top px-3">
+                    <button type="button" class="btn btn-header-action shadow-none mr-3 px-5"
+                        style="background: #f1f5f9; color: #718096; border: 1px solid transparent;">
+                        <i class="fas fa-times mr-2"></i> SALIR
+                    </button>
+                    <button type="button" class="btn btn-header-action teal shadow-none mr-3 px-5"
+                        (click)="prepararIndices()" [disabled]="isLoadingData">
+                        <i class="fas fa-cog mr-2" [class.fa-spin]="isLoadingData"></i> PREPARAR ÍNDICES
+                    </button>
+                    <button type="button" class="btn btn-header-action teal shadow-none px-5"
+                        (click)="abrirModalGenerar()" [disabled]="isLoadingData">
+                        <i class="fas fa-subscript mr-2"></i> GENERAR CÁLCULOS
+                    </button>
                 </div>
-                <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
-                    <app-dynamic-table [config]="pendingTableConfig" [data]="pendingTableData"></app-dynamic-table>
+
+                <!-- TABLA DE PENDIENTES (HISTORICO RECIENTE) -->
+                <div class="mt-5 px-1">
+                    <div class="d-flex align-items-center mb-3 px-2">
+                        <div class="icon-circle shadow-sm rounded-circle d-flex align-items-center justify-content-center text-white mr-3"
+                            style="width: 38px; height: 38px; background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);">
+                            <i class="fas fa-history" style="font-size: 0.9rem;"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 text-dark font-weight-bold">Lotes Procesados Recientemente</h6>
+                            <small class="text-muted">Historial de ejecuciones en el servidor Sandra</small>
+                        </div>
+                    </div>
+                    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+                        <app-dynamic-table [config]="pendingTableConfig" [data]="pendingTableData"></app-dynamic-table>
+                    </div>
                 </div>
             </div>
 

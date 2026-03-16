@@ -28,6 +28,10 @@ export class LayoutService {
     });
     headerConfig$ = this.headerConfigSubject.asObservable();
 
+    // BehaviorSubject para efecto de blur global (procesamiento)
+    private blurSubject = new BehaviorSubject<boolean>(false);
+    blur$ = this.blurSubject.asObservable();
+
     private scrollToTopSubject = new Subject<void>();
     scrollToTop$ = this.scrollToTopSubject.asObservable();
 
@@ -55,5 +59,13 @@ export class LayoutService {
     updateHeader(config: Partial<IHeaderConfig>) {
         const current = this.headerConfigSubject.value;
         this.headerConfigSubject.next({ ...current, ...config });
+    }
+
+    /**
+     * Activa o desactiva el efecto de blur global
+     * @param active true para activar blur, false para limpiar
+     */
+    setBlur(active: boolean) {
+        this.blurSubject.next(active);
     }
 }

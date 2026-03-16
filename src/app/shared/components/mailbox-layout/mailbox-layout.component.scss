@@ -129,3 +129,12 @@
     position: relative;
     z-index: 1;
 }
+
+.blur-sensitive {
+    transition: filter 0.4s ease, opacity 0.4s ease;
+    &.active-blur {
+        filter: blur(8px) grayscale(20%);
+        opacity: 0.6;
+        pointer-events: none;
+    }
+}

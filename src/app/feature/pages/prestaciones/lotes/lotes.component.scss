@@ -77,11 +77,11 @@
 /* TERMINAL LOGS (RUST STYLE)                                                 */
 /* -------------------------------------------------------------------------- */
 .rust-editor-wrapper {
-    background-color: #f8fafc;
+    background-color: #ffffff;
     border-radius: 12px;
-    border: 1px solid #ced4da;
+    border: 1px solid #e2e8f0;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
     .editor-header {
         background-color: #f1f5f9;
@@ -102,12 +102,64 @@
         font-size: 0.9rem;
         font-weight: 500;
         line-height: 1.6;
+        height: 180px; /* Altura inicial fija */
+        transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
         &:focus {
             box-shadow: none;
             outline: none;
         }
     }
+
+    &.highlight-terminal {
+        background-color: #ffffff;
+        box-shadow: 0 30px 60px rgba(89, 140, 137, 0.25);
+        border-color: #5eaaa8;
+        border-width: 2px;
+        z-index: 1200;
+        
+        position: relative;
+        /* Elevación ultra-alta para foco total */
+        transform: translateY(-240px) scale(1.02); 
+        margin-bottom: -240px;
+        
+        .editor-body {
+            height: 520px;
+        }
+    }
+}
+
+/* Contenedor para evitar el salto de layout */
+.terminal-container-stable {
+    position: relative;
+    z-index: 1300; /* Asegurar que el contenedor esté sobre el overlay de otras áreas si fuera necesario */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.blur-sensitive {
+    transition: filter 0.4s ease, opacity 0.4s ease;
+    &.active-blur {
+        filter: blur(8px) grayscale(20%);
+        opacity: 0.6;
+        pointer-events: none;
+    }
+}
+
+.terminal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.1); /* Fondo casi invisible/claro */
+    backdrop-filter: blur(6px); /* Solo el blur para enfoque */
+    z-index: 1100;
+    animation: fadeInOverlay 0.6s ease forwards;
+}
+
+@keyframes fadeInOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* -------------------------------------------------------------------------- */

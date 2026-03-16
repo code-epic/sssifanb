@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbDropdown, NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { LayoutService } from 'src/app/core/services/layout/layout.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-mailbox-layout',
@@ -10,7 +12,9 @@ import { NgbDropdown, NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/
   templateUrl: './mailbox-layout.component.html',
   styleUrls: ['./mailbox-layout.component.scss']
 })
-export class MailboxLayoutComponent {
+export class MailboxLayoutComponent implements OnInit, OnDestroy {
+  public isBlurActive: boolean = false;
+  private blurSub: Subscription;
 
   @ViewChild('filterDropdown') filterDropdown!: NgbDropdown;
 
@@ -32,7 +36,18 @@ export class MailboxLayoutComponent {
   @Output() refresh = new EventEmitter<void>();
   @Output() search = new EventEmitter<string>();
 
-  constructor() { }
+  constructor(private layoutService: LayoutService, private cdr: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
+    this.blurSub = this.layoutService.blur$.subscribe(active => {
+      this.isBlurActive = active;
+      this.cdr.detectChanges();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.blurSub) this.blurSub.unsubscribe();
+  }
 
   onSearchSubmit() {
     this.search.emit(this.searchTerm);

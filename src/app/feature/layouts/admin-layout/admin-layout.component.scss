@@ -77,6 +77,15 @@ app-navbar {
     }
 }
 
+.blur-sensitive {
+    transition: filter 0.4s ease, opacity 0.4s ease;
+    &.active-blur {
+        filter: blur(8px) grayscale(20%);
+        opacity: 0.7;
+        pointer-events: none;
+    }
+}
+
 // Contenedor principal superpuesto convertido en pipeline elástico
 .container-fluid.mt--7 {
     margin-top: -5rem !important;

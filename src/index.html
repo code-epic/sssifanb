@@ -29,6 +29,7 @@
         sessionStorage.setItem('net_info', JSON.stringify(event.data.payload));
         console.log('Network context updated from parent.', event.data.payload);
       }
+
     });
 
     function sendToParent(type, message, details = null) {

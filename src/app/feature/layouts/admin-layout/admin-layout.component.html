@@ -1,10 +1,10 @@
 <!-- Sidenav -->
-<app-sidebar></app-sidebar>
+<app-sidebar class="blur-sensitive" [class.active-blur]="isBlurActive"></app-sidebar>
 <div class="main-content">
   <!-- Top navbar -->
-  <app-navbar></app-navbar>
+  <app-navbar class="blur-sensitive" [class.active-blur]="isBlurActive"></app-navbar>
 
-   <div class="header bg-gradient-info pb-8 pt-5 pt-md-7">
+   <div class="header bg-gradient-info pb-8 pt-5 pt-md-7 blur-sensitive" [class.active-blur]="isBlurActive">
     <div class="container-fluid">
       <div class="header-body">
         <div *ngIf="showCards" [@slideFade]>
@@ -17,7 +17,7 @@
     <div class="row">
       <div class="col-xl-12 mb-12 mb-xl-0">
         <div class="card shadow">
-          <div class="card-header border-0" [ngClass]="getHeaderClass()">
+          <div class="card-header border-0 blur-sensitive" [ngClass]="getHeaderClass()" [class.active-blur]="isBlurActive">
               <!-- Título / Breadcrumb Dinámico -->
               <div class="header-title-wrapper">
                 <h6 class="mb-0 header-title">

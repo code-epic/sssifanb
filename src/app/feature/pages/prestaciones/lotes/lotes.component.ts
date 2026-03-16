@@ -1,9 +1,11 @@
-import { Component, OnInit, TemplateRef, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, OnDestroy, NgZone } from '@angular/core';
 import { SecurityQueueService } from 'src/app/core/services/util/security-queue.service';
 import { Subscription } from 'rxjs';
 import { LayoutService } from 'src/app/core/services/layout/layout.service';
 import { DynamicTableConfig } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ApiService } from 'src/app/core/services/api.service';
+import { IAPICore } from 'src/app/core/models/api/api-model';
 
 @Component({
     selector: 'app-prest-lotes',
@@ -12,6 +14,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class LotesComponent implements OnInit, OnDestroy {
     private securitySub!: Subscription;
+    private port: MessagePort | null = null;
 
     @ViewChild('modalGenerar') modalGenerar!: TemplateRef<any>;
 
@@ -22,6 +25,7 @@ export class LotesComponent implements OnInit, OnDestroy {
     ];
     public currentTabId = 'aporte';
     public isLoadingData = false;
+    public isDisplayingLogs = false;
 
     // --- FORM STATES ---
     public selectDirectiva: string = '0';
@@ -59,13 +63,21 @@ export class LotesComponent implements OnInit, OnDestroy {
         { periodo: 'DIC-2023', directiva: 'Ajuste Salarial Ordinario', cantidad: '14,800', estatus: 'Validado' }
     ];
 
+    public xAPI: IAPICore = {
+        funcion: '',
+        parametros: '',
+    };
+
     constructor(
+        private apiService: ApiService,
         private layoutService: LayoutService,
         private modalService: NgbModal,
-        private securityQueue: SecurityQueueService
+        private securityQueue: SecurityQueueService,
+        private zone: NgZone
     ) { }
 
     ngOnInit(): void {
+        this.layoutService.toggleCards(false);
         this.layoutService.updateHeader({
             title: 'Principal / Prestaciones: Procesos en Lote',
             showBackButton: true,
@@ -78,8 +90,81 @@ export class LotesComponent implements OnInit, OnDestroy {
             estatusFormat: `<span class="badge badge-pill bg-pastel-success-soft text-success border-0 px-3 py-2 shadow-none font-weight-700" style="font-size: 0.7rem; letter-spacing: 0.5px;">${item.estatus.toUpperCase()}</span>`
         }));
 
-        this.securitySub = this.securityQueue.minimized$.subscribe(() => {
+        // Escuchar por el puerto de comunicación del padre
+        window.addEventListener('message', (event) => {
+            const msg = event.data;
+
+            // 1. Manejar establecimiento del puerto si viene en el evento
+            if (event.ports && event.ports.length > 0) {
+                this.port = event.ports[0];
+                this.port.onmessage = (msgEvent) => {
+                    this.handlePortMessage(msgEvent);
+                };
+                console.log('[LotesComponent] Canal de comunicación (MessagePort) establecido.');
+            }
+
+            // 2. Manejar el mensaje directamente si viene por window.postMessage (Fallback del padre)
+            if (msg && msg.type === 'EXEC_FNX_FINALIZADO') {
+                this.notifyCompletion(msg);
+            }
+        });
+    }
+
+    private handlePortMessage(event: MessageEvent) {
+        if (event.data && event.data.type === 'EXEC_FNX_FINALIZADO') {
+            this.notifyCompletion(event.data);
+        }
+    }
+
+    /**
+     * Procesa la notificación de finalización y actualiza la UI con efecto animado
+     */
+    private notifyCompletion(msg: any) {
+        this.logContent = '';
+        this.zone.run(async () => {
+            const newContent = msg.payload?.data || msg.data;
+
+            if (typeof newContent === 'string') {
+                if (this.logContent) this.logContent += '\n';
+                await this.typeText(newContent);
+            } else {
+                this.logContent = JSON.stringify(newContent, null, 2);
+            }
+
             this.isLoadingData = false;
+            // Quitamos el cierre automático:
+            // this.layoutService.setBlur(false); 
+        });
+    }
+
+    public dismissTerminal() {
+        this.isDisplayingLogs = false;
+        this.isLoadingData = false;
+        this.layoutService.setBlur(false);
+    }
+
+    /**
+     * Efecto de tipeado progresivo lineal (Optimizado)
+     */
+    private async typeText(text: string) {
+        const lines = text.split('\n');
+        for (const line of lines) {
+            // Solo agregamos salto si la línea no lo trae ya (evitar saltos dobles)
+            const cleanLine = line.endsWith('\n') ? line : line + '\n';
+            this.logContent += cleanLine;
+
+            // Pausa mucho más corta para evaluación rápida
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 30 + 10));
+            this.scrollToBottom();
+        }
+    }
+
+    private scrollToBottom() {
+        setTimeout(() => {
+            const textarea = document.querySelector('.editor-body') as HTMLTextAreaElement;
+            if (textarea) {
+                textarea.scrollTop = textarea.scrollHeight;
+            }
         });
     }
 
@@ -95,11 +180,32 @@ export class LotesComponent implements OnInit, OnDestroy {
 
     public prepararIndices(): void {
         this.isLoadingData = true;
-        this.logContent += "\n// Preparando índices de capital para el período seleccionado...";
-        setTimeout(() => {
-            this.isLoadingData = false;
-            this.logContent += "\n// 12,504 registros pre-procesados exitosamente.";
-        }, 1500);
+        this.isDisplayingLogs = true;
+        this.layoutService.setBlur(true); // Activar blur global
+        this.logContent += "\n// Solicitando al Núcleo PACE el pre-procesamiento de índices...";
+
+        const netInfo = JSON.parse(sessionStorage.getItem('net_info') || '{}');
+        const config = netInfo.config || {};
+
+        const fnx = {
+            funcion: 'Fnx_ProcesarCalculos',
+            id_cliente: config.clientId,
+            aplicacion: 'sandra.app.ipsfa'
+        };
+
+        // El API inicia el proceso, pero la finalización real (especialmente si es asíncrona)
+        // llega a través del MessagePort canalizado por el padre (Tauri/Bunker).
+        this.apiService.post('fnx', fnx).subscribe({
+            next: (data: any) => {
+                console.log('[LotesComponent] Solicitud de cálculo enviada:', data);
+                this.logContent += "\n// Petitorio aceptado. Procesando en segundo plano...";
+            },
+            error: (error) => {
+                console.error('[LotesComponent] Error al iniciar FNX:', error);
+                this.isLoadingData = false;
+                this.logContent += "\n// ERROR: No se pudo contactar con el núcleo de cálculos.";
+            }
+        });
     }
 
     public abrirModalGenerar(): void {

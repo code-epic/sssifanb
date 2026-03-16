@@ -38,6 +38,7 @@ export class AdminLayoutComponent implements OnInit {
   public clicked1: boolean = false;
   public pagina: string = '';
   public showCards: boolean = true;
+  public isBlurActive: boolean = false;
 
   public headerConfig: IHeaderConfig;
 
@@ -117,6 +118,12 @@ export class AdminLayoutComponent implements OnInit {
     // Suscribirse al evento global de forzar scroll top
     this.layoutService.scrollToTop$.subscribe(() => {
       this.doNativeScrollToTop();
+    });
+
+    // Suscribirse al estado de blur global
+    this.layoutService.blur$.subscribe(active => {
+      this.isBlurActive = active;
+      this.cdr.detectChanges();
     });
   }
 

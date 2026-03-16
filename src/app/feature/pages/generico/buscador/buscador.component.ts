@@ -135,27 +135,26 @@ export class BuscadorComponent implements OnInit, OnDestroy {
 
   async buscarCadena(cadena: string) {
     const payload = { 'funcion': 'IPSFA_LMilitares', 'parametros': cadena.replace(/"/g, '\\"') };
+    this.isLoading = true;
+    this.militares = [];
 
     try {
-      const data = await this.apiService.postStream<IAfiliado[]>('crud', payload);
+      await this.apiService.postStream<IAfiliado>('crudstream', payload, (militar) => {
+        console.log(militar);
+        // this.militares.push(militar);
+      });
       this.isLoading = false;
-      this.militares = data || [];
-
-      // Save Session
-      sessionStorage.setItem('buscador_session', JSON.stringify({
-        q: cadena,
-        res: this.militares
-      }))
-      this.buscar = '';
-
+      try {
+        sessionStorage.setItem('buscador_session', JSON.stringify({ q: cadena, res: this.militares }));
+      } catch (e) {
+        console.warn('[Buscador] No se pudo guardar la sesión (límite excedido):', e);
+      }
     } catch (error) {
-      console.error(error);
+      console.error('[Buscador] Error en stream:', error);
       this.isLoading = false;
-      this.errorMessage = 'Error al consultar el servicio.'
-      this.buscar = '';
+      this.errorMessage = 'Error al procesar los datos del servidor';
     }
   }
-
   selectMilitarFromList(militar: any) {
     this.afiliadoService.setAfiliado(militar);
     this.router.navigate(['/afiliacion/identificacion']);
