@@ -27,13 +27,16 @@ export class UtilService {
     let output = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
     return output
   }
+
   //retorna fecha en formato Dia/Mes/Anio
   ConvertirFecha(fecha: any): string {
     return fecha.year + '-' + + fecha.month + '-' + fecha.day
   }
 
 
-
+  GenerarId(): string {
+    return Math.random().toString(36).substring(2, 10).toUpperCase();
+  }
 
   Semillero(id: string): string {
     var f = new Date()
