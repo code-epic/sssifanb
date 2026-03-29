@@ -5,27 +5,27 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuardGuard  {
+export class AuthGuardGuard {
 
-  constructor(private router: Router){ }
+  constructor(private router: Router) { }
 
   canActivate(
     next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {     
-    
-      if (sessionStorage.getItem("token") != undefined ){
-        return true;
-      }else{
-        sessionStorage.clear()
-        this.router.navigate(['login']);
-        return false;
-      }
+    state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+
+    if (sessionStorage.getItem("token") != undefined) {
+      return true;
+    } else {
+      // sessionStorage.clear() // Comentado para evitar conflictos con la sincronización por postMessage de Tauri
+      // this.router.navigate(['login']);
+      return false;
+    }
   }
 
 
 
-  authConecting(): Promise<boolean> {    
-    return new Promise<boolean>((resolv, reject) => {      
+  authConecting(): Promise<boolean> {
+    return new Promise<boolean>((resolv, reject) => {
       // firebase.auth().onAuthStateChanged( user => {
       //   if(user){
       //     return resolv(true);

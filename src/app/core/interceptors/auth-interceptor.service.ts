@@ -18,6 +18,7 @@ import { SecurityQueueService } from '../services/util/security-queue.service';
 export class AuthInterceptorService implements HttpInterceptor {
 
   private SECRET_KEY = environment.Hash
+  private isClosingSession = false;
 
 
   constructor(
@@ -233,6 +234,9 @@ export class AuthInterceptorService implements HttpInterceptor {
   }
 
   cerrar(msj: string) {
+    if (this.isClosingSession) return;
+    this.isClosingSession = true;
+
     Swal.fire({
       title: 'Sesión Finalizada',
       text: msj,
@@ -247,6 +251,7 @@ export class AuthInterceptorService implements HttpInterceptor {
         title: 'text-dark font-weight-bold pt-2',
       }
     }).then((result) => {
+      this.isClosingSession = false;
       if (result.isConfirmed) {
         this._login.logout();
       }

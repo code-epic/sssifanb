@@ -3,11 +3,11 @@
 
 <head>
   <meta charset="utf-8">
-  <base href="/">
+  <base href="./">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Sistemas Tecnologicos Code Epic">
   <meta name="author" content="Code Epic Technologies">
-  <title>Sandra Dashboard</title>
+  <title>Sistema de Seguridad Social</title>
   <link href="./assets/img/brand/favicon0.png" rel="icon" type="image/png">
 
 </head>
@@ -19,7 +19,7 @@
 
   (function () {
     // Configuración
-    const appId = 'sssifanb';
+    const appId = 'sandra.app.ipsfa';
     const originalError = console.error;
     const originalFetch = window.fetch;
     const OriginalXHR = window.XMLHttpRequest;
@@ -27,33 +27,64 @@
     window.addEventListener('message', (event) => {
       if (event.data.type === 'NETWORK_CONTEXT') {
         sessionStorage.setItem('net_info', JSON.stringify(event.data.payload));
-        console.log('Network context updated from parent.', event.data.payload);
+      }
+      if (event.data.type === 'SET_SESSION') {
+        const currentToken = sessionStorage.getItem('token');
+        if (currentToken !== event.data.token) {
+          sessionStorage.setItem('token_sssifanb', event.data.token);
+        }
       }
 
     });
 
-    function sendToParent(type, message, details = null) {
-      if (window.parent) {
-        window.parent.postMessage({
-          type: 'SDC_LOG',
-          app_id: appId,
-          source: 'external-app',
-          payload: {
-            app_id: appId,
-            source: 'external-app',
-            log_type: type, // 'FETCH', 'XHR', 'ERROR', 'INFO'
-            message: message,
-            details: details // Objeto estructurado
-          }
-        }, '*');
-      }
-    }
+    // Referencias originales
+    const original = {
+      log: console.log,
+      error: console.error,
+      fetch: window.fetch,
+      xhr: window.XMLHttpRequest
+    };
 
-    console.error = function (...args) {
-      originalError.apply(console, args);
-      const msg = args.map(a => (a instanceof Error ? a.message + '\n' + a.stack : a)).join(' ');
+    // Helper para comunicación con padre
+    const sendToParent = (type, message, details = null) => {
+      if (!window.parent) return;
+      window.parent.postMessage({
+        type: 'SDC_LOG',
+        app_id: APP_ID,
+        source: 'external-proxy',
+        payload: {
+          app_id: APP_ID,
+          source: 'external-proxy',
+          log_type: type,
+          message,
+          details
+        }
+      }, '*');
+    };
+    // Helper para truncar texto
+    const truncate = (str) => {
+      if (!str) return '[No Body]';
+      return str.length > MAX_BODY_LENGTH ? str.substring(0, MAX_BODY_LENGTH) + '... (truncated)' : str;
+    };
+
+    // 1. Interceptar Console Error
+    console.error = (...args) => {
+      original.error.apply(console, args);
+      const msg = args.map(a => (a instanceof Error ? `${a.message}\n${a.stack}` : a)).join(' ');
       sendToParent('ERROR', msg);
     };
+
+    console.log = (...args) => {
+      original.log.apply(console, args);
+      const msg = args.map(a => {
+        if (a instanceof Error) return `${a.message}\\n${a.stack}`;
+        if (typeof a === 'object' && a !== null) return JSON.stringify(a, null, 2); // <- ¡Esta lógica serializa los objetos!
+        return a;
+      }).join(' ');
+
+      sendToParent('LOG', msg);
+    };
+
 
     window.fetch = async function (...args) {
       const [resource, config] = args;
@@ -147,8 +178,6 @@
     };
 
     Object.assign(window.XMLHttpRequest, OriginalXHR);
-
-    sendToParent('INFO', `Monitor (XHR/Fetch) iniciado para ${appId}`);
 
   })();
 

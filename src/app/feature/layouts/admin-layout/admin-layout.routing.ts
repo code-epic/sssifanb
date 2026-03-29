@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuardGuard } from 'src/app/core/guards/auth-guard.guard';
 import { BuscadorComponent } from '../../pages/generico/buscador/buscador.component';
 import { PerfilComponent } from '../../pages/generico/perfil/perfil.component';
 import { PrincipalComponent } from '../../pages/principal/principal.component';
@@ -9,25 +10,25 @@ export const AdminLayoutRoutes: Routes = [
     {
         path: 'principal',
         component: PrincipalComponent,
-        // canActivate: [AuthGuardGuard]
+        canActivate: [AuthGuardGuard]
     }, {
         path: 'buscador',
         component: BuscadorComponent,
-        // canActivate: [AuthGuardGuard]
+        canActivate: [AuthGuardGuard]
     }, {
         path: 'perfil',
         component: PerfilComponent,
-        // canActivate: [AuthGuardGuard]
+        canActivate: [AuthGuardGuard]
     },
     {
         path: 'template-file',
         component: TemplateFormFileComponent,
-        // canActivate: [AuthGuardGuard]
+        canActivate: [AuthGuardGuard]
     },
     {
         path: 'template-picture',
         component: TemplateFormPictureComponent,
-        // canActivate: [AuthGuardGuard]
+        canActivate: [AuthGuardGuard]
     },
     {
         path: 'afiliacion',

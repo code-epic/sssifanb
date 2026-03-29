@@ -112,22 +112,22 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.listTitles = ROUTES.filter(listTitle => listTitle);
+    // this.listTitles = ROUTES.filter(listTitle => listTitle);
 
-    // Iniciar reloj
-    this.timer = setInterval(() => {
-      this.time = new Date();
-    }, 1000);
+    // // Iniciar reloj
+    // this.timer = setInterval(() => {
+    //   this.time = new Date();
+    // }, 1000);
 
-    this.initForm();
+    // this.initForm();
 
-    this.listTitles = ROUTES.filter(listTitle => listTitle);
+    // this.listTitles = ROUTES.filter(listTitle => listTitle);
 
-    this.nombre = this.loginService.Usuario.nombre
-    this.cedula = this.loginService.Usuario.cedula
-    this.correo = this.loginService.Usuario.correo
-
-
+    // if (this.loginService.Usuario) {
+    //   this.nombre = this.loginService.Usuario.nombre || 'Analista';
+    //   this.cedula = this.loginService.Usuario.cedula || '';
+    //   this.correo = this.loginService.Usuario.correo || '';
+    // }
   }
 
   getElapsedTime(timestamp: number): string {

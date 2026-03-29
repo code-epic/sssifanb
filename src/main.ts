@@ -19,7 +19,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { RouterModule, provideRouter } from '@angular/router';
+import { RouterModule, provideRouter, withHashLocation } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -80,9 +80,11 @@ bootstrapApplication(AppComponent, {
             preventDuplicates: false
         })),
         {
-            provide: [LocationStrategy, AuthGuardGuard, JsonPipe],
+            provide: LocationStrategy,
             useClass: HashLocationStrategy
         },
+        AuthGuardGuard,
+        JsonPipe,
         {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthInterceptorService,
@@ -94,7 +96,7 @@ bootstrapApplication(AppComponent, {
         },
         provideAnimations(),
         provideHttpClient(withInterceptorsFromDi()),
-        provideRouter(routes)
+        provideRouter(routes, withHashLocation())
     ]
 })
   .catch(err => console.error(err));

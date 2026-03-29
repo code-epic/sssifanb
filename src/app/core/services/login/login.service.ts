@@ -60,10 +60,10 @@ export class LoginService {
     private http: HttpClient) {
 
     this.Id = environment.ID;
-    if (sessionStorage.getItem('token') != undefined) {
-      this.SToken = sessionStorage.getItem('token')
-      this.getUserDecrypt(this.SToken)
-    }
+    // if (sessionStorage.getItem('token') != undefined) {
+    //   this.SToken = sessionStorage.getItem('token')
+    //   this.getUserDecrypt(this.SToken)
+    // }
   }
 
   async IniciarSesion(itk: string) {
@@ -116,11 +116,19 @@ export class LoginService {
 
 
   public getUserDecrypt(cadena_jwt: string): any {
-    const token: any = jwtDecode(cadena_jwt);
-    this.Token = token;
-    this.Usuario = this.Token.Usuario;
-
-    return this.Token;
+    if (!cadena_jwt || cadena_jwt === 'undefined' || cadena_jwt === 'null') {
+      console.warn('LoginService: Token inválido o ausente en getUserDecrypt');
+      return null;
+    }
+    try {
+      const token: any = jwtDecode(cadena_jwt);
+      this.Token = token;
+      this.Usuario = this.Token?.Usuario || {};
+      return this.Token;
+    } catch (error) {
+      console.error('LoginService: Error al decodificar JWT', error);
+      return null;
+    }
   }
 
 
@@ -201,9 +209,7 @@ export class LoginService {
 
       progressCallback('¡Hasta pronto!');
       await this.utils.sleep(1200); // Pequeña pausa para que el usuario lea el mensaje final.
-      this.router.navigate(['/']).then(() => {
-        window.location.reload();
-      });
+      this.router.navigate(['/']);
     }
   }
 
@@ -222,8 +228,12 @@ export class LoginService {
 
   //ObenterAplicacion 
   protected obenterAplicacion(itk: string) {
+    if (!this.Token || !this.Token.Usuario) {
+      console.error('LoginService: No se puede obtener aplicación sin datos de usuario decodificados');
+      return;
+    }
 
-
+    console.log('LoginService: Obteniendo perfil de aplicación para:', this.Token.Usuario.cedula);
     let cadena = this.Token.Usuario.cedula + ',' + this.Token.Usuario.sistema + ',' + this.Token.Usuario.correo
     this.xAPI = {} as IAPICore
     this.xAPI.funcion = environment.funcion.CONSULTAR_USUARIO_PERFIL
@@ -244,7 +254,9 @@ export class LoginService {
 
           sessionStorage.setItem("crypt", texto);
           this.cargarMenu();
-          this.router.navigate(["/principal"]);
+          // this.router.navigate(["/principal"]).then(() => {
+          //   window.location.reload();
+          // });
         } catch (e) {
 
           console.error('Error al procesar el perfil del usuario:', e);

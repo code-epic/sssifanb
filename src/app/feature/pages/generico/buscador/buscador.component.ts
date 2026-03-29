@@ -141,7 +141,7 @@ export class BuscadorComponent implements OnInit, OnDestroy {
     try {
       await this.apiService.postStream<IAfiliado>('crudstream', payload, (militar) => {
         console.log(militar);
-        // this.militares.push(militar);
+        this.militares.push(militar);
       });
       this.isLoading = false;
       try {
