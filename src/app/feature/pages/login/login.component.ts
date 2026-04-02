@@ -128,7 +128,7 @@ export class LoginComponent implements OnInit {
     login() {
         this.verifying = true;
         this.verified = false;
-        // this.ngxService.startLoader("loader-login");
+        this.ngxService.startLoader("loader-login");
 
         this.loginService.getLogin(this.usuario, this.clave).subscribe(
             (data) => { // Success
@@ -152,7 +152,7 @@ export class LoginComponent implements OnInit {
                 console.log("Error al iniciar sesion desde GDoc")
                 this.usuario = ''
                 this.clave = ''
-                // this.ngxService.stopLoader("loader-login");
+                this.ngxService.stopLoader("loader-login");
 
                 this.loading = false;
                 this.isHidden = false;

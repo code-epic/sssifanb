@@ -35,24 +35,24 @@ export class SidebarComponent implements OnInit {
   }
 
   async ngOnInit() {
-    // this.menuItems = ROUTES;
-    // // Si ROUTES está vacío (ej. F5), intentar recargarlo desde le sesión
-    // if (ROUTES.length == 0) {
-    //   this.loginService.cargarMenu();
-    // }
+    this.menuItems = ROUTES;
+    // Si ROUTES está vacío (ej. F5), intentar recargarlo desde le sesión
+    if (ROUTES.length == 0) {
+      this.loginService.cargarMenu();
+    }
 
-    // this.router.events.subscribe((event) => {
-    //   this.isCollapsed = true;
-    // });
+    this.router.events.subscribe((event) => {
+      this.isCollapsed = true;
+    });
 
-    // // Escuchar cambios del Afiliado para cambiar Logo
-    // this.afiliadoService.afiliado$.subscribe(afiliado => {
-    //   if (afiliado && afiliado.componente && afiliado.componente.abreviatura) {
-    //     let abrev = afiliado.componente.abreviatura.toUpperCase();
-    //     this.logoUrl = `./assets/img/componentes/${abrev}.webp`;
-    //   } else {
-    //     this.logoUrl = './assets/img/ipsfa/logo.webp';
-    //   }
-    // });
+    // Escuchar cambios del Afiliado para cambiar Logo
+    this.afiliadoService.afiliado$.subscribe(afiliado => {
+      if (afiliado && afiliado.componente && afiliado.componente.abreviatura) {
+        let abrev = afiliado.componente.abreviatura.toUpperCase();
+        this.logoUrl = `./assets/img/componentes/${abrev}.webp`;
+      } else {
+        this.logoUrl = './assets/img/ipsfa/logo.webp';
+      }
+    });
   }
 }

@@ -254,9 +254,9 @@ export class LoginService {
 
           sessionStorage.setItem("crypt", texto);
           this.cargarMenu();
-          // this.router.navigate(["/principal"]).then(() => {
-          //   window.location.reload();
-          // });
+          this.router.navigate(["/principal"]).then(() => {
+            window.location.reload();
+          });
         } catch (e) {
 
           console.error('Error al procesar el perfil del usuario:', e);
@@ -274,9 +274,9 @@ export class LoginService {
       (error) => {
         sessionStorage.clear();
         localStorage.clear();
-        // this.router.navigate(["/login"]).then(() => {
-        //   window.location.reload();
-        // });
+        this.router.navigate(["/login"]).then(() => {
+          window.location.reload();
+        });
         console.error('Fallo conectando al perfil del usuario: ', error)
       }
     )
