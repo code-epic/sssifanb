@@ -60,10 +60,10 @@ export class LoginService {
     private http: HttpClient) {
 
     this.Id = environment.ID;
-    // if (sessionStorage.getItem('token') != undefined) {
-    //   this.SToken = sessionStorage.getItem('token')
-    //   this.getUserDecrypt(this.SToken)
-    // }
+    if (sessionStorage.getItem('token') != undefined) {
+      this.SToken = sessionStorage.getItem('token')
+      this.getUserDecrypt(this.SToken)
+    }
   }
 
   async IniciarSesion(itk: string) {

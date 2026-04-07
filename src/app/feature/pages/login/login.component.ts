@@ -74,8 +74,14 @@ export class LoginComponent implements OnInit {
         private ngxService: NgxUiLoaderService,
         @Inject(DOCUMENT) private document: Document) {
 
-        if (sessionStorage.getItem("token") != undefined) {
-            this.router.navigate(['/principal']);
+        const sessionToken = sessionStorage.getItem("token");
+        const hasMenu = sessionStorage.getItem("menu");
+        if (sessionToken && sessionToken !== 'undefined' && sessionToken !== 'null') {
+            if (!hasMenu) {
+                this.loginService.Iniciar(sessionToken);
+            } else {
+                this.router.navigate(['/principal']);
+            }
         }
 
     }

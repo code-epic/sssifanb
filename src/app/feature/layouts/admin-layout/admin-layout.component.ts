@@ -154,7 +154,7 @@ export class AdminLayoutComponent implements OnInit {
       showBackButton: false,
       alertSeverity: 1
     });
-    // this.ruta.navigate(['/' + url]);
+    this.ruta.navigate(['/' + url]);
   }
 
   goBack() {
