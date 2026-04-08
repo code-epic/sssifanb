@@ -69,15 +69,15 @@ export class LoginService {
   async IniciarSesion(itk: string) {
     this.Token = await this.getUserDecrypt(itk)
     sessionStorage.setItem("token", itk);
+    sessionStorage.removeItem("token_failed"); // Limpiamos rastro de fallo previo
     this.obenterAplicacion(itk)
   }
 
   async Iniciar(token: string = '') {
     token = token == '' ? sessionStorage.getItem('token') : token
-
+    sessionStorage.removeItem("token_failed"); // Limpiamos rastro de fallo previo
     await this.getUserDecrypt(token);
     this.obenterAplicacion(token);
-
   }
   getLogin(user: string, clave: string): Observable<IToken> {
     const netInfo = sessionStorage.getItem('net_info');
@@ -233,7 +233,7 @@ export class LoginService {
       return;
     }
 
-    console.log('LoginService: Obteniendo perfil de aplicación para:', this.Token.Usuario.cedula);
+    // console.log('LoginService: Obteniendo perfil de aplicación para:', this.Token.Usuario.cedula);
     let cadena = this.Token.Usuario.cedula + ',' + this.Token.Usuario.sistema + ',' + this.Token.Usuario.correo
     this.xAPI = {} as IAPICore
     this.xAPI.funcion = environment.funcion.CONSULTAR_USUARIO_PERFIL
@@ -246,9 +246,14 @@ export class LoginService {
             throw new Error("La respuesta del perfil de usuario no es válida o está vacía.");
           }
 
+          // this.Menu = data[0].Aplicacion[0].Rol.Menu
 
-          sessionStorage.setItem("menu", JSON.stringify(data[0].Aplicacion[0].Rol.Menu));
-          let texto = await this.sha256.hash(JSON.stringify(data[0].Aplicacion[0].Rol.Menu));
+          // console.log(this.consolidarAplicaciones(data[0].Aplicacion))
+
+          let menu = await this.consolidarAplicaciones(data[0].Aplicacion).Rol.Menu
+          sessionStorage.setItem('menu', JSON.stringify(menu))
+          // sessionStorage.setItem("menu", JSON.stringify(data[0].Aplicacion[0].Rol.Menu));
+          let texto = await this.sha256.hash(JSON.stringify(menu));
 
           this.utils.uuidv4();
 
@@ -265,18 +270,17 @@ export class LoginService {
             text: 'No se pudo cargar la configuración de su perfil. Por favor, contacte al administrador.',
             icon: 'error'
           });
-          sessionStorage.clear();
-          localStorage.clear();
-
+          sessionStorage.setItem('token_failed', itk);
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('menu');
         }
 
       },
       (error) => {
-        sessionStorage.clear();
-        localStorage.clear();
-        this.router.navigate(["/login"]).then(() => {
-          window.location.reload();
-        });
+        sessionStorage.setItem('token_failed', itk);
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("menu");
+        this.router.navigate(["/login"]);
         console.error('Fallo conectando al perfil del usuario: ', error)
       }
     )
@@ -303,6 +307,75 @@ export class LoginService {
         });
       });
     }
+  }
+
+
+
+  /**
+   * Consolidación de Perfiles y Aplicaciones
+   * 
+   * Esta función es CRÍTICA para la gestión de seguridad multidimensional.
+   * Permite que usuarios con múltiples perfiles (ej. Gerente y Operador) operen bajo
+   * una ÚNICA sesión consolidada, evitando conflictos de acceso y cierres de sesión.
+   * 
+   * @param aplicaciones Listado de aplicaciones/roles devueltos por el backend
+   * @returns Una aplicación unificada con todos los menús y privilegios combinados
+   */
+  consolidarAplicaciones(aplicaciones: any[]): any {
+    if (!aplicaciones || aplicaciones.length === 0) return null;
+
+    // Inicializamos la base con la primera aplicación del arreglo
+    const appConsolidada = {
+      ...aplicaciones[0],
+      perfil: aplicaciones.map(a => a.perfil).join(' / '), // Concatenamos nombres para auditoría visual
+      Rol: {
+        ...aplicaciones[0].Rol,
+        descripcion: "Perfil Consolidado",
+        Menu: []
+      }
+    };
+
+    // Mapa para evitar duplicidad de menús principales (ej. si dos perfiles tienen 'Expedientes')
+    const menuMap = new Map<string, any>();
+
+    aplicaciones.forEach(app => {
+      app.Rol.Menu.forEach((itemMenu: any) => {
+        const menuKey = itemMenu.url || itemMenu.nombre;
+
+        if (!menuMap.has(menuKey)) {
+          // Si el módulo es nuevo para esta sesión, lo registramos íntegro
+          menuMap.set(menuKey, JSON.parse(JSON.stringify(itemMenu)));
+        } else {
+          // Si el módulo ya existe (ej. 'Administración'), unificamos sus SubMenús
+          const menuExistente = menuMap.get(menuKey);
+
+          itemMenu.SubMenu.forEach((nuevoSub: any) => {
+            const subExistente = menuExistente.SubMenu.find((s: any) => s.url === nuevoSub.url);
+
+            if (!subExistente) {
+              // Si es una funcionalidad nueva en este módulo, la agregamos
+              menuExistente.SubMenu.push(JSON.parse(JSON.stringify(nuevoSub)));
+            } else {
+              // Si la funcionalidad es compartida (ej. /expedientes), CONSOLIDAMOS PRIVILEGIOS
+              // Esto asegura que el usuario tenga el MÁXIMO permiso disponible entre sus roles
+              const privilegiosMap = new Map();
+
+              // Cargamos privilegios actuales
+              subExistente.Privilegios?.forEach((p: any) => privilegiosMap.set(p.metodo, p));
+              // Inyectamos privilegios del nuevo rol sin sobreescribir los existentes
+              nuevoSub.Privilegios?.forEach((p: any) => privilegiosMap.set(p.metodo, p));
+
+              // El resultado es el conjunto unión de todos los métodos autorizados
+              subExistente.Privilegios = Array.from(privilegiosMap.values());
+            }
+          });
+        }
+      });
+    });
+
+    // Reconstruimos el menú final consolidado
+    appConsolidada.Rol.Menu = Array.from(menuMap.values());
+    return appConsolidada;
   }
 
 

@@ -170,9 +170,10 @@ export class AdminLayoutComponent implements OnInit {
   getHeaderClass() {
     if (!this.headerConfig) return '';
     switch (this.headerConfig.alertSeverity) {
-      case 2: return 'header-warn'; // Azul
-      case 3: return 'header-critical'; // Rojo
-      default: return '';
+      case 2: return 'header-info';     // Nivel 2: Azul Mate profundo
+      case 3: return 'header-critical'; // Nivel 3: Rojo intenso
+      case 4: return 'header-warn';     // Nivel 4: Naranja de advertencia
+      default: return '';               // Nivel 1: Normal / Transparente
     }
   }
 

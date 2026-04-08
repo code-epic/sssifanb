@@ -1,5 +1,7 @@
-<div class="bg-white {{ config?.containerClass || 'rounded-lg shadow-sm border' }}" [ngStyle]="!config?.containerClass ? {'border-color': 'rgba(89,140,137,0.15)', 'border-radius': '16px', 'overflow': 'visible'} : {'overflow': 'visible'}">
-    <table class="table custom-table align-middle mb-0 {{ config?.tableClass || '' }}">
+<div class="bg-white custom-table-container {{ config?.containerClass || 'rounded-lg shadow-sm border' }}" 
+     [ngStyle]="!config?.containerClass ? {'border-color': 'rgba(89,140,137,0.15)', 'border-radius': '16px'} : {}">
+    <div class="table-responsive-pastel">
+        <table class="table custom-table align-middle mb-0 {{ config?.tableClass || '' }}">
         <thead class="bg-light-soft sticky-top" *ngIf="!config?.hideHeader">
             <tr>
                 <!-- Selection Header -->
@@ -137,7 +139,8 @@
                 <td *ngIf="config?.actions && config!.actions!.length > 0"></td>
             </tr>
         </tbody>
-    </table>
+        </table>
+    </div>
 </div>
 
 <!-- Pagination Footer -->

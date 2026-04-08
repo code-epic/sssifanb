@@ -18,6 +18,9 @@ export const environment = {
     CONSULTAR_USUARIO_PERFIL: '_SYS_CUsuarioPerfil',
     ACTUALIZAR_CLAVE_USUARIO: '_SYS_UUserPanel',
     ACTUALIZAR_TOTP: '_SYS_UUserTOTP',
+    LISTAR_AFILIADO_AUTORIDAD: 'IPSFA_LMilitaryAuthority',
+    CONSULTAR_AFILIADO_AUTORIDAD: 'IPSFA_CMilitaryAuthority',
+    ACTUALIZAR_AFILIADO_AUTORIDAD: 'IPSFA_UMilitaryAuthority'
   },
   subPath: {
     login: 'wusuario/loginV2'

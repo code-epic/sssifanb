@@ -174,7 +174,7 @@ $input-border: #e9ecef;
     border: 1px solid #eaecf5;
     color: #8898aa;
     padding: 0.4rem 0.8rem;
-    border-radius: 6px; // Bordes redondeados elegantes
+    border-radius: 6px; 
     font-size: 0.75rem;
     font-weight: 500;
     display: flex;
@@ -182,17 +182,51 @@ $input-border: #e9ecef;
     letter-spacing: 0.3px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
 
+    &.tim-expiration-badge {
+        background-color: rgba(245, 54, 92, 0.05);
+        border-color: rgba(245, 54, 92, 0.1);
+        
+        i { color: #f5365c; }
+        span { color: #f5365c; }
+    }
+
     i {
         margin-right: 6px;
         font-size: 0.85rem;
-        color: $teal-accent; // Icono de reloj en el color primario
+        color: $teal-accent; 
     }
 
     span {
         font-weight: 700; 
         margin-left: 4px;
-        color: $teal-accent; // El número de años destacado
+        color: $teal-accent; 
         letter-spacing: 0px;
+    }
+}
+
+.grado-badge-minimal {
+    background: #ffffff;
+    min-width: 64px;
+    width: auto;
+    height: 64px;
+    padding: 0 1.2rem;
+    border-radius: 14px;
+    border: 1px solid rgba($teal-accent, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03) !important;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        border-color: rgba($teal-accent, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.06) !important;
+    }
+
+    img {
+        max-width: 100%;
+        object-fit: contain;
     }
 }
 

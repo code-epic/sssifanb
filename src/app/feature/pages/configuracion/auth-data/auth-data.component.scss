@@ -227,14 +227,10 @@
     }
 }
 
-.btn-pastel-icon.pastel-success {
+.btn-pastel-icon {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    /* Perfectamente circular */
-    background-color: #e8f5f4;
-    /* Fondo verde muy claro del screenshot */
-    color: #5e9290;
     border: none;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
@@ -242,11 +238,35 @@
     justify-content: center;
     font-size: 1rem;
 
-    &:hover {
-        background-color: #5e9290;
-        color: white;
-        transform: scale(1.1) rotate(90deg);
-        box-shadow: 0 5px 15px rgba(94, 146, 144, 0.2);
+    &.pastel-success {
+        background-color: #e8f5f4;
+        color: #5e9290;
+        &:hover {
+            background-color: #5e9290;
+            color: white;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 5px 15px rgba(94, 146, 144, 0.2);
+        }
+    }
+
+    &.pastel-primary {
+        background-color: #e3f2fd;
+        color: #1e88e5;
+        &:hover {
+            background-color: #1e88e5;
+            color: white;
+            transform: scale(1.1) rotate(360deg);
+            box-shadow: 0 5px 15px rgba(30, 136, 229, 0.2);
+        }
+    }
+}
+
+.blur-sensitive {
+    transition: filter 0.4s ease, opacity 0.4s ease;
+    &.active-blur {
+        filter: blur(3px);
+        opacity: 0.7;
+        pointer-events: none;
     }
 }
 
@@ -260,4 +280,269 @@
 
 hr {
     border-top: 1.5px dashed #e2e8f0;
+}
+
+/* --- HERENCIA ESTILO TIM (PASTEL PREMIUM) --- */
+
+/* Botones Circulares con Efecto Pop-up */
+.btn-pastel-icon-circle {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid transparent;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s;
+    cursor: pointer;
+    padding: 0;
+}
+
+.tooltip-action:hover {
+    transform: scale(1.15);
+    z-index: 10;
+}
+
+/* Variantes de Color Pastel */
+.pastel-success {
+    color: #598c89 !important;
+    background-color: rgba(89, 140, 137, 0.1) !important;
+    border-color: rgba(89, 140, 137, 0.2) !important;
+}
+.pastel-success:hover {
+    background-color: #598c89 !important;
+    color: white !important;
+    box-shadow: 0 4px 6px -1px rgba(89, 140, 137, 0.3) !important;
+}
+
+.pastel-danger {
+    color: #ef4444 !important;
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+}
+.pastel-danger:hover {
+    background-color: #ef4444 !important;
+    color: white !important;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3) !important;
+}
+
+.pastel-warning {
+    color: #f59e0b !important;
+    background-color: rgba(245, 158, 11, 0.1) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+}
+.pastel-warning:hover {
+    background-color: #f59e0b !important;
+    color: white !important;
+    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3) !important;
+}
+
+.pastel-primary {
+    color: #3b82f6 !important;
+    background-color: rgba(59, 130, 246, 0.1) !important;
+    border-color: rgba(59, 130, 246, 0.2) !important;
+}
+.pastel-primary:hover {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Checkbox Personalizado Estilo Sandra */
+.custom-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    input { display: none; }
+    .checkmark {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(89, 140, 137, 0.3);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        i {
+            font-size: 10px;
+            color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    }
+    input:checked + .checkmark {
+        background: #598c89;
+        border-color: #598c89;
+        box-shadow: 0 4px 6px rgba(89, 140, 137, 0.2);
+        i { opacity: 1; transform: scale(1); }
+    }
+}
+
+/* Animaciones Dropdown */
+.animate-dropdown-in {
+    animation: animateDropdownIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes animateDropdownIn {
+    from { opacity: 0; transform: translateY(15px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-menu-caret::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 18px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    transform: rotate(45deg);
+    z-index: -1;
+    box-shadow: -3px -3px 5px rgba(0,0,0,0.05);
+}
+
+/* Minimalismo Slim para la Tabla */
+::ng-deep .custom-table {
+    border: none !important;
+    
+    td {
+        padding-top: 0.65rem !important;
+        padding-bottom: 0.65rem !important;
+        font-size: 0.8rem !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.2px;
+        vertical-align: middle !important;
+    }
+    
+    th {
+        padding-top: 0.85rem !important;
+        padding-bottom: 0.85rem !important;
+        font-size: 0.72rem !important;
+        font-weight: 800 !important;
+        color: #64748b !important;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #f1f5f9 !important;
+    }
+
+    /* FORZAR ESTILOS DE BOTONES DENTRO DE LA TABLA (PASTEL PREMIUM) */
+    .btn-pastel-icon-circle {
+        all: unset !important; /* Limpiar todo rastro de estilo nativo */
+        width: 34px !important;
+        height: 34px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+        background-color: transparent !important;
+        border: none !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        cursor: pointer !important;
+        box-shadow: none !important;
+        position: relative !important;
+        margin: 0 5px !important; /* Espaciado entre botones ordenado */
+        opacity: 0; /* Ocultar por defecto para despejar la vista */
+        transform: translateX(8px);
+
+        i {
+            font-size: 0.9rem !important;
+            line-height: 1 !important;
+        }
+
+        &:hover {
+            transform: translateY(-2px) !important;
+            scale: 1.1 !important;
+        }
+
+        &.pastel-success {
+            color: #598c89 !important;
+            background-color: rgba(89, 140, 137, 0.12) !important;
+            &:hover { background-color: #598c89 !important; color: white !important; box-shadow: 0 4px 12px rgba(89, 140, 137, 0.3) !important; }
+        }
+
+        &.pastel-danger {
+            color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.12) !important;
+            &:hover { background-color: #ef4444 !important; color: white !important; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important; }
+        }
+    }
+
+    /* Revelar botones con suavidad al pasar el cursor sobre la fila */
+    tr:hover .btn-pastel-icon-circle {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Suavizado Global de Fuentes de Tabla */
+.custom-table {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+.badge-pastel-minimal {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    border: 1px solid rgba(0,0,0,0.02) !important;
+}
+
+// --- CONFIRMATION MODAL ANIMATIONS ---
+@keyframes pulse-circle {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(89, 140, 137, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(89, 140, 137, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(89, 140, 137, 0); }
+}
+
+.icon-confirm-pulse {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(89, 140, 137, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: #598c89;
+    font-size: 2.5rem;
+    animation: pulse-circle 2s infinite;
+    border: 2px solid rgba(89, 140, 137, 0.2);
+
+    &.blue {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+        border-color: rgba(52, 152, 219, 0.2);
+        animation: pulse-circle-blue 2s infinite;
+    }
+
+    &.green {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #27ae60;
+        border-color: rgba(46, 204, 113, 0.2);
+        animation: pulse-circle-green 2s infinite;
+    }
+
+    &.amber {
+        background-color: rgba(235, 154, 68, 0.1);
+        color: #eb9a44;
+        border-color: rgba(235, 154, 68, 0.2);
+        animation: pulse-circle-amber 2s infinite;
+    }
+}
+
+@keyframes pulse-circle-blue {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(52, 152, 219, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+}
+
+@keyframes pulse-circle-green {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(46, 204, 113, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+}
+
+@keyframes pulse-circle-amber {
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(235, 154, 68, 0.4); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(235, 154, 68, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(235, 154, 68, 0); }
 }

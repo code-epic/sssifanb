@@ -121,7 +121,7 @@
                     </div>
                 </div>
 
-                <div class="blur-sensitive" [class.active-blur]="isDisplayingLogs" style="max-width: 1000px;">
+                <div class="blur-sensitive" [class.active-blur]="isDisplayingLogs">
 
 
                     <div class="row px-1 mb-12">
@@ -167,7 +167,7 @@
 
                 <!-- Terminal -->
                 <div class="terminal-overlay" *ngIf="isDisplayingLogs" (click)="dismissTerminal()"></div>
-                <div class="mb-4 terminal-container-stable" style="max-width: 1000px;">
+                <div class="mb-4 terminal-container-stable">
                     <div class="rust-editor-wrapper" [class.highlight-terminal]="isDisplayingLogs">
                         <div class="editor-header w-100 px-3 py-2 d-flex justify-content-between align-items-center font-monospace"
                             style="font-size: 0.8rem;">
@@ -189,7 +189,7 @@
                     </div>
                 </div>
                 <!-- Espacio de Acciones (Alineado con el contenido) -->
-                <div class="d-flex justify-content-end align-items-center mt-4 pt-4" style="max-width: 1000px;">
+                <div class="d-flex justify-content-end align-items-center mt-4 pt-4">
                     <button type="button" class="btn btn-header-action amber mr-3 shadow-none" (click)="toggleView()">
                         <i class="fas fa-times"></i> CANCELAR
                     </button>

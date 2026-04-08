@@ -13,6 +13,10 @@
                                 <div class="antiguedad-badge shadow-sm mr-2" *ngIf="tiempoServicio">
                                     <i class="fas fa-history"></i> Antigüedad: <span>{{ tiempoServicio }}</span>
                                 </div>
+                                <!-- Vencimiento del Carnet (TIM) -->
+                                <div class="antiguedad-badge shadow-sm mr-2 tim-expiration-badge" *ngIf="fechaVencimientoTIM">
+                                    <i class="fas fa-id-card"></i> Vencimiento: <span class="text-danger">{{ fechaVencimientoTIM | date:'dd/MM/yyyy' }}</span>
+                                </div>
                                 <!-- Botón de Impresión de Documentos -->
                                 <div class="dropdown" [class.show]="showPrintDropdown" *ngIf="tiempoServicio">
                                     <button class="btn btn-sm shadow-sm dropdown-toggle-no-caret d-flex align-items-center justify-content-center" type="button" id="printDocsDropdown" (click)="showPrintDropdown = !showPrintDropdown; $event.stopPropagation()" aria-haspopup="true" [attr.aria-expanded]="showPrintDropdown" title="Imprimir Documentos" style="width: 32px; height: 32px; background-color: rgba(89, 140, 137, 0.1); border: 1px solid rgba(89, 140, 137, 0.2); border-radius: 8px; color: #598c89; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.2)'" onmouseout="this.style.backgroundColor='rgba(89, 140, 137, 0.1)'">
@@ -152,45 +156,46 @@
 
                     </div>
 
-                    <div class="col-lg-3 d-flex flex-column align-items-center justify-content-start">
-                        <!-- Contenedor Foto Pasaporte con tamaño ajustado -->
-                        <div class="avatar-container position-relative shadow-sm mt-2" 
-                             style="border-radius: 8px; width: 100%; max-width: 215px; aspect-ratio: 3/4; background-color: #f8f9fe; margin: 0 auto; box-sizing: border-box;">
+                    <div class="col-lg-3 d-flex flex-column" style="min-height: 100%;">
+                        <!-- Foto Pasaporte centrada al inicio -->
+                        <div class="d-flex flex-column align-items-center justify-content-start">
+                             <!-- Foto Pasaporte -->
+                            <div class="avatar-container position-relative shadow-sm mt-2" 
+                                 style="border-radius: 8px; width: 100%; max-width: 215px; aspect-ratio: 3/4; background-color: #f8f9fe; margin: 0 auto; box-sizing: border-box;">
 
-                            <!-- Foto Transicionable (object-fit: contain) -->
-                            <img [src]="getFotoUrl()" class="w-100 h-100" id="fotoPrincipal"
-                                 style="object-fit: contain; position: absolute; top: 0; left: 0; z-index: 1; border-radius: 8px; transition: transform 0.3s;">
-                            
-                            <!-- Overlay Clickeable PREMIUM para Modal de Doble Clic -->
-                            <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center" 
-                                 style="top: 0; left: 0; z-index: 3; cursor: pointer; transition: background 0.3s ease; border-radius: 8px;" 
-                                 onmouseover="this.style.background='rgba(255,255,255,0.15)'; document.getElementById('fotoPrincipal').style.transform='scale(1.04)'; this.querySelector('.zoom-hint').style.opacity='1'" 
-                                 onmouseout="this.style.background='transparent'; document.getElementById('fotoPrincipal').style.transform='scale(1)'; this.querySelector('.zoom-hint').style.opacity='0'"
-                                 (dblclick)="triggerModal.click()"
-                                 title="Doble clic para expandir al visualizador">
-                                 
-                                 <div class="zoom-hint d-flex align-items-center justify-content-center" style="opacity: 0; transition: opacity 0.3s ease;">
-                                     <i class="fas fa-search-plus text-white shadow-sm" style="font-size: 2.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></i>
-                                 </div>
-                            </div>
-                            
-                            <!-- Botón oculto real en DOM para garantizar disparo en Angular -->
-                            <button #triggerModal id="btnZoomModal" style="opacity: 0; position: absolute; z-index: -1;" data-toggle="modal" data-target="#modalZoomFoto"></button>
-                            
-                            <!-- Botón inferior circular y minimalista para evitar tapar -->
-                            <div class="position-absolute" style="top: 8px; right: 8px; z-index: 4;">
-                                <button type="button" class="btn btn-sm text-white shadow-sm d-flex align-items-center justify-content-center" 
-                                        style="background: rgba(89, 140, 137, 0.9); border: none; border-radius: 50%; width: 32px; height: 32px; padding: 0;" title="Actualizar Foto">
-                                    <i class="fas fa-camera"></i>
-                                </button>
+                                <!-- Foto Transicionable -->
+                                <img [src]="getFotoUrl()" class="w-100 h-100" id="fotoPrincipal"
+                                     style="object-fit: contain; position: absolute; top: 0; left: 0; z-index: 1; border-radius: 8px; transition: transform 0.3s;">
+                                
+                                <!-- Overlay Zoom -->
+                                <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center" 
+                                     style="top: 0; left: 0; z-index: 3; cursor: pointer; transition: background 0.3s ease; border-radius: 8px;" 
+                                     onmouseover="this.style.background='rgba(255,255,255,0.15)'; document.getElementById('fotoPrincipal').style.transform='scale(1.04)';" 
+                                     onmouseout="this.style.background='transparent'; document.getElementById('fotoPrincipal').style.transform='scale(1)';"
+                                     (dblclick)="triggerModal.click()"
+                                     title="Doble clic para expandir">
+                                </div>
+                                
+                                <!-- Botón Cámara -->
+                                <div class="position-absolute" style="top: 8px; right: 8px; z-index: 4;">
+                                    <button type="button" class="btn btn-sm text-white shadow-sm d-flex align-items-center justify-content-center" 
+                                            style="background: rgba(89, 140, 137, 0.9); border: none; border-radius: 50%; width: 32px; height: 32px; padding: 0;" title="Actualizar Foto">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                </div>
+                                
+                                <button #triggerModal id="btnZoomModal" style="opacity: 0; position: absolute; z-index: -1;" data-toggle="modal" data-target="#modalZoomFoto"></button>
                             </div>
                         </div>
 
-                        <!-- Grado centrado debajito del marco, fuera de la zona de recorte de la foto -->
-                        <div class="w-100 d-flex justify-content-center mt-3" style="z-index: 3;">
+                        <!-- Logo de Grado Militar forzado al fondo del contenedor para alineación simétrica -->
+                        <div class="w-100 d-flex justify-content-center mt-auto pb-4" style="z-index: 3;">
+                            <div class="grado-badge-minimal shadow-sm d-flex align-items-center justify-content-center" 
+                                 title="Grado Militar">
                                 <img *ngIf="getGradoBadgePath()" [src]="getGradoBadgePath()" alt="Grado" 
-                                     style="height: 55px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));" 
+                                     style="height: 38px; width: auto; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));" 
                                      (error)="badgeImg.style.display='none'" #badgeImg>
+                            </div>
                         </div>
                     </div>
                 </div>

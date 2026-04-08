@@ -14,7 +14,6 @@
         font-weight: 800;
         padding: 1.25rem 1rem;
         background: #f8fafc;
-        white-space: nowrap;
         user-select: none;
         
         &.sortable {
@@ -308,4 +307,37 @@
             display: inline-block;
         }
     }
+}
+
+// ----------------------------------------------------------------------------
+// CUSTOM SCROLLBAR (CLEAN & PASTEL)
+// ----------------------------------------------------------------------------
+.table-responsive-pastel {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    width: 100%;
+    border-radius: 16px; // Match container
+
+    &::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+        &:hover {
+            background: #94a3b8;
+        }
+    }
+}
+
+.custom-table-container {
+    overflow: hidden; // Ensure border-radius clips the content/scrollbar
+    position: relative;
 }

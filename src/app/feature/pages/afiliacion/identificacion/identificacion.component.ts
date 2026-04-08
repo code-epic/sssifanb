@@ -18,6 +18,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     public familiarForm: FormGroup;
     public currentTab: string = 'militar';
     public moneda: string = 'Bs.';
+    public fechaVencimientoTIM: string = '';
 
     // Var to control the pastel printing dropdown menu visibility
     public showPrintDropdown: boolean = false;
@@ -75,7 +76,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             title: 'Principal / Afiliación: Identificación Militar',
             showBackButton: true,
             alertSeverity: 1,
-            showAlertsIcon: true
+            showAlertsIcon: false
         });
 
         this.initForms();
@@ -95,6 +96,9 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
                 // Calcular Tiempo de Servicio
                 this.tiempoServicio = this.calcularTServicio(parsedData.fingreso, parsedData.fretiro, parsedData.situacion);
+
+                // Mapear Vencimiento TIM
+                this.fechaVencimientoTIM = this.formatDate(afiliadoData.tim?.fechavencimiento);
 
                 // Procesar Familiares
                 this.familiares = this.processFamiliares(afiliadoData.familiar);

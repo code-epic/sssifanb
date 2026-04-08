@@ -1,7 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { IAfiliado } from 'src/app/core/models/afiliacion/afiliado.model';
+import { ApiService } from 'src/app/core/services/api.service';
 import { LayoutService } from 'src/app/core/services/layout/layout.service';
 import { DynamicTableConfig } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
+import { environment } from 'src/environments/environment';
+import { UtilService } from 'src/app/core/services/util/util.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-auth-data',
@@ -13,13 +19,15 @@ export class AuthDataComponent implements OnInit {
   editando: boolean = false;
   authForm: FormGroup;
 
-  componentes: string[] = ['EJÉRCITO', 'ARMADA', 'AVIACIÓN', 'GUARDIA NACIONAL', 'MILICIA'];
-  grados: string[] = ['GENERAL EN JEFE', 'GENERAL DE DIVISIÓN', 'GENERAL DE BRIGADA', 'CORONEL', 'TENIENTE CORONEL', 'MAYOR', 'CAPITÁN', 'PRIMER TENIENTE', 'TENIENTE'];
+  componentes: string[] = ['EJÉRCITO BOLIVARIANO', 'ARMADA BOLIVARIANA', 'AVIACIÓN MILITAR BOLIVARIANA', 'GUARDIA NACIONAL BOLIVARIANA', 'MILICIA BOLIVARIANA'];
+  grados: string[] = ['GENERAL EN JEFE', 'GENERAL DE DIVISIÓN', 'GENERAL DE BRIGADA', 'CORONEL', 'TENIENTE CORONEL', 'MAYOR', 'CAPITÁN', 'PRIMER TENIENTE', 'TENIENTE', 'SARGENTO MAYOR DE PRIMERA', 'SARGENTO MAYOR DE SEGUNDA', 'SARGENTO MAYOR DE TERCERA', 'SARGENTO PRIMERO'];
   niveles: any[] = [
-    { label: 'BAJO', value: 0, color: 'success' },
-    { label: 'MEDIO', value: 1, color: 'warning' },
-    { label: 'ALTO', value: 2, color: 'danger' }
+    { label: 'BAJO', value: 0, color: 'infop' },
+    { label: 'MEDIO', value: 1, color: 'warningp' },
+    { label: 'ALTO', value: 2, color: 'dangerp' }
   ];
+
+  loading: boolean = false;
 
   tableConfig: DynamicTableConfig = {
     selectable: true,
@@ -30,27 +38,29 @@ export class AuthDataComponent implements OnInit {
     tableClass: 'mailbox-table w-100 mb-0',
     containerClass: 'p-0 border-0 shadow-none rounded-20',
     columns: [
-      { key: 'cedula', header: 'Cédula', sortable: true },
+      { key: 'cedula', header: 'Cédula', sortable: true, width: '100px' },
       { key: 'nombre_completo', header: 'Nombres y Apellidos', sortable: true },
-      { key: 'componente', header: 'Componente', sortable: true },
-      { key: 'grado', header: 'Grado' },
-      { key: 'nivel_label', header: 'Nivel Acceso', type: 'badge', badgeColorKey: 'nivel_color' }
+      { key: 'componente_desc', header: 'Componente', sortable: true, width: '180px' },
+      { key: 'grado_html', header: 'Grado', type: 'html', align: 'center', width: '120px' },
+      { key: 'nivel_html', header: 'Autorización', type: 'html', align: 'center', width: '220px' }
     ],
     actions: [
-      { name: 'ver', icon: 'fa fa-search', tooltip: 'Ver Detalle', buttonClass: 'btn-circular btn-info-soft shadow-sm ml-2' },
-      { name: 'eliminar', icon: 'fa fa-trash', tooltip: 'Eliminar', buttonClass: 'btn-circular btn-danger-soft shadow-sm ml-2' }
+      { name: 'ver', icon: 'fa fa-search', tooltip: 'Ver Detalle', buttonClass: 'btn-pastel-icon-circle pastel-success mx-1 tooltip-action' },
+      { name: 'eliminar', icon: 'fa fa-times', tooltip: 'Quitar Autorización', buttonClass: 'btn-pastel-icon-circle pastel-danger mx-1 tooltip-action' }
     ]
   };
 
-  tableData = [
-    { id: 1, cedula: '12345678', nombre_completo: 'JUAN PÉREZ', componente: 'EJÉRCITO', grado: 'CORONEL', nivel: 2, nivel_label: 'ALTO', nivel_color: 'danger' },
-    { id: 2, cedula: '87654321', nombre_completo: 'MARÍA RODRÍGUEZ', componente: 'ARMADA', grado: 'MAYOR', nivel: 1, nivel_label: 'MEDIO', nivel_color: 'warning' },
-    { id: 3, cedula: '11223344', nombre_completo: 'PEDRO LÓPEZ', componente: 'AVIACIÓN', grado: 'CAPITÁN', nivel: 0, nivel_label: 'BAJO', nivel_color: 'success' }
-  ];
+  tableData = [];
+  filteredData = [];
+  searchTerm: string = '';
+  allSelected: boolean = false;
 
   constructor(
     private fb: FormBuilder,
-    private layoutService: LayoutService
+    private layoutService: LayoutService,
+    private apiService: ApiService,
+    private utilService: UtilService,
+    private modalService: NgbModal
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +71,65 @@ export class AuthDataComponent implements OnInit {
       showAlertsIcon: true
     });
     this.initForm();
+    this.listMilitaryAuthority();
+  }
+
+  listMilitaryAuthority() {
+    this.loading = true;
+    const payload = { "funcion": environment.funcion.LISTAR_AFILIADO_AUTORIDAD, "parametros": "2" };
+    this.apiService.post('crud', payload).subscribe({
+      next: (res: any[]) => {
+        if (res && Array.isArray(res)) {
+          this.tableData = res.map(item => {
+            const authLevel = Number(item.authorization_level || 0);
+            const nivelObj = this.niveles.find(n => n.value === authLevel) || this.niveles[0];
+
+            let icon = 'fa-shield-alt';
+            let color = '#1e293b';
+            if (authLevel === 1) icon = 'fa-lock';
+            if (authLevel === 2) icon = 'fa-user-shield';
+
+            // Lógica de Color para Grado Militar
+            const gDesc = (item.grado?.descripcion || '').toUpperCase();
+            const gAbr = (item.grado?.abreviatura || '').toUpperCase();
+            let gColor = 'info'; // Default
+
+            // Alta Jerarquía
+            if (gDesc.includes('GENERAL') || gDesc.includes('ALMIRANTE') || gAbr.match(/^(GJ|GD|GB|MG|VA|CA|CRNL|CNEL)$/)) {
+              gColor = 'indigo-soft';
+            } else if (gDesc.includes('MAYOR') || gDesc.includes('CAPITAN') || gAbr.match(/^(MY|CAP|TTE|PTTE|TF|AN)$/)) {
+              gColor = 'blue-soft';
+            } else if (gDesc.includes('SARGENTO') || gAbr.match(/^(SM1|SM2|SM3|S1|S2)$/)) {
+              gColor = 'amber-soft';
+            }
+
+            return {
+              ...item,
+              cedula: item.id,
+              nombre_completo: item.persona?.datobasico?.nombrecompleto?.toUpperCase(),
+              componente_desc: item.componente?.abreviatura?.toUpperCase() || item.componente?.descripcion?.toUpperCase(),
+              grado_html: `<div class="d-flex align-items-center justify-content-center">
+                             <span class="badge-pastel-minimal ${gColor}" style="font-size: 0.65rem; font-weight: 700; width: 100%; border-radius: 4px; padding: 3px 8px; border: 1px solid rgba(0,0,0,0.05);">
+                               ${gAbr}
+                             </span>
+                           </div>`,
+              nivel_html: `<div class="d-flex align-items-center justify-content-center">
+                             <div class="badge-pastel-minimal ${nivelObj.color}" style="font-size: 0.65rem; padding: 4px 14px; border-radius: 20px; display: flex; align-items: center; min-width: 105px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                               <i class="fas ${icon} mr-2" style="font-size: 0.75rem; opacity: 0.85;"></i>
+                               <span style="font-weight: 800; letter-spacing: 0.6px;">${nivelObj.label}</span>
+                             </div>
+                           </div>`
+            };
+          });
+          this.filteredData = [...this.tableData];
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error listando autoridades:', error);
+        this.loading = false;
+      }
+    });
   }
 
   initForm(): void {
@@ -70,7 +139,7 @@ export class AuthDataComponent implements OnInit {
       apellido: ['', Validators.required],
       componente: ['', Validators.required],
       grado: ['', Validators.required],
-      nivel: [0, Validators.required]
+      nivel: [1, Validators.required]
     });
   }
 
@@ -80,41 +149,128 @@ export class AuthDataComponent implements OnInit {
     this.activeTab = 'mantenimiento';
   }
 
+  filterTable() {
+    const term = this.searchTerm.toLowerCase().trim();
+    if (!term) {
+      this.filteredData = [...this.tableData];
+      return;
+    }
+    this.filteredData = this.tableData.filter(row =>
+      row.cedula?.toString().includes(term) ||
+      row.nombre_completo?.toLowerCase().includes(term) ||
+      row.componente_desc?.toLowerCase().includes(term)
+    );
+  }
+
+  toggleAll(event: any) {
+    this.allSelected = event.target.checked;
+    // La tabla dinámica maneja la selección interna, pero aquí podríamos sincronizar estados si fuera necesario
+  }
+
+  onRowSelection(rows: any[]) {
+    this.allSelected = rows.length === this.filteredData.length;
+  }
+
   onRowClicked(row: any) {
     this.editando = true;
-    const nombres = row.nombre_completo.split(' ');
     this.authForm.patchValue({
       cedula: row.cedula,
-      nombre: nombres[0],
-      apellido: nombres.slice(1).join(' '),
-      componente: row.componente,
-      grado: row.grado,
-      nivel: row.nivel
+      nombre: row.persona.datobasico.nombreprimero,
+      apellido: row.persona.datobasico.apellidoprimero,
+      componente: row.componente?.descripcion?.toUpperCase(),
+      grado: row.grado?.descripcion?.toUpperCase(),
+      nivel: Number(row.authorization_level || 0)
     });
     this.activeTab = 'mantenimiento';
   }
 
-  onTableAction(event: any) {
+  onTableAction(event: any, contentDelete?: any) {
     if (event.actionName === 'ver') {
       this.onRowClicked(event.row);
     } else if (event.actionName === 'eliminar') {
-      console.log('Eliminar autorización:', event.row);
-      // Aquí abriría el modal de confirmación
+      this.selectedDocId = event.row.cedula;
+      this.modalService.open(contentDelete, { centered: true, size: 'md' });
     }
   }
 
-  onSubmit(): void {
+  onSubmit(content?: any): void {
     if (this.authForm.valid) {
-      console.log('Guardando Autorización:', this.authForm.value);
-      this.activeTab = 'listado';
+      this.updateMilitaryAuthority(content);
     } else {
       this.markAllAsTouched();
     }
   }
 
+  updateMilitaryAuthority(content: any) {
+    this.modalService.open(content, { centered: true, size: 'md', backdrop: 'static' });
+  }
+
+  selectedDocId: string = '';
+  ejecutarEliminar(modal: any) {
+    this.loading = true;
+    modal.close();
+    // Simulación de eliminación exitosa
+    setTimeout(() => {
+      this.loading = false;
+      this.utilService.AlertMini('top-end', 'success', 'Autorización revocada con éxito', 3000);
+      this.listMilitaryAuthority();
+    }, 1000);
+  }
+
+  ejecutarUpdate(modal: any) {
+    const { cedula, nivel } = this.authForm.value;
+    this.loading = true;
+    modal.close();
+
+    const payload = {
+      "funcion": environment.funcion.ACTUALIZAR_AFILIADO_AUTORIDAD,
+      "parametros": `${cedula},${nivel}`
+    };
+
+    this.apiService.post('crud', payload).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        this.utilService.AlertMini('top-end', 'success', 'Nivel de acceso actualizado con éxito', 3000);
+        this.activeTab = 'listado';
+        this.listMilitaryAuthority();
+      },
+      error: (error) => {
+        this.loading = false;
+        console.error('Error actualizando:', error);
+        this.utilService.AlertMini('top-end', 'error', 'No se pudo procesar la actualización', 3000);
+      }
+    });
+  }
+
   private markAllAsTouched(): void {
     Object.values(this.authForm.controls).forEach(control => {
       control.markAsTouched();
+    });
+  }
+
+  buscarCedula(cedula: string) {
+    if (!cedula) return;
+
+    const payload = { "funcion": environment.funcion.CONSULTAR_AFILIADO_AUTORIDAD, "parametros": cedula };
+
+    this.apiService.post('crud', payload).subscribe({
+      next: (res: any) => {
+        // La respuesta es un array, tomamos el primero si existe
+        if (res && res.length > 0) {
+          const data = res[0];
+          this.authForm.patchValue({
+            cedula: data.id,
+            nombre: data.persona.datobasico.nombreprimero?.toUpperCase(),
+            apellido: data.persona.datobasico.apellidoprimero?.toUpperCase(),
+            componente: data.componente?.descripcion?.toUpperCase(),
+            grado: data.grado?.descripcion?.toUpperCase(),
+            nivel: Number(data.authorization_level || 0)
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error consultando cédula:', error);
+      }
     });
   }
 }

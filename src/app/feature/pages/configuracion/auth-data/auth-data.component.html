@@ -1,37 +1,91 @@
-<!-- Custom Tabs Header -->
-<ul class="nav nav-tabs custom-nav-tabs fade-in border-0 mb-4 d-flex align-items-center" id="authTabs" role="tablist">
-    <li class="nav-item">
-        <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'listado'"
-            (click)="activeTab = 'listado'">
-            <i class="fa fa-list-ul" style="font-size: 1.1rem; margin-right: 12px;"></i> Gestor de Autorizaciones
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'mantenimiento'"
-            (click)="activeTab = 'mantenimiento'">
-            <i class="fa fa-shield-alt" style="font-size: 1.1rem; margin-right: 12px;"></i>
-            {{ editando ? 'Editar Autorización' : 'Nueva Autorización' }}
-        </a>
-    </li>
+<div class="d-flex justify-content-between align-items-center w-100 border-bottom mb-4 fade-in">
+    <!-- Custom Tabs Header -->
+    <ul class="nav nav-tabs custom-nav-tabs border-0" id="authTabs" role="tablist"
+        style="border-bottom: none !important;">
+        <li class="nav-item">
+            <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'listado'"
+                (click)="activeTab = 'listado'">
+                <i class="fa fa-list-ul" style="font-size: 1.1rem; margin-right: 12px;"></i> Gestor de Autorizaciones
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link cursor-pointer d-flex align-items-center" [class.active]="activeTab === 'mantenimiento'"
+                (click)="activeTab = 'mantenimiento'">
+                <i class="fa fa-shield-alt" style="font-size: 1.1rem; margin-right: 12px;"></i>
+                {{ editando ? 'Editar Autorización' : 'Nueva Autorización' }}
+            </a>
+        </li>
+    </ul>
 
-    <!-- Botón alineado a los tabs -->
-    <li class="nav-item ms-auto text-end" *ngIf="activeTab === 'listado'">
-        <button class="btn-pastel-icon pastel-success shadow-none" type="button" (click)="nuevaAutorizacion()"
-            title="Nueva Autorización">
-            <i class="fas fa-plus"></i>
+    <!-- Botón de Acción Principal (Alineado a la derecha en tabs si se prefiere, pero el toolbar lo llevará) -->
+    <div class="pe-3 pb-2" *ngIf="activeTab === 'listado'">
+        <button class="btn btn-sm btn-header-action teal shadow-none" (click)="nuevaAutorizacion()"
+            style="font-size: 0.75rem; padding: 0.4rem 1rem;">
+            <i class="fas fa-plus mr-1"></i> NUEVA AUTORIZACIÓN
         </button>
-    </li>
-</ul>
+    </div>
+</div>
 
 <!-- Tabs Content Wrapper -->
 <div class="tab-content fade-in mt-2" id="authTabsContent">
 
     <!-- TAB 1: LISTADO DE AUTORIZACIONES -->
     <div class="tab-pane fade" [class.show]="activeTab === 'listado'" [class.active]="activeTab === 'listado'">
-        <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
-            <app-dynamic-table [config]="tableConfig" [data]="tableData" (rowClicked)="onRowClicked($event)"
-                (actionClicked)="onTableAction($event)">
-            </app-dynamic-table>
+        <div class="card border-0 shadow-sm overflow-hidden"
+            style="border-radius: 16px; position: relative; min-height: 400px;">
+
+            <!-- Toolbar de Búsqueda y Herramientas (Estilo TIM) -->
+            <div class="bg-white py-3 px-4 d-flex justify-content-between align-items-center flex-wrap border-bottom"
+                style="z-index: 10;">
+
+                <div class="d-flex align-items-center mb-2 mb-md-0">
+                    <!-- Checkbox All -->
+
+                    <!-- Botones Lote -->
+                    <div class="border-left pl-3 ml-2 d-flex align-items-center">
+                        <button class="btn-pastel-icon-circle pastel-primary tooltip-action mr-2"
+                            (click)="listMilitaryAuthority()" [disabled]="loading" ngbTooltip="Actualizar Listado">
+                            <i class="fas" [class.fa-sync-alt]="!loading" [class.fa-spinner]="loading"
+                                [class.fa-spin]="loading"></i>
+                        </button>
+                        <button class="btn-pastel-icon-circle pastel-success tooltip-action mr-2"
+                            ngbTooltip="Descargar Reporte">
+                            <i class="fas fa-file-excel"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Barra de Búsqueda y Filtros con aprovechamiento de espacio -->
+                <div class="modern-form-group mb-0 flex-grow-1 ml-4" style="max-width: 600px;">
+                    <div class="input-group input-group-sm shadow-none bg-white"
+                        style="border-radius: 8px; border: 1px solid #e2e8f0; position: relative;">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-transparent border-0 text-muted pr-0"
+                                style="padding-left: 14px;"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input type="text" [(ngModel)]="searchTerm" (input)="filterTable()"
+                            class="form-control border-0 shadow-none bg-transparent"
+                            placeholder="Buscar por cédula, nombre o componente..."
+                            style="font-size: 0.85rem; padding-left: 12px; height: 38px;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spinner central elegante durante la carga -->
+            <div *ngIf="loading" class="position-absolute w-100 h-100 d-flex align-items-center justify-content-center"
+                style="z-index: 100; background: rgba(255,255,255,0.6); backdrop-filter: blur(4px);">
+                <div class="spinner-border text-primary-teal" role="status"
+                    style="width: 3rem; height: 3rem; border-width: 0.25em;">
+                    <span class="sr-only">Cargando...</span>
+                </div>
+            </div>
+
+            <div class="blur-sensitive" [class.active-blur]="loading">
+                <app-dynamic-table [config]="tableConfig" [data]="filteredData" (rowClicked)="onRowClicked($event)"
+                    (actionClicked)="onTableAction($event, modalConfirmarDelete)"
+                    (selectionChanged)="onRowSelection($event)">
+                </app-dynamic-table>
+            </div>
         </div>
     </div>
 
@@ -39,7 +93,7 @@
     <div class="tab-pane fade" [class.show]="activeTab === 'mantenimiento'"
         [class.active]="activeTab === 'mantenimiento'">
         <div class="card border-0 shadow-sm p-lg-5 p-4" style="border-radius: 20px; background: white;">
-            <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
+            <form [formGroup]="authForm" (ngSubmit)="onSubmit(modalConfirmarUpdate)">
 
                 <h6 class="heading-small mb-4 font-weight-800 text-primary-teal">
                     <i class="fas fa-id-card mr-2 scale-110"></i> IDENTIFICACIÓN DEL MILITAR
@@ -55,7 +109,8 @@
                                     <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                 </div>
                                 <input type="text" formControlName="cedula" class="form-control"
-                                    placeholder="V-00000000">
+                                    placeholder="V-00000000" (keydown.tab)="buscarCedula(authForm.get('cedula').value)"
+                                    (keydown.enter)="buscarCedula(authForm.get('cedula').value)">
                             </div>
                         </div>
                     </div>
@@ -157,3 +212,63 @@
     </div>
 
 </div>
+
+<!-- Modal: Confirmar Actualización de Autorización (Elegante) -->
+<ng-template #modalConfirmarUpdate let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+
+            <!-- Icono con Pulso Animado Azul (Seguridad/Autorización) -->
+            <div class="icon-confirm-pulse blue">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+
+            <h4 class="font-weight-bold text-dark mb-2">¿Confirmar Actualización?</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Se modificará el nivel de acceso para el militar con la cédula <strong>{{ authForm.get('cedula').value
+                    }}</strong>. ¿Desea proceder con este cambio?
+            </p>
+
+            <div class="d-flex justify-content-center align-items-center mt-4">
+                <button type="button" class="btn-header-action mr-3 shadow-none" (click)="modal.dismiss('Cancel')"
+                    style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
+                    No, Cancelar
+                </button>
+                <button type="button" class="btn-header-action teal m-0 shadow-none" (click)="ejecutarUpdate(modal)"
+                    style="flex: 1.2; padding: 0.8rem;">
+                    Sí, Actualizar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Confirmar Eliminación (X pulsada estilo TIM) -->
+<ng-template #modalConfirmarDelete let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+
+            <!-- Icono con Pulso Animado Rojo (Eliminación) -->
+            <div class="icon-confirm-pulse red">
+                <i class="fas fa-times-circle"></i>
+            </div>
+
+            <h4 class="font-weight-bold text-dark mb-2">¿Revocar Autorización?</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Está a punto de eliminar el acceso autorizado para la cédula <strong>{{ selectedDocId }}</strong>. Esta
+                acción es inmediata. ¿Desea continuar?
+            </p>
+
+            <div class="d-flex justify-content-center align-items-center mt-4">
+                <button type="button" class="btn-header-action mr-3 shadow-none" (click)="modal.dismiss('Cancel')"
+                    style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
+                    No, Mantener
+                </button>
+                <button type="button" class="btn-header-action danger m-0 shadow-none" (click)="ejecutarEliminar(modal)"
+                    style="flex: 1.2; padding: 0.8rem; background-color: #ef4444; color: white;">
+                    Sí, Revocar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>

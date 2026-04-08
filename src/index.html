@@ -132,7 +132,10 @@
       }
       if (event.data.type === 'SET_SESSION') {
         const currentToken = sessionStorage.getItem('token');
-        if (currentToken !== event.data.token) {
+        const tokenFailed = sessionStorage.getItem('token_failed');
+        
+        // Solo recargamos si el token es nuevo y no está marcado como fallido
+        if (currentToken !== event.data.token && tokenFailed !== event.data.token) {
           const loader = document.getElementById('global-loader');
           if (loader) loader.style.display = 'flex';
 
