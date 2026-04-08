@@ -38,11 +38,11 @@ export class AuthDataComponent implements OnInit {
     tableClass: 'mailbox-table w-100 mb-0',
     containerClass: 'p-0 border-0 shadow-none rounded-20',
     columns: [
-      { key: 'cedula', header: 'Cédula', sortable: true, width: '100px' },
-      { key: 'nombre_completo', header: 'Nombres y Apellidos', sortable: true },
-      { key: 'componente_desc', header: 'Componente', sortable: true, width: '180px' },
-      { key: 'grado_html', header: 'Grado', type: 'html', align: 'center', width: '120px' },
-      { key: 'nivel_html', header: 'Autorización', type: 'html', align: 'center', width: '220px' }
+      { key: 'cedula_html', header: 'Cédula', type: 'html', width: '120px' },
+      { key: 'nombre_completo', header: 'Nombre Apellidos', sortable: true },
+      { key: 'grado_html', header: 'Grado', type: 'html', align: 'center', width: '100px' },
+      { key: 'componente_desc', header: 'Componente', sortable: true, width: '200px' },
+      { key: 'nivel_html', header: 'Autorización', type: 'html', align: 'right', width: '140px' }
     ],
     actions: [
       { name: 'ver', icon: 'fa fa-search', tooltip: 'Ver Detalle', buttonClass: 'btn-pastel-icon-circle pastel-success mx-1 tooltip-action' },
@@ -105,20 +105,20 @@ export class AuthDataComponent implements OnInit {
 
             return {
               ...item,
-              cedula: item.id,
+              cedula_html: `<span class="badge badge-pill bg-light text-muted border font-weight-bold shadow-none" 
+                                style="font-size: 0.68rem; letter-spacing: 0.3px; padding: 0.4em 0.8em; border-color: #cbd5e1 !important; color: #475569 !important;">
+                                V-${item.id}
+                            </span>`,
               nombre_completo: item.persona?.datobasico?.nombrecompleto?.toUpperCase(),
-              componente_desc: item.componente?.abreviatura?.toUpperCase() || item.componente?.descripcion?.toUpperCase(),
-              grado_html: `<div class="d-flex align-items-center justify-content-center">
-                             <span class="badge-pastel-minimal ${gColor}" style="font-size: 0.65rem; font-weight: 700; width: 100%; border-radius: 4px; padding: 3px 8px; border: 1px solid rgba(0,0,0,0.05);">
-                               ${gAbr}
-                             </span>
-                           </div>`,
-              nivel_html: `<div class="d-flex align-items-center justify-content-center">
-                             <div class="badge-pastel-minimal ${nivelObj.color}" style="font-size: 0.65rem; padding: 4px 14px; border-radius: 20px; display: flex; align-items: center; min-width: 105px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
-                               <i class="fas ${icon} mr-2" style="font-size: 0.75rem; opacity: 0.85;"></i>
-                               <span style="font-weight: 800; letter-spacing: 0.6px;">${nivelObj.label}</span>
-                             </div>
-                           </div>`
+              grado_html: `<span class="font-weight-800 text-dark" style="font-size: 0.82rem;">${item.grado?.abreviatura?.toUpperCase() || ''}</span>`,
+              componente_desc: item.componente?.descripcion?.toUpperCase(),
+              nivel_html: `<div class="d-flex justify-content-end pr-2">
+                            <div class="badge-pastel-minimal ${nivelObj.color}" 
+                                style="font-size: 0.65rem; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; min-width: 90px; justify-content: center; border: 1px solid rgba(0,0,0,0.03);">
+                                <i class="fas ${icon} mr-2" style="font-size: 0.7rem; opacity: 0.8;"></i>
+                                <span style="font-weight: 800; letter-spacing: 0.5px;">${nivelObj.label}</span>
+                            </div>
+                        </div>`
             };
           });
           this.filteredData = [...this.tableData];
@@ -186,7 +186,9 @@ export class AuthDataComponent implements OnInit {
 
   onTableAction(event: any, contentDelete?: any) {
     if (event.actionName === 'ver') {
-      this.onRowClicked(event.row);
+      this.selectedDocId = event.row.id || event.row.cedula;
+      this.activeTab = 'mantenimiento';
+      this.buscarCedula(this.selectedDocId);
     } else if (event.actionName === 'eliminar') {
       this.selectedDocId = event.row.cedula;
       this.modalService.open(contentDelete, { centered: true, size: 'md' });
