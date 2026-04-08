@@ -18,11 +18,13 @@ export const environment = {
     CONSULTAR_USUARIO_PERFIL: '_SYS_CUsuarioPerfil',
     ACTUALIZAR_CLAVE_USUARIO: '_SYS_UUserPanel',
     ACTUALIZAR_TOTP: '_SYS_UUserTOTP',
+    CONSULTAR_IDENTIFICACION_MILITAR: 'FANB_CIdentificarMilitar',
+    CONSULTAR_MILITARES: 'IPSFA_LMilitares',
     LISTAR_AFILIADO_AUTORIDAD: 'IPSFA_LMilitaryAuthority',
     CONSULTAR_AFILIADO_AUTORIDAD: 'IPSFA_CMilitaryAuthority',
     ACTUALIZAR_AFILIADO_AUTORIDAD: 'IPSFA_UMilitaryAuthority'
   },
   subPath: {
-    login: 'wusuario/login'
+    login: 'wusuario/loginV2'
   }
 };

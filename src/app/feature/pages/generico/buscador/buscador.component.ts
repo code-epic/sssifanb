@@ -14,6 +14,7 @@ import { IAfiliado } from 'src/app/core/models/afiliacion/afiliado.model';
 import { AfiListarComponent } from '../../afiliacion/afi-listar/afi-listar.component';
 import { SecurityQueueService } from 'src/app/core/services/util/security-queue.service';
 import { Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-buscador',
@@ -112,7 +113,7 @@ export class BuscadorComponent implements OnInit, OnDestroy {
   }
 
   buscarCedula(cedula: string) {
-    const payload = { "funcion": "FANB_CIdentificarMilitar", "parametros": cedula };
+    const payload = { "funcion": environment.funcion.CONSULTAR_IDENTIFICACION_MILITAR, "parametros": cedula };
     this.militares = [];
     sessionStorage.removeItem('buscador_session'); // Clear session on direct ID search
     this.apiService.post('crud', payload).subscribe({
@@ -134,7 +135,7 @@ export class BuscadorComponent implements OnInit, OnDestroy {
   }
 
   async buscarCadena(cadena: string) {
-    const payload = { 'funcion': 'IPSFA_LMilitares', 'parametros': cadena.replace(/"/g, '\\"') };
+    const payload = { 'funcion': environment.funcion.CONSULTAR_MILITARES, 'parametros': cadena.replace(/"/g, '\\"') };
     this.isLoading = true;
     this.militares = [];
 

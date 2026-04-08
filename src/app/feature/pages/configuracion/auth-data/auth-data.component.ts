@@ -105,6 +105,7 @@ export class AuthDataComponent implements OnInit {
 
             return {
               ...item,
+              cedula: item.id,
               cedula_html: `<span class="badge badge-pill bg-light text-muted border font-weight-bold shadow-none" 
                                 style="font-size: 0.68rem; letter-spacing: 0.3px; padding: 0.4em 0.8em; border-color: #cbd5e1 !important; color: #475569 !important;">
                                 V-${item.id}
@@ -172,6 +173,7 @@ export class AuthDataComponent implements OnInit {
   }
 
   onRowClicked(row: any) {
+    // console.log(row);
     this.editando = true;
     this.authForm.patchValue({
       cedula: row.cedula,

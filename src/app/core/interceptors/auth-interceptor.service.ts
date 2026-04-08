@@ -237,25 +237,25 @@ export class AuthInterceptorService implements HttpInterceptor {
     if (this.isClosingSession) return;
     this.isClosingSession = true;
 
-    Swal.fire({
-      title: 'Sesión Finalizada',
-      text: msj,
-      icon: 'error',
-      showCancelButton: false,
-      confirmButtonText: 'Entendido',
-      allowEscapeKey: false,
-      allowOutsideClick: false,
-      customClass: {
-        popup: 'pastel-swal-popup border-0 rounded-20 px-4 py-4',
-        confirmButton: 'btn btn-header-action red px-5',
-        title: 'text-dark font-weight-bold pt-2',
-      }
-    }).then((result) => {
-      this.isClosingSession = false;
-      if (result.isConfirmed) {
-        this._login.logout();
-      }
-    });
+    // Swal.fire({
+    //   title: 'Sesión Finalizada',
+    //   text: msj,
+    //   icon: 'error',
+    //   showCancelButton: false,
+    //   confirmButtonText: 'Entendido',
+    //   allowEscapeKey: false,
+    //   allowOutsideClick: false,
+    //   customClass: {
+    //     popup: 'pastel-swal-popup border-0 rounded-20 px-4 py-4',
+    //     confirmButton: 'btn btn-header-action red px-5',
+    //     title: 'text-dark font-weight-bold pt-2',
+    //   }
+    // }).then((result) => {
+    //   this.isClosingSession = false;
+    //   if (result.isConfirmed) {
+    this._login.logout();
+    //   }
+    // });
   }
 
 
