@@ -1,0 +1,314 @@
+<!-- =============================================================================
+  COMPONENTE: PATRIA - Nómina Patria
+  Patrón basado en LotesComponent
+  ============================================================================= -->
+
+<div class="row">
+    <div class="col-xl-12" style="margin: 0px;">
+
+        <!-- ================================================================= -->
+        <!-- VISTA: BUZÓN / LISTADO -->
+        <!-- ================================================================= -->
+        <ng-container *ngIf="!isNewCalculationView">
+
+            <!-- Toolbar de Búsqueda y Herramientas -->
+            <div class="bg-white py-3 px-4 d-flex justify-content-between align-items-center flex-wrap"
+                style="border-bottom: 1px solid #f1f5f9;">
+
+                <div class="d-flex align-items-center mb-2 mb-md-0" style="margin-left: 16px;">
+                    <!-- Botones de Acción -->
+                    <div class="border-left pl-3 ml-3 d-flex align-items-center">
+                        <button class="btn btn-sm btn-pastel-icon-circle bg-light text-muted shadow-sm mr-2 tooltip-action border"
+                            ngbTooltip="Actualizar Bandeja" (click)="buscar()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button (click)="toggleView()"
+                            class="btn btn-sm btn-pastel-icon-circle pastel-primary shadow-sm tooltip-action"
+                            ngbTooltip="Generar Nómina Patria">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filtros (Estilo Lotes) -->
+                <div class="modern-form-group mb-0 w-auto">
+                    <div class="input-group input-group-sm shadow-sm bg-white"
+                        style="border-radius: 8px; border: 1px solid #e2e8f0; position: relative;">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-transparent border-0 text-muted px-3"
+                                style="background-color: #f8fafc !important;">
+                                <i class="fas fa-filter"></i>
+                            </span>
+                        </div>
+                        <input type="text" class="form-control border-0 shadow-none bg-transparent pl-1"
+                            placeholder="Buscar registros..." style="min-width: 300px; font-size: 0.85rem;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros Rápidos (Debajo del toolbar) -->
+            <div class="bg-white px-4 py-3" style="border-bottom: 1px solid #f1f5f9;">
+                <div class="row g-3 align-items-end">
+                    <!-- Fecha Desde -->
+                    <div class="col-md-2">
+                        <div class="modern-form-group mb-0">
+                            <label class="small font-weight-600 text-muted">Desde</label>
+                            <app-pastel-datepicker iconClass="fas fa-calendar-alt" [(ngModel)]="fechaDesde"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <!-- Fecha Hasta -->
+                    <div class="col-md-2">
+                        <div class="modern-form-group mb-0">
+                            <label class="small font-weight-600 text-muted">Hasta</label>
+                            <app-pastel-datepicker iconClass="fas fa-calendar-check" [(ngModel)]="fechaHasta"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <!-- Componente -->
+                    <div class="col-md-3">
+                        <div class="modern-form-group mb-0">
+                            <label class="small font-weight-600 text-muted">Componente</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                                </div>
+                                <select class="form-control form-control-sm" [(ngModel)]="componenteSeleccionado">
+                                    <option value="">TODOS LOS COMPONENTES</option>
+                                    <option value="EJ">EJÉRCITO BOLIVARIANO</option>
+                                    <option value="AR">ARMADA BOLIVARIANA</option>
+                                    <option value="AV">AVIACIÓN MILITAR BOLIVARIANA</option>
+                                    <option value="GN">GUARDIA NACIONAL BOLIVARIANA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Botón Buscar -->
+                    <div class="col-md-2">
+                        <button class="btn btn-verde-titulos btn-sm px-4" (click)="buscar()">
+                            <i class="fas fa-search mr-1"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listado de Registros -->
+            <div class="card-body p-0 d-flex flex-column" style="margin-top: 10px;">
+                <div class="px-4 pb-3">
+                    <app-dynamic-table 
+                        [config]="tableConfig" 
+                        [data]="registrosData"
+                        (actionClick)="onAction($event)">
+                    </app-dynamic-table>
+                </div>
+
+                <!-- Estado Vacío -->
+                <div class="empty-state text-center py-5 my-5" *ngIf="registrosData.length === 0 && !isLoading">
+                    <div class="empty-icon shadow-sm mx-auto mb-4 d-flex align-items-center justify-content-center"
+                        style="width: 90px; height: 90px; background-color: #f8fafc; border-radius: 50%; border: 1px dashed #cbd5e1;">
+                        <i class="fas fa-file-invoice-dollar text-muted opacity-50" style="font-size: 2.8rem;"></i>
+                    </div>
+                    <h4 class="font-weight-bold text-dark mb-2">Sin Registros</h4>
+                    <p class="text-muted font-weight-500">No hay finiquitos para el período seleccionado.</p>
+                </div>
+
+                <!-- Loading -->
+                <div class="text-center py-5" *ngIf="isLoading">
+                    <div class="spinner-border text-Verde" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Buscando registros...</p>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- ================================================================= -->
+        <!-- VISTA: FORMULARIO GENERAR NÓMINA (Patrón Lotes) -->
+        <!-- ================================================================= -->
+        <ng-container *ngIf="isNewCalculationView">
+            <div class="card-body p-4 fade-in">
+
+                <!-- Cabecera -->
+                <div class="d-flex justify-content-between align-items-center mb-5 pb-4 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <h4 class="font-weight-bold text-dark mb-0" style="letter-spacing: -0.5px;">
+                                <i class="fas fa-file-invoice-dollar text-verde-titulos mr-2"></i>
+                                Generar Nómina Patria
+                            </h4>
+                            <p class="text-muted mb-0 font-weight-500" style="font-size: 0.9rem;">
+                                Configuración del proceso de exportación para Sistema Patria
+                            </p>
+                        </div>
+                    </div>
+                    <div class="badge badge-verde-pastel px-3 py-2"
+                        style="font-size: 0.75rem; font-weight: 700; border-radius: 30px;">
+                        <i class="fas fa-microchip mr-2"></i> PATRIA KERNEL v1.0
+                    </div>
+                </div>
+
+                <!-- Formulario de Generación -->
+                <div class="row px-1 mb-12">
+                    <!-- Fecha Desde -->
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Fecha Desde</label>
+                            <app-pastel-datepicker iconClass="fas fa-calendar-alt" [(ngModel)]="fechaDesde"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <!-- Fecha Hasta -->
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Fecha Hasta</label>
+                            <app-pastel-datepicker iconClass="fas fa-calendar-check" [(ngModel)]="fechaHasta"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <!-- Componente -->
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Componente</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                                </div>
+                                <select class="form-control" [(ngModel)]="componenteSeleccionado">
+                                    <option value="">TODOS LOS COMPONENTES</option>
+                                    <option value="EJ">EJÉRCITO BOLIVARIANO</option>
+                                    <option value="AR">ARMADA BOLIVARIANA</option>
+                                    <option value="AV">AVIACIÓN MILITAR BOLIVARIANA</option>
+                                    <option value="GN">GUARDIA NACIONAL BOLIVARIANA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opciones de Generación -->
+                <div class="row px-1 mb-12">
+                    <div class="col-md-12">
+                        <div class="modern-form-group">
+                            <label>Tipo de Archivo</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-file-export"></i></span>
+                                </div>
+                                <select class="form-control" [(ngModel)]="tipoArchivo">
+                                    <option value="zst">Comprimido (ZSTD) - Recomendado</option>
+                                    <option value="txt">Texto Plano (TXT)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal de Vista Previa -->
+                <div class="mb-4 terminal-container-stable">
+                    <div class="rust-editor-wrapper">
+                        <div class="editor-header w-100 px-3 py-2 d-flex justify-content-between align-items-center font-monospace"
+                            style="font-size: 0.8rem;">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-terminal mr-2"></i>
+                                <span>preview/patria_output.txt</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-white text-muted border mr-3"
+                                    style="font-size: 0.65rem; border-radius: 10px;">VISTA PREVIA</span>
+                            </div>
+                        </div>
+                        <textarea class="form-control editor-body font-monospace p-4 mb-12" 
+                            [value]="previewContent"
+                            readonly 
+                            style="resize: none; border: none; font-size: 0.75rem; height: 200px; color: #10b981;">
+                        </textarea>
+                    </div>
+                </div>
+
+                <!-- Espacio de Acciones -->
+                <div class="d-flex justify-content-end align-items-center mt-4 pt-4">
+                    <button type="button" class="btn btn-header-action amber mr-3 shadow-none" (click)="toggleView()">
+                        <i class="fas fa-times"></i> CANCELAR
+                    </button>
+                    <button type="button" class="btn btn-header-action teal shadow-none"
+                        (click)="openConfirmarModal()" [disabled]="isLoading">
+                        <i class="fas fa-file-export"></i> GENERAR NÓMINA
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+
+    </div>
+</div>
+
+<!-- =============================================================================
+  MODALES
+  ============================================================================= -->
+
+<!-- Modal: Confirmar Generación -->
+<ng-template #modalConfirmar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center"
+                    style="width: 80px; height: 80px; background-color: #f0fdf4; border-radius: 50%; color: #16a34a;">
+                    <i class="fas fa-file-signature" style="font-size: 2.5rem;"></i>
+                </div>
+            </div>
+            <h3 class="font-weight-bold text-dark mb-3">¿Generar Nómina Patria?</h3>
+            <p class="text-muted mb-4 px-3" style="font-size: 1rem;">
+                Se generará el archivo de nómina para cargar en el Sistema Patria con los parámetros seleccionados.
+            </p>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-light px-4 py-2 mr-3 font-weight-bold"
+                    (click)="modal.dismiss('Cancel')" style="border-radius: 12px; min-width: 140px;">Cancelar</button>
+                <button type="button" class="btn btn-header-action teal px-4 py-2 font-weight-bold shadow-none"
+                    (click)="generarNomina(); modal.close()" style="border-radius: 12px; min-width: 140px;">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Ver Detalle -->
+<ng-template #modalVer let-modal>
+    <div class="modal-header bg-Verde text-white">
+        <h5 class="modal-title">
+            <i class="fas fa-eye mr-2"></i>Detalle del Registro
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()"></button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedRegistro">
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-borderless table-sm">
+                    <tr> <th class="text-muted w-50">Cédula:</th> <td>{{ selectedRegistro.cedula }}</td> </tr>
+                    <tr> <th class="text-muted">Apellidos/Nombres:</th> <td>{{ selectedRegistro.apellidos }}</td> </tr>
+                    <tr> <th class="text-muted">Cuenta:</th> <td>{{ selectedRegistro.numero_cuenta }}</td> </tr>
+                    <tr> <th class="text-muted">Monto:</th> <td class="font-weight-bold text-success">{{ selectedRegistro.monto | number:'1.2-2' }} Bs</td> </tr>
+                    <tr> <th class="text-muted">Fecha Contable:</th> <td>{{ selectedRegistro.f_contable }}</td> </tr>
+                    <tr> <th class="text-muted">Estatus:</th> <td><span class="badge badge-info">{{ selectedRegistro.status_id }}</span></td> </tr>
+                </table>
+            </div>
+            <div class="col-md-6 border-left">
+                <table class="table table-borderless table-sm">
+                    <tr> <th class="text-muted w-50">T. Servicio:</th> <td>{{ selectedRegistro.tiempo_servicio }}</td> </tr>
+                    <tr> <th class="text-muted">Componente:</th> <td>{{ selectedRegistro.componente_id }}</td> </tr>
+                    <tr> <th class="text-muted">Grado/Jerarquía:</th> <td>{{ selectedRegistro.grado_id }}</td> </tr>
+                    <tr> <th class="text-muted">Reconocido (A/M/D):</th> <td>{{ selectedRegistro.anio_reconocido }}/{{ selectedRegistro.mes_reconocido }}/{{ selectedRegistro.dia_reconocido }}</td> </tr>
+                    <tr> <th class="text-muted">Tipo Movimiento:</th> <td>{{ selectedRegistro.tipo_movimiento_id }}</td> </tr>
+                    <tr> <th class="text-muted">Partida:</th> <td>{{ selectedRegistro.partida_id }}</td> </tr>
+                </table>
+            </div>
+        </div>
+        <div class="mt-3 p-3 bg-light rounded" *ngIf="selectedRegistro.observaciones">
+            <label class="small font-weight-bold text-muted mb-1 d-block text-uppercase">Observaciones</label>
+            <p class="mb-0 text-dark small">{{ selectedRegistro.observaciones }}</p>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">
+            Cerrar
+        </button>
+        <button type="button" class="btn btn-verde" (click)="descargar(selectedRegistro); modal.close()">
+            <i class="fas fa-download mr-1"></i> Descargar
+        </button>
+    </div>
+</ng-template>

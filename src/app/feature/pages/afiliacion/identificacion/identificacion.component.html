@@ -13,6 +13,9 @@
                                 <div class="antiguedad-badge shadow-sm mr-2" *ngIf="tiempoServicio">
                                     <i class="fas fa-history"></i> Antigüedad: <span>{{ tiempoServicio }}</span>
                                 </div>
+                                <div class="antiguedad-badge shadow-sm mr-2" *ngIf="tiempoServicioTotal" style="background-color: rgba(89, 140, 137, 0.15); border: 1px solid rgba(89, 140, 137, 0.3);">
+                                    <i class="fas fa-briefcase"></i> Años de Servicio: <span>{{ tiempoServicioTotal }}</span>
+                                </div>
                                 <!-- Vencimiento del Carnet (TIM) -->
                                 <div class="antiguedad-badge shadow-sm mr-2 tim-expiration-badge" *ngIf="fechaVencimientoTIM">
                                     <i class="fas fa-id-card"></i> Vencimiento: <span class="text-danger">{{ fechaVencimientoTIM | date:'dd/MM/yyyy' }}</span>
@@ -39,6 +42,10 @@
                                         </a>
                                         <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('hoja_vida', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
                                             <i class="fas fa-address-card mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Hoja de Vida
+                                        </a>
+                                        <div class="dropdown-divider mb-1" style="border-top-color: rgba(89, 140, 137, 0.1);"></div>
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('historial_movimientos', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-history mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Historial de Movimientos
                                         </a>
                                     </div>
                                 </div>

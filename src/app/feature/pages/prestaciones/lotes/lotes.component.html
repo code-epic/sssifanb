@@ -131,7 +131,65 @@
                                 <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
+                            <div class="modern-form-group">
+                                <label>Componente</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i
+                                                class="fas fa-shield-alt"></i></span></div>
+                                    <select class="form-control" [(ngModel)]="selectComponente">
+                                        <option value="99">TODOS LOS COMPONENTES</option>
+                                        <option value="1">EJÉRCITO BOLIVARIANO</option>
+                                        <option value="2">ARMADA BOLIVARIANA</option>
+                                        <option value="3">AVIACIÓN MILITAR BOLIVARIANA</option>
+                                        <option value="4">GUARDIA NACIONAL BOLIVARIANA</option>
+                                        <option value="5">MILICIA BOLIVARIANA</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="modern-form-group">
+                                <label>Grado</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i
+                                                class="fas fa-medal"></i></span></div>
+                                    <select class="form-control" [(ngModel)]="selectGrado">
+                                        <option value="99">TODOS LOS GRADOS</option>
+                                        <option value="1">GENERAL EN JEFE</option>
+                                        <option value="2">GENERAL DE DIVISIÓN</option>
+                                        <option value="3">GENERAL DE BRIGADA</option>
+                                        <option value="4">CORONEL</option>
+                                        <option value="5">TENIENTE CORONEL</option>
+                                        <option value="6">MAYOR</option>
+                                        <option value="7">CAPITÁN</option>
+                                        <option value="8">PRIMER TENIENTE</option>
+                                        <option value="9">TENIENTE</option>
+                                        <option value="10">SARGENTO MAYOR DE PRIMERA</option>
+                                        <option value="11">SARGENTO MAYOR DE SEGUNDA</option>
+                                        <option value="12">SARGENTO MAYOR DE TERCERA</option>
+                                        <option value="13">SARGENTO PRIMERO</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="modern-form-group">
+                                <label>Situación Militar</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i
+                                                class="fas fa-user-clock"></i></span></div>
+                                    <select class="form-control" [(ngModel)]="selectSituacion">
+                                        <option value="201">Personal Activo</option>
+                                        <option value="203">Finiquito de Prestaciones</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row px-1 mb-12">
+                        <div class="col-md-12">
                             <div class="modern-form-group">
                                 <label>Directiva de Sueldos (Origen)</label>
                                 <div class="input-group">
@@ -141,19 +199,6 @@
                                         <option value="0">--- SELECCIONE DIRECTIVA VIGENTE ---</option>
                                         <option value="1">DIR-2023 - Incremento Presidencial</option>
                                         <option value="2">DIR-2022 - Ajuste Ordinario</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="modern-form-group">
-                                <label>Situación Militar</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i
-                                                class="fas fa-user-clock"></i></span></div>
-                                    <select class="form-control" [(ngModel)]="selectSituacion">
-                                        <option value="201">Personal Activo</option>
-                                        <option value="203">Finiquito de Prestaciones</option>
                                     </select>
                                 </div>
                             </div>

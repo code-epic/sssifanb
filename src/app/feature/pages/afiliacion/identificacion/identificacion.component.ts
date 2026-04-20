@@ -96,6 +96,11 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
                 // Calcular Tiempo de Servicio
                 this.tiempoServicio = this.calcularTServicio(parsedData.fingreso, parsedData.fretiro, parsedData.situacion);
+                // Calcular Tiempo Total solo si hay tiempo reconocido
+                const tieneReconocido = parsedData.areconocido > 0 || parsedData.mreconocido > 0 || parsedData.dreconocido > 0;
+                this.tiempoServicioTotal = tieneReconocido 
+                    ? this.calcularTServicioTotal(parsedData.fingreso, parsedData.areconocido, parsedData.mreconocido, parsedData.dreconocido)
+                    : '';
 
                 // Mapear Vencimiento TIM
                 this.fechaVencimientoTIM = this.formatDate(afiliadoData.tim?.fechavencimiento);
@@ -190,6 +195,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     }
 
     public tiempoServicio: string = '';
+    public tiempoServicioTotal: string = '';
 
     private calcularTServicio(fechaIngresoIso: string, fechaRetiroIso: string, situacion: string): string {
         if (!fechaIngresoIso) return '';
@@ -229,6 +235,29 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         }
 
         return `${ano}A ${mes}M ${dia}D`;
+    }
+
+    private calcularTServicioTotal(fechaIngresoIso: string, areconocido: number, mreconocido: number, dreconocido: number): string {
+        const basic = this.calcularTServicio(fechaIngresoIso, '', 'ACT');
+        if (!basic || !areconocido) return basic;
+
+        const parts = basic.match(/(\d+)A\s*(\d+)M\s*(\d+)D/);
+        if (!parts) return basic;
+
+        let anos = parseInt(parts[1], 10) + areconocido;
+        let meses = parseInt(parts[2], 10) + mreconocido;
+        let dias = parseInt(parts[3], 10) + dreconocido;
+
+        if (dias >= 30) {
+            dias = dias - 30;
+            meses++;
+        }
+        if (meses >= 12) {
+            meses = meses - 12;
+            anos++;
+        }
+
+        return `${anos}A ${meses}M ${dias}D`;
     }
 
     private parseData(data: any): any {
@@ -493,6 +522,18 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     imprimirDocumento(tipo: string, event: Event) {
         event.preventDefault();
         console.log('Generar documento:', tipo);
+        
+        const cedula = this.identificacionForm?.get('persona.datobasico.cedula')?.value;
+        
+        if (tipo === 'historial_movimientos') {
+            // Abrir historial de movimientos en nueva pestaña
+            if (cedula) {
+                const url = `https://app.ipsfa.gob.ve/sssifanb/reportes/movimientos/${cedula}`;
+                window.open(url, '_blank');
+            }
+            return;
+        }
+        
         // TODO: Implementar lógica de generación y apertura en nueva pestaña
     }
 

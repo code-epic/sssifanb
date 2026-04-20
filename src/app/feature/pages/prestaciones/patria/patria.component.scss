@@ -1,0 +1,102 @@
+/* =============================================================================
+  COMPONENTE: PATRIA - Estilos
+  ============================================================================= */
+
+:host {
+    display: block;
+}
+
+// Variables locales
+$color-verde: #598c89;
+$color-verde-soft: rgba(89, 140, 137, 0.1);
+$color-verde-light: rgba(89, 140, 137, 0.15);
+
+.btn-Verde {
+    background-color: $color-verde !important;
+    border-color: $color-verde !important;
+    color: white !important;
+    
+    &:hover {
+        background-color: darken($color-verde, 10%) !important;
+    }
+}
+
+.btn-verde-titulos {
+    @extend .btn-Verde;
+}
+
+.btn-verde-soft {
+    background-color: $color-verde-soft !important;
+    border: 1px solid rgba(89, 140, 137, 0.3) !important;
+    color: $color-verde !important;
+    
+    &:hover {
+        background-color: $color-verde-light !important;
+    }
+}
+
+.bg-Verde {
+    background-color: $color-verde !important;
+    color: white !important;
+}
+
+.spinner-border.text-Verde {
+    border-color: $color-verde !important;
+}
+
+// Card styles
+.card {
+    border-radius: 12px;
+    
+    .card-body {
+        border-radius: 12px;
+    }
+}
+
+// Table styles
+.mailbox-table {
+    th {
+        background-color: $color-verde-soft;
+        color: darken($color-verde, 10%);
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    tr:hover {
+        background-color: rgba(89, 140, 137, 0.05);
+    }
+}
+
+// Modal overrides
+.modal-header {
+    border-radius: 12px 12px 0 0;
+    
+    .modal-title {
+        font-weight: 600;
+    }
+}
+
+.modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+// Form controls
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    
+    &:focus {
+        border-color: $color-verde;
+        box-shadow: 0 0 0 3px rgba(89, 140, 137, 0.1);
+    }
+}
+
+// Alert override
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.3);
+    color: #856404;
+}

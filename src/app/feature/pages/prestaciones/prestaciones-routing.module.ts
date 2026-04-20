@@ -7,6 +7,7 @@ import { MovimientosComponent } from './movimientos/movimientos.component';
 import { OrdenesPagoComponent } from './ordenes-pago/ordenes-pago.component';
 import { LotesComponent } from './lotes/lotes.component';
 import { ReportesComponent } from './reportes/reportes.component';
+import { PatriaComponent } from './patria/patria.component';
 
 const routes: Routes = [
     { path: 'anticipos', component: AnticiposComponent },
@@ -16,6 +17,7 @@ const routes: Routes = [
     { path: 'ordenes-pago', component: OrdenesPagoComponent },
     { path: 'lotes', component: LotesComponent },
     { path: 'reportes', component: ReportesComponent },
+    { path: 'patria', component: PatriaComponent },
     { path: '', redirectTo: 'anticipos', pathMatch: 'full' }
 ];
 
