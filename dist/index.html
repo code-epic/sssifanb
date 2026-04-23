@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <base href="/v2/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Sistemas Tecnologicos Code Epic">
+  <meta name="author" content="Code Epic Technologies">
+  <title>Sistema de Seguridad Social</title>
+  <link href="./assets/img/brand/favicon0.png" rel="icon" type="image/png">
+  <style>
+    /* Premium Global Loader - Vital/Matte Green Theme */
+    #global-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(245, 250, 253, 0.94); /* Más opaco */
+      backdrop-filter: blur(25px); /* Desenfoque más profundo */
+      -webkit-backdrop-filter: blur(25px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      color: #263238; /* $matte-dark */
+      font-family: 'Nunito', sans-serif;
+      transition: opacity 0.4s ease;
+    }
+
+    .loader-content {
+      text-align: center;
+      animation: fadeIn 0.8s ease-out;
+      background: white;
+      padding: 3rem;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(138, 175, 120, 0.15);
+      border: 1px solid rgba(138, 175, 120, 0.2);
+    }
+
+    .spinner-box {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 25px;
+    }
+
+    .circle-outer {
+      width: 100%;
+      height: 100%;
+      border: 4px solid rgba(138, 175, 120, 0.1); /* $matte-seafoam alpha */
+      border-top: 4px solid #8aaf78; /* $matte-seafoam */
+      border-radius: 50%;
+      animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    .circle-inner {
+      position: absolute;
+      top: 20%;
+      left: 20%;
+      width: 60%;
+      height: 60%;
+      border: 4px solid rgba(104, 147, 180, 0.1); /* $matte-ocean alpha */
+      border-bottom: 4px solid #6893b4; /* $matte-ocean */
+      border-radius: 50%;
+      animation: spin-reverse 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    }
+
+    .loader-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      color: #598c89; /* Teal accent from system */
+    }
+
+    .loader-subtitle {
+      font-size: 0.85rem;
+      color: #78909c;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes spin-reverse {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(-360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+
+<link rel="stylesheet" href="styles.d713787ad8ce7093.css"></head>
+
+<body class="mat-typography">
+  <!-- Ventana de Carga Global -->
+  <div id="global-loader">
+    <div class="loader-content">
+      <div class="spinner-box">
+        <div class="circle-outer"></div>
+        <div class="circle-inner"></div>
+      </div>
+      <div class="loader-title">Sincronizando</div>
+      <div class="loader-subtitle">Estableciendo conexión segura...</div>
+    </div>
+  </div>
+
+  <app-root></app-root>
+<script src="runtime.0a0dab0c6ed6bc4b.js" type="module"></script><script src="polyfills.db67a2e59a68277f.js" type="module"></script><script src="scripts.ad3394f915d931af.js" defer></script><script src="main.cbc66cb2fd76d33c.js" type="module"></script></body>
+<script>
+
+  (function () {
+    // Configuración
+    const APP_ID = 'sandra.app.ipsfa';
+    const originalError = console.error;
+    const originalFetch = window.fetch;
+    const OriginalXHR = window.XMLHttpRequest;
+
+    window.addEventListener('message', (event) => {
+      if (event.data.type === 'NETWORK_CONTEXT') {
+        sessionStorage.setItem('net_info', JSON.stringify(event.data.payload));
+      }
+      if (event.data.type === 'SET_SESSION') {
+        const currentToken = sessionStorage.getItem('token');
+        const tokenFailed = sessionStorage.getItem('token_failed');
+        
+        // Solo recargamos si el token es nuevo y no está marcado como fallido
+        if (currentToken !== event.data.token && tokenFailed !== event.data.token) {
+          const loader = document.getElementById('global-loader');
+          if (loader) loader.style.display = 'flex';
+
+          setTimeout(() => {
+            sessionStorage.setItem('token', event.data.token);
+            window.location.reload();
+          }, 2800); // 2.8s para dar tiempo a la percepción de seguridad
+        }
+      }
+
+    });
+
+    // Referencias originales
+    const original = {
+      log: console.log,
+      error: console.error,
+      fetch: window.fetch,
+      xhr: window.XMLHttpRequest
+    };
+
+    // Helper para comunicación con padre
+    const sendToParent = (type, message, details = null) => {
+      if (!window.parent) return;
+      window.parent.postMessage({
+        type: 'SDC_LOG',
+        app_id: APP_ID,
+        source: 'external-proxy',
+        payload: {
+          app_id: APP_ID,
+          source: 'external-proxy',
+          log_type: type,
+          message,
+          details
+        }
+      }, '*');
+    };
+    // Helper para truncar texto
+    const truncate = (str) => {
+      if (!str) return '[No Body]';
+      return str.length > MAX_BODY_LENGTH ? str.substring(0, MAX_BODY_LENGTH) + '... (truncated)' : str;
+    };
+
+    // 1. Interceptar Console Error
+    console.error = (...args) => {
+      original.error.apply(console, args);
+      const msg = args.map(a => (a instanceof Error ? `${a.message}\n${a.stack}` : a)).join(' ');
+      sendToParent('ERROR', msg);
+    };
+
+    console.log = (...args) => {
+      original.log.apply(console, args);
+      const msg = args.map(a => {
+        if (a instanceof Error) return `${a.message}\\n${a.stack}`;
+        if (typeof a === 'object' && a !== null) return JSON.stringify(a, null, 2); // <- ¡Esta lógica serializa los objetos!
+        return a;
+      }).join(' ');
+
+      sendToParent('LOG', msg);
+    };
+
+
+    window.fetch = async function (...args) {
+      const [resource, config] = args;
+      const url = resource.toString();
+      const method = (config && config.method) ? config.method : 'GET';
+      const requestBody = (config && config.body) ? config.body : null;
+
+      try {
+        const response = await originalFetch(...args);
+
+        if (response.status >= 400) {
+          let responseBody = '[No Body]';
+          try {
+            responseBody = await response.clone().text();
+            if (responseBody.length > 5000) responseBody = responseBody.substring(0, 5000) + '... (truncated)';
+          } catch (e) { }
+
+          const msg = `HTTP Error ${response.status} ${method} ${url}`;
+
+          sendToParent('FETCH', msg, {
+            url: response.url || url,
+            method: method,
+            status: response.status,
+            request_headers: (config && config.headers) ? config.headers : {},
+            request_payload: requestBody,
+            response_body: responseBody,
+            source: 'external-app'
+          });
+        }
+
+        return response;
+      } catch (err) {
+        sendToParent('ERROR', `Fetch Exception: ${url} - ${err.message}`, {
+          url: url,
+          error: err.message
+        });
+        throw err;
+      }
+    };
+
+    window.XMLHttpRequest = function () {
+      const xhr = new OriginalXHR();
+      let method = 'GET';
+      let url = '';
+      let requestBody = null;
+      const requestHeaders = {};
+
+      const originalOpen = xhr.open;
+      xhr.open = function (m, u, ...args) {
+        method = m;
+        url = u;
+        return originalOpen.apply(xhr, [m, u, ...args]);
+      };
+
+      const originalSetRequestHeader = xhr.setRequestHeader;
+      xhr.setRequestHeader = function (header, value) {
+        requestHeaders[header] = value;
+        return originalSetRequestHeader.apply(xhr, [header, value]);
+      };
+
+      const originalSend = xhr.send;
+      xhr.send = function (body) {
+        requestBody = body;
+        return originalSend.apply(xhr, [body]);
+      };
+
+      xhr.addEventListener('loadend', function () {
+        if (xhr.status >= 400) {
+          let responseBody = xhr.responseText || '[No Body]';
+          if (responseBody.length > 5000) responseBody = responseBody.substring(0, 5000) + '... (truncated)';
+
+          const msg = `XHR Error ${xhr.status} ${method} ${url}`;
+
+          sendToParent('FETCH', msg, {
+            url: xhr.responseURL || url,
+            method: method,
+            status: xhr.status,
+            request_headers: requestHeaders,
+            request_payload: requestBody,
+            response_body: responseBody,
+            source: 'external-app'
+          });
+        }
+      });
+
+      xhr.addEventListener('error', function () {
+        sendToParent('ERROR', `XHR Network Exception: ${method} ${url}`, { url: url, method: method });
+      });
+
+      return xhr;
+    };
+
+    Object.assign(window.XMLHttpRequest, OriginalXHR);
+
+  })();
+
+
+
+</script>
+
+</html>
