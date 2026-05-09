@@ -11,6 +11,7 @@ import { OrdenesPagoComponent } from './ordenes-pago/ordenes-pago.component';
 import { LotesComponent } from './lotes/lotes.component';
 import { ReportesComponent } from './reportes/reportes.component';
 import { PatriaComponent } from './patria/patria.component';
+import { FideicomitentesComponent } from './movimientos/fideicomitentes/fideicomitentes.component';
 
 import { NgbDropdownModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-datepicker/pastel-datepicker.component';
@@ -26,7 +27,8 @@ import { MailboxLayoutComponent } from 'src/app/shared/components/mailbox-layout
         OrdenesPagoComponent,
         LotesComponent,
         ReportesComponent,
-        PatriaComponent
+        PatriaComponent,
+        FideicomitentesComponent
     ],
     imports: [
         CommonModule,
