@@ -1,0 +1,342 @@
+<!-- MAIN VIEW: MAILBOX LAYOUT -->
+<app-mailbox-layout #mailboxLayout *ngIf="!isNewView" [tabs]="workflowTabs" [currentTabId]="currentTabId"
+    [isLoadingTabs]="isLoadingData" [showToolbar]="true" [allSelected]="allSelected"
+    [searchPlaceholder]="'Buscar por ID o nómina...'" (search)="onMailboxSearch($event)"
+    (tabSwitch)="onMailboxTabSwitch($event)" (refresh)="onMailboxRefresh()" (selectAll)="onMailboxSelectAll($event)">
+
+    <ng-container toolbar-actions>
+        <button class="btn btn-pastel-icon-circle mr-2 fade-in tooltip-action btn-nuevo-pastel"
+            (click)="nuevoFideicomitente()" ngbTooltip="Nuevo Fideicomitente">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="btn btn-pastel-icon-circle fade-in tooltip-action btn-csv-emerald"
+            (click)="mostrarConfirmacionCSV()" ngbTooltip="Exportar CSV">
+            <i class="fas fa-file-excel"></i>
+        </button>
+    </ng-container>
+
+    <!-- FILTROS INYECTADOS -->
+    <ng-container mailbox-filters>
+        <div class="modern-form-group">
+            <label>Rango de Registro</label>
+            <div class="row align-items-center">
+                <div class="col-6 pr-2">
+                    <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                </div>
+                <div class="col-6 pl-2">
+                    <app-pastel-datepicker iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                </div>
+            </div>
+        </div>
+
+        <div class="modern-form-group mb-1">
+            <label>Componente Militar</label>
+            <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text"><i
+                            class="fas fa-shield-alt text-verde-titulos"></i></span></div>
+                <select class="form-control" style="font-size: 0.85rem;">
+                    <option value="" selected>Todos los Componentes...</option>
+                    <option value="ejb">Ejército Bolivariano</option>
+                    <option value="arb">Armada Bolivariana</option>
+                    <option value="amb">Aviación Militar</option>
+                    <option value="gnb">Guardia Nacional</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-end mt-4 pt-2" style="border-top: 1px solid #f1f5f9;">
+            <button class="btn btn-light shadow-sm font-weight-bold px-4 mr-2"
+                style="border-radius: 8px; font-size: 0.85rem; padding: 0.5rem; color: #64748b;"
+                (click)="mailboxLayout.filterDropdown.close()">
+                Cancelar
+            </button>
+            <button class="btn font-weight-bold shadow-sm transition-all px-4"
+                style="background-color: #598c89; color: white; border-radius: 8px; font-size: 0.85rem; padding: 0.5rem;"
+                (click)="mailboxLayout.filterDropdown.close()">Aplicar Filtros
+            </button>
+        </div>
+    </ng-container>
+
+    <!-- BODY MAILBOX -->
+    <ng-container mailbox-body>
+        <app-dynamic-table [config]="pendingTableConfig" [data]="pendingTableData"
+            (actionClicked)="onPendingTableAction($event)">
+        </app-dynamic-table>
+    </ng-container>
+</app-mailbox-layout>
+
+<!-- MODAL: CSV -->
+<ng-template #modalCSV let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse"
+                style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Exportar a CSV?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Desea generar y descargar el listado de Fideicomitentes en formato CSV?
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action shadow-none w-100"
+                    style="background-color: #f1fdf6; color: #10b981; border: 1px solid #d1fae5;"
+                    (click)="confirmarCSV()">
+                    Generar CSV
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- MODAL: APROBAR -->
+<ng-template #modalAprobar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse teal">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Aprobar Registro?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Está seguro que desea aprobar el registro <strong>{{ selectedItem?.id }}</strong>? Esta acción es
+                irreversible.
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action teal shadow-none w-100" (click)="confirmarAprobacion()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- MODAL: RECHAZAR -->
+<ng-template #modalRechazar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse red">
+                <i class="fas fa-times"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Rechazar Registro?</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Se dispone a rechazar el registro <strong>{{ selectedItem?.id }}</strong>.
+            </p>
+
+            <div class="modern-form-group mb-4 text-left">
+                <label class="text-danger font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">MOTIVO DE
+                    RECHAZO *</label>
+                <textarea class="form-control border shadow-none" rows="2" placeholder="Escriba el motivo..."
+                    style="border-radius: 12px; border-color: #e2e8f0 !important; border-width: 2px !important; resize: none; font-size: 0.95rem; padding: 1rem; color: #475569;"
+                    required></textarea>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action red shadow-none w-100" (click)="confirmarRechazo()">
+                    Rechazar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- MODAL: CARGAR FIDEICOMITENTES (WIZARD) -->
+<ng-template #modalNuevo let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background: #ffffff;">
+
+        <!-- Header Minimalista -->
+        <div class="modal-header-minimal d-flex align-items-center justify-content-between p-4"
+            style="border-bottom: 1px solid rgba(89, 140, 137, 0.08);">
+            <div class="d-flex align-items-center">
+                <div class="icon-circle mr-3 bg-light-teal"
+                    style="width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: rgba(89, 140, 137, 0.1);">
+                    <i class="fas fa-piggy-bank text-primary-teal" style="font-size: 1.25rem; color: #598c89;"></i>
+                </div>
+                <div class="modal-title-box">
+                    <h5 class="m-0 font-weight-bold" style="color: #1e293b;">Cargar Fideicomitentes</h5>
+                    <small class="text-muted text-uppercase font-weight-bold"
+                        style="letter-spacing: 0.5px; font-size: 0.7rem;">Procesamiento de Archivos Lote</small>
+                </div>
+            </div>
+            <button type="button" class="close" (click)="modal.dismiss()"
+                style="opacity: 0.3; transition: opacity 0.2s; outline: none; border: none; background: transparent;">
+                <i class="fas fa-times" style="font-size: 1.2rem;"></i>
+            </button>
+        </div>
+
+        <div class="modal-body p-0">
+            <!-- Stepper Indicators -->
+            <div class="d-flex justify-content-center align-items-center stepper-ultra-minimal py-4 border-bottom"
+                style="background: rgba(248, 250, 252, 0.5); gap: 40px;">
+                <div class="stepper-item" [class.active]="pasoActual === 1" (click)="pasoActual = 1">
+                    <span class="step-label">1. Configuración</span>
+                </div>
+                <div class="stepper-item" [class.active]="pasoActual === 2" [class.disabled]="pasoActual < 2">
+                    <span class="step-label">2. Archivos</span>
+                </div>
+                <div class="stepper-item" [class.active]="pasoActual === 3" [class.disabled]="pasoActual < 3">
+                    <span class="step-label">3. Ejecución</span>
+                </div>
+            </div>
+
+            <!-- Paso 1: Configuración -->
+            <div class="fade-in p-5" *ngIf="pasoActual === 1">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="modern-form-group">
+                            <label>Tipo de Nómina</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                            class="fas fa-list-ul"></i></span></div>
+                                <select class="form-control text-dark font-weight-600">
+                                    <option value="" selected disabled>Seleccione Nómina...</option>
+                                    <option>PERSONAL MILITAR ACTIVO</option>
+                                    <option>PERSONAL CIVIL EGRESADO</option>
+                                    <option>SOBREVIVIENTES PENSIONADOS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="modern-form-group">
+                            <label>Componente</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i
+                                            class="fas fa-shield-alt"></i></span></div>
+                                <select class="form-control text-dark font-weight-600">
+                                    <option value="" selected disabled>Seleccione...</option>
+                                    <option>EJB</option>
+                                    <option>ARB</option>
+                                    <option>AMB</option>
+                                    <option>GNB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modern-form-group">
+                            <label>Fecha de Registro</label>
+                            <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 2: Carga de Archivo -->
+            <div class="fade-in px-5 py-4" *ngIf="pasoActual === 2">
+                <div class="alert bg-light-soft border-0 mb-3 p-3"
+                    style="background: rgba(89, 140, 137, 0.05); border-radius: 12px;">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-info-circle mr-2" style="color: #598c89;"></i>
+                        <span class="font-weight-bold"
+                            style="font-size: 0.75rem; color: #598c89; text-transform: uppercase; letter-spacing: 0.5px;">Columnas
+                            Obligatorias:</span>
+                    </div>
+                    <code
+                        style="font-size: 0.8rem; color: #475569; display: block; background: white; padding: 8px; border-radius: 8px; border: 1px solid rgba(89, 140, 137, 0.1);">
+                        cedula, n_hijos, grado, fecha_ingreso, f_ult_ascenso, st_profesion
+                    </code>
+                </div>
+
+                <input type="file" #fileInput style="display: none;" (change)="onFileChange($event)" accept=".csv">
+
+                <div class="premium-uploader-minimal d-flex flex-column align-items-center justify-content-center py-4 px-5 mb-1"
+                    [class.loading]="cargandoArchivos" (click)="triggerFileSelect(fileInput)"
+                    style="border: 2px dashed rgba(89, 140, 137, 0.2); border-radius: 20px; cursor: pointer; min-height: 110px; transition: all 0.3s;">
+
+                    <ng-container *ngIf="!cargandoArchivos">
+                        <div class="icon-circle mb-2"
+                            style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(89, 140, 137, 0.08); border: 1px solid rgba(89, 140, 137, 0.2);">
+                            <i class="fas fa-file" style="font-size: 1.4rem; color: #598c89;"></i>
+                        </div>
+                        <span class="font-weight-bold text-dark mb-0" style="font-size: 0.9rem;">Seleccionar archivo
+                            CSV</span>
+                        <span class="text-muted" style="font-size: 0.7rem;">Máximo 10MB</span>
+                    </ng-container>
+
+                    <ng-container *ngIf="cargandoArchivos">
+                        <div class="spinner-border text-primary-teal mb-3" role="status"
+                            style="width: 2.5rem; height: 2.5rem; color: #598c89;"></div>
+                        <span class="font-weight-bold text-primary-teal mb-2">Validando Estructura...</span>
+
+                        <div class="w-75 mb-1">
+                            <div class="progress shadow-sm"
+                                style="height: 6px; border-radius: 10px; background-color: rgba(89, 140, 137, 0.1);">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                    [style.width.%]="progresoCarga" style="background-color: #598c89;"></div>
+                            </div>
+                        </div>
+                        <small class="text-muted font-weight-bold" style="font-size: 0.7rem;">{{ progresoCarga
+                            }}%</small>
+                    </ng-container>
+                </div>
+            </div>
+
+            <!-- Paso 3: Ejecución / Éxito -->
+            <div class="fade-in px-5 py-4 text-center" *ngIf="pasoActual === 3">
+                <div class="icon-confirm-pulse teal mb-3 mx-auto"
+                    style="width: 64px; height: 64px; font-size: 1.8rem; background: rgba(89, 140, 137, 0.1); color: #598c89; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <h5 class="font-weight-bold text-dark mb-1" style="font-size: 1.1rem;">Verificación Exitosa</h5>
+                <p class="text-muted mx-auto mb-3" style="font-size: 0.85rem; max-width: 380px;">El sistema está listo
+                    para importar los datos.
+                </p>
+
+                <!-- RESUMEN DE CARGA -->
+                <div class="summary-card bg-light-soft mb-3 p-3 text-left"
+                    style="background: rgba(248, 250, 252, 0.8); border-radius: 16px; border: 1px solid #f1f5f9;">
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2"
+                        style="border-bottom: 1px dashed #e2e8f0;">
+                        <span class="text-muted font-weight-bold"
+                            style="font-size: 0.75rem; text-transform: uppercase;">Archivo:</span>
+                        <span class="text-dark font-weight-bold" style="font-size: 0.85rem;">{{ fileToUpload?.name
+                            }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted font-weight-bold"
+                            style="font-size: 0.75rem; text-transform: uppercase;">Registros a Procesar:</span>
+                        <span class="badge badge-pill bg-white text-primary-teal border shadow-sm px-3 py-1"
+                            style="font-size: 0.95rem; font-weight: 800; color: #598c89;">
+                            {{ totalRegistros }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="alert bg-light-soft py-2 px-3 border-0 mb-0"
+                    style="background: rgba(89, 140, 137, 0.05); color: #598c89; border-radius: 12px; font-size: 0.75rem; display: inline-block;">
+                    <i class="fas fa-shield-check mr-2"></i> Estructura validada bajo la directiva vigente.
+                </div>
+            </div>
+
+            <!-- Footer con Navegación -->
+            <div class="modal-footer-minimal d-flex justify-content-between align-items-center p-3"
+                style="border-top: 1px solid rgba(0,0,0,0.04);">
+                <button type="button" class="btn btn-header-action gray shadow-none"
+                    *ngIf="pasoActual > 1 && pasoActual < 3" (click)="pasoActual = pasoActual - 1">
+                    <i class="fas fa-chevron-left mr-2"></i> Volver
+                </button>
+                <div class="ml-auto">
+                    <button type="button" class="btn btn-header-action teal shadow-none px-4" *ngIf="pasoActual === 1"
+                        (click)="pasoActual = 2">
+                        Siguiente <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                    <button type="button" class="btn btn-header-action teal shadow-none px-5" *ngIf="pasoActual === 3"
+                        (click)="procesarFinal()">
+                        <i class="fas fa-save mr-2"></i> Procesar Carga
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

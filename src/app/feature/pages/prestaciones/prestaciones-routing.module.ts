@@ -8,7 +8,7 @@ import { OrdenesPagoComponent } from './ordenes-pago/ordenes-pago.component';
 import { LotesComponent } from './lotes/lotes.component';
 import { ReportesComponent } from './reportes/reportes.component';
 import { PatriaComponent } from './patria/patria.component';
-import { FideicomitentesComponent } from './movimientos/fideicomitentes/fideicomitentes.component';
+import { FideicomitentesComponent } from './fideicomitentes/fideicomitentes.component';
 import { SimuladorComponent } from './simulador/simulador.component';
 
 const routes: Routes = [
