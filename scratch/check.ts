@@ -6,8 +6,15 @@ import { AfiliadoService } from 'src/app/core/services/afiliacion/afiliado.servi
 import { IAfiliado } from 'src/app/core/models/afiliacion/afiliado.model';
 import { MdlFamiliarComponent } from './mdl-familiar/mdl-familiar.component';
 import { LoginService } from 'src/app/core/services/login/login.service';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { ApiService } from 'src/app/core/services/api.service';
+import { environment } from 'src/environments/environment';
+import { SecurityQueueService } from 'src/app/core/services/util/security-queue.service';
+import { UtilService } from 'src/app/core/services/util/util.service';
+
 
 @Component({
     selector: 'app-afi-identificacion',
@@ -23,6 +30,10 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     public currentTab: string = 'militar';
     public moneda: string = 'Bs.';
     public fechaVencimientoTIM: string = '';
+    public isLoadingSearch: boolean = false;
+
+    @ViewChild('cedulaInput') cedulaInput: ElementRef;
+
 
     // Var to control the pastel printing dropdown menu visibility
     public showPrintDropdown: boolean = false;
@@ -56,12 +67,16 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     public cuentasBancarias: any[] = [];
 
     constructor(
-        private layoutService: LayoutService,
         private fb: FormBuilder,
         private afiliadoService: AfiliadoService,
         private cdr: ChangeDetectorRef,
         private modalService: NgbModal,
-        private loginService: LoginService
+        private loginService: LoginService,
+        private router: Router,
+        private apiService: ApiService,
+        private securityQueue: SecurityQueueService,
+        private utilservice: UtilService,
+        private layoutService: LayoutService
     ) {
         console.log(sessionStorage.getItem('menu'));
     }
@@ -81,6 +96,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             showAlertsIcon: false
         });
 
+        // Auto-focus search field
+        setTimeout(() => this.focusSearch(), 500);
 
         this.afiliadoService.afiliado$.pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
             if (data) {
@@ -517,6 +534,80 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
     switchTab(tab: string) {
         this.currentTab = tab;
+    }
+
+    onSearchEnter(event: any) {
+        if (event) event.preventDefault();
+        const value = this.identificacionForm.get('persona.datobasico.cedula')?.value;
+        if (!value || value.length < 3) return;
+
+        this.isLoadingSearch = true;
+        const isNumeric = /^\d+$/.test(value);
+        
+        if (isNumeric) {
+            this.consultarPorCedula(value);
+        } else {
+            // Redirigir al buscador global con el texto
+            sessionStorage.setItem("buscador_session", JSON.stringify({ q: value, res: [] }));
+            this.router.navigate(['/principal/buscador']);
+        }
+    }
+
+    consultarPorCedula(cedula: string) {
+        const payload = {
+            funcion: environment.funcion.CONSULTAR_IDENTIFICACION_MILITAR,
+            parametros: cedula,
+        };
+        this.apiService.post("crud", payload).subscribe({
+            next: (data: IAfiliado) => {
+                this.isLoadingSearch = false;
+                if (data) {
+                    this.afiliadoService.setAfiliado(data);
+                } else {
+                    this.utilservice.AlertMini('top-end', 'error', 'No se encontró el afiliado', 2000);
+                }
+            },
+            error: (err) => {
+                this.isLoadingSearch = false;
+                this.utilservice.AlertMini('top-end', 'error', 'Error en la consulta', 2000);
+            }
+        });
+    }
+
+    @HostListener('window:keydown', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        // Ctrl + K to focus search
+        if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+            event.preventDefault();
+            this.focusSearch();
+        }
+
+        // Alt + Left/Right for tabs
+        if (event.altKey && event.key === 'ArrowRight') {
+            this.moveTab(1);
+        }
+        if (event.altKey && event.key === 'ArrowLeft') {
+            this.moveTab(-1);
+        }
+    }
+
+    focusSearch() {
+        if (this.cedulaInput) {
+            this.cedulaInput.nativeElement.focus();
+            this.cedulaInput.nativeElement.select();
+        }
+    }
+
+    private moveTab(direction: number) {
+        const tabs = ['militar', 'sueldo', 'antiguedad', 'banco', 'direccion', 'fisico'];
+        const currentIndex = tabs.indexOf(this.currentTab);
+        let nextIndex = currentIndex + direction;
+
+        if (nextIndex >= tabs.length) nextIndex = 0;
+        if (nextIndex < 0) nextIndex = tabs.length - 1;
+
+        this.switchTab(tabs[nextIndex]);
+        this.cdr.detectChanges();
     }
 
     guardarAfiliado() {

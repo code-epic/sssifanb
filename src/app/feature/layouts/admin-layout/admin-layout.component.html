@@ -4,7 +4,7 @@
   <!-- Top navbar -->
   <app-navbar class="blur-sensitive" [class.active-blur]="isBlurActive"></app-navbar>
 
-   <div class="header bg-gradient-info pb-8 pt-5 pt-md-7 blur-sensitive" [class.active-blur]="isBlurActive">
+   <div class="header bg-gradient-info pb-8 pt-5 pt-md-7 blur-sensitive" [class.active-blur]="isBlurActive" [class.header-compact]="!showCards">
     <div class="container-fluid">
       <div class="header-body">
         <div *ngIf="showCards" [@slideFade]>
@@ -13,7 +13,7 @@
       </div>
     </div>
   </div> 
-  <div class="container-fluid mt--7">
+  <div class="container-fluid mt--7" [class.mt-compact]="!showCards">
     <div class="row">
       <div class="col-xl-12 mb-12 mb-xl-0">
         <div class="card shadow">

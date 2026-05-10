@@ -160,7 +160,7 @@ export class AdminLayoutComponent implements OnInit {
   goBack() {
     this.afiliadoService.clearAfiliado(); // 1. Restablecer el logo del sidebar
     this.layoutService.triggerScrollToTop(); // 2. Despachar el evento de scroll global al contenedor
-    this.location.back();
+    this.ruta.navigate(['/principal']);
   }
 
   toggleCardsVisibility() {

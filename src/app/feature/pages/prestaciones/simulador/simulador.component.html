@@ -1,0 +1,287 @@
+<div class="container-fluid animate-fade-in" *ngIf="simuladorForm">
+    <div [formGroup]="simuladorForm">
+        
+        <!-- CARD PRINCIPAL: DATOS DEL SIMULADOR -->
+        <div class="card shadow-soft border-0 mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="text-uppercase text-muted ls-1 mb-0 font-weight-bold" style="font-size: 0.75rem;">
+                        <i class="fas fa-search mr-2 text-primary"></i>Expediente del Militar
+                    </h6>
+                    <button class="btn btn-sm btn-outline-secondary" (click)="limpiar()" title="Limpiar Formulario">
+                        <i class="fas fa-redo-alt mr-1"></i> Reiniciar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body pt-0">
+                <!-- SECCIÓN 0: BÚSQUEDA Y DATOS PERSONALES -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Cédula de Identidad</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex">
+                                    <span class="input-group-text"><i class="fas fa-id-card" [class.text-primary]="isLoadingSearch"></i></span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="V-00000000" 
+                                    formControlName="cedula" #cedulaInput (keyup.enter)="onSearchEnter($event)">
+                                <div class="input-group-append cursor-pointer" (click)="onSearchEnter(null)">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-spinner fa-spin" *ngIf="isLoadingSearch"></i>
+                                        <i class="fas fa-search" *ngIf="!isLoadingSearch"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Nombres</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
+                                <input type="text" class="form-control" placeholder="Nombres" formControlName="nombres">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Apellidos</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
+                                <input type="text" class="form-control" placeholder="Apellidos" formControlName="apellidos">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3" style="border-top: 1px solid #f1f5f9;">
+
+                <!-- SECCIÓN 1: DATOS MILITARES -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Fecha de Cálculo</label>
+                            <app-pastel-datepicker formControlName="fecha" iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Componente</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-shield-alt"></i></span></div>
+                                <select class="form-control" formControlName="componente">
+                                    <option value="">Seleccione...</option>
+                                    <option value="EJ">EJERCITO BOLIVARIANO</option>
+                                    <option value="AR">ARMADA BOLIVARIANA</option>
+                                    <option value="AV">AVIACION MILITAR BOLIVARIANA</option>
+                                    <option value="GN">GUARDIA NACIONAL BOLIVARIANA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Grado / Jerarquía</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-star"></i></span></div>
+                                <select class="form-control" formControlName="grado">
+                                    <option value="">Seleccione...</option>
+                                    <!-- Aquí irían los grados dinámicos -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Fecha Ingreso</label>
+                            <app-pastel-datepicker formControlName="fechaIngreso" iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Fecha Último Ascenso</label>
+                            <app-pastel-datepicker formControlName="fechaUltAscenso" iconClass="fas fa-medal"></app-pastel-datepicker>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Nro. de Hijos</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-users"></i></span></div>
+                                <select class="form-control" formControlName="nHijos">
+                                    <option [value]="i" *ngFor="let i of [0,1,2,3,4,5,6,7,8,9,10]">{{ i }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-top: 1px dashed #e2e8f0;">
+
+                <!-- SECCIÓN 2: VALORES ECONÓMICOS -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>Sueldo Básico (SB)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-money-bill-wave"></i></span></div>
+                                <input type="number" class="form-control" placeholder="0.00" formControlName="sb">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>Alic. Bono Vac.</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-umbrella-beach"></i></span></div>
+                                <input type="number" class="form-control" placeholder="0.00" formControlName="alicBonoVac">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>P. Docu.</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-file-contract"></i></span></div>
+                                <input type="number" class="form-control" placeholder="0.00" formControlName="pDocu">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="modern-form-group">
+                            <label>P. Prof.</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-user-graduate"></i></span></div>
+                                <input type="number" class="form-control" placeholder="0.00" formControlName="pProf">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Alic. Fin de Año</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-gift"></i></span></div>
+                                <input type="number" class="form-control" placeholder="0.00" formControlName="alicFin">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>P. Tiempo Servicio (PTS)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-clock"></i></span></div>
+                                <input type="number" class="form-control" placeholder="0.00" formControlName="pTS">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="modern-form-group">
+                            <label>Tiempo de Servicio (Años)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-history"></i></span></div>
+                                <input type="number" class="form-control" placeholder="0" formControlName="ts">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTÓN CALCULAR -->
+                <div class="row mt-3">
+                    <div class="col-12 text-center">
+                        <button type="button" class="btn btn-lg btn-success shadow-lg px-5 py-3" 
+                                style="border-radius: 50px; font-weight: 800; letter-spacing: 1px;"
+                                (click)="confirmarCalculo()">
+                            <i class="fas fa-calculator mr-2"></i> CALCULAR PRESTACIONES
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE RESULTADOS -->
+        <div class="animate-up" *ngIf="resultados">
+            <div class="row">
+                <!-- SM: Sueldo Mensual -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card shadow-soft border-0 h-100 bg-gradient-success-light overflow-hidden">
+                        <div class="card-body p-4 text-center">
+                            <h6 class="text-uppercase text-success font-weight-bold ls-1 mb-2">Sueldo Mensual (SM)</h6>
+                            <h2 class="display-4 font-weight-900 text-dark mb-0">Bs. {{ resultados.sm }}</h2>
+                            <small class="text-muted">SB + PD + PTS + PProf</small>
+                        </div>
+                    </div>
+                </div>
+                <!-- SI: Sueldo Integral -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card shadow-soft border-0 h-100 bg-gradient-info-light overflow-hidden">
+                        <div class="card-body p-4 text-center">
+                            <h6 class="text-uppercase text-info font-weight-bold ls-1 mb-2">Sueldo Integral (SI)</h6>
+                            <h2 class="display-4 font-weight-900 text-dark mb-0">Bs. {{ resultados.si }}</h2>
+                            <small class="text-muted">SM + Alicuotas</small>
+                        </div>
+                    </div>
+                </div>
+                <!-- AA: Asignación Antigüedad -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card shadow-soft border-0 h-100 bg-gradient-warning-light overflow-hidden" style="border: 2px solid rgba(255, 152, 0, 0.1);">
+                        <div class="card-body p-4 text-center">
+                            <h6 class="text-uppercase text-warning font-weight-bold ls-1 mb-2">Asign. Antigüedad (AA)</h6>
+                            <h2 class="display-4 font-weight-900 text-dark mb-0">Bs. {{ resultados.aa }}</h2>
+                            <small class="text-muted">SI * Tiempo de Servicio</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detalles del Cálculo -->
+            <div class="card shadow-none border bg-light-soft mb-4">
+                <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center">
+                    <span class="text-muted font-weight-500" style="font-size: 0.85rem;">
+                        <i class="fas fa-info-circle mr-2"></i> Valores proyectados a la fecha: <strong>{{ resultados.fechaCalculo | date:'dd/MM/yyyy' }}</strong>
+                    </span>
+                    <button class="btn btn-sm btn-pastel-icon pastel-primary" title="Imprimir Simulación">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal: Confirmación de Cálculo -->
+<ng-template #modalConfirmar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <!-- Icono con Pulso Animado Éxito -->
+            <div class="icon-confirm-pulse emerald">
+                <i class="fas fa-calculator"></i>
+            </div>
+
+            <h4 class="font-weight-bold text-dark mb-2">¿Confirmar Cálculo?</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Se procederá a realizar la simulación de prestaciones sociales con los parámetros ingresados.
+            </p>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn btn-secondary btn-block mr-3 shadow-none py-3" 
+                    (click)="modal.dismiss()"
+                    style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border: none; flex: 1; border-radius: 12px; font-weight: 700;">
+                    Revisar
+                </button>
+                <button type="button" class="btn btn-success btn-block m-0 shadow-none py-3" 
+                    (click)="ejecutarCalculo(modal)"
+                    style="flex: 1.2; border-radius: 12px; font-weight: 700; background: linear-gradient(135deg, #2dce89 0%, #2dcecc 100%); border: none;">
+                    Calcular Ahora
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>

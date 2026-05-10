@@ -34,37 +34,31 @@
             </div>
           </div>
           <div style="max-height: 350px; overflow-y: auto;">
-            <div *ngFor="let item of (securityRequests$ | async); let last = last"
-              class="px-4 py-3 transition-all" 
-              [class.bg-authorized]="item.status === 'authorized'"
-              [class.bg-hover-light]="item.status !== 'authorized'"
-              [class.border-bottom]="!last"
-              [class.cursor-pointer]="item.status === 'authorized'"
+            <div *ngFor="let item of (securityRequests$ | async); let last = last" class="px-4 py-3 transition-all"
+              [class.bg-authorized]="item.status === 'authorized'" [class.bg-hover-light]="item.status !== 'authorized'"
+              [class.border-bottom]="!last" [class.cursor-pointer]="item.status === 'authorized'"
               (click)="item.status === 'authorized' ? applyResolution(item.id) : null"
               style="border-color: #f8eeee !important;">
-              
+
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="d-flex align-items-center">
                   <span class="font-weight-800 text-dark" style="font-size: 0.8rem; letter-spacing: -0.2px;">
                     Ticket #{{ item.id.substring(0,14) }}...
                   </span>
-                  
+
                   <!-- Spinner para pendientes -->
                   <div *ngIf="item.status === 'waiting'" class="spinner-border ml-2" role="status"
                     style="width: 0.85rem; height: 0.85rem; border-width: 0.1rem; color: #d68b8b; opacity: 0.6;"></div>
-                  
+
                   <!-- Icono Check para autorizados (Eliminado para minimalismo) -->
                 </div>
-                
+
                 <div class="text-right d-flex align-items-center">
-                  <button *ngIf="item.status === 'waiting'" 
-                          (click)="syncWithParent(item.id); $event.stopPropagation()"
-                          class="btn btn-sm btn-link p-0 mr-2" 
-                          title="Sincronizar con servidor">
+                  <button *ngIf="item.status === 'waiting'" (click)="syncWithParent(item.id); $event.stopPropagation()"
+                    class="btn btn-sm btn-link p-0 mr-2" title="Sincronizar con servidor">
                     <i class="fas fa-sync-alt" style="font-size: 0.7rem; color: #9a7d7d;"></i>
                   </button>
-                  <span class="badge px-2 py-1"
-                    [class.badge-light]="item.status === 'waiting'"
+                  <span class="badge px-2 py-1" [class.badge-light]="item.status === 'waiting'"
                     [class.badge-success-light]="item.status === 'authorized'"
                     style="font-size: 0.65rem; border: 1px solid rgba(0,0,0,0.05);">
                     {{ item.status === 'authorized' ? 'LISTO' : getElapsedTime(item.timestamp) }}
@@ -79,9 +73,10 @@
                   <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
                     style="width: 100%; background-color: #d68b8b; border-radius: 10px; opacity: 0.8;"></div>
                 </div>
-                
-                <div *ngIf="item.status === 'authorized'" class="d-flex align-items-center text-authorized font-weight-800" style="font-size: 0.72rem;">
-                   <i class="ni ni-curved-next mr-1" style="font-size: 0.85rem;"></i> HACER CLIC PARA APLICAR
+
+                <div *ngIf="item.status === 'authorized'"
+                  class="d-flex align-items-center text-authorized font-weight-800" style="font-size: 0.72rem;">
+                  <i class="ni ni-curved-next mr-1" style="font-size: 0.85rem;"></i> HACER CLIC PARA APLICAR
                 </div>
               </div>
 

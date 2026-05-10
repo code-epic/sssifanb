@@ -1,5 +1,5 @@
 <form *ngIf="identificacionForm" [formGroup]="identificacionForm" autocomplete="off" (ngSubmit)="guardarAfiliado()">
-    
+
     <!-- WRAPPER: PERSONA -> DATOBASICO (Sección 1) -->
     <div formGroupName="persona">
         <div formGroupName="datobasico">
@@ -7,45 +7,106 @@
             <div class="card shadow-none border-0 mb-4 bg-transparent">
                 <div class="row">
                     <div class="col-lg-9 pr-lg-3">
-                        <div class="section-title-wrapper d-flex justify-content-between align-items-center">
-                            <h6 class="section-title mb-0"><i class="fas fa-user-circle"></i> Información Personal</h6>
+                        <div
+                            class="section-title-wrapper d-flex justify-content-between align-items-center flex-nowrap">
+                            <h6 class="section-title mb-0">
+                                <i class="fas fa-user-circle"></i>
+                                <span class="d-none d-xxl-inline">Información Personal</span>
+                                <span class="d-inline d-xxl-none">Info. Personal</span>
+                            </h6>
                             <div class="d-flex align-items-center">
-                                <div class="antiguedad-badge shadow-sm mr-2" *ngIf="tiempoServicio">
-                                    <i class="fas fa-history"></i> Antigüedad: <span>{{ tiempoServicio }}</span>
+                                <div class="antiguedad-badge antig-theme shadow-sm mr-2" *ngIf="tiempoServicio" title="Antigüedad">
+                                    <i class="fas fa-history"></i>
+                                    <span class="d-none d-xxl-inline">Antigüedad:</span>
+                                    <span class="d-inline d-xxl-none">Antig:</span>
+                                    <span>{{ tiempoServicio }}</span>
                                 </div>
-                                <div class="antiguedad-badge shadow-sm mr-2" *ngIf="tiempoServicioTotal" style="background-color: rgba(89, 140, 137, 0.15); border: 1px solid rgba(89, 140, 137, 0.3);">
-                                    <i class="fas fa-briefcase"></i> Años de Servicio: <span>{{ tiempoServicioTotal }}</span>
+                                <div class="antiguedad-badge serv-theme shadow-sm mr-2" *ngIf="tiempoServicioTotal"
+                                    title="Años de Servicio">
+                                    <i class="fas fa-briefcase"></i>
+                                    <span class="d-none d-xxl-inline">Años de Servicio:</span>
+                                    <span class="d-inline d-xxl-none">Serv:</span>
+                                    <span>{{ tiempoServicioTotal }}</span>
                                 </div>
                                 <!-- Vencimiento del Carnet (TIM) -->
-                                <div class="antiguedad-badge shadow-sm mr-2 tim-expiration-badge" *ngIf="fechaVencimientoTIM">
-                                    <i class="fas fa-id-card"></i> Vencimiento: <span class="text-danger">{{ fechaVencimientoTIM | date:'dd/MM/yyyy' }}</span>
+                                <div class="antiguedad-badge venc-theme shadow-sm mr-2"
+                                    *ngIf="fechaVencimientoTIM" title="Vencimiento de Carnet">
+                                    <i class="fas fa-id-card"></i>
+                                    <span class="d-none d-xxl-inline">Vencimiento:</span>
+                                    <span class="d-inline d-xxl-none">Venc:</span>
+                                    <span class="text-danger">{{ fechaVencimientoTIM | date:'dd/MM/yyyy' }}</span>
                                 </div>
                                 <!-- Botón de Impresión de Documentos -->
                                 <div class="dropdown" [class.show]="showPrintDropdown" *ngIf="tiempoServicio">
-                                    <button class="btn btn-sm shadow-sm dropdown-toggle-no-caret d-flex align-items-center justify-content-center" type="button" id="printDocsDropdown" (click)="showPrintDropdown = !showPrintDropdown; $event.stopPropagation()" aria-haspopup="true" [attr.aria-expanded]="showPrintDropdown" title="Imprimir Documentos" style="width: 32px; height: 32px; background-color: rgba(89, 140, 137, 0.1); border: 1px solid rgba(89, 140, 137, 0.2); border-radius: 8px; color: #598c89; transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.2)'" onmouseout="this.style.backgroundColor='rgba(89, 140, 137, 0.1)'">
+                                    <button
+                                        class="btn btn-sm shadow-sm dropdown-toggle-no-caret d-flex align-items-center justify-content-center"
+                                        type="button" id="printDocsDropdown"
+                                        (click)="showPrintDropdown = !showPrintDropdown; $event.stopPropagation()"
+                                        aria-haspopup="true" [attr.aria-expanded]="showPrintDropdown"
+                                        title="Imprimir Documentos"
+                                        style="width: 32px; height: 32px; background-color: rgba(89, 140, 137, 0.1); border: 1px solid rgba(89, 140, 137, 0.2); border-radius: 8px; color: #598c89; transition: all 0.2s ease;"
+                                        onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.2)'"
+                                        onmouseout="this.style.backgroundColor='rgba(89, 140, 137, 0.1)'">
                                         <i class="fas fa-print" style="font-size: 0.9rem;"></i>
                                     </button>
-                                    <div class="dropdown-menu dropdown-menu-right shadow-sm border-0 animated fadeIn" [class.show]="showPrintDropdown" aria-labelledby="printDocsDropdown" style="border-radius: 12px; font-size: 0.9rem; min-width: 220px; padding: 0.5rem 0; box-shadow: 0 10px 25px rgba(89, 140, 137, 0.15) !important; border: 1px solid rgba(89, 140, 137, 0.1) !important;">
-                                        <h6 class="dropdown-header text-verde-titulos font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;"><i class="fas fa-print mr-2" style="width: 20px; text-align: center;"></i>DOCUMENTOS Y REPORTES</h6>
-                                        <div class="dropdown-divider mb-1" style="border-top-color: rgba(89, 140, 137, 0.1);"></div>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('constancia', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-file-alt mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Constancia
+                                    <div class="dropdown-menu dropdown-menu-right shadow-sm border-0 animated fadeIn"
+                                        [class.show]="showPrintDropdown" aria-labelledby="printDocsDropdown"
+                                        style="border-radius: 12px; font-size: 0.9rem; min-width: 220px; padding: 0.5rem 0; box-shadow: 0 10px 25px rgba(89, 140, 137, 0.15) !important; border: 1px solid rgba(89, 140, 137, 0.1) !important;">
+                                        <h6 class="dropdown-header text-verde-titulos font-weight-bold"
+                                            style="font-size: 0.75rem; letter-spacing: 0.5px;"><i
+                                                class="fas fa-print mr-2"
+                                                style="width: 20px; text-align: center;"></i>DOCUMENTOS Y REPORTES</h6>
+                                        <div class="dropdown-divider mb-1"
+                                            style="border-top-color: rgba(89, 140, 137, 0.1);"></div>
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                            style="transition: all 0.2s ease;" href="javascript:void(0);"
+                                            (click)="imprimirDocumento('constancia', $event)"
+                                            onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
+                                            onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-file-alt mr-3 opacity-75"
+                                                style="width: 20px; text-align: center;"></i> Constancia
                                         </a>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('hoja_ruta', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-map mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Hoja de Ruta
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                            style="transition: all 0.2s ease;" href="javascript:void(0);"
+                                            (click)="imprimirDocumento('hoja_ruta', $event)"
+                                            onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
+                                            onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-map mr-3 opacity-75"
+                                                style="width: 20px; text-align: center;"></i> Hoja de Ruta
                                         </a>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('consultar_netos', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-search-dollar mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Consultar Netos
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                            style="transition: all 0.2s ease;" href="javascript:void(0);"
+                                            (click)="imprimirDocumento('consultar_netos', $event)"
+                                            onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
+                                            onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-search-dollar mr-3 opacity-75"
+                                                style="width: 20px; text-align: center;"></i> Consultar Netos
                                         </a>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('constancia_arc', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-file-invoice-dollar mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Constancia de ARC
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                            style="transition: all 0.2s ease;" href="javascript:void(0);"
+                                            (click)="imprimirDocumento('constancia_arc', $event)"
+                                            onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
+                                            onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-file-invoice-dollar mr-3 opacity-75"
+                                                style="width: 20px; text-align: center;"></i> Constancia de ARC
                                         </a>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('hoja_vida', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-address-card mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Hoja de Vida
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                            style="transition: all 0.2s ease;" href="javascript:void(0);"
+                                            (click)="imprimirDocumento('hoja_vida', $event)"
+                                            onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
+                                            onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-address-card mr-3 opacity-75"
+                                                style="width: 20px; text-align: center;"></i> Hoja de Vida
                                         </a>
-                                        <div class="dropdown-divider mb-1" style="border-top-color: rgba(89, 140, 137, 0.1);"></div>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer" style="transition: all 0.2s ease;" href="javascript:void(0);" (click)="imprimirDocumento('historial_movimientos', $event)" onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'" onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-history mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Historial de Movimientos
+                                        <div class="dropdown-divider mb-1"
+                                            style="border-top-color: rgba(89, 140, 137, 0.1);"></div>
+                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                            style="transition: all 0.2s ease;" href="javascript:void(0);"
+                                            (click)="imprimirDocumento('historial_movimientos', $event)"
+                                            onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
+                                            onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
+                                            <i class="fas fa-history mr-3 opacity-75"
+                                                style="width: 20px; text-align: center;"></i> Historial de Movimientos
                                         </a>
                                     </div>
                                 </div>
@@ -56,9 +117,12 @@
                                 <div class="modern-form-group">
                                     <label>Cédula de Identidad</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-id-card"></i></span></div>
-                                        <input type="text" class="form-control" placeholder="V-00000000" formControlName="cedula">
-                                        <div class="input-group-append"><span class="input-group-text"><i class="fas fa-search cursor-pointer"></i></span></div>
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-id-card"></i></span></div>
+                                        <input type="text" class="form-control" placeholder="V-00000000"
+                                            formControlName="cedula">
+                                        <div class="input-group-append"><span class="input-group-text"><i
+                                                    class="fas fa-search cursor-pointer"></i></span></div>
                                     </div>
                                 </div>
                             </div>
@@ -66,8 +130,10 @@
                                 <div class="modern-form-group">
                                     <label>Nombres</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
-                                        <input type="text" class="form-control" placeholder="Nombres" formControlName="nombres">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-user"></i></span></div>
+                                        <input type="text" class="form-control" placeholder="Nombres"
+                                            formControlName="nombres">
                                     </div>
                                 </div>
                             </div>
@@ -75,24 +141,28 @@
                                 <div class="modern-form-group">
                                     <label>Apellidos</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
-                                        <input type="text" class="form-control" placeholder="Apellidos" formControlName="apellidos">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-user"></i></span></div>
+                                        <input type="text" class="form-control" placeholder="Apellidos"
+                                            formControlName="apellidos">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="modern-form-group">
-                                    <label>Fecha de Nacimiento</label>
-                                    <app-pastel-datepicker formControlName="fechanacimiento" iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                                    <label>F. Nacimiento</label>
+                                    <app-pastel-datepicker formControlName="fechanacimiento"
+                                        iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="modern-form-group">
                                     <label>Sexo</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-venus-mars"></i></span></div>
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-venus-mars"></i></span></div>
                                         <select class="form-control" formControlName="sexo">
                                             <option value="">Seleccione...</option>
                                             <option value="F">FEMENINO</option>
@@ -101,11 +171,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="modern-form-group">
                                     <label>Estado Civil</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-heart"></i></span></div>
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-heart"></i></span></div>
                                         <select class="form-control" formControlName="estadocivil">
                                             <option value="">Seleccione...</option>
                                             <option value="S">SOLTERO</option>
@@ -116,35 +187,36 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- NUEVA FILA: Hijos, Tiempo Reconocido, Profesionalización -->
-                        <div class="row">
-                            <!-- Cantidad de Hijos -->
                             <div class="col-md-3">
                                 <div class="modern-form-group">
-                                    <label>Cantidad de Hijos</label>
+                                    <label>Estatus</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-child"></i></span></div>
-                                        <input type="number" class="form-control" placeholder="0" [formControl]="$any(identificacionForm.get('numerohijos'))">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-heart"></i></span></div>
+                                        <select class="form-control" formControlName="estatus">
+                                            <option value="">Seleccione...</option>
+                                            <option value="201">ACTIVO</option>
+                                            <option value="202">INACTIVO</option>
+                                            <option value="203">CANCELADO</option>
+                                            <option value="204">SUSPENDIDO</option>
+                                            <option value="205">PARALIZADO</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Años, Meses, Días Reconocidos -->
-                            <div class="col-md-6">
+                        </div>
+
+                        <!-- FILA: Hijos, Profesionalización, Tiempo Reconocido -->
+                        <div class="row">
+                            <!-- Cantidad de Hijos -->
+                            <div class="col-md-2">
                                 <div class="modern-form-group">
-                                    <label>Tiempo Reconocido (A / M / D)</label>
+                                    <label>Hijos</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-history"></i></span></div>
-                                        <!-- Años -->
-                                        <input type="number" class="form-control text-center px-1" placeholder="Años" title="Años" [formControl]="$any(identificacionForm.get('areconocido'))">
-                                        <div class="input-group-prepend input-group-append"><span class="input-group-text border-left px-2">A</span></div>
-                                        <!-- Meses -->
-                                        <input type="number" class="form-control text-center px-1 border-left" placeholder="Mes" title="Meses" [formControl]="$any(identificacionForm.get('mreconocido'))">
-                                        <div class="input-group-prepend input-group-append"><span class="input-group-text border-left px-2">M</span></div>
-                                        <!-- Días -->
-                                        <input type="number" class="form-control text-center px-1 border-left" placeholder="Día" title="Días" [formControl]="$any(identificacionForm.get('dreconocido'))">
-                                        <div class="input-group-append"><span class="input-group-text border-left px-2">D</span></div>
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-child"></i></span></div>
+                                        <input type="number" class="form-control" placeholder="0"
+                                            [formControl]="$any(identificacionForm.get('numerohijos'))">
                                     </div>
                                 </div>
                             </div>
@@ -153,9 +225,38 @@
                                 <div class="modern-form-group">
                                     <label>Profesionalización</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-graduation-cap"></i></span></div>
-                                        <input type="number" class="form-control" placeholder="0.00" [formControl]="$any(identificacionForm.get('pprof'))">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-graduation-cap"></i></span></div>
+                                        <input type="number" class="form-control" placeholder="0.00"
+                                            [formControl]="$any(identificacionForm.get('pprof'))">
                                         <div class="input-group-append"><span class="input-group-text">%</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Años, Meses, Días Reconocidos -->
+                            <div class="col-md-7">
+                                <div class="modern-form-group">
+                                    <label>Tiempo Reconocido (A / M / D)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-history"></i></span></div>
+                                        <!-- Años -->
+                                        <input type="number" class="form-control text-center px-1" placeholder="Años"
+                                            title="Años" [formControl]="$any(identificacionForm.get('areconocido'))">
+                                        <div class="input-group-prepend input-group-append"><span
+                                                class="input-group-text border-left px-2">A</span></div>
+                                        <!-- Meses -->
+                                        <input type="number" class="form-control text-center px-1 border-left"
+                                            placeholder="Mes" title="Meses"
+                                            [formControl]="$any(identificacionForm.get('mreconocido'))">
+                                        <div class="input-group-prepend input-group-append"><span
+                                                class="input-group-text border-left px-2">M</span></div>
+                                        <!-- Días -->
+                                        <input type="number" class="form-control text-center px-1 border-left"
+                                            placeholder="Día" title="Días"
+                                            [formControl]="$any(identificacionForm.get('dreconocido'))">
+                                        <div class="input-group-append"><span
+                                                class="input-group-text border-left px-2">D</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -166,42 +267,45 @@
                     <div class="col-lg-3 d-flex flex-column" style="min-height: 100%;">
                         <!-- Foto Pasaporte centrada al inicio -->
                         <div class="d-flex flex-column align-items-center justify-content-start">
-                             <!-- Foto Pasaporte -->
-                            <div class="avatar-container position-relative shadow-sm mt-2" 
-                                 style="border-radius: 8px; width: 100%; max-width: 215px; aspect-ratio: 3/4; background-color: #f8f9fe; margin: 0 auto; box-sizing: border-box;">
+                            <!-- Foto Pasaporte -->
+                            <div class="avatar-container position-relative shadow-sm mt-2"
+                                style="border-radius: 8px; width: 100%; max-width: 215px; aspect-ratio: 3/4; background-color: #f8f9fe; margin: 0 auto; box-sizing: border-box;">
 
                                 <!-- Foto Transicionable -->
                                 <img [src]="getFotoUrl()" class="w-100 h-100" id="fotoPrincipal"
-                                     style="object-fit: contain; position: absolute; top: 0; left: 0; z-index: 1; border-radius: 8px; transition: transform 0.3s;">
-                                
+                                    style="object-fit: contain; position: absolute; top: 0; left: 0; z-index: 1; border-radius: 8px; transition: transform 0.3s;">
+
                                 <!-- Overlay Zoom -->
-                                <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center" 
-                                     style="top: 0; left: 0; z-index: 3; cursor: pointer; transition: background 0.3s ease; border-radius: 8px;" 
-                                     onmouseover="this.style.background='rgba(255,255,255,0.15)'; document.getElementById('fotoPrincipal').style.transform='scale(1.04)';" 
-                                     onmouseout="this.style.background='transparent'; document.getElementById('fotoPrincipal').style.transform='scale(1)';"
-                                     (dblclick)="triggerModal.click()"
-                                     title="Doble clic para expandir">
+                                <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
+                                    style="top: 0; left: 0; z-index: 3; cursor: pointer; transition: background 0.3s ease; border-radius: 8px;"
+                                    onmouseover="this.style.background='rgba(255,255,255,0.15)'; document.getElementById('fotoPrincipal').style.transform='scale(1.04)';"
+                                    onmouseout="this.style.background='transparent'; document.getElementById('fotoPrincipal').style.transform='scale(1)';"
+                                    (dblclick)="triggerModal.click()" title="Doble clic para expandir">
                                 </div>
-                                
+
                                 <!-- Botón Cámara -->
                                 <div class="position-absolute" style="top: 8px; right: 8px; z-index: 4;">
-                                    <button type="button" class="btn btn-sm text-white shadow-sm d-flex align-items-center justify-content-center" 
-                                            style="background: rgba(89, 140, 137, 0.9); border: none; border-radius: 50%; width: 32px; height: 32px; padding: 0;" title="Actualizar Foto">
+                                    <button type="button"
+                                        class="btn btn-sm text-white shadow-sm d-flex align-items-center justify-content-center"
+                                        style="background: rgba(89, 140, 137, 0.9); border: none; border-radius: 50%; width: 32px; height: 32px; padding: 0;"
+                                        title="Actualizar Foto">
                                         <i class="fas fa-camera"></i>
                                     </button>
                                 </div>
-                                
-                                <button #triggerModal id="btnZoomModal" style="opacity: 0; position: absolute; z-index: -1;" data-toggle="modal" data-target="#modalZoomFoto"></button>
+
+                                <button #triggerModal id="btnZoomModal"
+                                    style="opacity: 0; position: absolute; z-index: -1;" data-toggle="modal"
+                                    data-target="#modalZoomFoto"></button>
                             </div>
                         </div>
 
                         <!-- Logo de Grado Militar forzado al fondo del contenedor para alineación simétrica -->
                         <div class="w-100 d-flex justify-content-center mt-auto pb-4" style="z-index: 3;">
-                            <div class="grado-badge-minimal shadow-sm d-flex align-items-center justify-content-center" 
-                                 title="Grado Militar">
-                                <img *ngIf="getGradoBadgePath()" [src]="getGradoBadgePath()" alt="Grado" 
-                                     style="height: 38px; width: auto; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));" 
-                                     (error)="badgeImg.style.display='none'" #badgeImg>
+                            <div class="grado-badge-minimal shadow-sm d-flex align-items-center justify-content-center"
+                                title="Grado Militar">
+                                <img *ngIf="getGradoBadgePath()" [src]="getGradoBadgePath()" alt="Grado"
+                                    style="height: 38px; width: auto; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));"
+                                    (error)="badgeImg.style.display='none'" #badgeImg>
                             </div>
                         </div>
                     </div>
@@ -211,22 +315,28 @@
     </div> <!-- End Persona/Datobasico wrapper -->
 
     <!-- SECCIÓN 2: DATOS MILITARES (TABS) -->
-     <div class="mb-4">
-         <!-- Tabs Navigation -->
+    <div class="mb-4">
+        <!-- Tabs Navigation -->
         <ul class="nav modern-tabs mb-4">
             <li class="nav-item">
                 <a class="nav-link" [class.active]="currentTab === 'militar'" (click)="switchTab('militar')">
-                    <i class="fas fa-id-badge"></i> Datos Militares
+                    <i class="fas fa-id-badge"></i>
+                    <span class="d-none d-xxl-inline">Datos Militares</span>
+                    <span class="d-inline d-xxl-none">Militar</span>
                 </a>
             </li>
-             <li class="nav-item">
+            <li class="nav-item">
                 <a class="nav-link" [class.active]="currentTab === 'sueldo'" (click)="switchTab('sueldo')">
-                    <i class="fas fa-money-bill-wave"></i> Datos Sueldo
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span class="d-none d-xxl-inline">Datos Sueldo</span>
+                    <span class="d-inline d-xxl-none">Sueldo</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" [class.active]="currentTab === 'antiguedad'" (click)="switchTab('antiguedad')">
-                    <i class="fas fa-piggy-bank"></i> Asignaciones
+                    <i class="fas fa-piggy-bank"></i>
+                    <span class="d-none d-xxl-inline">Asignaciones</span>
+                    <span class="d-inline d-xxl-none">Asign.</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -236,7 +346,9 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" [class.active]="currentTab === 'direccion'" (click)="switchTab('direccion')">
-                    <i class="fas fa-map-marker-alt"></i> Dirección
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span class="d-none d-xxl-inline">Dirección</span>
+                    <span class="d-inline d-xxl-none">Direc.</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -244,13 +356,13 @@
                     <i class="fas fa-ruler-combined"></i> Físicos
                 </a>
             </li>
-           
+
         </ul>
 
         <!-- Tab Content -->
         <div class="card shadow-sm border-0">
             <div class="card-body">
-                
+
                 <!-- MILITAR (Root level fields) -->
                 <div *ngIf="currentTab === 'militar'" class="fade-in">
                     <!-- Fila 1: Fecha Ingreso, Componente, Grado -->
@@ -258,14 +370,16 @@
                         <div class="col-md-3">
                             <div class="modern-form-group">
                                 <label>Fecha de Ingreso</label>
-                                <app-pastel-datepicker formControlName="fingreso" iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                                <app-pastel-datepicker formControlName="fingreso"
+                                    iconClass="fas fa-calendar-check"></app-pastel-datepicker>
                             </div>
                         </div>
                         <div class="col-md-5">
                             <div class="modern-form-group">
                                 <label>Componente</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt"></i></span></div>
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                class="fas fa-shield-alt"></i></span></div>
                                     <select class="form-control" formControlName="componente">
                                         <option value="">Seleccione...</option>
                                         <option value="EJ">EJERCITO BOLIVARIANO</option>
@@ -280,20 +394,24 @@
                             <div class="modern-form-group">
                                 <label>Grado / Jerarquía</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star"></i></span></div>
-                                    <select class="form-control" formControlName="grado"><option value="">Seleccione...</option></select>
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                class="fas fa-star"></i></span></div>
+                                    <select class="form-control" formControlName="grado">
+                                        <option value="">Seleccione...</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Fila 2: Categoría, Clasificación, Situación -->
-                     <div class="row">
+                    <div class="row">
                         <div class="col-md-4">
                             <div class="modern-form-group">
                                 <label>Categoría</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-folder-open text-verde-titulos"></i></span></div>
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                class="fas fa-folder-open text-verde-titulos"></i></span></div>
                                     <select class="form-control" formControlName="categoria">
                                         <option value="EFE">EFECTIVO</option>
                                         <option value="ASI">ASIMILADO</option>
@@ -303,11 +421,12 @@
                                 </div>
                             </div>
                         </div>
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="modern-form-group">
                                 <label>Clasificación</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-tag text-verde-titulos"></i></span></div>
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                class="fas fa-user-tag text-verde-titulos"></i></span></div>
                                     <select class="form-control" formControlName="clase">
                                         <option value="OFI">OFICIAL DE COMANDO</option>
                                         <option value="OFIT">OFICIAL TECNICO</option>
@@ -316,11 +435,12 @@
                                 </div>
                             </div>
                         </div>
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="modern-form-group">
                                 <label>Situación</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-info-circle text-verde-titulos"></i></span></div>
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                class="fas fa-info-circle text-verde-titulos"></i></span></div>
                                     <select class="form-control" formControlName="situacion">
                                         <option value="ACT">ACTIVO</option>
                                         <option value="RCP">RESERVA ACTIVA</option>
@@ -333,33 +453,39 @@
 
                     <!-- Fila 3: Último Ascenso, Retiro, Nro Resolución, Posición -->
                     <div class="row">
-                         <div class="col-md-3">
-                             <div class="modern-form-group">
+                        <div class="col-md-3">
+                            <div class="modern-form-group">
                                 <label>Fecha Último Ascenso</label>
-                                <app-pastel-datepicker formControlName="fascenso" iconClass="fas fa-medal"></app-pastel-datepicker>
+                                <app-pastel-datepicker formControlName="fascenso"
+                                    iconClass="fas fa-medal"></app-pastel-datepicker>
                             </div>
-                         </div>
-                         <div class="col-md-3">
-                             <div class="modern-form-group">
+                        </div>
+                        <div class="col-md-3">
+                            <div class="modern-form-group">
                                 <label>Fecha de Retiro</label>
-                                <app-pastel-datepicker formControlName="fretiro" iconClass="fas fa-sign-out-alt"></app-pastel-datepicker>
+                                <app-pastel-datepicker formControlName="fretiro"
+                                    iconClass="fas fa-sign-out-alt"></app-pastel-datepicker>
                             </div>
-                         </div>
-                         <div class="col-md-3">
+                        </div>
+                        <div class="col-md-3">
                             <div class="modern-form-group">
                                 <label>Nro. Resolución</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-file-alt"></i></span></div>
-                                    <input type="text" class="form-control" placeholder="Ej: 00123" formControlName="nresuelto">
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                class="fas fa-file-alt"></i></span></div>
+                                    <input type="text" class="form-control" placeholder="Ej: 00123"
+                                        formControlName="nresuelto">
                                 </div>
                             </div>
                         </div>
-                         <div class="col-md-3">
+                        <div class="col-md-3">
                             <div class="modern-form-group">
                                 <label>Posición en Escalafón</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-sort-numeric-down"></i></span></div>
-                                    <input type="number" class="form-control" placeholder="Posición" formControlName="posicion">
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                class="fas fa-sort-numeric-down"></i></span></div>
+                                    <input type="number" class="form-control" placeholder="Posición"
+                                        formControlName="posicion">
                                 </div>
                             </div>
                         </div>
@@ -369,14 +495,14 @@
 
                 <!-- TAB: DATOS DE SUELDO -->
                 <div *ngIf="currentTab === 'sueldo'" class="fade-in">
-                    
+
                     <div class="row">
                         <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-3">
                             <h4 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
                                 Resumen Salarial
                             </h4>
-                            <button class="btn-pastel-icon pastel-success shadow-sm" type="button" 
-                                    data-toggle="modal" data-target="#modalHistorialSueldo" title="Ver Historial">
+                            <button class="btn-pastel-icon pastel-success shadow-sm" type="button" data-toggle="modal"
+                                data-target="#modalHistorialSueldo" title="Ver Historial">
                                 <i class="fas fa-history"></i>
                             </button>
                         </div>
@@ -385,59 +511,86 @@
                     <div class="row" style="margin-top: 20px;">
                         <!-- Columna Ingresos Principales (Ledger Card) -->
                         <div class="col-lg-6 mb-4">
-                            <div class="card shadow-sm border-0 h-100 ledger-card" style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-4 px-4" style="border-left: 4px solid #598c89 !important; border-bottom: 1px solid #f4f5f7 !important;">
+                            <div class="card shadow-sm border-0 h-100 ledger-card"
+                                style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-4 px-4"
+                                    style="border-left: 4px solid #598c89 !important; border-bottom: 1px solid #f4f5f7 !important;">
                                     <div>
-                                        <h6 class="text-uppercase font-weight-bold mb-1" style="color: #94a3b8; font-size: 0.75rem; letter-spacing: 1.2px;">Ingreso Principal</h6>
-                                        <h4 class="mb-0 font-weight-500" style="color: #64748b; font-size: 1.15rem;">Sueldo Integral</h4>
+                                        <h6 class="text-uppercase font-weight-bold mb-1"
+                                            style="color: #94a3b8; font-size: 0.75rem; letter-spacing: 1.2px;">Ingreso
+                                            Principal</h6>
+                                        <h4 class="mb-0 font-weight-500" style="color: #64748b; font-size: 1.15rem;">
+                                            Sueldo Integral</h4>
                                     </div>
-                                    <h3 class="font-weight-500 mb-0" style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda }} 0.00</h3>
+                                    <h3 class="font-weight-500 mb-0"
+                                        style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda }}
+                                        0.00</h3>
                                 </div>
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush">
                                         <!-- Item -->
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <div class="d-flex align-items-center">
-                                                <div class="icon-circle mr-3" style="background-color: rgba(89, 140, 137, 0.1); width: 36px; height: 36px;">
-                                                    <i class="fas fa-arrow-up" style="color: #598c89; font-size: 0.85rem;"></i>
+                                                <div class="icon-circle mr-3"
+                                                    style="background-color: rgba(89, 140, 137, 0.1); width: 36px; height: 36px;">
+                                                    <i class="fas fa-arrow-up"
+                                                        style="color: #598c89; font-size: 0.85rem;"></i>
                                                 </div>
-                                                <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Sueldo Base</span>
+                                                <span class="font-weight-500"
+                                                    style="font-size: 0.95rem; color: #64748b;">Sueldo Base</span>
                                             </div>
-                                            <span class="font-weight-600 tracking-tight" style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
                                         </li>
                                         <!-- Item -->
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <div class="d-flex align-items-center">
-                                                <div class="icon-circle mr-3" style="background-color: rgba(89, 140, 137, 0.1); width: 36px; height: 36px;">
-                                                    <i class="fas fa-chart-bar" style="color: #598c89; font-size: 0.85rem;"></i>
+                                                <div class="icon-circle mr-3"
+                                                    style="background-color: rgba(89, 140, 137, 0.1); width: 36px; height: 36px;">
+                                                    <i class="fas fa-chart-bar"
+                                                        style="color: #598c89; font-size: 0.85rem;"></i>
                                                 </div>
-                                                <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Sueldo Mensual</span>
+                                                <span class="font-weight-500"
+                                                    style="font-size: 0.95rem; color: #64748b;">Sueldo Mensual</span>
                                             </div>
-                                            <span class="font-weight-600 tracking-tight" style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
                                         </li>
                                         <!-- List Divider -->
-                                        <li class="list-group-item text-muted font-weight-500 text-uppercase py-2 px-4" style="background-color: #f8f9fa; font-size: 0.75rem; letter-spacing: 0.5px;">
+                                        <li class="list-group-item text-muted font-weight-500 text-uppercase py-2 px-4"
+                                            style="background-color: #f8f9fa; font-size: 0.75rem; letter-spacing: 0.5px;">
                                             <i class="fas fa-layer-group mr-2 opacity-50"></i>Bonificaciones
                                         </li>
                                         <!-- Item -->
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <div class="d-flex align-items-center">
-                                                <div class="icon-circle mr-3" style="background-color: rgba(64, 101, 98, 0.06); width: 36px; height: 36px;">
-                                                    <i class="fas fa-gift" style="color: #598c89; font-size: 0.85rem;"></i>
+                                                <div class="icon-circle mr-3"
+                                                    style="background-color: rgba(64, 101, 98, 0.06); width: 36px; height: 36px;">
+                                                    <i class="fas fa-gift"
+                                                        style="color: #598c89; font-size: 0.85rem;"></i>
                                                 </div>
-                                                <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Bono Fin de Año</span>
+                                                <span class="font-weight-500"
+                                                    style="font-size: 0.95rem; color: #64748b;">Bono Fin de Año</span>
                                             </div>
-                                            <span class="font-weight-600 tracking-tight" style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
                                         </li>
                                         <!-- Item -->
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <div class="d-flex align-items-center">
-                                                <div class="icon-circle mr-3" style="background-color: rgba(251, 140, 0, 0.1); width: 36px; height: 36px;">
+                                                <div class="icon-circle mr-3"
+                                                    style="background-color: rgba(251, 140, 0, 0.1); width: 36px; height: 36px;">
                                                     <i class="fas fa-sun text-warning" style="font-size: 0.85rem;"></i>
                                                 </div>
-                                                <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Bono Vacacional</span>
+                                                <span class="font-weight-500"
+                                                    style="font-size: 0.95rem; color: #64748b;">Bono Vacacional</span>
                                             </div>
-                                            <span class="font-weight-600 tracking-tight" style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -446,14 +599,20 @@
 
                         <!-- Columna Primas -->
                         <div class="col-lg-6 mb-4">
-                            <div class="card shadow-sm border-0 h-100 ledger-card" style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-header bg-white border-bottom d-flex align-items-center py-4 px-4" style="border-color: #f4f5f7 !important;">
-                                    <div class="icon-circle mr-3" style="width: 38px; height: 38px; background-color: rgba(251, 140, 0, 0.08);">
+                            <div class="card shadow-sm border-0 h-100 ledger-card"
+                                style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom d-flex align-items-center py-4 px-4"
+                                    style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3"
+                                        style="width: 38px; height: 38px; background-color: rgba(251, 140, 0, 0.08);">
                                         <i class="fas fa-award text-warning" style="font-size: 1rem;"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Primas y Compensaciones</h5>
-                                        <small class="font-weight-500 text-uppercase" style="color: #94a3b8; font-size: 0.70rem; letter-spacing: 0.5px;">Ingresos Colaterales</small>
+                                        <h5 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">
+                                            Primas y Compensaciones</h5>
+                                        <small class="font-weight-500 text-uppercase"
+                                            style="color: #94a3b8; font-size: 0.70rem; letter-spacing: 0.5px;">Ingresos
+                                            Colaterales</small>
                                     </div>
                                 </div>
                                 <div class="card-body p-0">
@@ -461,32 +620,55 @@
                                         <table class="table table-hover align-items-center mb-0 ledger-table">
                                             <tbody>
                                                 <tr>
-                                                    <td class="font-weight-500 pl-4 border-top-0 py-3" style="font-size: 0.95rem;">Transporte</td>
-                                                    <td class="text-right pr-4 font-weight-600 border-top-0 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                    <td class="font-weight-500 pl-4 border-top-0 py-3"
+                                                        style="font-size: 0.95rem;">Transporte</td>
+                                                    <td class="text-right pr-4 font-weight-600 border-top-0 py-3"
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                    </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">Descendencia</td>
-                                                    <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
+                                                        Descendencia</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3"
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                    </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">Productividad</td>
-                                                    <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
+                                                        Productividad</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3"
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                    </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">Estabilidad</td>
-                                                    <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
+                                                        Estabilidad</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3"
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                    </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">Profesionalización</td>
-                                                    <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</td>
+                                                    <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
+                                                        Profesionalización</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3"
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                    </td>
                                                 </tr>
                                                 <tr class="bg-light">
-                                                    <td class="font-weight-500 pl-4 py-3 text-muted" style="font-size: 0.95rem;"><i class="fas fa-clock mr-2 opacity-5 mt-1"></i>Años de Servicio</td>
-                                                    <td class="text-right pr-4 font-weight-600 py-3 text-muted" style="font-size: 1.05rem;">0</td>
+                                                    <td class="font-weight-500 pl-4 py-3 text-muted"
+                                                        style="font-size: 0.95rem;"><i
+                                                            class="fas fa-clock mr-2 opacity-5 mt-1"></i>Años de
+                                                        Servicio</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3 text-muted"
+                                                        style="font-size: 1.05rem;">0</td>
                                                 </tr>
                                                 <tr class="bg-light">
-                                                    <td class="font-weight-500 pl-4 py-3 text-muted" style="font-size: 0.95rem;"><i class="fas fa-times-circle mr-2 opacity-5 mt-1"></i>No Ascenso</td>
-                                                    <td class="text-right pr-4 font-weight-600 py-3 text-muted" style="font-size: 1.05rem;">0</td>
+                                                    <td class="font-weight-500 pl-4 py-3 text-muted"
+                                                        style="font-size: 0.95rem;"><i
+                                                            class="fas fa-times-circle mr-2 opacity-5 mt-1"></i>No
+                                                        Ascenso</td>
+                                                    <td class="text-right pr-4 font-weight-600 py-3 text-muted"
+                                                        style="font-size: 1.05rem;">0</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -505,8 +687,8 @@
                             <h4 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
                                 Estado de Cuenta Fideicomiso
                             </h4>
-                             <button class="btn-pastel-icon pastel-success shadow-sm" type="button" 
-                                    data-toggle="modal" data-target="#modalHistorialAntiguedad" title="Ver Historial de Movimientos">
+                            <button class="btn-pastel-icon pastel-success shadow-sm" type="button" data-toggle="modal"
+                                data-target="#modalHistorialAntiguedad" title="Ver Historial de Movimientos">
                                 <i class="fas fa-exchange-alt"></i>
                             </button>
                         </div>
@@ -516,46 +698,74 @@
                         <!-- Haberes -->
                         <div class="col-lg-7 mb-4">
                             <!-- Hero Banner: Saldo Disponible -->
-                            <div class="card shadow-sm border-0 mb-3 hero-banner-soft" style="border-radius: 12px; overflow: hidden; position: relative; border-left: 4px solid #598c89 !important;">
-                                <i class="fas fa-chart-line" style="position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.03;"></i>
+                            <div class="card shadow-sm border-0 mb-3 hero-banner-soft"
+                                style="border-radius: 12px; overflow: hidden; position: relative; border-left: 4px solid #598c89 !important;">
+                                <i class="fas fa-chart-line"
+                                    style="position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.03;"></i>
                                 <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center">
                                     <div style="z-index: 1;">
-                                        <h6 class="text-uppercase font-weight-500 mb-1" style="color: #94a3b8; font-size: 0.70rem; letter-spacing: 0.8px;">Saldo Disponible Total</h6>
-                                        <h3 class="mb-0 font-weight-600" style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda }} 0.00</h3>
+                                        <h6 class="text-uppercase font-weight-500 mb-1"
+                                            style="color: #94a3b8; font-size: 0.70rem; letter-spacing: 0.8px;">Saldo
+                                            Disponible Total</h6>
+                                        <h3 class="mb-0 font-weight-600"
+                                            style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda
+                                            }} 0.00</h3>
                                     </div>
-                                    <div class="icon-circle shadow-sm" style="width: 42px; height: 42px; background-color: rgba(89, 140, 137, 0.1); z-index: 1;">
+                                    <div class="icon-circle shadow-sm"
+                                        style="width: 42px; height: 42px; background-color: rgba(89, 140, 137, 0.1); z-index: 1;">
                                         <i class="fas fa-wallet" style="font-size: 1.1rem; color: #598c89;"></i>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Ledger A. de Antigüedad -->
-                            <div class="card shadow-sm border-0 ledger-card" style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center" style="border-color: #f4f5f7 !important;">
-                                    <div class="icon-circle mr-3" style="width: 34px; height: 34px; background-color: rgba(89, 140, 137, 0.1);"><i class="fas fa-coins" style="color: #598c89; font-size: 0.9rem;"></i></div>
-                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Haberes y Depósitos</h6>
+                            <div class="card shadow-sm border-0 ledger-card"
+                                style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center"
+                                    style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3"
+                                        style="width: 34px; height: 34px; background-color: rgba(89, 140, 137, 0.1);"><i
+                                            class="fas fa-coins" style="color: #598c89; font-size: 0.9rem;"></i></div>
+                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Haberes
+                                        y Depósitos</h6>
                                 </div>
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Asignación de Antigüedad</span>
-                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Asignación de
+                                                Antigüedad</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Depositado en Banco</span>
-                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Depositado en Banco</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Capital en Banco</span>
-                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Capital en Banco</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Fondo de Garantías</span>
-                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Fondo de Garantías</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Diferencia A.A.</span>
-                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Diferencia A.A.</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -565,44 +775,74 @@
                         <!-- Cargas y Egresos -->
                         <div class="col-lg-5 mb-4">
                             <!-- Retenciones Card -->
-                            <div class="card shadow-sm border-0 mb-4 ledger-card" style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center" style="border-color: #f4f5f7 !important;">
-                                    <div class="icon-circle mr-3" style="width: 34px; height: 34px; background-color: rgba(244, 67, 54, 0.1);"><i class="fas fa-exclamation-triangle text-danger" style="font-size: 0.9rem;"></i></div>
-                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Cargos y Retenciones</h6>
+                            <div class="card shadow-sm border-0 mb-4 ledger-card"
+                                style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center"
+                                    style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3"
+                                        style="width: 34px; height: 34px; background-color: rgba(244, 67, 54, 0.1);"><i
+                                            class="fas fa-exclamation-triangle text-danger"
+                                            style="font-size: 0.9rem;"></i></div>
+                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Cargos
+                                        y Retenciones</h6>
                                 </div>
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="text-danger font-weight-500" style="font-size: 0.95rem;"><i class="fas fa-ban mr-2 opacity-75"></i>Embargo</span>
-                                            <span class="text-danger font-weight-600 tracking-tight" style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="text-danger font-weight-500" style="font-size: 0.95rem;"><i
+                                                    class="fas fa-ban mr-2 opacity-75"></i>Embargo</span>
+                                            <span class="text-danger font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="text-warning font-weight-500 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;"><i class="fas fa-hand-holding-usd mr-2 opacity-75"></i>Anticipos Otorgados</span>
-                                            <span class="text-warning font-weight-600 tracking-tight" style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="text-warning font-weight-500 text-uppercase"
+                                                style="font-size: 0.75rem; letter-spacing: 0.5px;"><i
+                                                    class="fas fa-hand-holding-usd mr-2 opacity-75"></i>Anticipos
+                                                Otorgados</span>
+                                            <span class="text-warning font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
 
                             <!-- Intereses Card -->
-                            <div class="card shadow-sm border-0 ledger-card" style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center" style="border-color: #f4f5f7 !important;">
-                                    <div class="icon-circle mr-3" style="width: 34px; height: 34px; background-color: rgba(251, 140, 0, 0.1);"><i class="fas fa-chart-pie text-warning" style="font-size: 0.9rem;"></i></div>
-                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Intereses Caídos</h6>
+                            <div class="card shadow-sm border-0 ledger-card"
+                                style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center"
+                                    style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3"
+                                        style="width: 34px; height: 34px; background-color: rgba(251, 140, 0, 0.1);"><i
+                                            class="fas fa-chart-pie text-warning" style="font-size: 0.9rem;"></i></div>
+                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">
+                                        Intereses Caídos</h6>
                                 </div>
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Calculados Anual</span>
-                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Calculados Anual</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Cancelados a la Fecha</span>
-                                            <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Cancelados a la Fecha</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
                                         </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-4 border-light">
-                                            <span class="text-warning font-weight-500 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.5px;"><i class="fas fa-balance-scale mr-2 opacity-75"></i>Deuda Restante</span>
-                                            <span class="text-warning font-weight-600 tracking-tight" style="font-size: 1.15rem;">{{ moneda }} 0.00</span>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-4 border-light">
+                                            <span class="text-warning font-weight-500 text-uppercase"
+                                                style="font-size: 0.75rem; letter-spacing: 0.5px;"><i
+                                                    class="fas fa-balance-scale mr-2 opacity-75"></i>Deuda
+                                                Restante</span>
+                                            <span class="text-warning font-weight-600 tracking-tight"
+                                                style="font-size: 1.15rem;">{{ moneda }} 0.00</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -611,8 +851,10 @@
 
                         <!-- Metadata Footer Spanning Full Width -->
                         <div class="col-12 mt-2 mb-4">
-                            <div class="card shadow-sm border-0 ledger-card" style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-body bg-white py-3 px-4 d-flex justify-content-around align-items-center font-weight-500" style="font-size: 0.85rem; color: #94a3b8;">
+                            <div class="card shadow-sm border-0 ledger-card"
+                                style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-body bg-white py-3 px-4 d-flex justify-content-around align-items-center font-weight-500"
+                                    style="font-size: 0.85rem; color: #94a3b8;">
                                     <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Últ. Depósito: N/A</span>
                                     <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: 0.00%</span>
                                     <span><i class="fas fa-plus-circle mr-2 opacity-50"></i>Días Adicionales: 0</span>
@@ -631,42 +873,59 @@
                                 <!-- Columna de Visualización (Tarjeta Digital Minimalista) -->
                                 <div class="col-lg-5 mb-4 mb-lg-0">
                                     <div class="bank-card-container">
-                                        <div class="digital-bank-card minimalist shadow-sm" [style.border-top-color]="bancoSeleccionado?.color || '#598c89'">
-                                            <div class="card-content d-flex flex-column justify-content-between h-100 p-4">
+                                        <div class="digital-bank-card minimalist shadow-sm"
+                                            [style.border-top-color]="bancoSeleccionado?.color || '#598c89'">
+                                            <div
+                                                class="card-content d-flex flex-column justify-content-between h-100 p-4">
                                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                                     <div class="bank-logo-area">
                                                         <div *ngIf="bancoSeleccionado" class="bank-logo-wrapper">
-                                                            <img [src]="'assets/img/ipsfa/bancos/' + bancoSeleccionado.code + '.webp'" 
-                                                                 class="img-fluid bank-logo-img" 
-                                                                 [alt]="bancoSeleccionado.name"
-                                                                 onerror="this.src='assets/img/ipsfa/bancos/default.webp'">
+                                                            <img [src]="'assets/img/ipsfa/bancos/' + bancoSeleccionado.code + '.webp'"
+                                                                class="img-fluid bank-logo-img"
+                                                                [alt]="bancoSeleccionado.name"
+                                                                onerror="this.src='assets/img/ipsfa/bancos/default.webp'">
                                                         </div>
                                                         <div *ngIf="!bancoSeleccionado" class="bank-placeholder-mini">
                                                             <i class="fas fa-university text-muted opacity-4"></i>
                                                         </div>
                                                     </div>
                                                     <div class="card-account-type">
-                                                        <span class="badge-pastel-minimal" [ngClass]="identificacionForm.get('persona.datofinanciero.tipo').value === 'CA' ? 'green' : 'blue'">
-                                                            {{ identificacionForm.get('persona.datofinanciero.tipo').value === 'CA' ? 'CORRIENTE' : 'AHORRO' }}
+                                                        <span class="badge-pastel-minimal"
+                                                            [ngClass]="identificacionForm.get('persona.datofinanciero.tipo').value === 'CA' ? 'green' : 'blue'">
+                                                            {{
+                                                            identificacionForm.get('persona.datofinanciero.tipo').value
+                                                            === 'CA' ? 'CORRIENTE' : 'AHORRO' }}
                                                         </span>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="mb-4">
-                                                    <div class="font-small text-muted mb-1" style="font-size: 0.65rem; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 600;">Número de Cuenta</div>
+                                                    <div class="font-small text-muted mb-1"
+                                                        style="font-size: 0.65rem; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 600;">
+                                                        Número de Cuenta</div>
                                                     <div class="account-number-display-minimal">
-                                                        {{ identificacionForm.get('persona.datofinanciero.cuenta')?.value || '**** **** ** **********' }}
+                                                        {{
+                                                        identificacionForm.get('persona.datofinanciero.cuenta')?.value
+                                                        || '**** **** ** **********' }}
                                                     </div>
                                                 </div>
 
                                                 <div class="d-flex justify-content-between align-items-end mt-2">
                                                     <div class="card-holder-info">
-                                                        <div class="font-weight-bold text-dark" style="font-size: 0.8rem; letter-spacing: -0.2px;">
-                                                            {{ identificacionForm.get('persona.datobasico.nombres').value }} {{ identificacionForm.get('persona.datobasico.apellidos').value }}
+                                                        <div class="font-weight-bold text-dark"
+                                                            style="font-size: 0.8rem; letter-spacing: -0.2px;">
+                                                            {{
+                                                            identificacionForm.get('persona.datobasico.nombres').value
+                                                            }} {{
+                                                            identificacionForm.get('persona.datobasico.apellidos').value
+                                                            }}
                                                         </div>
-                                                        <small class="text-muted" style="font-size: 0.6rem; opacity: 0.7;">Titular del Expediente</small>
+                                                        <small class="text-muted"
+                                                            style="font-size: 0.6rem; opacity: 0.7;">Titular del
+                                                            Expediente</small>
                                                     </div>
-                                                    <i class="fas fa-wifi fa-rotate-90 text-muted opacity-3" style="font-size: 1rem;"></i>
+                                                    <i class="fas fa-wifi fa-rotate-90 text-muted opacity-3"
+                                                        style="font-size: 1rem;"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -675,20 +934,23 @@
 
                                 <!-- Columna de Formulario (Compacto y Siguiendo Patrones) -->
                                 <div class="col-lg-7">
-                                    <div class="form-container-minimal p-4 border-0 bg-light-pastel" style="border-radius: 12px;">
+                                    <div class="form-container-minimal p-4 border-0 bg-light-pastel"
+                                        style="border-radius: 12px;">
                                         <div class="row">
                                             <div class="col-12 mb-3">
                                                 <div class="modern-form-group mb-0">
-                                                    <label class="text-uppercase font-weight-bold" style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Número de Cuenta</label>
+                                                    <label class="text-uppercase font-weight-bold"
+                                                        style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Número
+                                                        de Cuenta</label>
                                                     <div class="input-group shadow-sm">
                                                         <div class="input-group-prepend">
-                                                            <span class="input-group-text bg-white border-right-0"><i class="fas fa-barcode text-success"></i></span>
+                                                            <span class="input-group-text bg-white border-right-0"><i
+                                                                    class="fas fa-barcode text-success"></i></span>
                                                         </div>
-                                                        <input type="text" 
-                                                            class="form-control border-left-0 font-weight-bold" 
+                                                        <input type="text"
+                                                            class="form-control border-left-0 font-weight-bold"
                                                             style="font-size: 0.95rem; letter-spacing: 1px;"
-                                                            placeholder="0000 0000 00 0000000000" 
-                                                            maxlength="23" 
+                                                            placeholder="0000 0000 00 0000000000" maxlength="23"
                                                             formControlName="cuenta">
                                                     </div>
                                                 </div>
@@ -696,14 +958,18 @@
 
                                             <div class="col-md-6 mb-3">
                                                 <div class="modern-form-group mb-0">
-                                                    <label class="text-uppercase font-weight-bold" style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Institución</label>
+                                                    <label class="text-uppercase font-weight-bold"
+                                                        style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Institución</label>
                                                     <div class="input-group shadow-sm">
                                                         <div class="input-group-prepend">
-                                                            <span class="input-group-text bg-white border-right-0"><i class="fas fa-university text-success"></i></span>
+                                                            <span class="input-group-text bg-white border-right-0"><i
+                                                                    class="fas fa-university text-success"></i></span>
                                                         </div>
-                                                        <select class="form-control border-left-0 font-weight-bold" formControlName="institucion" style="font-size: 0.85rem;">
+                                                        <select class="form-control border-left-0 font-weight-bold"
+                                                            formControlName="institucion" style="font-size: 0.85rem;">
                                                             <option value="">Seleccione...</option>
-                                                            <option *ngFor="let b of bancos" [value]="b.code">{{ b.name }}</option>
+                                                            <option *ngFor="let b of bancos" [value]="b.code">{{ b.name
+                                                                }}</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -711,12 +977,16 @@
 
                                             <div class="col-md-6 mb-3">
                                                 <div class="modern-form-group mb-0">
-                                                    <label class="text-uppercase font-weight-bold" style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Tipo de Cuenta</label>
+                                                    <label class="text-uppercase font-weight-bold"
+                                                        style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Tipo
+                                                        de Cuenta</label>
                                                     <div class="input-group shadow-sm">
                                                         <div class="input-group-prepend">
-                                                            <span class="input-group-text bg-white border-right-0"><i class="fas fa-tags text-success"></i></span>
+                                                            <span class="input-group-text bg-white border-right-0"><i
+                                                                    class="fas fa-tags text-success"></i></span>
                                                         </div>
-                                                        <select class="form-control border-left-0 font-weight-bold" formControlName="tipo" style="font-size: 0.85rem;">
+                                                        <select class="form-control border-left-0 font-weight-bold"
+                                                            formControlName="tipo" style="font-size: 0.85rem;">
                                                             <option value="CA">CORRIENTE</option>
                                                             <option value="AH">AHORRO</option>
                                                         </select>
@@ -725,7 +995,8 @@
                                             </div>
 
                                             <div class="col-12 mt-2">
-                                                <button type="button" class="btn-header-action green btn-block py-2 m-0 shadow-sm" 
+                                                <button type="button"
+                                                    class="btn-header-action green btn-block py-2 m-0 shadow-sm"
                                                     (click)="agregarCuenta()"
                                                     [disabled]="!identificacionForm.get('persona.datofinanciero.cuenta').value || !identificacionForm.get('persona.datofinanciero.institucion').value">
                                                     <i class="fas fa-plus-circle mr-2"></i>Vincular a Expediente
@@ -738,23 +1009,33 @@
 
                             <!-- Lista de Cuentas (Vista Compacta) -->
                             <div class="mt-5" *ngIf="cuentasBancarias.length > 0">
-                                <h6 class="text-muted font-weight-bold mb-3" style="font-size: 0.7rem; letter-spacing: 1.2px; text-transform: uppercase;">
-                                    Cuentas Vinculadas <span class="badge badge-pill badge-light-success ml-1">{{ cuentasBancarias.length }}/4</span>
+                                <h6 class="text-muted font-weight-bold mb-3"
+                                    style="font-size: 0.7rem; letter-spacing: 1.2px; text-transform: uppercase;">
+                                    Cuentas Vinculadas <span class="badge badge-pill badge-light-success ml-1">{{
+                                        cuentasBancarias.length }}/4</span>
                                 </h6>
-                                
+
                                 <div class="row">
-                                    <div class="col-md-6 col-xl-4 mb-3" *ngFor="let cta of cuentasBancarias; let i = index">
+                                    <div class="col-md-6 col-xl-4 mb-3"
+                                        *ngFor="let cta of cuentasBancarias; let i = index">
                                         <div class="account-item-minimal d-flex align-items-center">
                                             <div class="bank-dot-minimal" [style.background-color]="cta.color"></div>
                                             <div class="flex-grow-1 px-3 py-2 overflow-hidden">
-                                                <div class="text-dark font-weight-bold text-truncate" style="font-size: 0.8rem;">{{ cta.nombreInstitucion }}</div>
-                                                <div class="text-muted" style="font-size: 0.7rem; font-family: 'Roboto Mono'; opacity: 0.8;">{{ cta.cuenta }}</div>
+                                                <div class="text-dark font-weight-bold text-truncate"
+                                                    style="font-size: 0.8rem;">{{ cta.nombreInstitucion }}</div>
+                                                <div class="text-muted"
+                                                    style="font-size: 0.7rem; font-family: 'Roboto Mono'; opacity: 0.8;">
+                                                    {{ cta.cuenta }}</div>
                                             </div>
                                             <div class="d-flex pr-2">
-                                                <button class="btn-icon-minimal btn-attach" (click)="adjuntarCertificado(i)" [ngClass]="{'active': cta.archivo}" title="Certificado">
-                                                    <i class="fas" [ngClass]="cta.archivo ? 'fa-check-circle' : 'fa-file-upload'"></i>
+                                                <button class="btn-icon-minimal btn-attach"
+                                                    (click)="adjuntarCertificado(i)" [ngClass]="{'active': cta.archivo}"
+                                                    title="Certificado">
+                                                    <i class="fas"
+                                                        [ngClass]="cta.archivo ? 'fa-check-circle' : 'fa-file-upload'"></i>
                                                 </button>
-                                                <button class="btn-icon-minimal btn-remove" (click)="eliminarCuenta(i)" title="Eliminar">
+                                                <button class="btn-icon-minimal btn-remove" (click)="eliminarCuenta(i)"
+                                                    title="Eliminar">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </div>
@@ -767,38 +1048,72 @@
                 </div>
 
                 <!-- DIRECCION y CONTACTO -->
-                 <div *ngIf="currentTab === 'direccion'" class="fade-in">
-                     <div formGroupName="persona">
+                <div *ngIf="currentTab === 'direccion'" class="fade-in">
+                    <div formGroupName="persona">
                         <!-- DIRECCION -->
                         <div formGroupName="direccion">
-                             <div class="row">
-                                 <div class="col-md-4"><div class="modern-form-group"><label>Estado</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-map text-success"></i></span></div><select class="form-control" formControlName="estado"><option value="">Seleccione...</option></select></div></div></div>
-                                 <div class="col-md-4"><div class="modern-form-group"><label>Ciudad</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-city text-success"></i></span></div><select class="form-control" formControlName="ciudad"><option value="">Seleccione...</option></select></div></div></div>
-                                 <div class="col-md-4"><div class="modern-form-group"><label>Municipio</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-map-marker-alt text-success"></i></span></div><select class="form-control" formControlName="municipio"><option value="">Seleccione...</option></select></div></div></div>
-                             </div>
-                              <div class="row">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="modern-form-group"><label>Estado</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                        class="fas fa-map text-success"></i></span></div><select
+                                                class="form-control" formControlName="estado">
+                                                <option value="">Seleccione...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="modern-form-group"><label>Ciudad</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                        class="fas fa-city text-success"></i></span></div><select
+                                                class="form-control" formControlName="ciudad">
+                                                <option value="">Seleccione...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="modern-form-group"><label>Municipio</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                        class="fas fa-map-marker-alt text-success"></i></span></div>
+                                            <select class="form-control" formControlName="municipio">
+                                                <option value="">Seleccione...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-8">
-                                     <div class="modern-form-group">
+                                    <div class="modern-form-group">
                                         <label>Dirección Exacta</label>
                                         <div class="input-group">
-                                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span></div>
-                                            <input type="text" class="form-control" placeholder="Av. Principal, Calle..." formControlName="calleavenida">
+                                            <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                        class="fas fa-map-marked-alt"></i></span></div>
+                                            <input type="text" class="form-control"
+                                                placeholder="Av. Principal, Calle..." formControlName="calleavenida">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                     <div class="modern-form-group">
+                                    <div class="modern-form-group">
                                         <label>Casa</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="No." formControlName="casa">
+                                            <input type="text" class="form-control" placeholder="No."
+                                                formControlName="casa">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                     <div class="modern-form-group">
+                                    <div class="modern-form-group">
                                         <label>Apto</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="No." formControlName="apartamento">
+                                            <input type="text" class="form-control" placeholder="No."
+                                                formControlName="apartamento">
                                         </div>
                                     </div>
                                 </div>
@@ -807,356 +1122,473 @@
 
                         <!-- CONTACTO -->
                         <div class="row">
-                             <div class="col-md-6" formGroupName="telefono">
+                            <div class="col-md-6" formGroupName="telefono">
                                 <div class="modern-form-group">
                                     <label>Teléfono Móvil</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-mobile-alt"></i></span></div>
-                                        <input type="text" class="form-control" placeholder="(04xx) 000-0000" formControlName="movil">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-mobile-alt"></i></span></div>
+                                        <input type="text" class="form-control" placeholder="(04xx) 000-0000"
+                                            formControlName="movil">
                                     </div>
                                 </div>
-                             </div>
-                             <div class="col-md-6" formGroupName="correo">
+                            </div>
+                            <div class="col-md-6" formGroupName="correo">
                                 <div class="modern-form-group">
                                     <label>Correo Electrónico</label>
                                     <div class="input-group">
-                                        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div>
-                                        <input type="email" class="form-control" placeholder="usuario@dominio.com" formControlName="principal">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-envelope"></i></span></div>
+                                        <input type="email" class="form-control" placeholder="usuario@dominio.com"
+                                            formControlName="principal">
                                     </div>
                                 </div>
-                             </div>
+                            </div>
                         </div>
                         <div class="row" formGroupName="redsocial">
-                             <div class="col-md-4">
-                                 <div class="modern-form-group"><label>Twitter</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fab fa-twitter"></i></span></div><input type="text" class="form-control" formControlName="twitter"></div></div>
-                             </div>
-                             <div class="col-md-4">
-                                 <div class="modern-form-group"><label>Facebook</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fab fa-facebook-f"></i></span></div><input type="text" class="form-control" formControlName="facebook"></div></div>
-                             </div>
-                             <div class="col-md-4">
-                                 <div class="modern-form-group"><label>Instagram</label><div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fab fa-instagram"></i></span></div><input type="text" class="form-control" formControlName="instagram"></div></div>
-                             </div>
+                            <div class="col-md-4">
+                                <div class="modern-form-group"><label>Twitter</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fab fa-twitter"></i></span></div><input type="text"
+                                            class="form-control" formControlName="twitter">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="modern-form-group"><label>Facebook</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fab fa-facebook-f"></i></span></div><input type="text"
+                                            class="form-control" formControlName="facebook">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="modern-form-group"><label>Instagram</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fab fa-instagram"></i></span></div><input type="text"
+                                            class="form-control" formControlName="instagram">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                 </div>
+                </div>
 
-                 <!-- FISICOS -->
+                <!-- FISICOS -->
                 <div *ngIf="currentTab === 'fisico'" class="fade-in">
                     <div formGroupName="persona">
                         <div class="row" formGroupName="datofisico">
-                            <div class="col-md-3"><div class="modern-form-group"><label>Estatura (m)</label><div class="input-group"><input type="text" class="form-control" placeholder="1.75" formControlName="talla"></div></div></div>
-                            <div class="col-md-3"><div class="modern-form-group"><label>Peso (kg)</label><div class="input-group"><input type="text" class="form-control" placeholder="75" formControlName="peso"></div></div></div>
+                            <div class="col-md-3">
+                                <div class="modern-form-group"><label>Estatura (m)</label>
+                                    <div class="input-group"><input type="text" class="form-control" placeholder="1.75"
+                                            formControlName="talla"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="modern-form-group"><label>Peso (kg)</label>
+                                    <div class="input-group"><input type="text" class="form-control" placeholder="75"
+                                            formControlName="peso"></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="row" formGroupName="datofisionomico">
                             <div class="col-md-3">
                                 <div class="modern-form-group"><label>Grupo Sanguíneo</label>
-                                    <div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-tint text-danger"></i></span></div><select class="form-control" formControlName="gruposanguineo"><option value="">Seleccione...</option><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select></div>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-tint text-danger"></i></span></div><select
+                                            class="form-control" formControlName="gruposanguineo">
+                                            <option value="">Seleccione...</option>
+                                            <option value="O+">O+</option>
+                                            <option value="O-">O-</option>
+                                            <option value="A+">A+</option>
+                                            <option value="A-">A-</option>
+                                            <option value="B+">B+</option>
+                                            <option value="B-">B-</option>
+                                            <option value="AB+">AB+</option>
+                                            <option value="AB-">AB-</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                 <div class="modern-form-group"><label>Color de Piel</label>
-                                    <div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-palette text-warning"></i></span></div><select class="form-control" formControlName="colorpiel"><option value="">Seleccione...</option><option value="MORENA">MORENA</option><option value="BLANCA">BLANCA</option><option value="NEGRA">NEGRA</option></select></div>
+                                <div class="modern-form-group"><label>Color de Piel</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-palette text-warning"></i></span></div><select
+                                            class="form-control" formControlName="colorpiel">
+                                            <option value="">Seleccione...</option>
+                                            <option value="MORENA">MORENA</option>
+                                            <option value="BLANCA">BLANCA</option>
+                                            <option value="NEGRA">NEGRA</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                 <div class="modern-form-group"><label>Color de Ojos</label>
-                                    <div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-eye text-info"></i></span></div><select class="form-control" formControlName="colorojos"><option value="">Seleccione...</option><option value="CASTAÑO">CASTAÑO</option><option value="NEGRO">NEGRO</option><option value="AZUL">AZUL</option><option value="VERDE">VERDE</option></select></div>
+                                <div class="modern-form-group"><label>Color de Ojos</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-eye text-info"></i></span></div><select
+                                            class="form-control" formControlName="colorojos">
+                                            <option value="">Seleccione...</option>
+                                            <option value="CASTAÑO">CASTAÑO</option>
+                                            <option value="NEGRO">NEGRO</option>
+                                            <option value="AZUL">AZUL</option>
+                                            <option value="VERDE">VERDE</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                 <div class="modern-form-group"><label>Color de Cabello</label>
-                                    <div class="input-group"><div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-tag text-dark"></i></span></div><select class="form-control" formControlName="colorcabello"><option value="">Seleccione...</option><option value="NEGRO">NEGRO</option><option value="CASTAÑO">CASTAÑO</option><option value="RUBIO">RUBIO</option><option value="ROJO">ROJO</option><option value="CANOSO">CANOSO</option></select></div>
+                                <div class="modern-form-group"><label>Color de Cabello</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-user-tag text-dark"></i></span></div><select
+                                            class="form-control" formControlName="colorcabello">
+                                            <option value="">Seleccione...</option>
+                                            <option value="NEGRO">NEGRO</option>
+                                            <option value="CASTAÑO">CASTAÑO</option>
+                                            <option value="RUBIO">RUBIO</option>
+                                            <option value="ROJO">ROJO</option>
+                                            <option value="CANOSO">CANOSO</option>
+                                        </select>
+                                    </div>
                                 </div>
-                             </div>
-                         </div>
-                     </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-     <!-- Main Submit Button -->
-     <div class="card shadow-none bg-transparent border-0 mb-4">
-         <div class="row">
-             <div class="col text-right d-flex justify-content-end align-items-center">
-                 <button type="button" class="btn-header-action blue mr-3 shadow-none" (click)="openModalConsultarNetos(modalConsultarNetos)">
-                     <i class="fas fa-money-bill-wave"></i> Consultar Netos
-                 </button>
-                 <button type="button" class="btn-header-action amber mr-3 shadow-none" (click)="openModalEmitirTIM(modalEmitirTIM)">
-                     <i class="fas fa-id-card"></i> Emitir TIM
-                 </button>
-                 <button type="button" class="btn-header-action teal shadow-none" (click)="openModalConfirmarGuardar(modalConfirmarGuardar)">
-                     <i class="fas fa-save"></i> Guardar Cambios
-                 </button>
-             </div>
-         </div>
-     </div>
+    <!-- Main Submit Button -->
+    <div class="card shadow-none bg-transparent border-0 mb-4">
+        <div class="row">
+            <div class="col text-right d-flex justify-content-end align-items-center">
+                <button type="button" class="btn-header-action blue mr-3 shadow-none"
+                    (click)="openModalConsultarNetos(modalConsultarNetos)">
+                    <i class="fas fa-money-bill-wave"></i> Consultar Netos
+                </button>
+                <button type="button" class="btn-header-action amber mr-3 shadow-none"
+                    (click)="openModalEmitirTIM(modalEmitirTIM)">
+                    <i class="fas fa-id-card"></i> Emitir TIM
+                </button>
+                <button type="button" class="btn-header-action teal shadow-none"
+                    (click)="openModalConfirmarGuardar(modalConfirmarGuardar)">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
 </form>
 
-     <!-- SECCIÓN 3: GRUPO FAMILIAR (SEPARATE BLOCK) -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header border-0 d-flex justify-content-between align-items-center bg-white">
-            <h3 class="mb-0 text-dark font-weight-bold">
-                <i class="fas fa-users mr-2 text-verde-titulos"></i>Grupo Familiar
-            </h3>
-             <button class="btn-pastel-icon pastel-success shadow-sm" type="button" (click)="openModalAgregarFamiliar(modalAgregarFamiliar)" title="Agregar Familiar">
-                 <i class="fas fa-plus"></i>
-             </button>
-        </div>
-            <div class="table-responsive">
-                <table class="table align-items-center table-flush table-striped-custom">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-                                <i class="fas fa-user-friends mr-2 text-verde-titulos opacity-75"></i>Parentesco
-                            </th>
-                            <th class="font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-                                <i class="far fa-id-card mr-2 text-verde-titulos opacity-75"></i>Cédula
-                            </th>
-                            <th class="font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-                                <i class="fas fa-user mr-2 text-verde-titulos opacity-75"></i>Nombres y Apellidos
-                            </th>
-                            <th class="font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-                                <i class="far fa-calendar-alt mr-2 text-verde-titulos opacity-75"></i>Fecha Nac.
-                            </th>
-                            <th class="text-right font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
-                                <i class="fas fa-cog mr-2 text-verde-titulos opacity-75"></i>Acción
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let familiar of familiares" [class.row-inactive]="familiar.inactivo"
-                            (dblclick)="openFamiliarModal(familiar)">
-                            <td>
-                                <span class="badge badge-pill text-uppercase shadow-sm border" style="background-color: rgba(89, 140, 137, 0.1); color: #598c89; border-color: rgba(89, 140, 137, 0.2) !important; font-size: 0.7rem; padding: 0.5em 0.9em;">
-                                     {{ familiar.parentesco }}
-                                </span>
-                            </td>
-                            <td style="color: #32325d; font-weight: 400;">
-                                {{ familiar.cedula }}
-                            </td>
-                            <td style="color: #32325d; font-weight: 400;">
-                                {{ familiar.nombres | uppercase }}
-                                <span *ngIf="familiar.esMilitar" class="ml-2" title="Personal Militar" data-toggle="tooltip">
-                                     <i class="fas fa-user-shield text-verde-titulos"></i>
-                                </span>
-                            </td>
-                            <td class="text-muted">
-                                {{ familiar.fechanacimiento | date:'dd/MM/yyyy' }}
-                            </td>
-                            <td class="text-right">
-                                 <div class="dropdown" ngbDropdown placement="bottom-right" container="body">
-                                    <button class="btn btn-sm btn-icon-only text-light" ngbDropdownToggle>
-                                      <i class="fas fa-ellipsis-v text-verde-titulos"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow" ngbDropdownMenu>
-                                      <a class="dropdown-item" href="javascript:void(0)"><i class="fas fa-eye mr-2 text-verde-titulos"></i>Ver Detalle</a>
-                                      <a class="dropdown-item" href="javascript:void(0)" (click)="openFamiliarModal(familiar)"><i class="fas fa-edit mr-2 text-verde-titulos"></i>Editar</a>
-                                    </div>
-                                  </div>
-                            </td>
-                        </tr>
-                        <tr *ngIf="familiares.length === 0">
-                             <td colspan="5" class="text-center py-5">
-                                <div class="empty-state">
-                                    <div class="icon-shape bg-verde-titulos-soft text-verde-titulos rounded-circle shadow-sm mb-3" style="width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center;">
-                                        <i class="fas fa-users fa-2x"></i>
-                                    </div>
-                                    <p class="text-muted mb-0 font-weight-500">Sin grupo familiar registrado</p>
-                                </div>
-                             </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+<!-- SECCIÓN 3: GRUPO FAMILIAR (SEPARATE BLOCK) -->
+<div class="card shadow-sm border-0">
+    <div class="card-header border-0 d-flex justify-content-between align-items-center bg-white">
+        <h3 class="mb-0 text-dark font-weight-bold">
+            <i class="fas fa-users mr-2 text-verde-titulos"></i>Grupo Familiar
+        </h3>
+        <button class="btn-pastel-icon pastel-success shadow-sm" type="button"
+            (click)="openModalAgregarFamiliar(modalAgregarFamiliar)" title="Agregar Familiar">
+            <i class="fas fa-plus"></i>
+        </button>
     </div>
+    <div class="table-responsive">
+        <table class="table align-items-center table-flush table-striped-custom">
+            <thead class="thead-light">
+                <tr>
+                    <th class="font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <i class="fas fa-user-friends mr-2 text-verde-titulos opacity-75"></i>Parentesco
+                    </th>
+                    <th class="font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <i class="far fa-id-card mr-2 text-verde-titulos opacity-75"></i>Cédula
+                    </th>
+                    <th class="font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <i class="fas fa-user mr-2 text-verde-titulos opacity-75"></i>Nombres y Apellidos
+                    </th>
+                    <th class="font-weight-600 text-verde-titulos" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <i class="far fa-calendar-alt mr-2 text-verde-titulos opacity-75"></i>Fecha Nac.
+                    </th>
+                    <th class="text-right font-weight-600 text-verde-titulos"
+                        style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <i class="fas fa-cog mr-2 text-verde-titulos opacity-75"></i>Acción
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let familiar of familiares" [class.row-inactive]="familiar.inactivo"
+                    (dblclick)="openFamiliarModal(familiar)">
+                    <td>
+                        <span class="badge badge-pill text-uppercase shadow-sm border"
+                            style="background-color: rgba(89, 140, 137, 0.1); color: #598c89; border-color: rgba(89, 140, 137, 0.2) !important; font-size: 0.7rem; padding: 0.5em 0.9em;">
+                            {{ familiar.parentesco }}
+                        </span>
+                    </td>
+                    <td style="color: #32325d; font-weight: 400;">
+                        {{ familiar.cedula }}
+                    </td>
+                    <td style="color: #32325d; font-weight: 400;">
+                        {{ familiar.nombres | uppercase }}
+                        <span *ngIf="familiar.esMilitar" class="ml-2" title="Personal Militar" data-toggle="tooltip">
+                            <i class="fas fa-user-shield text-verde-titulos"></i>
+                        </span>
+                    </td>
+                    <td class="text-muted">
+                        {{ familiar.fechanacimiento | date:'dd/MM/yyyy' }}
+                    </td>
+                    <td class="text-right">
+                        <div class="dropdown" ngbDropdown placement="bottom-right" container="body">
+                            <button class="btn btn-sm btn-icon-only text-light" ngbDropdownToggle>
+                                <i class="fas fa-ellipsis-v text-verde-titulos"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow" ngbDropdownMenu>
+                                <a class="dropdown-item" href="javascript:void(0)"><i
+                                        class="fas fa-eye mr-2 text-verde-titulos"></i>Ver Detalle</a>
+                                <a class="dropdown-item" href="javascript:void(0)"
+                                    (click)="openFamiliarModal(familiar)"><i
+                                        class="fas fa-edit mr-2 text-verde-titulos"></i>Editar</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="familiares.length === 0">
+                    <td colspan="5" class="text-center py-5">
+                        <div class="empty-state">
+                            <div class="icon-shape bg-verde-titulos-soft text-verde-titulos rounded-circle shadow-sm mb-3"
+                                style="width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <p class="text-muted mb-0 font-weight-500">Sin grupo familiar registrado</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 
 <!-- MODAL FAMILIAR (Needs formGroup binding, keeping same flat form for modal) -->
-<div class="modal fade" id="modalFamiliar" tabindex="-1" role="dialog" aria-hidden="true" style="background-color: rgba(50, 50, 93, 0.2);">
-  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-    <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
-      <div class="modal-header border-0 px-4 py-4" style="background-color: #f7fafc;">
-        <h5 class="modal-title font-weight-bold" style="color: #32325d;"><i class="fas fa-user-plus mr-2 text-success opacity-75"></i>Ficha del Familiar</h5>
-        <button class="btn-pastel-icon pastel-danger" type="button" data-dismiss="modal" aria-label="Close" title="Cerrar Ficha">
-            <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body p-4 bg-white" [formGroup]="familiarForm">
-           <div class="row">
-               
-               <!-- Columna Foto Institucional (Rectangular) -->
-               <div class="col-lg-3 d-flex flex-column align-items-center border-right pr-4">
-                    <div class="avatar-container position-relative overflow-hidden shadow-sm mb-4 w-100" style="border-radius: 8px; aspect-ratio: 3/4; max-width: 190px;">
-                        <img src="./assets/img/ipsfa/logo.webp " class="w-100 h-100" style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
-                        <div class="avatar-overlay d-flex align-items-end justify-content-center pb-4">
-                            <button type="button" class="btn btn-ok btn-sm rounded-pill px-4" style="backdrop-filter: blur(2px);">
-                                <i class="fas fa-camera mr-2"></i>Capturar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="w-100 mb-3 modern-form-group">
-                        <label class="text-center w-100 d-block">Estatus Vital</label>
-                        <select class="form-control text-center font-weight-bold text-success" style="background-color: rgba(45, 206, 137, 0.05);">
-                            <option value="S">SOBREVIVIENTE</option>
-                            <option value="F">FALLECIDO</option>
-                        </select>
-                    </div>
-               </div>
+<div class="modal fade" id="modalFamiliar" tabindex="-1" role="dialog" aria-hidden="true"
+    style="background-color: rgba(50, 50, 93, 0.2);">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header border-0 px-4 py-4" style="background-color: #f7fafc;">
+                <h5 class="modal-title font-weight-bold" style="color: #32325d;"><i
+                        class="fas fa-user-plus mr-2 text-success opacity-75"></i>Ficha del Familiar</h5>
+                <button class="btn-pastel-icon pastel-danger" type="button" data-dismiss="modal" aria-label="Close"
+                    title="Cerrar Ficha">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body p-4 bg-white" [formGroup]="familiarForm">
+                <div class="row">
 
-               <!-- Columna Formulario de Datos -->
-               <div class="col-lg-9 pl-4">
-                    <h6 class="text-uppercase text-muted font-weight-bold mb-4" style="font-size: 0.8rem; letter-spacing: 1px; border-bottom: 1px solid #eceff1; padding-bottom: 0.5rem;">Información Básica</h6>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="modern-form-group">
-                                <label>Cédula</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-id-card"></i></span></div>
-                                    <input type="text" class="form-control font-weight-bold" placeholder="Cédula" formControlName="cedula">
-                                </div>
+                    <!-- Columna Foto Institucional (Rectangular) -->
+                    <div class="col-lg-3 d-flex flex-column align-items-center border-right pr-4">
+                        <div class="avatar-container position-relative overflow-hidden shadow-sm mb-4 w-100"
+                            style="border-radius: 8px; aspect-ratio: 3/4; max-width: 190px;">
+                            <img src="assets/img/ipsfa/logo.webp" class="w-100 h-100"
+                                style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
+                            <div class="avatar-overlay d-flex align-items-end justify-content-center pb-4">
+                                <button type="button" class="btn btn-ok btn-sm rounded-pill px-4"
+                                    style="backdrop-filter: blur(2px);">
+                                    <i class="fas fa-camera mr-2"></i>Capturar
+                                </button>
                             </div>
                         </div>
-                        <div class="col-md-8">
-                            <div class="modern-form-group">
-                                <label>Nombres y Apellidos</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user-edit"></i></span></div>
-                                    <input type="text" class="form-control font-weight-bold text-uppercase" placeholder="Nombre completo" formControlName="nombres">
-                                </div>
-                            </div>
+                        <div class="w-100 mb-3 modern-form-group">
+                            <label class="text-center w-100 d-block">Estatus Vital</label>
+                            <select class="form-control text-center font-weight-bold text-success"
+                                style="background-color: rgba(45, 206, 137, 0.05);">
+                                <option value="S">SOBREVIVIENTE</option>
+                                <option value="F">FALLECIDO</option>
+                            </select>
                         </div>
                     </div>
-                    
-                    <div class="row mt-3">
-                        <div class="col-md-4">
-                            <div class="modern-form-group">
-                                <label>Parentesco</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-project-diagram"></i></span></div>
-                                    <select class="form-control font-weight-bold" formControlName="parentesco">
-                                        <option value="">Seleccione...</option>
-                                        <option value="HIJO">HIJO</option>
-                                        <option value="HIJA">HIJA</option>
-                                        <option value="ESPOSA">ESPOSA</option>
-                                        <option value="ESPOSO">ESPOSO</option>
-                                        <option value="MADRE">MADRE</option>
-                                        <option value="PADRE">PADRE</option>
-                                    </select>
+
+                    <!-- Columna Formulario de Datos -->
+                    <div class="col-lg-9 pl-4">
+                        <h6 class="text-uppercase text-muted font-weight-bold mb-4"
+                            style="font-size: 0.8rem; letter-spacing: 1px; border-bottom: 1px solid #eceff1; padding-bottom: 0.5rem;">
+                            Información Básica</h6>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label>Cédula</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="far fa-id-card"></i></span></div>
+                                        <input type="text" class="form-control font-weight-bold" placeholder="Cédula"
+                                            formControlName="cedula">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="modern-form-group">
+                                    <label>Nombres y Apellidos</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-user-edit"></i></span></div>
+                                        <input type="text" class="form-control font-weight-bold text-uppercase"
+                                            placeholder="Nombre completo" formControlName="nombres">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="modern-form-group">
-                                <label>Fecha Nacimiento</label>
-                                <app-pastel-datepicker formControlName="fecha_nacimiento" iconClass="far fa-calendar-alt"></app-pastel-datepicker>
+
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label>Parentesco</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-project-diagram"></i></span></div>
+                                        <select class="form-control font-weight-bold" formControlName="parentesco">
+                                            <option value="">Seleccione...</option>
+                                            <option value="HIJO">HIJO</option>
+                                            <option value="HIJA">HIJA</option>
+                                            <option value="ESPOSA">ESPOSA</option>
+                                            <option value="ESPOSO">ESPOSO</option>
+                                            <option value="MADRE">MADRE</option>
+                                            <option value="PADRE">PADRE</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="modern-form-group">
-                                <label>Condición</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-wheelchair"></i></span></div>
-                                    <select class="form-control font-weight-bold text-danger">
-                                        <option value="N">NINGUNA</option>
-                                        <option value="E">ESPECIAL / MENTAL</option>
-                                        <option value="F">FÍSICA</option>
-                                    </select>
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label>Fecha Nacimiento</label>
+                                    <app-pastel-datepicker formControlName="fecha_nacimiento"
+                                        iconClass="far fa-calendar-alt"></app-pastel-datepicker>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="modern-form-group">
+                                    <label>Condición</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                                    class="fas fa-wheelchair"></i></span></div>
+                                        <select class="form-control font-weight-bold text-danger">
+                                            <option value="N">NINGUNA</option>
+                                            <option value="E">ESPECIAL / MENTAL</option>
+                                            <option value="F">FÍSICA</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-               </div><!-- fin columna form -->
-               
-           </div><!-- fin row -->
-      </div>
-      <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-between">
-        <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-ok" (click)="guardarFamiliar()">Guardar Expediente</button>
-      </div>
+
+                    </div><!-- fin columna form -->
+
+                </div><!-- fin row -->
+            </div>
+            <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-ok" (click)="guardarFamiliar()">Guardar Expediente</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- MODAL ZOOM FOTO PRINCIPAL (ELEGANCIA LIGHTBOX) -->
-<div class="modal fade" id="modalZoomFoto" tabindex="-1" role="dialog" aria-hidden="true" style="background-color: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px);">
-  <div class="modal-dialog modal-dialog-centered modal-xl d-flex justify-content-center" role="document">
-    <div class="modal-content border-0 bg-transparent text-center" style="max-width: 900px; box-shadow: none;">
-        
-        <!-- Boton de cierre Premium -->
-        <button type="button" class="close text-white position-absolute" data-dismiss="modal" aria-label="Close" 
+<div class="modal fade" id="modalZoomFoto" tabindex="-1" role="dialog" aria-hidden="true"
+    style="background-color: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px);">
+    <div class="modal-dialog modal-dialog-centered modal-xl d-flex justify-content-center" role="document">
+        <div class="modal-content border-0 bg-transparent text-center" style="max-width: 900px; box-shadow: none;">
+
+            <!-- Boton de cierre Premium -->
+            <button type="button" class="close text-white position-absolute" data-dismiss="modal" aria-label="Close"
                 style="right: -10px; top: -30px; z-index: 10; font-size: 2.2rem; opacity: 0.7; transition: opacity 0.2s; outline: none; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"
                 onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
-            <i class="fas fa-times-circle"></i>
-        </button>
-        
-        <!-- Carrusel Fotográfico Visualizador -->
-        <div id="carouselFotoExpediente" class="carousel slide" data-ride="carousel" data-interval="false">
-            <div class="carousel-inner position-relative rounded-lg">
-                
-                <!-- Slide Activo (Foto Principal Estilo Polaroid) -->
-                <div class="carousel-item active d-flex justify-content-center align-items-center" style="min-height: 50vh;">
-                    <div class="position-relative d-inline-block">
-                        <!-- Marco Fotográfico Blanco Clásico -->
-                        <div class="bg-white shadow-lg mx-auto" style="padding: 12px 12px 40px 12px; border-radius: 4px; border: 1px solid #e2e8f0; transform: rotate(-1deg);">
-                            <img [src]="getFotoUrl()" class="img-fluid" style="object-fit: contain; max-height: 65vh; max-width: 100%; border: 1px solid #cbd5e1;">
-                            
-                            <!-- El grado se acopla como una calcomanía institucional debajo -->
-                            <div class="position-absolute d-flex justify-content-center w-100" style="bottom: 12px; left: 0;">
-                                <img *ngIf="getGradoBadgePath()" [src]="getGradoBadgePath()" alt="Grado Zoom" 
-                                    style="height: 60px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));" 
-                                    (error)="badgeImgZoom.style.display='none'" #badgeImgZoom>
+                <i class="fas fa-times-circle"></i>
+            </button>
+
+            <!-- Carrusel Fotográfico Visualizador -->
+            <div id="carouselFotoExpediente" class="carousel slide" data-ride="carousel" data-interval="false">
+                <div class="carousel-inner position-relative rounded-lg">
+
+                    <!-- Slide Activo (Foto Principal Estilo Polaroid) -->
+                    <div class="carousel-item active d-flex justify-content-center align-items-center"
+                        style="min-height: 50vh;">
+                        <div class="position-relative d-inline-block">
+                            <!-- Marco Fotográfico Blanco Clásico -->
+                            <div class="bg-white shadow-lg mx-auto"
+                                style="padding: 12px 12px 40px 12px; border-radius: 4px; border: 1px solid #e2e8f0; transform: rotate(-1deg);">
+                                <img [src]="getFotoUrl()" class="img-fluid"
+                                    style="object-fit: contain; max-height: 65vh; max-width: 100%; border: 1px solid #cbd5e1;">
+
+                                <!-- El grado se acopla como una calcomanía institucional debajo -->
+                                <div class="position-absolute d-flex justify-content-center w-100"
+                                    style="bottom: 12px; left: 0;">
+                                    <img *ngIf="getGradoBadgePath()" [src]="getGradoBadgePath()" alt="Grado Zoom"
+                                        style="height: 60px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));"
+                                        (error)="badgeImgZoom.style.display='none'" #badgeImgZoom>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Slide Secundario: Documentos PDF/DNI Futuro -->
-                <div class="carousel-item d-flex justify-content-center align-items-center" style="min-height: 50vh;">
-                   <div class="position-relative d-inline-block">
-                       <div class="d-flex align-items-center justify-content-center flex-column shadow-lg" 
-                            style="min-height: 65vh; width: 45vh; max-width: 100%; background: linear-gradient(135deg, #1e293b, #0f172a); padding: 15px; border-radius: 6px; border: 1px solid #334155; transform: rotate(1deg);">
-                            
-                            <div class="d-flex flex-column align-items-center justify-content-center text-muted w-100 h-100" style="border: 2px dashed #475569; border-radius: 8px;">
-                                <i class="fas fa-file-image text-white mb-4" style="font-size: 4.5rem; opacity: 0.25;"></i>
-                                <span class="text-white font-weight-bold" style="opacity: 0.6; font-size: 1.2rem; letter-spacing: 1px;">DOCUMENTOS ANEXOS</span>
-                                <span class="text-white mt-2" style="opacity: 0.4; font-size: 0.9rem;">Área de Escaneos Fotográficos</span>
+                    <!-- Slide Secundario: Documentos PDF/DNI Futuro -->
+                    <div class="carousel-item d-flex justify-content-center align-items-center"
+                        style="min-height: 50vh;">
+                        <div class="position-relative d-inline-block">
+                            <div class="d-flex align-items-center justify-content-center flex-column shadow-lg"
+                                style="min-height: 65vh; width: 45vh; max-width: 100%; background: linear-gradient(135deg, #1e293b, #0f172a); padding: 15px; border-radius: 6px; border: 1px solid #334155; transform: rotate(1deg);">
+
+                                <div class="d-flex flex-column align-items-center justify-content-center text-muted w-100 h-100"
+                                    style="border: 2px dashed #475569; border-radius: 8px;">
+                                    <i class="fas fa-file-image text-white mb-4"
+                                        style="font-size: 4.5rem; opacity: 0.25;"></i>
+                                    <span class="text-white font-weight-bold"
+                                        style="opacity: 0.6; font-size: 1.2rem; letter-spacing: 1px;">DOCUMENTOS
+                                        ANEXOS</span>
+                                    <span class="text-white mt-2" style="opacity: 0.4; font-size: 0.9rem;">Área de
+                                        Escaneos Fotográficos</span>
+                                </div>
                             </div>
-                       </div>
-                   </div>
+                        </div>
+                    </div>
+
                 </div>
 
+                <!-- Controles Premium de Vidrio Esmaltado -->
+                <a class="carousel-control-prev" href="#carouselFotoExpediente" role="button" data-slide="prev"
+                    style="width: 15%; opacity: 1;">
+                    <div class="d-flex justify-content-center align-items-center shadow-lg"
+                        style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                        <i class="fas fa-chevron-left text-white" style="font-size: 1.5rem; margin-right: 4px;"></i>
+                    </div>
+                    <span class="sr-only">Anterior</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselFotoExpediente" role="button" data-slide="next"
+                    style="width: 15%; opacity: 1;">
+                    <div class="d-flex justify-content-center align-items-center shadow-lg"
+                        style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                        <i class="fas fa-chevron-right text-white" style="font-size: 1.5rem; margin-left: 4px;"></i>
+                    </div>
+                    <span class="sr-only">Siguiente</span>
+                </a>
             </div>
-            
-            <!-- Controles Premium de Vidrio Esmaltado -->
-            <a class="carousel-control-prev" href="#carouselFotoExpediente" role="button" data-slide="prev" style="width: 15%; opacity: 1;">
-                <div class="d-flex justify-content-center align-items-center shadow-lg" 
-                     style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;" 
-                     onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                    <i class="fas fa-chevron-left text-white" style="font-size: 1.5rem; margin-right: 4px;"></i>
-                </div>
-                <span class="sr-only">Anterior</span>
-            </a>
-            <a class="carousel-control-next" href="#carouselFotoExpediente" role="button" data-slide="next" style="width: 15%; opacity: 1;">
-                <div class="d-flex justify-content-center align-items-center shadow-lg" 
-                     style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;" 
-                     onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                    <i class="fas fa-chevron-right text-white" style="font-size: 1.5rem; margin-left: 4px;"></i>
-                </div>
-                <span class="sr-only">Siguiente</span>
-            </a>
+
         </div>
-        
     </div>
-  </div>
 </div>
 
 <!-- Modal: Emitir TIM (Carnetización) -->
 <ng-template #modalEmitirTIM let-modal>
     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
         <div class="modal-body p-5 text-center bg-white">
-            
+
             <!-- Icono con Pulso Animado Ámbar -->
             <div class="icon-confirm-pulse amber">
                 <i class="fas fa-id-card"></i>
@@ -1166,14 +1598,16 @@
             <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
                 Indique el motivo para la generación y emisión del Carnet de Identificación Militar (TIM).
             </p>
-            
+
             <div class="modern-form-group mb-5 text-left">
-                <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">MOTIVO DE EMISIÓN DEL CARNET</label>
+                <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">MOTIVO DE
+                    EMISIÓN DEL CARNET</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-list-ul text-warning"></i></span>
                     </div>
-                    <select class="form-control" [(ngModel)]="selectedMotivoEmision" [ngModelOptions]="{standalone: true}">
+                    <select class="form-control" [(ngModel)]="selectedMotivoEmision"
+                        [ngModelOptions]="{standalone: true}">
                         <option value="" selected disabled>Seleccione un motivo...</option>
                         <option value="INGRESO A LA FANB / GRADUACION">INGRESO A LA FANB / GRADUACION</option>
                         <option value="CAMBIO DE GRADO (ASCENSO)">CAMBIO DE GRADO (ASCENSO)</option>
@@ -1186,15 +1620,13 @@
             </div>
 
             <div class="d-flex justify-content-center align-items-center">
-                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" 
-                    (click)="modal.dismiss('Cancel')" 
+                <button type="button" class="btn-header-action btn-block mr-3 shadow-none"
+                    (click)="modal.dismiss('Cancel')"
                     style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
                     Cancelar
                 </button>
-                <button type="button" class="btn-header-action amber btn-block m-0 shadow-none" 
-                    (click)="emitirTIM(modal)" 
-                    [disabled]="!selectedMotivoEmision"
-                    style="flex: 1.2; padding: 0.8rem;">
+                <button type="button" class="btn-header-action amber btn-block m-0 shadow-none"
+                    (click)="emitirTIM(modal)" [disabled]="!selectedMotivoEmision" style="flex: 1.2; padding: 0.8rem;">
                     Emitir TIM
                 </button>
             </div>
@@ -1207,7 +1639,7 @@
 <ng-template #modalConfirmarGuardar let-modal>
     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
         <div class="modal-body p-5 text-center bg-white">
-            
+
             <!-- Icono con Pulso Animado -->
             <div class="icon-confirm-pulse">
                 <i class="fas fa-save"></i>
@@ -1215,18 +1647,17 @@
 
             <h4 class="font-weight-bold text-dark mb-3">¿Guardar Cambios?</h4>
             <p class="text-muted font-weight-500 mb-5" style="font-size: 1rem; line-height: 1.6;">
-                ¿Está seguro que desea guardar los cambios realizados en el expediente del afiliado? Esta acción actualizará la base de datos de forma inmediata.
+                ¿Está seguro que desea guardar los cambios realizados en el expediente del afiliado? Esta acción
+                actualizará la base de datos de forma inmediata.
             </p>
 
             <div class="d-flex justify-content-center align-items-center">
-                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" 
-                    (click)="modal.dismiss('No')" 
+                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" (click)="modal.dismiss('No')"
                     style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
                     No, Cancelar
                 </button>
-                <button type="button" class="btn-header-action teal btn-block m-0 shadow-none" 
-                    (click)="confirmarGuardado(modal)" 
-                    style="flex: 1; padding: 0.8rem;">
+                <button type="button" class="btn-header-action teal btn-block m-0 shadow-none"
+                    (click)="confirmarGuardado(modal)" style="flex: 1; padding: 0.8rem;">
                     Sí, Guardar
                 </button>
             </div>
@@ -1238,7 +1669,7 @@
 <ng-template #modalConsultarNetos let-modal>
     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
         <div class="modal-body p-5 text-center bg-white">
-            
+
             <!-- Icono con Pulso Animado Azul -->
             <div class="icon-confirm-pulse blue">
                 <i class="fas fa-wallet"></i>
@@ -1250,7 +1681,8 @@
             </p>
 
             <div class="modern-form-group mb-5 text-left">
-                <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">PERIODO DE NÓMINA</label>
+                <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">PERIODO DE
+                    NÓMINA</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fas fa-calendar-check text-info"></i></span>
@@ -1264,15 +1696,13 @@
             </div>
 
             <div class="d-flex justify-content-center align-items-center">
-                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" 
-                    (click)="modal.dismiss('Cancel')" 
+                <button type="button" class="btn-header-action btn-block mr-3 shadow-none"
+                    (click)="modal.dismiss('Cancel')"
                     style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
                     Cancelar
                 </button>
-                <button type="button" class="btn-header-action blue btn-block m-0 shadow-none" 
-                    (click)="generarNeto(modal)" 
-                    [disabled]="!selectedNomina"
-                    style="flex: 1; padding: 0.8rem;">
+                <button type="button" class="btn-header-action blue btn-block m-0 shadow-none"
+                    (click)="generarNeto(modal)" [disabled]="!selectedNomina" style="flex: 1; padding: 0.8rem;">
                     <i class="fas fa-print mr-2"></i>Generar
                 </button>
             </div>
@@ -1284,7 +1714,7 @@
 <ng-template #modalAgregarFamiliar let-modal>
     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
         <div class="modal-body p-5 text-center bg-white">
-            
+
             <!-- Icono con Pulso Animado Verde -->
             <div class="icon-confirm-pulse green">
                 <i class="fas fa-user-plus"></i>
@@ -1302,7 +1732,8 @@
                         <div class="modern-form-group mb-4">
                             <label class="text-dark font-weight-bold" style="font-size: 0.75rem;">NAC.</label>
                             <div class="input-group">
-                                <select class="form-control" [(ngModel)]="selectedNacionalidadFamiliar" [ngModelOptions]="{standalone: true}">
+                                <select class="form-control" [(ngModel)]="selectedNacionalidadFamiliar"
+                                    [ngModelOptions]="{standalone: true}">
                                     <option value="" selected disabled>...</option>
                                     <option value="V-">V-</option>
                                     <option value="E-">E-</option>
@@ -1314,12 +1745,14 @@
                     </div>
                     <div class="col-8">
                         <div class="modern-form-group mb-4">
-                            <label class="text-dark font-weight-bold" style="font-size: 0.75rem;">DOCUMENTO ID / CÉDULA</label>
+                            <label class="text-dark font-weight-bold" style="font-size: 0.75rem;">DOCUMENTO ID /
+                                CÉDULA</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-id-card text-success"></i></span>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Ej: 12345678" [(ngModel)]="cedulaFamiliar" [ngModelOptions]="{standalone: true}">
+                                <input type="text" class="form-control" placeholder="Ej: 12345678"
+                                    [(ngModel)]="cedulaFamiliar" [ngModelOptions]="{standalone: true}">
                             </div>
                         </div>
                     </div>
@@ -1332,7 +1765,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-users text-success"></i></span>
                         </div>
-                        <select class="form-control" [(ngModel)]="selectedParentescoFamiliar" [ngModelOptions]="{standalone: true}">
+                        <select class="form-control" [(ngModel)]="selectedParentescoFamiliar"
+                            [ngModelOptions]="{standalone: true}">
                             <option value="" selected disabled>Seleccione el parentesco...</option>
                             <option value="HIJO">HIJO / HIJA</option>
                             <option value="ESPOSA">ESPOSA / ESPOSO</option>
@@ -1344,13 +1778,13 @@
             </div>
 
             <div class="d-flex justify-content-center align-items-center">
-                <button type="button" class="btn-header-action btn-block mr-3 shadow-none" 
-                    (click)="modal.dismiss('Cancel')" 
+                <button type="button" class="btn-header-action btn-block mr-3 shadow-none"
+                    (click)="modal.dismiss('Cancel')"
                     style="background-color: rgba(108, 118, 127, 0.08); color: #637381; border-color: transparent; flex: 1; padding: 0.8rem;">
                     Cancelar
                 </button>
-                <button type="button" class="btn-header-action green btn-block m-0 shadow-none" 
-                    (click)="continuarRegistroFamiliar(modal)" 
+                <button type="button" class="btn-header-action green btn-block m-0 shadow-none"
+                    (click)="continuarRegistroFamiliar(modal)"
                     [disabled]="!selectedNacionalidadFamiliar || !cedulaFamiliar || !selectedParentescoFamiliar"
                     style="flex: 1.2; padding: 0.8rem;">
                     Continuar Registro <i class="fas fa-chevron-right ml-2" style="font-size: 0.7rem;"></i>
@@ -1359,5 +1793,3 @@
         </div>
     </div>
 </ng-template>
-
-

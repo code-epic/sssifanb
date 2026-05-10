@@ -1,4 +1,4 @@
-  <!-- Loading Overlay (Visible only when loading) -->
+<!-- Loading Overlay (Visible only when loading) -->
 <div class="loading-overlay" *ngIf="isLoading">
     <div class="loading-card">
         <div class="spinner-box">
@@ -8,76 +8,84 @@
     </div>
 </div>
 
-<div  [ngClass]="{'search-wrapper': true, 'blur-content': isLoading}">
-  <div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10 text-center position-relative">
-      
-        
+<div [ngClass]="{'search-wrapper': true, 'blur-content': isLoading}">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 text-center position-relative">
 
-          <h2 class="title-search">Búsqueda <strong>Inteligente</strong></h2>
-          <p class="subtitle-search">Ingrese la Cédula o Cadena de texto para localizar expedientes militares</p>
-          
-          <form class="navbar-search" (submit)="$event.preventDefault()">
-            <div class="form-group mb-0" [ngClass]="{ 'focused': focus === true }">
-              <div class="input-group custom-input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"><i class="fas fa-search"></i></span>
+
+
+            <h2 class="title-search">Búsqueda <strong>Inteligente</strong></h2>
+            <p class="subtitle-search">Ingrese la Cédula o Cadena de texto para localizar expedientes militares</p>
+
+            <form class="navbar-search" (submit)="$event.preventDefault()">
+                <div class="form-group mb-0" [ngClass]="{ 'focused': focus === true }">
+                    <div class="input-group custom-input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input class="form-control" placeholder="Cédula de Identidad o Cadena de Texto..." type="text"
+                            [ngModelOptions]="{standalone: true}" [(ngModel)]="buscar" (focus)="focus = true"
+                            (blur)="focus = false" (keyup.enter)="Consultar($event)" (click)="$event.target.select()"
+                            [disabled]="isLoading" spellcheck="false" autocomplete="off" autocorrect="off"
+                            autocapitalize="off">
+                        <div class="input-group-append btn-search-append" (click)="Consultar($event)">
+                            <span class="input-group-text"><i class="fas fa-sliders-h"
+                                    title="Configuración Avanzada"></i></span>
+                        </div>
+                    </div>
                 </div>
-                <input class="form-control" placeholder="Cédula de Identidad o Cadena de Texto..." type="text" 
-                  [ngModelOptions]="{standalone: true}" [(ngModel)]="buscar" 
-                  (focus)="focus = true" (blur)="focus = false" (keyup.enter)="Consultar($event)"
-                  (click)="$event.target.select()"
-                  [disabled]="isLoading"
-                  spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">
-                <div class="input-group-append btn-search-append" (click)="Consultar($event)">
-                   <span class="input-group-text"><i class="fas fa-sliders-h" title="Configuración Avanzada"></i></span>
+                <small class="text-danger mt-2 d-block text-left pl-3" *ngIf="errorMessage">{{ errorMessage }}</small>
+            </form>
+
+            <!-- Security Badge -->
+            <div class="security-badge-container" *ngIf="militares.length === 0">
+                <div class="security-badge">
+                    <div class="badge-icon">
+                        <div class="icon-circle bg-gradient-warning text-white">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    <div class="security-content">
+                        <h6 class="text-uppercase text-muted ls-1 font-weight-bold mb-1" style="font-size: 0.75rem;">
+                            Seguridad Activa & Auditoría
+                        </h6>
+                        <h5 class="font-weight-bold text-dark mb-2" style="font-size: 0.95rem;">
+                            <i class="fas fa-check-circle text-success mr-1" style="font-size: 0.8rem;"></i> Conexión
+                            Segura y Monitoreada
+                        </h5>
+                        <p class="text-muted mb-3" style="font-size: 0.85rem; line-height: 1.6;">
+                            Toda actividad es registrada y geo-referenciada. El uso indebido será sancionado según la
+                            <strong>Ley de Delitos Informáticos</strong>.
+                        </p>
+                        <div class="d-flex align-items-center flex-wrap">
+                            <span
+                                class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase"
+                                style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                <i class="fas fa-lock mr-1"></i> TLS 1.3
+                            </span>
+                            <span
+                                class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase"
+                                style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                <i class="fas fa-fingerprint mr-1"></i> IP Tracking
+                            </span>
+                            <span
+                                class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase"
+                                style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                <i class="fas fa-file-contract mr-1"></i> ISO 27001
+                            </span>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            <small class="text-danger mt-2 d-block text-left pl-3" *ngIf="errorMessage">{{ errorMessage }}</small>
-          </form>
 
-          <!-- Security Badge -->
-          <div class="security-badge-container" *ngIf="militares.length === 0">
-              <div class="security-badge">
-                  <div class="badge-icon">
-                      <div class="icon-circle bg-gradient-warning text-white">
-                          <i class="fas fa-shield-alt"></i>
-                      </div>
-                  </div>
-                  <div class="security-content">
-                      <h6 class="text-uppercase text-muted ls-1 font-weight-bold mb-1" style="font-size: 0.75rem;">
-                          Seguridad Activa & Auditoría
-                      </h6>
-                      <h5 class="font-weight-bold text-dark mb-2" style="font-size: 0.95rem;">
-                          <i class="fas fa-check-circle text-success mr-1" style="font-size: 0.8rem;"></i> Conexión Segura y Monitoreada
-                      </h5>
-                      <p class="text-muted mb-3" style="font-size: 0.85rem; line-height: 1.6;">
-                          Toda actividad es registrada y geo-referenciada. El uso indebido será sancionado según la <strong>Ley de Delitos Informáticos</strong>.
-                      </p>
-                      <div class="d-flex align-items-center flex-wrap">
-                          <span class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                              <i class="fas fa-lock mr-1"></i> TLS 1.3
-                          </span>
-                          <span class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                              <i class="fas fa-fingerprint mr-1"></i> IP Tracking
-                          </span>
-                          <span class="badge badge-pill badge-secondary mr-2 mb-1 px-3 py-1 font-weight-500 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                              <i class="fas fa-file-contract mr-1"></i> ISO 27001
-                          </span>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          
+        </div>
     </div>
-  </div>
 
-  <!-- Results List (Full Width) -->
-  <div class="row mt-4 animate-fade-in" *ngIf="militares.length > 0">
-      <div class="col-12">
-          <app-afi-listar [militares]="militares" (onSelect)="selectMilitarFromList($event)"></app-afi-listar>
-      </div>
-  </div>
+    <!-- Results List (Full Width) -->
+    <div class="row mt-4 animate-fade-in" *ngIf="militares.length > 0">
+        <div class="col-12">
+            <app-afi-listar [militares]="militares" (onSelect)="selectMilitarFromList($event)"></app-afi-listar>
+        </div>
+    </div>
 
 </div>
