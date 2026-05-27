@@ -6,7 +6,7 @@
             <div class="card-header bg-white border-0 py-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <h6 class="text-uppercase text-muted ls-1 mb-0 font-weight-bold" style="font-size: 0.75rem;">
-                        <i class="fas fa-search mr-2 text-primary"></i>Expediente del Militar
+                        <i class="fas fa-calculator mr-2 text-primary"></i>Datos del Simulador
                     </h6>
                     <button class="btn btn-sm btn-outline-secondary" (click)="limpiar()" title="Limpiar Formulario">
                         <i class="fas fa-redo-alt mr-1"></i> Reiniciar
@@ -15,48 +15,6 @@
             </div>
             
             <div class="card-body pt-0">
-                <!-- SECCIÓN 0: BÚSQUEDA Y DATOS PERSONALES -->
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="modern-form-group">
-                            <label>Cédula de Identidad</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend d-none d-lg-flex">
-                                    <span class="input-group-text"><i class="fas fa-id-card" [class.text-primary]="isLoadingSearch"></i></span>
-                                </div>
-                                <input type="text" class="form-control" placeholder="V-00000000" 
-                                    formControlName="cedula" #cedulaInput (keyup.enter)="onSearchEnter($event)">
-                                <div class="input-group-append cursor-pointer" (click)="onSearchEnter(null)">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-spinner fa-spin" *ngIf="isLoadingSearch"></i>
-                                        <i class="fas fa-search" *ngIf="!isLoadingSearch"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="modern-form-group">
-                            <label>Nombres</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
-                                <input type="text" class="form-control" placeholder="Nombres" formControlName="nombres">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="modern-form-group">
-                            <label>Apellidos</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
-                                <input type="text" class="form-control" placeholder="Apellidos" formControlName="apellidos">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="my-3" style="border-top: 1px solid #f1f5f9;">
-
                 <!-- SECCIÓN 1: DATOS MILITARES -->
                 <div class="row">
                     <div class="col-md-4">
@@ -72,10 +30,9 @@
                                 <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-shield-alt"></i></span></div>
                                 <select class="form-control" formControlName="componente">
                                     <option value="">Seleccione...</option>
-                                    <option value="EJ">EJERCITO BOLIVARIANO</option>
-                                    <option value="AR">ARMADA BOLIVARIANA</option>
-                                    <option value="AV">AVIACION MILITAR BOLIVARIANA</option>
-                                    <option value="GN">GUARDIA NACIONAL BOLIVARIANA</option>
+                                    <option *ngFor="let comp of componentes" [value]="comp.abreviatura">
+                                        {{ comp.nombre }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -87,7 +44,9 @@
                                 <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-star"></i></span></div>
                                 <select class="form-control" formControlName="grado">
                                     <option value="">Seleccione...</option>
-                                    <!-- Aquí irían los grados dinámicos -->
+                                    <option *ngFor="let g of grados" [value]="g.abreviatura">
+                                        {{ g.nombre }}
+                                    </option>
                                 </select>
                             </div>
                         </div>

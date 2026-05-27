@@ -1101,6 +1101,27 @@ ngb-datepicker {
     box-shadow: 0 0 0 0 rgba(214, 139, 139, 0);
   }
 }
+/* --- SKELETON LOADING SYSTEM --- */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-input) 25%, var(--border-color) 50%, var(--bg-input) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite linear;
+  border-radius: 4px;
+  display: inline-block;
+  color: transparent !important;
+  pointer-events: none;
+  -webkit-user-select: none;
+          user-select: none;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 @charset "UTF-8";
 /*!
 

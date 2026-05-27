@@ -18,7 +18,7 @@ export interface UploadProgressEvent {
 export class FileService {
 
     private _http = inject(HttpClient);
-    private _url = environment.Url;
+    private _url = environment.API;
 
     constructor() { }
 

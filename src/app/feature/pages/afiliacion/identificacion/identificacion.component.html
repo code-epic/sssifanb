@@ -382,10 +382,9 @@
                                                 class="fas fa-shield-alt"></i></span></div>
                                     <select class="form-control" formControlName="componente">
                                         <option value="">Seleccione...</option>
-                                        <option value="EJ">EJERCITO BOLIVARIANO</option>
-                                        <option value="AR">ARMADA BOLIVARIANA</option>
-                                        <option value="AV">AVIACION MILITAR BOLIVARIANA</option>
-                                        <option value="GN">GUARDIA NACIONAL BOLIVARIANA</option>
+                                        <option *ngFor="let comp of componentes" [value]="comp.abreviatura">
+                                            {{ comp.nombre }}
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -398,6 +397,9 @@
                                                 class="fas fa-star"></i></span></div>
                                     <select class="form-control" formControlName="grado">
                                         <option value="">Seleccione...</option>
+                                        <option *ngFor="let g of grados" [value]="g.abreviatura">
+                                            {{ g.nombre }}
+                                        </option>
                                     </select>
                                 </div>
                             </div>

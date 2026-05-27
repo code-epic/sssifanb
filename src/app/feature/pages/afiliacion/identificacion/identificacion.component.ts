@@ -8,6 +8,7 @@ import { MdlFamiliarComponent } from './mdl-familiar/mdl-familiar.component';
 import { LoginService } from 'src/app/core/services/login/login.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { COMPONENTES_MILITARES, GRADOS_MILITARES } from 'src/app/core/models/militar/militar.model';
 
 @Component({
     selector: 'app-afi-identificacion',
@@ -16,6 +17,9 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class IdentificacionComponent implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
+
+    public componentes = COMPONENTES_MILITARES;
+    public grados = GRADOS_MILITARES;
 
     public identificacionForm: FormGroup;
     public familiares: any[] = []; // Lista para la tabla
@@ -77,7 +81,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         this.layoutService.updateHeader({
             title: 'Principal / Afiliación: Identificación Militar',
             showBackButton: true,
-            alertSeverity: 1,
+            alertSeverity: 2,
             showAlertsIcon: false
         });
 

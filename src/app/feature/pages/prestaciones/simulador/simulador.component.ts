@@ -8,6 +8,7 @@ import { UtilService } from 'src/app/core/services/util/util.service';
 import { environment } from 'src/environments/environment';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { COMPONENTES_MILITARES, GRADOS_MILITARES } from 'src/app/core/models/militar/militar.model';
 
 @Component({
   selector: 'app-simulador',
@@ -17,6 +18,9 @@ import { takeUntil } from 'rxjs/operators';
 export class SimuladorComponent implements OnInit, OnDestroy {
   @ViewChild('modalConfirmar') modalConfirmar: TemplateRef<any>;
   @ViewChild('cedulaInput') cedulaInput: ElementRef;
+
+  public componentes = COMPONENTES_MILITARES;
+  public grados = GRADOS_MILITARES;
 
   public simuladorForm: FormGroup;
   public resultados: any = null;
@@ -47,7 +51,7 @@ export class SimuladorComponent implements OnInit, OnDestroy {
 
   private initForm() {
     this.simuladorForm = this.fb.group({
-      cedula: ['', Validators.required],
+      cedula: [''],
       nombres: [{ value: '', disabled: true }],
       apellidos: [{ value: '', disabled: true }],
       fecha: [new Date().toISOString().split('T')[0], Validators.required],

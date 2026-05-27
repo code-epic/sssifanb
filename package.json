@@ -11,6 +11,11 @@
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
     "build:prod": "node build.js && ./node_modules/@angular/cli/bin/ng build --configuration production --base-href=\"/sssifanb/\""
   },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "crypto": false
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "17.3.11",
@@ -45,7 +50,8 @@
     "rxjs": "^7.5.5",
     "sass": "^1.77.6",
     "sweetalert2": "^11.4.26",
-    "zone.js": "0.14.7"
+    "zone.js": "0.14.7",
+    "zstd-codec": "^0.1.5"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.3.8",
