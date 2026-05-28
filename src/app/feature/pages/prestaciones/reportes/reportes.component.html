@@ -1,13 +1,123 @@
 <div class="prestaciones-container fade-in">
-    <div class="hero-summary mb-4">
-        <div class="hero-info">
-            <h1>Reportes de Prestaciones</h1>
-            <p>Consultas y generación de documentos oficiales.</p>
+    <form [formGroup]="reporteForm" autocomplete="off" (ngSubmit)="consultar()">
+        <div class="card shadow-none border-0 mb-4 bg-transparent">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title-wrapper d-flex justify-content-between align-items-center flex-nowrap">
+                        <h6 class="section-title mb-0">
+                            <i class="fas fa-users"></i>
+                            <span class="d-none d-xxl-inline">Lista de Beneficiarios - Datos a consultar</span>
+                            <span class="d-inline d-xxl-none">Consultar</span>
+                        </h6>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Cédula de Identidad</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-id-card"></i></span></div>
+                                    <input type="text" class="form-control" placeholder="Cédula de Identidad" formControlName="cedula">
+                                </div>
+                                <div *ngIf="reporteForm.get('cedula')?.errors?.['pattern']" class="text-danger mt-1 font-weight-500" style="font-size: 0.75rem;">
+                                    Cédula inválida. Ingrese solo números.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Nombres y Apellidos</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-user"></i></span></div>
+                                    <input type="text" class="form-control" placeholder="Búsqueda por nombres y apellidos" formControlName="nombres">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Situación</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-info-circle text-verde-titulos"></i></span></div>
+                                    <select class="form-control" formControlName="situacion">
+                                        <option value="">Seleccione...</option>
+                                        <option value="ACT">ACTIVO</option>
+                                        <option value="RCP">RESERVA ACTIVA</option>
+                                        <option value="FCP">FALLECIDO</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Componentes</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-shield-alt"></i></span></div>
+                                    <select class="form-control" formControlName="componente">
+                                        <option value="">Seleccione...</option>
+                                        <option *ngFor="let comp of componentes" [value]="comp.id">{{ comp.nombre }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Grado</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i class="fas fa-star"></i></span></div>
+                                    <select class="form-control" formControlName="grado">
+                                        <option *ngFor="let g of grados" [value]="g.id">{{ g.nombre }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title-wrapper d-flex justify-content-between align-items-center flex-nowrap mt-4">
+                        <h6 class="section-title mb-0">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="d-none d-xxl-inline">Fecha de Ingreso</span>
+                            <span class="d-inline d-xxl-none">F. Ingreso</span>
+                        </h6>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Desde <span class="text-danger">*</span></label>
+                                <app-pastel-datepicker formControlName="fechaDesde" iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                                <div *ngIf="reporteForm.get('fechaDesde')?.invalid && reporteForm.get('fechaDesde')?.touched" class="text-danger mt-1 font-weight-500" style="font-size: 0.75rem;">
+                                    La fecha es requerida.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Hasta <span class="text-danger">*</span></label>
+                                <app-pastel-datepicker formControlName="fechaHasta" iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                                <div *ngIf="reporteForm.get('fechaHasta')?.invalid && reporteForm.get('fechaHasta')?.touched" class="text-danger mt-1 font-weight-500" style="font-size: 0.75rem;">
+                                    La fecha es requerida.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-none bg-transparent border-0 mb-4 mt-4">
+                        <div class="row">
+                            <div class="col text-right d-flex justify-content-end align-items-center">
+                                <button type="submit" class="btn-header-action teal mr-3 shadow-none">
+                                    <i class="fas fa-search"></i> Consultar
+                                </button>
+                                <button type="button" class="btn-header-action blue shadow-none" (click)="imprimir()">
+                                    <i class="fas fa-print"></i> Imprimir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="card shadow-sm border-0" style="border-radius: 20px;">
-        <div class="card-body p-4">
-            <p class="text-muted">Módulo de Reportes en desarrollo...</p>
-        </div>
-    </div>
+    </form>
 </div>

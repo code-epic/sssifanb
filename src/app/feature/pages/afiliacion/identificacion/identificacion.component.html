@@ -98,16 +98,7 @@
                                             <i class="fas fa-address-card mr-3 opacity-75"
                                                 style="width: 20px; text-align: center;"></i> Hoja de Vida
                                         </a>
-                                        <div class="dropdown-divider mb-1"
-                                            style="border-top-color: rgba(89, 140, 137, 0.1);"></div>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
-                                            style="transition: all 0.2s ease;" href="javascript:void(0);"
-                                            (click)="imprimirDocumento('historial_movimientos', $event)"
-                                            onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
-                                            onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-history mr-3 opacity-75"
-                                                style="width: 20px; text-align: center;"></i> Historial de Movimientos
-                                        </a>
+
                                     </div>
                                 </div>
                             </div>
@@ -189,6 +180,23 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="modern-form-group">
+                                    <label>Condición Militar</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-heart"></i></span></div>
+                                        <select class="form-control" formControlName="condicionmilitar">
+                                            <option value="">Seleccione...</option>
+                                            <option value="1">EN PROCESO DE BAJA</option>
+                                            <option value="2">DESERTORES</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="modern-form-group">
                                     <label>Estatus</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
@@ -201,6 +209,17 @@
                                             <option value="204">SUSPENDIDO</option>
                                             <option value="205">PARALIZADO</option>
                                         </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="modern-form-group">
+                                    <label>Observaciones</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
+                                                    class="fas fa-child"></i></span></div>
+                                        <input type="text" class="form-control" placeholder="Observaciones"
+                                            [formControl]="observaciones">
                                     </div>
                                 </div>
                             </div>
@@ -503,8 +522,8 @@
                             <h4 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
                                 Resumen Salarial
                             </h4>
-                            <button class="btn-pastel-icon pastel-success shadow-sm" type="button" data-toggle="modal"
-                                data-target="#modalHistorialSueldo" title="Ver Historial">
+                            <button class="btn-pastel-icon pastel-success shadow-sm" type="button"
+                                (click)="openModalHistorialSueldo(modalHistorialSueldo, $event)" title="Ver Historial">
                                 <i class="fas fa-history"></i>
                             </button>
                         </div>
@@ -686,13 +705,19 @@
 
                     <div class="row mb-4">
                         <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-3">
-                            <h4 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
-                                Estado de Cuenta Fideicomiso
-                            </h4>
-                            <button class="btn-pastel-icon pastel-success shadow-sm" type="button" data-toggle="modal"
-                                data-target="#modalHistorialAntiguedad" title="Ver Historial de Movimientos">
-                                <i class="fas fa-exchange-alt"></i>
-                            </button>
+                            <h3 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
+                                Estado de Cuenta Fideicomiso <font color="red">( Con Medida Judicial  )</font>
+                            </h3>
+                            <div class="btn-group shadow-sm" role="group" style="border-radius: 8px;">
+                                <button class="btn-pastel-icon pastel-success" type="button" style="border-radius: 8px 0 0 8px; border-right: 1px solid rgba(255,255,255,0.2);"
+                                    (click)="openModalAgregarAsignacion(modalAgregarAsignacion, $event)" title="Agregar Asignaciones">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button class="btn-pastel-icon pastel-success" type="button" style="border-radius: 0 8px 8px 0;"
+                                    (click)="openModalHistorialMovimientos(modalHistorialMovimientos, $event)" title="Ver Historial de Movimientos">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -792,9 +817,9 @@
                                     <ul class="list-group list-group-flush">
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="text-danger font-weight-500" style="font-size: 0.95rem;"><i
-                                                    class="fas fa-ban mr-2 opacity-75"></i>Embargo</span>
-                                            <span class="text-danger font-weight-600 tracking-tight"
+                                            <span class="text-primary-teal font-weight-500" style="font-size: 0.95rem;"><i
+                                                    class="fas fa-ban mr-2 opacity-75"></i>Días adicionales</span>
+                                            <span class="text-primary-teal font-weight-600 tracking-tight"
                                                 style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
                                         </li>
                                         <li
@@ -813,39 +838,39 @@
                             <!-- Intereses Card -->
                             <div class="card shadow-sm border-0 ledger-card"
                                 style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center"
-                                    style="border-color: #f4f5f7 !important;">
-                                    <div class="icon-circle mr-3"
-                                        style="width: 34px; height: 34px; background-color: rgba(251, 140, 0, 0.1);"><i
-                                            class="fas fa-chart-pie text-warning" style="font-size: 0.9rem;"></i></div>
-                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">
-                                        Intereses Caídos</h6>
-                                </div>
+                                
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush">
+                                        
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Calculados Anual</span>
+                                                style="font-size: 0.95rem; color: #64748b;">Monto Pago Patria:</span>
                                             <span class="font-weight-600 tracking-tight"
                                                 style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
                                         </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Cancelados a la Fecha</span>
+                                                style="font-size: 0.95rem; color: #64748b;">Fecha del Pago a Patria:</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                                style="font-size: 1.05rem; color: #475569;">DD/MM/YYYY</span>
                                         </li>
                                         <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-4 border-light">
-                                            <span class="text-warning font-weight-500 text-uppercase"
-                                                style="font-size: 0.75rem; letter-spacing: 0.5px;"><i
-                                                    class="fas fa-balance-scale mr-2 opacity-75"></i>Deuda
-                                                Restante</span>
-                                            <span class="text-warning font-weight-600 tracking-tight"
-                                                style="font-size: 1.15rem;">{{ moneda }} 0.00</span>
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Beneficiario:</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">V-Benficiario</span>
                                         </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Observación:</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;"></span>
+                                        </li>
+                                        
                                     </ul>
                                 </div>
                             </div>
@@ -857,9 +882,11 @@
                                 style="border-radius: 12px; overflow: hidden;">
                                 <div class="card-body bg-white py-3 px-4 d-flex justify-content-around align-items-center font-weight-500"
                                     style="font-size: 0.85rem; color: #94a3b8;">
-                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Últ. Depósito: N/A</span>
-                                    <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: 0.00%</span>
-                                    <span><i class="fas fa-plus-circle mr-2 opacity-50"></i>Días Adicionales: 0</span>
+                                     <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Fecha de Ult. Anticipo: DD/MM/AAAA</span>
+                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Comisión de Servicio: 0,00</span>
+                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Monto Recuperado: 0,00</span>
+                                    <span><i class="fas fa-plus-circle mr-2 opacity-50"></i>Medida Judicial: 0,00</span>
+                                    <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: 0.00</span>
                                 </div>
                             </div>
                         </div>
@@ -1490,9 +1517,9 @@
 
                 </div><!-- fin row -->
             </div>
-            <div class="modal-footer bg-light border-top-0 px-4 py-3 d-flex justify-content-between">
-                <button type="button" class="btn btn-cancel" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-ok" (click)="guardarFamiliar()">Guardar Expediente</button>
+            <div class="modal-footer bg-white border-top-0 px-4 py-3 d-flex justify-content-between" style="border-radius: 0 0 16px 16px;">
+                <button type="button" class="btn btn-cancel shadow-sm" data-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
+                <button type="button" class="btn btn-ok shadow-sm" (click)="guardarFamiliar()" style="border-radius: 8px;">Guardar Expediente</button>
             </div>
         </div>
     </div>
@@ -1792,6 +1819,290 @@
                     Continuar Registro <i class="fas fa-chevron-right ml-2" style="font-size: 0.7rem;"></i>
                 </button>
             </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Historial de Movimientos -->
+<ng-template #modalHistorialMovimientos let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <!-- Cabecera del Modal -->
+        <div class="modal-header d-flex justify-content-between align-items-center bg-white border-bottom-0 pt-4 pb-0 px-4">
+            <div class="d-flex align-items-center">
+                <div class="icon-circle mr-3" style="width: 45px; height: 45px; background-color: rgba(89, 140, 137, 0.1);">
+                    <i class="fas fa-history" style="color: #598c89; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                    <h5 class="font-weight-bold text-dark mb-0">Historial de Movimientos</h5>
+                    <small class="text-muted font-weight-500">Consulta de movimientos del beneficiario</small>
+                </div>
+            </div>
+            <button type="button" class="close" (click)="modal.dismiss('Cancel')" style="outline: none;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="modal-body p-4 bg-white">
+            <!-- Filtro -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="modern-form-group mb-0 text-left">
+                        <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">TIPO DE MOVIMIENTO</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-filter text-success"></i></span>
+                            </div>
+                            <select class="form-control" [(ngModel)]="tipoMovimientoFiltro" (change)="filtrarMovimientos()">
+                                <option value="">TODOS</option>
+                                <option value="INGRESO">INGRESO</option>
+                                <option value="EGRESO">EGRESO</option>
+                                <option value="AJUSTE">AJUSTE</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="table-responsive shadow-sm" style="border-radius: 12px; border: 1px solid #f4f5f7;">
+                <table class="table table-hover align-items-center mb-0 ledger-table">
+                    <thead style="background-color: rgba(89, 140, 137, 0.1);">
+                        <tr>
+                            <th class="text-uppercase text-dark font-weight-bold mb-0 pl-4" style="font-size: 0.75rem; letter-spacing: 1px;">Fecha / Hora</th>
+                            <th class="text-uppercase text-dark font-weight-bold mb-0" style="font-size: 0.75rem; letter-spacing: 1px;">Monto</th>
+                            <th class="text-right text-uppercase text-dark font-weight-bold mb-0 pr-4" style="font-size: 0.75rem; letter-spacing: 1px;">Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let mov of movimientosPaginados">
+                            <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem; color: #475569; white-space: nowrap;">
+                                <div>{{ mov.fecha | date:'dd/MM/yyyy' }}</div>
+                                <small class="text-muted"><i class="far fa-clock mr-1"></i> {{ mov.fecha | date:'hh:mm a' }}</small>
+                            </td>
+                            <td class="font-weight-600 py-3" style="font-size: 1.05rem;" [ngClass]="{'text-success': mov.monto > 0, 'text-danger': mov.monto < 0, 'text-dark': mov.monto === 0}">
+                                {{ mov.monto > 0 ? '+' : '' }}{{ mov.monto | number:'1.2-2' }} {{ moneda }}
+                            </td>
+                            <td class="text-right pr-4 font-weight-500 py-3" style="font-size: 0.95rem; color: #64748b;">
+                                <span class="badge badge-pill mr-2" 
+                                    [ngClass]="{'badge-success': mov.tipo === 'INGRESO', 'badge-danger': mov.tipo === 'EGRESO', 'badge-warning': mov.tipo === 'AJUSTE'}"
+                                    style="font-size: 0.65rem; padding: 0.3em 0.6em;">
+                                    {{ mov.tipo }}
+                                </span>
+                                {{ mov.descripcion }}
+                            </td>
+                        </tr>
+                        <tr *ngIf="movimientosPaginados.length === 0">
+                            <td colspan="3" class="text-center py-4 text-muted font-weight-500">
+                                <i class="fas fa-inbox mb-2" style="font-size: 1.5rem; opacity: 0.5; display: block;"></i>
+                                No se encontraron movimientos.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginador Custom -->
+            <div class="d-flex justify-content-between align-items-center mt-4" *ngIf="totalMovimientos > 0">
+                <span class="text-muted font-weight-500" style="font-size: 0.85rem;">
+                    Mostrando {{ (paginaActual - 1) * itemsPorPagina + 1 }} - 
+                    {{ paginaActual * itemsPorPagina > totalMovimientos ? totalMovimientos : paginaActual * itemsPorPagina }} 
+                    de {{ totalMovimientos }} movimientos
+                </span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" [class.disabled]="paginaActual === 1">
+                            <a class="page-link cursor-pointer border-0 shadow-sm" (click)="cambiarPagina(paginaActual - 1)" style="border-radius: 8px 0 0 8px; font-weight: 500;">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" *ngFor="let page of getPaginas()" [class.active]="paginaActual === page">
+                            <a class="page-link cursor-pointer border-0 shadow-sm" (click)="cambiarPagina(page)" style="font-weight: 500; margin: 0 2px;">{{ page }}</a>
+                        </li>
+                        <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+                            <a class="page-link cursor-pointer border-0 shadow-sm" (click)="cambiarPagina(paginaActual + 1)" style="border-radius: 0 8px 8px 0; font-weight: 500;">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="modal-footer bg-white border-top-0 d-flex justify-content-end p-3" style="border-radius: 0 0 16px 16px;">
+            <button type="button" class="btn-header-action btn-sm shadow-sm m-0" (click)="modal.dismiss('Close')"
+                style="background-color: rgba(108, 118, 127, 0.1); color: #637381; border-color: transparent; padding: 0.5rem 1.5rem; transition: all 0.3s ease;"
+                onmouseover="this.style.backgroundColor='rgba(108, 118, 127, 0.15)'" onmouseout="this.style.backgroundColor='rgba(108, 118, 127, 0.1)'">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Agregar Asignación -->
+<ng-template #modalAgregarAsignacion let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-header d-flex justify-content-between align-items-center bg-white border-bottom-0 pt-4 pb-0 px-4">
+            <div class="d-flex align-items-center">
+                <div class="icon-circle mr-3" style="width: 45px; height: 45px; background-color: rgba(89, 140, 137, 0.1);">
+                    <i class="fas fa-pen" style="color: #598c89; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                    <h5 class="font-weight-bold text-dark mb-0">Agregar Asignación</h5>
+                    <small class="text-muted font-weight-500">Registro de comisiones y medidas judiciales</small>
+                </div>
+            </div>
+            <button type="button" class="close" (click)="modal.dismiss('Cancel')" style="outline: none;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <form [formGroup]="asignacionForm" (ngSubmit)="guardarAsignacion(modal)">
+            <div class="modal-body p-4 bg-white">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="modern-form-group">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">COMISIÓN DE SERVICIO</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-money-bill-wave text-success"></i></span></div>
+                                <input type="number" step="0.01" class="form-control" formControlName="comisionServicio" placeholder="0.00"
+                                       [ngClass]="{'is-invalid': asignacionForm.get('comisionServicio')?.invalid && asignacionForm.get('comisionServicio')?.touched}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modern-form-group">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">MONTO RECUPERADO ACTIVO</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-coins text-warning"></i></span></div>
+                                <input type="number" step="0.01" class="form-control" formControlName="montoRecuperado" placeholder="0.00"
+                                       [ngClass]="{'is-invalid': asignacionForm.get('montoRecuperado')?.invalid && asignacionForm.get('montoRecuperado')?.touched}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="modern-form-group">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">FECHA</label>
+                            <app-pastel-datepicker formControlName="fecha" iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                            <div *ngIf="asignacionForm.get('fecha')?.invalid && asignacionForm.get('fecha')?.touched" class="text-danger mt-1 font-weight-500" style="font-size: 0.75rem;">
+                                La fecha es requerida.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="modern-form-group mb-0">
+                            <label class="text-dark font-weight-bold" style="font-size: 0.75rem; letter-spacing: 0.5px;">DESCRIPCIÓN / OBSERVACIONES</label>
+                            <textarea class="form-control" rows="2" formControlName="descripcion" placeholder="Ingrese observaciones detalladas..."
+                                      [ngClass]="{'is-invalid': asignacionForm.get('descripcion')?.invalid && asignacionForm.get('descripcion')?.touched}"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer bg-white border-top-0 d-flex justify-content-between p-3" style="border-radius: 0 0 16px 16px;">
+                <button type="button" class="btn-header-action btn-sm shadow-sm m-0" (click)="modal.dismiss('Cancel')"
+                    style="background-color: rgba(108, 118, 127, 0.1); color: #637381; border-color: transparent; padding: 0.5rem 1.5rem; flex: 1; margin-right: 10px !important; transition: all 0.3s ease;"
+                    onmouseover="this.style.backgroundColor='rgba(108, 118, 127, 0.15)'" onmouseout="this.style.backgroundColor='rgba(108, 118, 127, 0.1)'">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-header-action green btn-sm shadow-sm m-0" 
+                    [disabled]="asignacionForm.invalid"
+                    style="flex: 1.5; padding: 0.5rem 1.5rem; transition: all 0.3s ease;"
+                    onmouseover="if(!this.disabled) this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+                    Aceptar <i class="fas fa-check ml-2" style="font-size: 0.7rem;"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<!-- Modal: Historial de Sueldos -->
+<ng-template #modalHistorialSueldo let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-header d-flex justify-content-between align-items-center bg-white border-bottom-0 pt-4 pb-0 px-4">
+            <div class="d-flex align-items-center">
+                <div class="icon-circle mr-3" style="width: 45px; height: 45px; background-color: rgba(89, 140, 137, 0.1);">
+                    <i class="fas fa-money-check-alt" style="color: #598c89; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                    <h5 class="font-weight-bold text-dark mb-0">Historial de Sueldos</h5>
+                    <small class="text-muted font-weight-500">Consulta de los salarios devengados</small>
+                </div>
+            </div>
+            <button type="button" class="close" (click)="modal.dismiss('Cancel')" style="outline: none;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="modal-body p-4 bg-white">
+            <!-- Tabla -->
+            <div class="table-responsive shadow-sm" style="border-radius: 12px; border: 1px solid #f4f5f7;">
+                <table class="table table-hover align-items-center mb-0 ledger-table">
+                    <thead style="background-color: rgba(89, 140, 137, 0.1);">
+                        <tr>
+                            <th class="text-uppercase text-dark font-weight-bold mb-0 pl-4" style="font-size: 0.75rem; letter-spacing: 1px;">Fecha</th>
+                            <th class="text-uppercase text-dark font-weight-bold mb-0" style="font-size: 0.75rem; letter-spacing: 1px;">Sueldo Base</th>
+                            <th class="text-right text-uppercase text-dark font-weight-bold mb-0 pr-4" style="font-size: 0.75rem; letter-spacing: 1px;">Sueldo Mensual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let sld of sueldosPaginados">
+                            <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem; color: #475569; white-space: nowrap;">
+                                <div>{{ sld.fecha | date:'dd/MM/yyyy' }}</div>
+                            </td>
+                            <td class="font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">
+                                {{ sld.sueldoBase | number:'1.2-2' }} {{ moneda }}
+                            </td>
+                            <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem;" class="text-success">
+                                {{ sld.sueldoMensual | number:'1.2-2' }} {{ moneda }}
+                            </td>
+                        </tr>
+                        <tr *ngIf="sueldosPaginados.length === 0">
+                            <td colspan="3" class="text-center py-4 text-muted font-weight-500">
+                                <i class="fas fa-inbox mb-2" style="font-size: 1.5rem; opacity: 0.5; display: block;"></i>
+                                No se encontraron registros de sueldos.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginador Custom -->
+            <div class="d-flex justify-content-between align-items-center mt-4" *ngIf="totalSueldos > 0">
+                <span class="text-muted font-weight-500" style="font-size: 0.85rem;">
+                    Mostrando {{ (paginaSueldoActual - 1) * sueldosPorPagina + 1 }} - 
+                    {{ paginaSueldoActual * sueldosPorPagina > totalSueldos ? totalSueldos : paginaSueldoActual * sueldosPorPagina }} 
+                    de {{ totalSueldos }} registros
+                </span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" [class.disabled]="paginaSueldoActual === 1">
+                            <a class="page-link cursor-pointer border-0 shadow-sm" (click)="cambiarPaginaSueldo(paginaSueldoActual - 1)" style="border-radius: 8px 0 0 8px; font-weight: 500;">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" *ngFor="let page of getPaginasSueldo()" [class.active]="paginaSueldoActual === page">
+                            <a class="page-link cursor-pointer border-0 shadow-sm" (click)="cambiarPaginaSueldo(page)" style="font-weight: 500; margin: 0 2px;">{{ page }}</a>
+                        </li>
+                        <li class="page-item" [class.disabled]="paginaSueldoActual === totalPaginasSueldo">
+                            <a class="page-link cursor-pointer border-0 shadow-sm" (click)="cambiarPaginaSueldo(paginaSueldoActual + 1)" style="border-radius: 0 8px 8px 0; font-weight: 500;">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="modal-footer bg-white border-top-0 d-flex justify-content-end p-3" style="border-radius: 0 0 16px 16px;">
+            <button type="button" class="btn-header-action btn-sm shadow-sm m-0" (click)="modal.dismiss('Close')"
+                style="background-color: rgba(108, 118, 127, 0.1); color: #637381; border-color: transparent; padding: 0.5rem 1.5rem; transition: all 0.3s ease;"
+                onmouseover="this.style.backgroundColor='rgba(108, 118, 127, 0.15)'" onmouseout="this.style.backgroundColor='rgba(108, 118, 127, 0.1)'">
+                Cerrar
+            </button>
         </div>
     </div>
 </ng-template>

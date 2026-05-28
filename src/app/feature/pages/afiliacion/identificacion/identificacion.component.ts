@@ -24,6 +24,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     public identificacionForm: FormGroup;
     public familiares: any[] = []; // Lista para la tabla
     public familiarForm: FormGroup;
+    public asignacionForm: FormGroup;
     public currentTab: string = 'militar';
     public moneda: string = 'Bs.';
     public fechaVencimientoTIM: string = '';
@@ -38,6 +39,24 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     public selectedNacionalidadFamiliar: string = '';
     public cedulaFamiliar: string = '';
     public selectedParentescoFamiliar: string = '';
+
+    // Historial Movimientos Data
+    public tipoMovimientoFiltro: string = '';
+    public movimientosOriginales: any[] = [];
+    public movimientosFiltrados: any[] = [];
+    public movimientosPaginados: any[] = [];
+    public paginaActual: number = 1;
+    public itemsPorPagina: number = 5;
+    public totalMovimientos: number = 0;
+    public totalPaginas: number = 0;
+
+    // Historial Sueldos Data
+    public sueldosOriginales: any[] = [];
+    public sueldosPaginados: any[] = [];
+    public paginaSueldoActual: number = 1;
+    public sueldosPorPagina: number = 5;
+    public totalSueldos: number = 0;
+    public totalPaginasSueldo: number = 0;
 
     // Bancos Data
     public bancos: any[] = [
@@ -445,6 +464,13 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             fecha_nacimiento: ['', Validators.required]
         });
 
+        this.asignacionForm = this.fb.group({
+            comisionServicio: ['', [Validators.required, Validators.min(0)]],
+            montoRecuperado: ['', [Validators.required, Validators.min(0)]],
+            fecha: ['', Validators.required],
+            descripcion: ['', Validators.required]
+        });
+
         // Listener para formateo de cuenta bancaria y detección de banco
         const cuentaControl = this.identificacionForm.get('persona.datofinanciero.cuenta');
         cuentaControl?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(val => {
@@ -640,5 +666,176 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         // Aquí se procedería a abrir el modal de detalles (MdlFamiliarComponent) 
         // o a cargar la data inicial para el registro completo.
         modal.close();
+    }
+
+    // Modal Historial de Movimientos
+    openModalHistorialMovimientos(content: any, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.showPrintDropdown = false; // Close the dropdown if open
+
+        this.tipoMovimientoFiltro = '';
+        this.paginaActual = 1;
+        this.generarMovimientosMock(); // Para demostración (o cargar desde servicio)
+        this.filtrarMovimientos();
+
+        this.modalService.open(content, { centered: true, size: 'lg', backdrop: 'static' });
+    }
+
+    private generarMovimientosMock() {
+        this.movimientosOriginales = [];
+        const tipos = ['INGRESO', 'EGRESO', 'AJUSTE'];
+        const descripcionesIngreso = ['Abono de Nómina', 'Bono Vacacional', 'Aguinaldos', 'Retroactivo'];
+        const descripcionesEgreso = ['Descuento Préstamo', 'Retención ISRL', 'Pago Seguro', 'Cargo Administrativo'];
+        const descripcionesAjuste = ['Ajuste Salarial', 'Corrección de Saldo', 'Reintegro'];
+        
+        const now = new Date();
+        
+        // Generar 35 movimientos aleatorios
+        for (let i = 0; i < 35; i++) {
+            const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+            let desc = '';
+            let monto = 0;
+            
+            if (tipo === 'INGRESO') {
+                desc = descripcionesIngreso[Math.floor(Math.random() * descripcionesIngreso.length)];
+                monto = Math.random() * 5000 + 500;
+            } else if (tipo === 'EGRESO') {
+                desc = descripcionesEgreso[Math.floor(Math.random() * descripcionesEgreso.length)];
+                monto = -(Math.random() * 1000 + 100);
+            } else {
+                desc = descripcionesAjuste[Math.floor(Math.random() * descripcionesAjuste.length)];
+                monto = (Math.random() * 1000) - 500;
+            }
+            
+            // Random date within the last 6 months
+            const fecha = new Date(now.getTime() - Math.floor(Math.random() * 180) * 24 * 60 * 60 * 1000);
+            
+            this.movimientosOriginales.push({
+                fecha: fecha,
+                tipo: tipo,
+                descripcion: desc,
+                monto: monto
+            });
+        }
+    }
+
+    filtrarMovimientos() {
+        if (this.tipoMovimientoFiltro) {
+            this.movimientosFiltrados = this.movimientosOriginales.filter(m => m.tipo === this.tipoMovimientoFiltro);
+        } else {
+            this.movimientosFiltrados = [...this.movimientosOriginales];
+        }
+
+        // Ordenar por fecha (Mayor a menor - más recientes primero)
+        this.movimientosFiltrados.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+
+        this.totalMovimientos = this.movimientosFiltrados.length;
+        this.totalPaginas = Math.ceil(this.totalMovimientos / this.itemsPorPagina);
+        
+        // Reset a la pagina 1 si la pagina actual excede el total tras filtrar
+        if (this.paginaActual > this.totalPaginas && this.totalPaginas > 0) {
+            this.paginaActual = 1;
+        } else if (this.totalPaginas === 0) {
+            this.paginaActual = 1;
+        }
+
+        this.actualizarPaginacion();
+    }
+
+    actualizarPaginacion() {
+        const startIndex = (this.paginaActual - 1) * this.itemsPorPagina;
+        const endIndex = startIndex + this.itemsPorPagina;
+        this.movimientosPaginados = this.movimientosFiltrados.slice(startIndex, endIndex);
+    }
+
+    cambiarPagina(page: number) {
+        if (page >= 1 && page <= this.totalPaginas) {
+            this.paginaActual = page;
+            this.actualizarPaginacion();
+        }
+    }
+
+    getPaginas(): number[] {
+        const pages: number[] = [];
+        // Lógica simple para mostrar hasta 5 páginas cercanas
+        let startPage = Math.max(1, this.paginaActual - 2);
+        let endPage = Math.min(this.totalPaginas, startPage + 4);
+        
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+        return pages;
+    }
+
+    openModalAgregarAsignacion(content: any, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.asignacionForm.reset();
+        this.modalService.open(content, { centered: true, size: 'md', backdrop: 'static' });
+    }
+
+    guardarAsignacion(modal: any) {
+        if (this.asignacionForm.valid) {
+            console.log('Asignación guardada:', this.asignacionForm.value);
+            // Lógica para guardar aquí
+            modal.close();
+        } else {
+            this.asignacionForm.markAllAsTouched();
+        }
+    }
+
+    openModalHistorialSueldo(content: any, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.generarSueldosMock();
+        this.actualizarPaginacionSueldos();
+        this.modalService.open(content, { centered: true, size: 'lg', scrollable: true, backdrop: 'static' });
+    }
+
+    generarSueldosMock() {
+        this.sueldosOriginales = [
+            { fecha: new Date('2024-05-01T10:00:00'), sueldoBase: 1500, sueldoMensual: 2500 },
+            { fecha: new Date('2024-04-01T10:00:00'), sueldoBase: 1500, sueldoMensual: 2500 },
+            { fecha: new Date('2024-03-01T10:00:00'), sueldoBase: 1400, sueldoMensual: 2350 },
+            { fecha: new Date('2024-02-01T10:00:00'), sueldoBase: 1400, sueldoMensual: 2350 },
+            { fecha: new Date('2024-01-01T10:00:00'), sueldoBase: 1300, sueldoMensual: 2200 },
+            { fecha: new Date('2023-12-01T10:00:00'), sueldoBase: 1300, sueldoMensual: 2200 },
+            { fecha: new Date('2023-11-01T10:00:00'), sueldoBase: 1200, sueldoMensual: 2000 }
+        ];
+    }
+
+    actualizarPaginacionSueldos() {
+        this.totalSueldos = this.sueldosOriginales.length;
+        this.totalPaginasSueldo = Math.ceil(this.totalSueldos / this.sueldosPorPagina);
+        const inicio = (this.paginaSueldoActual - 1) * this.sueldosPorPagina;
+        const fin = inicio + this.sueldosPorPagina;
+        this.sueldosPaginados = this.sueldosOriginales.slice(inicio, fin);
+    }
+
+    cambiarPaginaSueldo(page: number) {
+        if (page >= 1 && page <= this.totalPaginasSueldo) {
+            this.paginaSueldoActual = page;
+            this.actualizarPaginacionSueldos();
+        }
+    }
+
+    getPaginasSueldo(): number[] {
+        const pages: number[] = [];
+        let startPage = Math.max(1, this.paginaSueldoActual - 2);
+        let endPage = Math.min(this.totalPaginasSueldo, startPage + 4);
+        
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+        return pages;
     }
 }
