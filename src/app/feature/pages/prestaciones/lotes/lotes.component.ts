@@ -110,6 +110,10 @@ export class LotesComponent extends BaseWorkflowClass implements OnDestroy {
 
         this.procesarTablaLotes();
         this.initMessagePort();
+
+        this.securitySub = this.securityQueue.minimized$.subscribe(() => {
+            this.isLoadingData = false;
+        });
     }
 
     private procesarTablaLotes(): void {
@@ -292,15 +296,15 @@ export class LotesComponent extends BaseWorkflowClass implements OnDestroy {
 
     private notifyCompletion(msg: any) {
         this.logContent = '';
-        this.zone.run(async () => {
+        this.zone.run(() => {
             const newContent = msg.payload?.data || msg.data;
+            this.isLoadingData = false;
             if (typeof newContent === 'string') {
                 if (this.logContent) this.logContent += '\n';
-                await this.typeText(newContent);
+                this.typeText(newContent);
             } else {
                 this.logContent = JSON.stringify(newContent, null, 2);
             }
-            this.isLoadingData = false;
             window.parent.postMessage({ type: 'START_DOWNLOAD', id: this.id, trackingId: this.trackId }, '*');
         });
     }
@@ -312,6 +316,11 @@ export class LotesComponent extends BaseWorkflowClass implements OnDestroy {
 
     private async typeText(text: string) {
         const lines = text.split('\n');
+        if (lines.length > 100) {
+            this.logContent += text + '\n';
+            this.scrollToBottom();
+            return;
+        }
         for (const line of lines) {
             this.logContent += (line.endsWith('\n') ? line : line + '\n');
             await new Promise(resolve => setTimeout(resolve, Math.random() * 30 + 10));
