@@ -27,11 +27,15 @@ export abstract class BaseWorkflowClass implements OnInit {
         valores: ''
     };
 
+    public Typeless: string = '';
+
     constructor(
         protected apiService: ApiService,
         protected layoutService: LayoutService,
         protected defaultPageTitle: string = 'Principal / Módulo'
-    ) { }
+    ) { 
+        this.Typeless = sessionStorage.getItem('Typeless') || '';
+    }
 
     ngOnInit(): void {
         this.layoutService.toggleCards(false);

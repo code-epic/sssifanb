@@ -37,11 +37,18 @@ export class AuthInterceptorService implements HttpInterceptor {
       return next.handle(cleanReq);
     }
 
-    if (!req.body || req.method === 'GET') {
-      return this.procesarPeticion(req, next);
-    }
+    const token: string = sessionStorage.getItem("token") || '';
 
-    const token: string = sessionStorage.getItem("token")
+    if (!req.body || req.method === 'GET') {
+      let headersConfig: any = {};
+      if (token) {
+        headersConfig['Authorization'] = `Bearer ${token}`;
+      }
+      const secureReq = req.clone({
+        setHeaders: headersConfig
+      });
+      return this.procesarPeticion(secureReq, next);
+    }
 
     const timestamp = new Date().getTime().toString();
     const payload = JSON.stringify(req.body) + timestamp;

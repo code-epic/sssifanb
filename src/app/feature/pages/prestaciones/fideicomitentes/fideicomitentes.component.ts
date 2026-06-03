@@ -304,24 +304,9 @@ export class FideicomitentesComponent extends BaseWorkflowClass implements OnIni
     }
 
     public procesarFinal(): void {
-        const reporteData = {
-            procesados: this.totalRegistros,
-            correctos: this.totalRegistrosCorrectos,
-            errores: this.totalErroresFechas,
-            responsable: "Usuario Actual", 
-            fecha: new Date().toISOString(),
-            login: "usuario_login",
-            lineasCorrectas: this.lineasCorrectas,
-            lineasErrores: this.erroresFechas,
-            headerOriginal: this.headerOriginal,
-            tipoNomina: this.tipoNominaSeleccionado,
-            componente: this.componenteSeleccionado,
-            fechaRegistro: this.fechaRegistro
-        };
-        
-        const jsonStr = JSON.stringify(reporteData);
+        const csvContent = this.headerOriginal + "\n" + this.lineasCorrectas.join("\n");
         const textEncoder = new TextEncoder();
-        const bytes = textEncoder.encode(jsonStr);
+        const bytes = textEncoder.encode(csvContent);
 
         // Simulando estado de carga
         this.cargandoArchivos = true;

@@ -16,6 +16,7 @@ import { map } from 'rxjs/operators';
 
 import { DOCUMENT, CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { jwtDecode } from 'jwt-decode';
 import { Sha256Service } from 'src/app/core/services/util/sha256';
 
 registerLocaleData(localeEs, 'es'); // Register locale data
@@ -410,8 +411,40 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.modalService.dismissAll();
   }
 
+  getBienvenidosText(): string {
+    let cargo = '';
 
+    if (this.loginService && this.loginService.Usuario) {
+      const u = this.loginService.Usuario;
+      cargo = u.cargo || u.denominacion || u.descripcion || (u.Perfil && u.Perfil.descripcion) || '';
+    }
 
+    if (!cargo) {
+      const tokenStr = sessionStorage.getItem('token');
+      if (tokenStr) {
+        try {
+          const decoded: any = jwtDecode(tokenStr);
+          const usr = decoded?.Usuario || decoded || {};
+          cargo = usr.cargo || usr.denominacion || usr.descripcion || (usr.Perfil && usr.Perfil.descripcion) || '';
+        } catch (e) {
+          console.error('Error decoding token for bienvenidos text:', e);
+        }
+      }
+    }
 
+    if (cargo) {
+      const cargoUpper = cargo.toUpperCase();
+      if (cargoUpper.includes('EJÉRCITO') || cargoUpper.includes('EJERCITO')) {
+        return 'Hola, Ejército, bienvenidos';
+      } else if (cargoUpper.includes('ARMADA')) {
+        return 'Hola, Armada, bienvenidos';
+      } else if (cargoUpper.includes('AVIACIÓN') || cargoUpper.includes('AVIACION')) {
+        return 'Hola, Aviación, bienvenidos';
+      } else if (cargoUpper.includes('GUARDIA') || cargoUpper.includes('GNB') || cargoUpper.includes('G.N.')) {
+        return 'Hola, Guardia, bienvenidos';
+      }
+    }
 
+    return 'Bienvenidos';
+  }
 }

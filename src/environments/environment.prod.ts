@@ -24,7 +24,9 @@ export const environment = {
     CONSULTAR_AFILIADO_AUTORIDAD: "IPSFA_CMilitaryAuthority",
     ACTUALIZAR_AFILIADO_AUTORIDAD: "IPSFA_UMilitaryAuthority",
     FINIQUITOS_NOMINA: "IPSFA_CFiniquitosNomina",
-    LISTAR_FIDEICOMITENTES: 'IPSFA_LFideicomitentes'
+    LISTAR_FIDEICOMITENTES: 'IPSFA_LFideicomitentes',
+    LISTAR_FIDEICOMITENTES_POR_COMPONENTE: 'IPSFA_LFideicomitentesPorComponente',
+    LISTAR_GRADOS: 'IPSFA_CComponentes' 
   },
   subPath: {
     login: "wusuario/loginV2",

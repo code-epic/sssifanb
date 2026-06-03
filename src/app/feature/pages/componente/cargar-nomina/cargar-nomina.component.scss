@@ -282,3 +282,203 @@ $input-border: #e9ecef;
         transform: translateY(-1px);
     }
 }
+
+// Estilos del Botón de Lápiz (Homologación)
+.btn-edit-homologacion {
+    background-color: rgba(99, 102, 241, 0.1) !important;
+    color: #6366f1 !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s ease !important;
+    
+    &:hover {
+        background-color: #6366f1 !important;
+        color: white !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2) !important;
+    }
+}
+
+// Estilos adicionales para la modal de homologación
+.homologacion-container {
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+.homologacion-sidebar {
+    background-color: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    border-radius: 12px 0 0 12px;
+    padding: 1.75rem;
+}
+
+.homologacion-content {
+    padding: 1.75rem;
+}
+
+.table-homologacion {
+    font-size: 0.85rem;
+    
+    thead th {
+        font-size: 0.72rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #64748b;
+        background-color: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    tbody td {
+        vertical-align: middle;
+        padding: 0.75rem;
+        color: #334155;
+    }
+}
+
+.badge-componente {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    
+    &.badge-ej { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    &.badge-ar { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    &.badge-av { background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9; }
+    &.badge-gn { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+    &.badge-mi { background-color: rgba(107, 114, 128, 0.1); color: #6b7280; }
+}
+
+.badge-ipsfanb {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+// ============================================================================
+// STAT CARDS SCSS DESIGN (DERIVED FROM AFILIACION/INDICADORES)
+// ============================================================================
+$card-pastel-green-soft: #e8f5e9;
+$card-pastel-green-dark: #679f6a;
+$card-pastel-blue-soft: #e3f2fd;
+$card-pastel-blue-dark: #1e88e5;
+$card-pastel-orange-soft: #fff3e0;
+$card-pastel-orange-dark: #fb8c00;
+$card-pastel-red-soft: #feebee;
+$card-pastel-red-dark: #e53935;
+$card-pastel-teal: #598c89;
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    width: 100%;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(89, 140, 137, 0.15);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+    transform: translateZ(0); /* Forzar recorte por hardware durante la animación */
+    
+    .card-watermark {
+        transition: all 0.4s ease;
+        pointer-events: none;
+    }
+    .icon-circle {
+        transition: all 0.4s ease;
+    }
+    
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(89, 140, 137, 0.08);
+        border-color: rgba(89, 140, 137, 0.15);
+        background: #ffffff;
+        
+        .card-watermark {
+            animation: floatWatermark 3s ease-in-out infinite;
+        }
+        .icon-circle {
+            animation: pulseSoft 2s infinite;
+        }
+    }
+
+    &.card-teal { background: rgba(89, 140, 137, 0.06); }
+    &.card-blue { background: rgba(59, 130, 246, 0.06); }
+    &.card-amber { background: rgba(245, 158, 11, 0.06); }
+    &.card-red { background: rgba(239, 68, 68, 0.06); }
+
+    // Active Selection State
+    &.active {
+        border-width: 2px;
+        box-shadow: 0 10px 25px rgba(89, 140, 137, 0.12);
+        
+        &.card-teal {
+            border-color: $card-pastel-teal;
+            background: rgba(89, 140, 137, 0.12);
+            .icon-circle { background-color: $card-pastel-teal !important; i { color: #ffffff !important; } }
+        }
+        &.card-blue {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.12);
+            .icon-circle { background-color: #3b82f6 !important; i { color: #ffffff !important; } }
+        }
+        &.card-amber {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.12);
+            .icon-circle { background-color: #f59e0b !important; i { color: #ffffff !important; } }
+        }
+        &.card-red {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.12);
+            .icon-circle { background-color: #ef4444 !important; i { color: #ffffff !important; } }
+        }
+    }
+}
+
+// Pastel Backgrounds and Texts
+.bg-light-teal { background-color: rgba(89, 140, 137, 0.1); }
+.text-primary-teal { color: #598c89 !important; }
+
+.bg-light-blue { background-color: rgba(59, 130, 246, 0.1); }
+.text-primary-blue { color: #3b82f6 !important; }
+
+.bg-light-amber { background-color: rgba(245, 158, 11, 0.1); }
+.text-amber { color: #f59e0b !important; }
+
+.bg-light-red { background-color: rgba(239, 68, 68, 0.1); }
+.text-red { color: #ef4444 !important; }
+
+// Animation Keyframes
+@keyframes floatWatermark {
+    0% { transform: rotate(-15deg) translateY(0px) scale(1); }
+    50% { transform: rotate(-15deg) translateY(-8px) scale(1.02); }
+    100% { transform: rotate(-15deg) translateY(0px) scale(1); }
+}
+
+@keyframes pulseSoft {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+

@@ -115,6 +115,33 @@ export class LoginService {
 
 
 
+  private detectarComponenteMilitar(usuario: any): string {
+    if (!usuario) return '';
+    const fieldsToSearch = [
+      usuario.cargo,
+      usuario.denominacion,
+      usuario.descripcion,
+      usuario.Perfil?.descripcion,
+      usuario.Rol?.descripcion,
+      usuario.nombre
+    ];
+    for (const field of fieldsToSearch) {
+      if (field) {
+        const fieldUpper = String(field).toUpperCase();
+        if (fieldUpper.includes('EJÉRCITO') || fieldUpper.includes('EJERCITO')) {
+          return 'EJERCITO';
+        } else if (fieldUpper.includes('ARMADA')) {
+          return 'ARMADA';
+        } else if (fieldUpper.includes('AVIACIÓN') || fieldUpper.includes('AVIACION')) {
+          return 'AVIACION';
+        } else if (fieldUpper.includes('GUARDIA') || fieldUpper.includes('GNB') || fieldUpper.includes('G.N.')) {
+          return 'GUARDIA';
+        }
+      }
+    }
+    return '';
+  }
+
   public getUserDecrypt(cadena_jwt: string): any {
     if (!cadena_jwt || cadena_jwt === 'undefined' || cadena_jwt === 'null') {
       console.warn('LoginService: Token inválido o ausente en getUserDecrypt');
@@ -124,6 +151,14 @@ export class LoginService {
       const token: any = jwtDecode(cadena_jwt);
       this.Token = token;
       this.Usuario = this.Token?.Usuario || {};
+      
+      const comp = this.detectarComponenteMilitar(this.Usuario);
+      if (comp) {
+        sessionStorage.setItem('existe_componente', comp);
+      } else {
+        sessionStorage.removeItem('existe_componente');
+      }
+
       return this.Token;
     } catch (error) {
       console.error('LoginService: Error al decodificar JWT', error);
