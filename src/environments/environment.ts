@@ -1,35 +1,37 @@
 export const environment = {
   production: false,
   enableServiceWorker: true,
-  ID: 'ipsfa',
-  Url: 'http://localhost',
-  API: '/v1/api/',
-  Hash: '8768b8d1727cb2d1ec9f0a8d8bc45f8b.sse',
-  BasePath: 'crud',
-  buildDateTime: 'Mon Apr 20 2026 18:42:16 GMT-0400 (Venezuela Time)',
-  version: 'Broglie 1.0.1-1b419f3',
-  fecha: '2025-04-12 05:08:00',
+  ID: "ipsfa",
+  Url: "http://localhost",
+  API: "/v1/api/",
+  Hash: "8768b8d1727cb2d1ec9f0a8d8bc45f8b.sse",
+  BasePath: "crud",
+  buildDateTime: "Mon Apr 20 2026 18:42:16 GMT-0400 (Venezuela Time)",
+  version: "Broglie 1.0.1-1b419f3",
+  fecha: "2025-04-12 05:08:00",
   coleciones: {
-    CONTADORES: 'wkf_sssifanb'
+    CONTADORES: "wkf_sssifanb",
   },
   funcion: {
-    master: 'CCEC_CMaestro',
-    content: 'CCEC_CContenido',
-    CONSULTAR_USUARIO_PERFIL: '_SYS_CUsuarioPerfil',
-    ACTUALIZAR_CLAVE_USUARIO: '_SYS_UUserPanel',
-    ACTUALIZAR_TOTP: '_SYS_UUserTOTP',
-    CONSULTAR_IDENTIFICACION_MILITAR: 'FANB_CIdentificarMilitar',
-    CONSULTAR_MILITARES: 'IPSFA_LMilitares',
-    LISTAR_AFILIADO_AUTORIDAD: 'IPSFA_LMilitaryAuthority',
-    CONSULTAR_AFILIADO_AUTORIDAD: 'IPSFA_CMilitaryAuthority',
-    ACTUALIZAR_AFILIADO_AUTORIDAD: 'IPSFA_UMilitaryAuthority',
-    FINIQUITOS_NOMINA: 'IPSFA_CFiniquitosNomina',
-    LISTAR_FIDEICOMITENTES: 'IPSFA_LFideicomitentes',
-    LISTAR_FIDEICOMITENTES_POR_COMPONENTE: 'IPSFA_LFideicomitentesPorComponente',
-    LISTAR_GRADOS: 'IPSFA_CComponentes'
+    master: "CCEC_CMaestro",
+    content: "CCEC_CContenido",
+    CONSULTAR_USUARIO_PERFIL: "_SYS_CUsuarioPerfil",
+    ACTUALIZAR_CLAVE_USUARIO: "_SYS_UUserPanel",
+    ACTUALIZAR_TOTP: "_SYS_UUserTOTP",
+    CONSULTAR_IDENTIFICACION_MILITAR: "FANB_CIdentificarMilitar",
+    CONSULTAR_MILITARES: "IPSFA_LMilitares",
+    LISTAR_AFILIADO_AUTORIDAD: "IPSFA_LMilitaryAuthority",
+    CONSULTAR_AFILIADO_AUTORIDAD: "IPSFA_CMilitaryAuthority",
+    ACTUALIZAR_AFILIADO_AUTORIDAD: "IPSFA_UMilitaryAuthority",
+    FINIQUITOS_NOMINA: "IPSFA_CFiniquitosNomina",
+    LISTAR_FIDEICOMITENTES: "IPSFA_LFideicomitentes",
+    LISTAR_FIDEICOMITENTES_POR_COMPONENTE:
+      "IPSFA_LFideicomitentesPorComponente",
+    LISTAR_GRADOS: "IPSFA_CComponentes",
+    LISTAR_REVISION_FIDEICOMITENTES: "IPSFA_CRevisionFidecomimites",
+    LISTAR_TMP_AVIACION: "IPSFA_CTmpAviacion",
   },
   subPath: {
-    login: 'wusuario/loginV2'
-  }
+    login: "wusuario/loginV2",
+  },
 };
-

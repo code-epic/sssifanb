@@ -18,6 +18,8 @@ import { NgbDropdownModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { PastelDatepickerComponent } from 'src/app/shared/components/pastel-datepicker/pastel-datepicker.component';
 import { DynamicTableComponent } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
 import { MailboxLayoutComponent } from 'src/app/shared/components/mailbox-layout/mailbox-layout.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { AuditoriaDiscrepanciasComponent } from './fideicomitentes/auditoria-discrepancias/auditoria-discrepancias.component';
 
 @NgModule({
     declarations: [
@@ -30,7 +32,8 @@ import { MailboxLayoutComponent } from 'src/app/shared/components/mailbox-layout
         ReportesComponent,
         PatriaComponent,
         FideicomitentesComponent,
-        SimuladorComponent
+        SimuladorComponent,
+        AuditoriaDiscrepanciasComponent
     ],
     imports: [
         CommonModule,
@@ -41,7 +44,8 @@ import { MailboxLayoutComponent } from 'src/app/shared/components/mailbox-layout
         NgbModalModule,
         PastelDatepickerComponent,
         DynamicTableComponent,
-        MailboxLayoutComponent
+        MailboxLayoutComponent,
+        ScrollingModule
     ]
 })
 export class PrestacionesModule { }

@@ -1,0 +1,213 @@
+<div class="auditoria-container fade-in">
+  
+    <!-- Toolbar Control -->
+    <div class="toolbar d-flex align-items-center mb-3">
+      <button class="btn btn-outline-secondary mr-3" (click)="volver.emit()" style="border-radius: 8px; font-weight: 600;">
+        <i class="fas fa-list mr-1"></i> Ir a Fideicomitentes
+      </button>
+      
+      <button class="btn btn-outline-primary mr-3" (click)="mostrarEstadisticas()" style="border-radius: 8px; font-weight: 600; border-color: rgba(59, 130, 246, 0.5);">
+        <i class="fas fa-chart-bar mr-1"></i> Estadísticas
+      </button>
+      
+      <div class="search-box input-group mr-3">
+        <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-search"></i></span></div>
+        <input type="text" class="form-control shadow-none" placeholder="Buscar cédula, etiquetas, errores..." (input)="onSearch($event)">
+      </div>
+      
+      <div class="scroll-controls ml-auto">
+        <button class="btn btn-icon-nav shadow-none mr-2" (click)="scrollToIndex('PREV')"><i class="fas fa-chevron-up"></i></button>
+        <button class="btn btn-icon-nav shadow-none" (click)="scrollToIndex('NEXT')"><i class="fas fa-chevron-down"></i></button>
+      </div>
+    </div>
+  
+    <!-- Streaming Progress Indicator (Non-blocking) - Tema Verde -->
+    <div *ngIf="isLoadingData" class="alert d-flex align-items-center py-2 px-3 mb-3 fade-in shadow-sm" style="border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3); background: rgba(236, 253, 245, 0.8); backdrop-filter: blur(4px);">
+        <div class="spinner-border spinner-border-sm text-success mr-3" role="status" style="border-width: 0.15em; width: 1.2rem; height: 1.2rem;"></div>
+        <div class="flex-grow-1">
+            <span class="font-weight-bold" style="color: #065f46; font-size: 0.85rem; letter-spacing: 0.2px;">Sincronizando Expedientes en Vivo...</span>
+            <span class="d-block text-success" style="font-size: 0.75rem; font-weight: 500; opacity: 0.8;">La auditoría se está poblando en tiempo real. Ya puedes interactuar con las carpetas.</span>
+        </div>
+        <div class="text-right d-flex align-items-center">
+            <div class="pulse-ring mr-2" style="border-color: rgba(16, 185, 129, 0.5);"></div>
+            <span class="badge" style="background: white; color: #059669; font-size: 0.8rem; border-radius: 8px; border: 1px solid #6ee7b7; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding: 5px 10px;">
+                <i class="fas fa-layer-group mr-1"></i> Recibiendo datos...
+            </span>
+        </div>
+    </div>
+
+    <!-- Layout Master-Detail (Optimizacion para >2000 registros) -->
+    <div class="row flex-grow-1 overflow-hidden fade-in" style="min-height: 0;">
+      
+      <!-- Panel Izquierdo: Navegación Tipo Árbol (Carpetas / Registros) -->
+      <div class="col-xl-3 col-lg-4 col-md-5 h-100 d-flex flex-column border-right pr-2" style="border-color: #e2e8f0 !important; min-width: 260px;">
+        
+        <!-- LEVEL 0: Folder View -->
+        <!-- Agregado pr-3 y pl-1 para evitar que el scroll pise las tarjetas -->
+        <div *ngIf="!currentFolder" class="folders-container p-2 pr-3 h-100 overflow-auto fade-in">
+          <div class="d-flex align-items-center mb-3 mt-1 pl-1">
+             <i class="fas fa-sitemap text-muted mr-2"></i>
+             <h6 class="text-muted font-weight-bold mb-0" style="text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px;">Carpetas de Auditoría</h6>
+          </div>
+          
+          <div class="folder-item mb-2 p-3 rounded d-flex align-items-center cursor-pointer shadow-sm" 
+               *ngFor="let folder of navigationFolders"
+               style="background: white; border: 1px solid #e2e8f0; transition: all 0.2s;"
+               (dblclick)="openFolder(folder.id)"
+               onmouseover="this.style.background='#f8fafc'; this.style.transform='translateY(-1px)';"
+               onmouseout="this.style.background='white'; this.style.transform='none';">
+               
+               <!-- Ícono suavizado con fondo de baja opacidad -->
+               <div class="folder-icon mr-3 d-flex justify-content-center align-items-center" 
+                    [style.color]="folder.color" 
+                    [style.background-color]="folder.color + '15'"
+                    style="font-size: 1.3rem; width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;">
+                  <i class="fas" [ngClass]="folder.icon"></i>
+               </div>
+               <div class="folder-info flex-grow-1" style="min-width: 0;">
+                  <span class="d-block font-weight-bold text-truncate" style="color: #334155; font-size: 0.95rem;">{{ folder.name }}</span>
+                  <small class="text-muted font-weight-600" style="font-size: 0.75rem;">{{ folder.count }} expedientes</small>
+               </div>
+               <div class="folder-action text-muted" style="opacity: 0.5;">
+                  <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i>
+               </div>
+          </div>
+
+          <div class="mt-4 p-3 rounded" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed rgba(59, 130, 246, 0.3);">
+             <small class="text-muted d-block text-center" style="font-size: 0.75rem;">
+                <i class="fas fa-mouse mr-1"></i> Haga <b>doble clic</b> sobre una carpeta para abrirla. Presione <b>ESC</b> para regresar.
+             </small>
+          </div>
+        </div>
+
+        <!-- LEVEL 1: Records View (Virtual Scroll) -->
+        <div *ngIf="currentFolder" class="records-container h-100 d-flex flex-column fade-in">
+          
+          <div class="folder-header d-flex align-items-center mb-3 p-2 rounded shadow-sm" style="background: white; border: 1px solid #e2e8f0;">
+            <button class="btn btn-sm shadow-none mr-2 d-flex align-items-center justify-content-center" 
+                    (click)="closeFolder()" 
+                    title="Volver a las carpetas (ESC)"
+                    style="width: 32px; height: 32px; border-radius: 8px; background: #f1f5f9; border: 1px solid #cbd5e1;">
+               <i class="fas fa-arrow-left" style="color: #475569;"></i>
+            </button>
+            <div class="d-flex align-items-center flex-grow-1 text-truncate">
+               <i class="fas {{ getFolderDetails(currentFolder).icon }} mr-2" [style.color]="getFolderDetails(currentFolder).color"></i>
+               <span class="font-weight-bold text-dark text-truncate" style="font-size: 0.95rem;">{{ getFolderDetails(currentFolder).name }}</span>
+            </div>
+            <span class="badge badge-light ml-2" style="font-size: 0.75rem;">{{ getFolderDetails(currentFolder).count }}</span>
+          </div>
+
+          <cdk-virtual-scroll-viewport itemSize="75" class="virtual-scroll-container flex-grow-1">
+            <ng-container *cdkVirtualFor="let registro of registros$ | async; trackBy: trackById">
+              
+              <div class="minimal-card fade-in" 
+                   [class.active]="activeRecordId === registro.id" 
+                   (click)="selectRecord(registro.id)">
+                   
+                   <div class="d-flex justify-content-between align-items-center w-100">
+                       <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
+                           <div class="mini-icon mr-3">
+                               <i class="fas fa-file-invoice" style="color: #94a3b8; font-size: 1.1rem;"></i>
+                           </div>
+                           <div class="d-flex flex-column text-truncate" style="min-width: 0;">
+                               <span class="cedula-mini text-truncate">V-{{ registro.cedula }}</span>
+                               <small class="text-muted mt-1 text-truncate" style="font-size: 0.68rem; font-weight: 600;"><i class="fas fa-calendar-alt mr-1"></i> {{ registro.fechaOperacion }}</small>
+                           </div>
+                       </div>
+                       <div class="text-right d-flex flex-column align-items-end justify-content-center ml-2" style="flex-shrink: 0;">
+                           <span class="badge badge-group mb-2" style="max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="registro.grupoValidacion">{{ registro.grupoValidacion }}</span>
+                           <span class="status-dot" [class.partial]="registro.status === 'PartialMatch'" [title]="registro.status === 'PartialMatch' ? 'Coincidencia Parcial' : registro.status"></span>
+                       </div>
+                   </div>
+              </div>
+              
+            </ng-container>
+          </cdk-virtual-scroll-viewport>
+        </div>
+
+      </div>
+
+      <!-- Panel Derecho: Detalle Activo -->
+      <div class="col-xl-9 col-lg-8 col-md-7 h-100 pl-4 d-flex flex-column">
+        
+        <div class="detalle-auditoria-panel h-100 fade-in" *ngIf="activeRecord; else emptyState">
+          <div class="card-detalle-auditoria h-100 d-flex flex-column m-0">
+            
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <div class="icon-circle mr-3" style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 1.2rem;">
+                  <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                  <h4 class="cedula mb-0">V-{{ activeRecord.cedula }}</h4>
+                  <span class="text-muted d-block mt-1" style="font-size: 0.75rem; font-weight: 600;"><i class="fas fa-calendar-alt mr-1"></i> Operación: {{ activeRecord.fechaOperacion }}</span>
+                </div>
+              </div>
+              <div class="d-flex flex-column align-items-end">
+                  <span class="status-badge mb-2" [class.partial]="activeRecord.status === 'PartialMatch'"><i class="fas fa-exclamation-triangle mr-1"></i> {{ activeRecord.status === 'PartialMatch' ? 'Coincidencia Parcial' : activeRecord.status }}</span>
+                  <span class="badge badge-group" style="font-size: 0.8rem; padding: 6px 12px;">{{ activeRecord.grupoValidacion }}</span>
+              </div>
+            </div>
+    
+            <div class="card-body py-3 px-3 flex-grow-1 overflow-auto">
+              <!-- Destacar CSV Line -->
+              <div class="csv-line-block mb-4 p-3 rounded" style="background: #1e293b; color: #38bdf8; font-family: 'Fira Code', monospace; font-size: 0.85rem; border-left: 4px solid #0ea5e9; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="color: #94a3b8; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 5px; font-family: sans-serif; letter-spacing: 1px;">Línea Base Original (CSV)</div>
+                {{ activeRecord.rawCSV }}
+              </div>
+
+              <!-- Lista Elegante de Discrepancias -->
+              <h6 class="text-muted font-weight-bold mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Campos con Discrepancias</h6>
+              <ul class="list-group list-group-flush mb-4" style="border-radius: 12px; overflow: hidden; border: 1px solid rgba(0,0,0,0.05);">
+                <li class="list-group-item d-flex justify-content-between align-items-center p-3" *ngFor="let diff of activeRecord.diferencias" style="border-color: rgba(0,0,0,0.03);">
+                  <div class="d-flex align-items-center">
+                    <div class="mr-3 text-center" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(99, 102, 241, 0.1); color: #6366f1; display: flex; align-items: center; justify-content: center;">
+                      <i class="fas fa-info" style="font-size: 0.8rem;"></i>
+                    </div>
+                    <div>
+                      <span class="d-block font-weight-bold" style="color: #334155; font-size: 0.9rem;">{{ diff.etiqueta || diff.campo }}</span>
+                      <small class="text-muted" style="font-size: 0.7rem;">Detectado conflicto de datos</small>
+                    </div>
+                  </div>
+                  
+                  <div class="d-flex align-items-center">
+                    <div class="d-flex flex-column text-right mr-4">
+                      <small style="font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Origen (CSV)</small>
+                      <span style="font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #ef4444; font-weight: 600; background: rgba(239,68,68,0.1); padding: 2px 8px; border-radius: 4px; margin-top: 2px;">{{ diff.origenCSV }}</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-muted mx-2" style="font-size: 0.7rem; opacity: 0.5;"></i>
+                    <div class="d-flex flex-column text-left ml-4">
+                      <small style="font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Sistema (gRPC)</small>
+                      <span style="font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #10b981; font-weight: 600; background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 4px; margin-top: 2px;">{{ diff.sistemaGRPC }}</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+    
+            <div class="card-footer d-flex justify-content-end align-items-center pt-3 pb-4 mb-2 mt-auto bg-white border-top">
+              <div class="action-buttons">
+                <button class="btn btn-rechazar mr-3 shadow-none px-4 py-2" (click)="procesarAccion(activeRecord, 'RECHAZAR'); $event.stopPropagation()" style="border-radius: 10px; font-weight: 700; border: 2px solid rgba(239, 68, 68, 0.2); background: white;">
+                  <i class="fas fa-times mr-2 text-danger"></i> Rechazar Cambios
+                </button>
+                <button class="btn btn-aceptar shadow-none px-4 py-2" (click)="procesarAccion(activeRecord, 'ACEPTAR'); $event.stopPropagation()" style="border-radius: 10px; font-weight: 700; background: #10b981; color: white; border: 2px solid #10b981; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);">
+                  <i class="fas fa-check mr-2"></i> Actualizar Cambios
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <ng-template #emptyState>
+            <div class="empty-state d-flex flex-column align-items-center justify-content-center h-100 text-muted fade-in" style="background: rgba(248,250,252, 0.5); border: 2px dashed #e2e8f0; border-radius: 16px;">
+                <i class="fas fa-clipboard-check mb-4" style="font-size: 4.5rem; opacity: 0.15; color: #3b82f6;"></i>
+                <h4 style="font-weight: 800; color: #64748b; letter-spacing: -0.5px;">Seleccione un registro</h4>
+                <p style="font-size: 0.95rem; text-align: center; max-width: 300px; color: #94a3b8;">Haga clic en un elemento de la lista izquierda para visualizar y auditar las discrepancias.</p>
+            </div>
+        </ng-template>
+
+      </div>
+    </div>
+
+  </div>
