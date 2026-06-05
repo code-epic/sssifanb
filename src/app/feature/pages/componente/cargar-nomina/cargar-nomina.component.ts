@@ -1,4 +1,10 @@
-import { Component, TemplateRef, ViewChild, OnInit } from "@angular/core";
+import {
+  Component,
+  TemplateRef,
+  ViewChild,
+  OnInit,
+  ChangeDetectorRef,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NgbModule, NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -136,9 +142,9 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     },
   ];
 
-  public isNewView: boolean = false;
   public pasoActual: number = 1;
   public cargandoArchivos: boolean = false;
+  public isManifestLoaded: boolean = false;
   public progresoCarga: number = 0;
   public progresoSubida: number = 0;
   public estadoSubida: string = "";
@@ -152,10 +158,11 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   public columnasPrevia: string[] = [];
   public lineasCorrectasPrevia: string[][] = [];
 
-  public searchCedula: string = "";
-  public militarData: any = null;
   public selectedItem: any = null;
   private masterPendingData: any[] = [];
+  public manifestFilesData: any[] = [];
+
+  @ViewChild("modalEstadisticas") modalEstadisticas!: TemplateRef<any>;
 
   // Fields for the wizard step 1
   public tipoNominaSeleccionado: string = "";
@@ -166,10 +173,16 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   public validacionHomologada = [];
 
   // Variables para las 4 tarjetas de indicadores
+  public showCards: boolean = false;
   public cardCorrectoCount: number = 0;
   public cardRevisionCount: number = 0;
   public cardRechazoCount: number = 0;
   public cardNuevosCount: number = 0;
+
+  // Variables para porcentajes (100% = Correctos + Revision + Nuevos)
+  public pctCorrectos: number = 0;
+  public pctRevision: number = 0;
+  public pctNuevos: number = 0;
 
   // --- CONFIG: Tabla Principal (Cargar Nómina) ---
   public pendingTableConfig: DynamicTableConfig = {
@@ -228,6 +241,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   };
 
   public pendingTableData: any[] = [];
+  public Componente = "";
 
   constructor(
     protected override apiService: ApiService,
@@ -235,6 +249,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     private modalService: NgbModal,
     private utilService: UtilService,
     private fileService: FileService,
+    private cdr: ChangeDetectorRef,
   ) {
     super(apiService, layoutService, "");
   }
@@ -257,6 +272,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     let xAPI = {
       funcion: "Fnx_DatosFideicomitentes",
       componente: `${comp.substring(0, 2)}`,
+      // componente: `19`,
     };
 
     this.apiService.post("fnx", xAPI).subscribe({
@@ -265,8 +281,10 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         setTimeout(() => {
           this.apiService.get("fnx:" + data.contenido.id).subscribe({
             next: (data: any) => {
+              console.log("datos de la nomina: " + data.documento);
               if (data.documento == "PROCESADO") {
                 let manifiesto = JSON.parse(data.rs);
+                console.log(manifiesto);
                 if (manifiesto && manifiesto.metrics) {
                   this.cardCorrectoCount = manifiesto.metrics.hits_100 || 0;
                   this.cardRevisionCount =
@@ -285,15 +303,56 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
                   } else {
                     this.cardNuevosCount = 0;
                   }
+
+                  if (
+                    manifiesto.archivos_generados &&
+                    Array.isArray(manifiesto.archivos_generados)
+                  ) {
+                    this.isManifestLoaded = true;
+                    this.manifestFilesData = manifiesto.archivos_generados.map(
+                      (item: any) => ({
+                        ...item,
+                        idFormat: `<div class="d-flex flex-column align-items-start"><span class="text-dark font-weight-600 mb-1" style="font-size: 0.9rem;">${item.nombre}</span></div>`,
+                        componenteFormat: this.getComponentBadge(
+                          this.componenteSeleccionado || "N/A",
+                        ),
+                        origenFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;"><i class="fas fa-file-csv text-muted mr-1"></i>${item.nombre}</span>`,
+                        cantidadFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;">${item.lineas > 0 ? item.lineas - 1 : 0}</span>`,
+                        fechaFormat: this.utilService.formatFechaRelativa(
+                          manifiesto.fecha || new Date().toISOString(),
+                        ),
+                        estatusFormat: `<span class="badge badge-pill badge-light text-muted border px-2 py-1" style="font-size: 0.75rem;">${item.descripcion || "Generado"}</span>`,
+                      }),
+                    );
+                    this.filtrarDatosPorTab();
+                  }
+
+                  this.actualizarPorcentajes();
+                  this.showCards = true;
                 }
+              } else if (data.documento == "ZOMBIE") {
+                this.showCards = false;
+                this.utilService.AlertMini(
+                  "top-end",
+                  "info",
+                  `Nomina esta en proceso de revision`,
+                  4000,
+                );
+              } else {
               }
             },
             error: (err) => {},
           });
-        }, 2000);
+        }, 1000);
       },
       error: (err) => {},
     });
+
+    this.Componente = sessionStorage.getItem("existe_componente") || "";
+    this.Componente =
+      this.Componente.trim() != ""
+        ? this.Componente.trim().toUpperCase().substring(0, 2)
+        : "";
   }
 
   protected override onInitExtension(): void {}
@@ -305,20 +364,11 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         { id: "PRINCIPAL", nombre: "Activos / Procesados" },
         { id: "CORRECTOS", nombre: "Correctos" },
         { id: "REVISION", nombre: "Revisión" },
-        { id: "RECHAZADOS", nombre: "Verificar Estatus" },
         { id: "NUEVOS", nombre: "Nuevos (Fideicomitentes)" },
       ];
       this.currentTabId = "PRINCIPAL";
       this.isLoadingData = false;
     }, 500);
-  }
-
-  public toggleView(): void {
-    this.isNewView = !this.isNewView;
-    if (!this.isNewView) {
-      this.searchCedula = "";
-      this.militarData = null;
-    }
   }
 
   public onMailboxSearch(term: string): void {
@@ -327,11 +377,18 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       return;
     }
     const st = term.toLowerCase();
-    this.pendingTableData = this.masterPendingData.filter((item) => {
-      const matchesSearch =
-        (item.id && item.id.toLowerCase().includes(st)) ||
-        (item.origen && item.origen.toLowerCase().includes(st)) ||
-        (item.componente && item.componente.toLowerCase().includes(st));
+    const isPrincipalOrNoManifest = this.currentTabId === "PRINCIPAL" || !this.isManifestLoaded;
+    const activeDataset = isPrincipalOrNoManifest ? this.masterPendingData : this.manifestFilesData;
+
+    this.pendingTableData = activeDataset.filter((item) => {
+      const isItemFromManifest = this.isManifestLoaded && this.currentTabId !== "PRINCIPAL";
+      const matchesSearch = isItemFromManifest
+        ? (item.nombre && item.nombre.toLowerCase().includes(st))
+        : (
+            (item.id && item.id.toLowerCase().includes(st)) ||
+            (item.origen && item.origen.toLowerCase().includes(st)) ||
+            (item.componente && item.componente.toLowerCase().includes(st))
+          );
 
       if (!matchesSearch) return false;
 
@@ -339,31 +396,37 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         case "PRINCIPAL":
           return true;
         case "CORRECTOS":
-          return (
-            item.estatus === "APROBADO" ||
-            item.estatus === "PROCESO" ||
-            item.estatus === "CONCILIADO" ||
-            Number(item.errores) === 0
-          );
+          if (this.isManifestLoaded) {
+            return item.nombre && item.nombre.toLowerCase().includes("correcto");
+          } else {
+            return (
+              item.estatus === "APROBADO" ||
+              item.estatus === "PROCESO" ||
+              item.estatus === "CONCILIADO" ||
+              Number(item.errores) === 0
+            );
+          }
         case "REVISION":
-          return (
-            item.estatus === "PENDIENTE" ||
-            item.estatus === "EN PROCESO" ||
-            !item.estatus
-          );
-        case "RECHAZADOS":
-          return (
-            item.estatus === "RECHAZADA" ||
-            item.estatus === "ERROR" ||
-            item.estatus === "RECHAZADO" ||
-            Number(item.errores) > 0
-          );
+          if (this.isManifestLoaded) {
+            return item.nombre && item.nombre.toLowerCase().includes("rechazo");
+          } else {
+            return (
+              item.estatus === "RECHAZADA" ||
+              item.estatus === "ERROR" ||
+              item.estatus === "RECHAZADO" ||
+              Number(item.errores) > 0
+            );
+          }
         case "NUEVOS":
-          return (
-            (item.origen && item.origen.toLowerCase().includes("nuevo")) ||
-            item.estatus === "NUEVO" ||
-            item.tipo === "NUEVO"
-          );
+          if (this.isManifestLoaded) {
+            return item.nombre && item.nombre.toLowerCase().includes("nuevo");
+          } else {
+            return (
+              (item.origen && item.origen.toLowerCase().includes("nuevo")) ||
+              item.estatus === "NUEVO" ||
+              item.tipo === "NUEVO"
+            );
+          }
         default:
           return true;
       }
@@ -372,7 +435,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   public onMailboxTabSwitch(tabId: string): void {
     this.onTabSwitch(tabId, () => {
-      this.loadPendingData();
+      this.filtrarDatosPorTab();
     });
   }
 
@@ -382,6 +445,40 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   public onMailboxSelectAll(checked: boolean): void {
     this.allSelected = checked;
+  }
+
+  private actualizarPorcentajes(): void {
+    // Para las tarjetas, evaluamos el porcentaje basándonos únicamente en el universo "Sano/En Proceso"
+    // para que la suma de estas tres tendencias sea exactamente 100%.
+    const baseTotal =
+      this.cardCorrectoCount + this.cardRevisionCount + this.cardNuevosCount;
+
+    if (baseTotal > 0) {
+      this.pctCorrectos = Number(
+        ((this.cardCorrectoCount / baseTotal) * 100).toFixed(1),
+      );
+      this.pctRevision = Number(
+        ((this.cardRevisionCount / baseTotal) * 100).toFixed(1),
+      );
+      this.pctNuevos = Number(
+        ((this.cardNuevosCount / baseTotal) * 100).toFixed(1),
+      );
+    } else {
+      this.pctCorrectos = 0;
+      this.pctRevision = 0;
+      this.pctNuevos = 0;
+    }
+    this.cdr.detectChanges();
+  }
+
+  public mostrarEstadisticas(): void {
+    if (this.modalEstadisticas) {
+      this.modalService.open(this.modalEstadisticas, {
+        centered: true,
+        size: "lg",
+        windowClass: "pastel-modal",
+      });
+    }
   }
 
   public loadPendingData(): void {
@@ -419,132 +516,69 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
           componenteFormat: this.getComponentBadge(item.componente || "N/A"),
           origenFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;"><i class="fas fa-file-csv text-muted mr-1"></i>${item.origen || ""}</span>`,
           cantidadFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;">${item.procesados || 0}</span>`,
-          fechaFormat: this.formatFechaRelativa(item.fecha),
+          fechaFormat: this.utilService.formatFechaRelativa(item.fecha),
           estatusFormat: this.getStatusBadge(item.estatus || "PENDIENTE"),
         }));
 
-        // Calculate card metrics from mappedData
-        let correcto = 0;
-        let revision = 0;
-        let rechazo = 0;
-        let nuevos = 0;
-
-        mappedData.forEach((item: any) => {
-          const status = (item.estatus || "PENDIENTE").toUpperCase();
-          const proc = Number(item.procesados) || 0;
-          const okVal = item.ok !== undefined ? Number(item.ok) : proc;
-          const errVal = Number(item.errores) || 0;
-
-          nuevos += proc;
-
-          if (
-            status === "APROBADO" ||
-            status === "PROCESO" ||
-            status === "CONCILIADO"
-          ) {
-            correcto += okVal;
-            rechazo += errVal;
-          } else if (
-            status === "RECHAZADA" ||
-            status === "ERROR" ||
-            status === "RECHAZADO"
-          ) {
-            rechazo += proc;
-          } else {
-            // PENDIENTE / EN PROCESO
-            revision += proc;
-          }
-        });
-
-        this.cardCorrectoCount = correcto;
-        this.cardRevisionCount = revision;
-        this.cardRechazoCount = rechazo;
-        this.cardNuevosCount = nuevos;
-
         this.masterPendingData = [...mappedData];
         this.filtrarDatosPorTab();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.isLoadingData = false;
         console.error("Error al cargar datos:", err);
         this.masterPendingData = [];
         this.pendingTableData = [];
+        this.cdr.detectChanges();
       },
     });
   }
 
   public filtrarDatosPorTab(): void {
-    let filtered = [...this.masterPendingData];
+    let filtered: any[] = [];
     if (this.currentTabId === "PRINCIPAL") {
       filtered = [...this.masterPendingData];
-    } else if (this.currentTabId === "CORRECTOS") {
-      filtered = this.masterPendingData.filter(
-        (item) =>
-          item.estatus === "APROBADO" ||
-          item.estatus === "PROCESO" ||
-          item.estatus === "CONCILIADO" ||
-          Number(item.errores) === 0,
-      );
-    } else if (this.currentTabId === "REVISION") {
-      filtered = this.masterPendingData.filter(
-        (item) =>
-          item.estatus === "PENDIENTE" ||
-          item.estatus === "EN PROCESO" ||
-          !item.estatus,
-      );
-    } else if (this.currentTabId === "RECHAZADOS") {
-      filtered = this.masterPendingData.filter(
-        (item) =>
-          item.estatus === "RECHAZADA" ||
-          item.estatus === "ERROR" ||
-          item.estatus === "RECHAZADO" ||
-          Number(item.errores) > 0,
-      );
-    } else if (this.currentTabId === "NUEVOS") {
-      filtered = this.masterPendingData.filter(
-        (item) =>
-          (item.origen && item.origen.toLowerCase().includes("nuevo")) ||
-          item.estatus === "NUEVO" ||
-          item.tipo === "NUEVO",
-      );
+    } else if (this.isManifestLoaded) {
+      if (this.currentTabId === "CORRECTOS") {
+        filtered = this.manifestFilesData.filter(
+          (item) => item.nombre && item.nombre.toLowerCase().includes("correcto")
+        );
+      } else if (this.currentTabId === "REVISION") {
+        filtered = this.manifestFilesData.filter(
+          (item) => item.nombre && item.nombre.toLowerCase().includes("rechazo")
+        );
+      } else if (this.currentTabId === "NUEVOS") {
+        filtered = this.manifestFilesData.filter(
+          (item) => item.nombre && item.nombre.toLowerCase().includes("nuevo")
+        );
+      }
+    } else {
+      if (this.currentTabId === "CORRECTOS") {
+        filtered = this.masterPendingData.filter(
+          (item) =>
+            item.estatus === "APROBADO" ||
+            item.estatus === "PROCESO" ||
+            item.estatus === "CONCILIADO" ||
+            Number(item.errores) === 0
+        );
+      } else if (this.currentTabId === "REVISION") {
+        filtered = this.masterPendingData.filter(
+          (item) =>
+            item.estatus === "RECHAZADA" ||
+            item.estatus === "ERROR" ||
+            item.estatus === "RECHAZADO" ||
+            Number(item.errores) > 0
+        );
+      } else if (this.currentTabId === "NUEVOS") {
+        filtered = this.masterPendingData.filter(
+          (item) =>
+            (item.origen && item.origen.toLowerCase().includes("nuevo")) ||
+            item.estatus === "NUEVO" ||
+            item.tipo === "NUEVO"
+        );
+      }
     }
     this.pendingTableData = filtered;
-  }
-
-  private formatFechaRelativa(fechaString: string): string {
-    if (!fechaString) return "";
-    const date = new Date(fechaString);
-    if (isNaN(date.getTime())) return fechaString;
-
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const absoluteStr = `${day}/${month}/${year} ${hours}:${minutes}`;
-
-    const diffMs = new Date().getTime() - date.getTime();
-    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-
-    let relativeStr = "";
-    if (diffHrs > 24) {
-      const days = Math.floor(diffHrs / 24);
-      relativeStr = `Hace ${days} día${days > 1 ? "s" : ""}`;
-    } else if (diffHrs > 0) {
-      relativeStr = `Hace ${diffHrs} hora${diffHrs > 1 ? "s" : ""}`;
-    } else if (diffMins > 0) {
-      relativeStr = `Hace ${diffMins} min${diffMins > 1 ? "s" : ""}`;
-    } else {
-      relativeStr = "Hace un momento";
-    }
-
-    return `
-            <div class="d-flex flex-column align-items-center">
-                <span class="text-dark font-weight-600 mb-1" style="font-size: 0.9rem;">${absoluteStr}</span>
-                <small class="text-muted" style="font-size: 0.75rem;"><i class="fas fa-clock mr-1"></i>${relativeStr}</small>
-            </div>
-        `;
   }
 
   public triggerFileSelect(input: HTMLInputElement): void {
@@ -653,7 +687,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   }
 
   public procesarFinal(): void {
-    const csvContent = this.headerOriginal + "\n" + this.lineasCorrectas.join("\n");
+    const csvContent =
+      this.headerOriginal + "\n" + this.lineasCorrectas.join("\n");
     const textEncoder = new TextEncoder();
     const bytes = textEncoder.encode(csvContent);
 
@@ -678,7 +713,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
         const formData = new FormData();
         formData.append("archivos", file);
-        formData.append("identificador", "NOM-CargarNomina");
+        formData.append("identificador", "NOM-" + this.Componente);
         formData.append("return", "true");
 
         // Endpoint (FileService ya le agrega environment.API)
@@ -754,7 +789,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     };
 
     const body = {
-      coleccion: "file-cargarnomina",
+      coleccion: "file-fideicomitentes",
       objeto: objetoExtendido,
       donde: `{\"id\":\"${idRegistro}\"}`,
       driver: "MGDBA",
@@ -764,6 +799,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     this.apiService.post(endpoint, body).subscribe({
       next: (resp) => {
         console.log("[Cargar Nómina] Nómina cargada con éxito:", resp);
+        this.loadPendingData();
       },
       error: (err) => {
         console.error("[Cargar Nómina] Error al registrar en ccoleccion:", err);
@@ -777,27 +813,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     });
   }
 
-  public buscarExpediente(): void {
-    if (!this.searchCedula) return;
-    this.militarData = {
-      cedula: this.searchCedula,
-      nombres: "GUSTAVO ADOLFO RIVAS TOVAR",
-      componente: "GUARDIA NACIONAL BOLIVARIANA",
-      grado: "CORONEL",
-      situacion: "ACTIVO",
-    };
-  }
-
-  public mostrarConfirmacionCSV(): void {
-    this.modalService.open(this.modalCSV, {
-      centered: true,
-      size: "md",
-      windowClass: "pastel-modal",
-    });
-  }
-
   public confirmarCSV(): void {
-    this.downloadCSV(this.pendingTableData, "nomina.csv");
+    this.utilService.downloadCSV(this.pendingTableData, "nomina.csv");
     this.modalService.dismissAll();
   }
 
@@ -910,7 +927,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       Detalle_Error: err.detalle,
     }));
 
-    this.downloadCSV(dataToExport, "SSS001-ERR.csv");
+    this.utilService.downloadCSV(dataToExport, "SSS001-ERR.csv");
   }
 
   public descargarCorrectosCSV(): void {
@@ -965,7 +982,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     // Identify all date columns
     const dateColumnIndexes: number[] = [];
     columns.forEach((col, idx) => {
-      if (this.isDateColumn(col)) {
+      if (this.utilService.isDateColumn(col)) {
         dateColumnIndexes.push(idx);
       }
     });
@@ -975,7 +992,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
-      const cells = this.parseCSVLine(line, delimiter);
+      const cells = this.utilService.parseCSVLine(line, delimiter);
       const cedula =
         cedulaIndex !== -1 && cells[cedulaIndex]
           ? cells[cedulaIndex].trim()
@@ -993,7 +1010,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       const line = lines[i].trim();
       if (!line) continue;
 
-      const cells = this.parseCSVLine(line, delimiter);
+      const cells = this.utilService.parseCSVLine(line, delimiter);
       const cedula =
         cedulaIndex !== -1 && cells[cedulaIndex]
           ? cells[cedulaIndex].trim()
@@ -1019,10 +1036,11 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       // Check all identified date columns for this row
       dateColumnIndexes.forEach((colIdx) => {
         const rawValue = cells[colIdx] ? cells[colIdx].trim() : "";
-        const normalizedValue = this.parseAndNormalizeDate(rawValue);
+        const normalizedValue =
+          this.utilService.parseAndNormalizeDate(rawValue);
         cells[colIdx] = normalizedValue; // Update the cell in the array
 
-        if (!this.isValidDateYYYYMMDD(normalizedValue)) {
+        if (!this.utilService.isValidDateYYYYMMDD(normalizedValue)) {
           hasError = true;
           this.erroresFechas.push({
             linea: i + 1, // Line number (header is line 1, first data is line 2)
@@ -1072,160 +1090,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     this.totalRegistrosCorrectos = this.lineasCorrectas.length;
   }
 
-  private isDateColumn(colName: string): boolean {
-    const name = colName.toLowerCase();
-    return (
-      name.includes("fecha") || name.startsWith("f_") || name.includes("date")
-    );
-  }
-
   public isDateValue(cell: string): boolean {
-    if (!cell) return false;
-    return /^\d{4}-\d{2}-\d{2}$/.test(cell.trim());
-  }
-
-  private parseAndNormalizeDate(value: string): string {
-    if (!value) return "";
-    value = value.trim();
-
-    // Check if starting with 4-digit year: YYYY/MM/DD, YYYY-MM-DD, YYYY.MM.DD, etc.
-    const yyyyMMddRegex = /^(\d{4})[\/\-\.\s](\d{1,2})[\/\-\.\s](\d{1,2})$/;
-    const matchYmd = value.match(yyyyMMddRegex);
-    if (matchYmd) {
-      const year = matchYmd[1];
-      const month = matchYmd[2].padStart(2, "0");
-      const day = matchYmd[3].padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    }
-
-    // Check if starting with day: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY, etc.
-    const ddMMyyyyRegex = /^(\d{1,2})[\/\-\.\s](\d{1,2})[\/\-\.\s](\d{4})$/;
-    const matchDmy = value.match(ddMMyyyyRegex);
-    if (matchDmy) {
-      const day = matchDmy[1].padStart(2, "0");
-      const month = matchDmy[2].padStart(2, "0");
-      const year = matchDmy[3];
-      return `${year}-${month}-${day}`;
-    }
-
-    return value;
-  }
-
-  private isValidDateYYYYMMDD(value: string): boolean {
-    if (!value) return false;
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!regex.test(value)) return false;
-
-    const parts = value.split("-");
-    const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10);
-    const day = parseInt(parts[2], 10);
-
-    if (month < 1 || month > 12) return false;
-    if (day < 1 || day > 31) return false;
-    if (year < 1900 || year > 2100) return false;
-
-    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    if (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) {
-      daysInMonth[1] = 29;
-    }
-    return day <= daysInMonth[month - 1];
-  }
-
-  private isValidDateDDMMYYYY(value: string): boolean {
-    if (!value) return false;
-    // Check regex format DD/MM/YYYY
-    const regex = /^\d{2}\/\d{2}\/\d{4}$/;
-    if (!regex.test(value)) return false;
-
-    const parts = value.split("/");
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-
-    if (month < 1 || month > 12) return false;
-    if (day < 1 || day > 31) return false;
-    if (year < 1900 || year > 2100) return false;
-
-    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    if (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) {
-      daysInMonth[1] = 29;
-    }
-    return day <= daysInMonth[month - 1];
-  }
-
-  private parseCSVLine(line: string, delimiter: string): string[] {
-    const result: string[] = [];
-    let current = "";
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === delimiter && !inQuotes) {
-        result.push(current.trim());
-        current = "";
-      } else {
-        current += char;
-      }
-    }
-    result.push(current.trim());
-    return result;
-  }
-
-  private downloadCSV(data: any[], filename: string) {
-    if (data.length === 0) return;
-    const separator = ";";
-    const keys = Object.keys(data[0]);
-    const csvContent =
-      keys.join(separator) +
-      "\n" +
-      data
-        .map((row) => {
-          return keys
-            .map((k) => {
-              let cell = row[k] === null || row[k] === undefined ? "" : row[k];
-              cell = cell.toString().replace(/"/g, '""');
-              if (cell.search(/("|,|\n)/g) >= 0) {
-                cell = `"${cell}"`;
-              }
-              return cell;
-            })
-            .join(separator);
-        })
-        .join("\n");
-
-    // Adaptación para Sandra Sandbox Bridge
-    const csvBase64 = btoa(unescape(encodeURIComponent("\ufeff" + csvContent)));
-    const csvDataUri = `data:text/csv;base64,${csvBase64}`;
-
-    if (window.parent && window !== window.parent) {
-      window.parent.postMessage(
-        {
-          type: "OPEN_CSV",
-          payload: {
-            fileName: filename,
-            data: csvDataUri,
-          },
-        },
-        "*",
-      );
-    } else {
-      // Fallback para cuando no corre dentro de Sandra
-      const blob = new Blob(["\ufeff" + csvContent], {
-        type: "text/csv;charset=utf-8;",
-      });
-      const link = document.createElement("a");
-      if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", filename);
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    }
+    return this.utilService.isDateValue(cell);
   }
 
   private getComponentBadge(comp: string): string {
@@ -1270,11 +1136,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   }
 
   public getNombreComponenteCompleto(): string {
-    const comp = (
-      sessionStorage.getItem("existe_componente") ||
-      sessionStorage.getItem("existeComponente") ||
-      ""
-    )
+    const comp = (sessionStorage.getItem("existe_componente") || "")
       .trim()
       .toUpperCase();
     if (comp.includes("EJERCITO") || comp.includes("EJÉRCITO") || comp === "EJ")
@@ -1289,7 +1151,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   public getSessionExisteComponenteCamel(): string {
     return (
-      sessionStorage.getItem("existeComponente") || "NO DEFINIDO"
+      sessionStorage.getItem("existe_componente") || "NO DEFINIDO"
     ).toUpperCase();
   }
 

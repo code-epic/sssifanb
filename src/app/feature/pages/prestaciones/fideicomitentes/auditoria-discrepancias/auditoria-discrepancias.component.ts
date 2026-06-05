@@ -368,10 +368,9 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
           // Si el militar no existe en la base de datos, componente_id y grado_id serán nulos
           if (element.componente_id == null && element.grado_id == null) {
             carpetas.add("NUEVO");
+          } else if (element.componente != element.componente_id) {
+            carpetas.add("CAMBIO_COMPONENTE");
           } else {
-            if (element.componente != element.componente_id) {
-              carpetas.add("CAMBIO_COMPONENTE");
-            }
             if (element.status_id == 202 || element.status_id == 203) {
               carpetas.add("REINCORPORADOS");
             }

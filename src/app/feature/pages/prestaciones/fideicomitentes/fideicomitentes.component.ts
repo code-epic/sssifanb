@@ -183,6 +183,9 @@ export class FideicomitentesComponent
   };
 
   public pendingTableData: any[] = [];
+  public trackId: string = "";
+
+  private port: MessagePort | null = null;
 
   constructor(
     protected override apiService: ApiService,
@@ -196,11 +199,13 @@ export class FideicomitentesComponent
       layoutService,
       "Principal / Prestaciones: Control de Fideicomitentes",
     );
+    this.trackId = this.utilService.GenerarId();
   }
 
   protected override onInitExtension(): void {
     this.loadMockTabs();
     this.loadPendingData();
+    this.initMessagePort();
   }
 
   private loadMockTabs(): void {
@@ -609,7 +614,61 @@ export class FideicomitentesComponent
 
   public confirmarAprobacion(): void {
     alert(`Fideicomitente ${this.selectedItem?.id} aprobado.`);
+
+    this.isLoadingData = true;
+    const netInfo = JSON.parse(sessionStorage.getItem("net_info") || "{}");
+    const config = netInfo.config || {};
+
+    const fnx = {
+      funcion: "Fnx_ConciliacionFideicomitentes",
+      componente: `${this.getComponenteInt(this.selectedItem?.componente)}`,
+      abreviado: `${this.selectedItem?.componente}`,
+      ruta: `${this.selectedItem?.msj.split("|")[1]}`,
+      archivo: `${this.selectedItem?.contenido[0].split("|")[1]}`,
+      id_cliente: `${config.clientId}`,
+      aplicacion: `sandra.app.ipsfa`,
+      trackid: this.trackId, //seguimiento para descargar y la carpeta que se va a crear
+    };
+
+    console.log(fnx);
+    this.apiService.post("fnx", fnx).subscribe({
+      next: (data: any) => {
+        console.log(data);
+        // this.id = data.contenido.id //id de la funcion fnx
+        // this.logContent += "\n// Petitorio aceptado. Procesando en segundo plano...";
+        this.isLoadingData = false;
+      },
+      error: (error) => {
+        this.isLoadingData = false;
+        // this.logContent += "\n// ERROR: No se pudo contactar con el núcleo de cálculos.";
+      },
+    });
+
     this.modalService.dismissAll();
+  }
+
+  private initMessagePort(): void {
+    window.addEventListener("message", (event) => {
+      const msg = event.data;
+      if (event.ports && event.ports.length > 0) {
+        this.port = event.ports[0];
+        this.port.onmessage = (msgEvent) => this.handlePortMessage(msgEvent);
+        console.log("[LotesComponent] Canal MessagePort establecido.");
+      }
+      if (msg && msg.type === "EXEC_FNX_FINALIZADO") {
+        this.notifyCompletion(msg);
+      }
+    });
+  }
+  private handlePortMessage(event: MessageEvent) {
+    if (event.data && event.data.type === "EXEC_FNX_FINALIZADO") {
+      this.notifyCompletion(event.data);
+    }
+  }
+
+  private notifyCompletion(msg: any) {
+    console.log(msg);
+    console.log("[finalizando Crash....]");
   }
 
   public confirmarRechazo(): void {
@@ -940,5 +999,20 @@ export class FideicomitentesComponent
     }
 
     return `<span class="font-weight-600 ${colorClass}" style="font-size: 0.9rem;"><i class="fas ${icon} mr-1"></i>${estatus}</span>`;
+  }
+
+  getComponenteInt(abreviado: string): number {
+    switch (abreviado.toUpperCase()) {
+      case "EJ":
+        return 1;
+      case "AR":
+        return 2;
+      case "AV":
+        return 3;
+      case "GN":
+        return 4;
+      default:
+        return 0;
+    }
   }
 }
