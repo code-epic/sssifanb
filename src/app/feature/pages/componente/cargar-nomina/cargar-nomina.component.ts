@@ -377,18 +377,20 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       return;
     }
     const st = term.toLowerCase();
-    const isPrincipalOrNoManifest = this.currentTabId === "PRINCIPAL" || !this.isManifestLoaded;
-    const activeDataset = isPrincipalOrNoManifest ? this.masterPendingData : this.manifestFilesData;
+    const isPrincipalOrNoManifest =
+      this.currentTabId === "PRINCIPAL" || !this.isManifestLoaded;
+    const activeDataset = isPrincipalOrNoManifest
+      ? this.masterPendingData
+      : this.manifestFilesData;
 
     this.pendingTableData = activeDataset.filter((item) => {
-      const isItemFromManifest = this.isManifestLoaded && this.currentTabId !== "PRINCIPAL";
+      const isItemFromManifest =
+        this.isManifestLoaded && this.currentTabId !== "PRINCIPAL";
       const matchesSearch = isItemFromManifest
-        ? (item.nombre && item.nombre.toLowerCase().includes(st))
-        : (
-            (item.id && item.id.toLowerCase().includes(st)) ||
-            (item.origen && item.origen.toLowerCase().includes(st)) ||
-            (item.componente && item.componente.toLowerCase().includes(st))
-          );
+        ? item.nombre && item.nombre.toLowerCase().includes(st)
+        : (item.id && item.id.toLowerCase().includes(st)) ||
+          (item.origen && item.origen.toLowerCase().includes(st)) ||
+          (item.componente && item.componente.toLowerCase().includes(st));
 
       if (!matchesSearch) return false;
 
@@ -397,7 +399,9 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
           return true;
         case "CORRECTOS":
           if (this.isManifestLoaded) {
-            return item.nombre && item.nombre.toLowerCase().includes("correcto");
+            return (
+              item.nombre && item.nombre.toLowerCase().includes("correcto")
+            );
           } else {
             return (
               item.estatus === "APROBADO" ||
@@ -541,15 +545,17 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     } else if (this.isManifestLoaded) {
       if (this.currentTabId === "CORRECTOS") {
         filtered = this.manifestFilesData.filter(
-          (item) => item.nombre && item.nombre.toLowerCase().includes("correcto")
+          (item) =>
+            item.nombre && item.nombre.toLowerCase().includes("correcto"),
         );
       } else if (this.currentTabId === "REVISION") {
         filtered = this.manifestFilesData.filter(
-          (item) => item.nombre && item.nombre.toLowerCase().includes("rechazo")
+          (item) =>
+            item.nombre && item.nombre.toLowerCase().includes("rechazo"),
         );
       } else if (this.currentTabId === "NUEVOS") {
         filtered = this.manifestFilesData.filter(
-          (item) => item.nombre && item.nombre.toLowerCase().includes("nuevo")
+          (item) => item.nombre && item.nombre.toLowerCase().includes("nuevo"),
         );
       }
     } else {
@@ -559,7 +565,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
             item.estatus === "APROBADO" ||
             item.estatus === "PROCESO" ||
             item.estatus === "CONCILIADO" ||
-            Number(item.errores) === 0
+            Number(item.errores) === 0,
         );
       } else if (this.currentTabId === "REVISION") {
         filtered = this.masterPendingData.filter(
@@ -567,14 +573,14 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
             item.estatus === "RECHAZADA" ||
             item.estatus === "ERROR" ||
             item.estatus === "RECHAZADO" ||
-            Number(item.errores) > 0
+            Number(item.errores) > 0,
         );
       } else if (this.currentTabId === "NUEVOS") {
         filtered = this.masterPendingData.filter(
           (item) =>
             (item.origen && item.origen.toLowerCase().includes("nuevo")) ||
             item.estatus === "NUEVO" ||
-            item.tipo === "NUEVO"
+            item.tipo === "NUEVO",
         );
       }
     }
@@ -1231,9 +1237,13 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         if (Array.isArray(data)) rawData = data;
         const list: any[] = [];
 
+        const filtro =
+          componentFilter.substring(0, 2) == "GU"
+            ? "GN"
+            : componentFilter.substring(0, 2);
         rawData.forEach((item: any) => {
           const gradesArray = item.Grado;
-          if (item.codigo.substring(0, 2) == componentFilter.substring(0, 2)) {
+          if (item.codigo.substring(0, 2) == filtro) {
             if (Array.isArray(gradesArray)) {
               gradesArray.forEach((g: any) => {
                 const cpace = g.cpace ? String(g.cpace) : "";
@@ -1425,12 +1435,16 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     );
 
     let cmp = sessionStorage.getItem("existe_componente") || "";
-    cmp = cmp.trim().toUpperCase();
+    cmp =
+      cmp.trim().toUpperCase().substring(0, 2) == "GU"
+        ? "GN"
+        : cmp.trim().toUpperCase().substring(0, 2);
 
     const body = {
       funcion: "IPSFA_UComponentes",
-      parametros: `${cmp.substring(0, 2)},${codIpsfanb},${cod_componente}`,
+      parametros: `${cmp},${codIpsfanb},${cod_componente}`,
     };
+    console.log(body);
 
     this.apiService.post("crud", body).subscribe({
       next: (resp) => {
