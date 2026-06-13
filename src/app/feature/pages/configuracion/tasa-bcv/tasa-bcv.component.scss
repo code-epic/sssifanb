@@ -217,3 +217,39 @@
     from { opacity: 0; transform: translateY(-15px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+.badge-tasa-vigente {
+    background: rgba(89, 140, 137, 0.12) !important;
+    color: #598c89 !important;
+    border: 1px solid rgba(89, 140, 137, 0.2);
+    border-radius: 8px;
+    font-weight: 700;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.badge-tasa-historica {
+    background: rgba(74, 85, 104, 0.08) !important;
+    color: #4a5568 !important;
+    border: 1px solid rgba(74, 85, 104, 0.15);
+    border-radius: 8px;
+    font-weight: 700;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.card-tasa-vigente {
+    background: linear-gradient(135deg, #f0fbf7 0%, #ffffff 100%) !important;
+}
+
+.card-tasa-historica {
+    background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.03) !important;
+}
+
+.text-tasa-historica {
+    color: #4a5568 !important;
+}
+

@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, tap } from "rxjs";
 import { environment } from "src/environments/environment";
 
 export type ApiParams =
@@ -46,9 +46,46 @@ export class ApiService {
     params?: ApiParams,
     headers?: ApiHeaders,
   ): Observable<T> {
-    return this._http.post<T>(this._resolveUrl(endpoint), body, {
+    let request = this._http.post<T>(this._resolveUrl(endpoint), body, {
       params,
       headers,
+    });
+
+    if (endpoint.startsWith("divisa")) {
+      request = request.pipe(
+        tap((res: any) => {
+          if (res && res.success && res.data) {
+            const data = res.data;
+            sessionStorage.setItem(
+              "tasa_activa_" + data.moneda,
+              JSON.stringify(data),
+            );
+            sessionStorage.setItem("tasa_valor_" + data.moneda, data.valor);
+            sessionStorage.setItem("tasa_fecha_" + data.moneda, data.fecha);
+            sessionStorage.setItem("tasa_activa", JSON.stringify(data));
+          }
+        }),
+      );
+    }
+
+    return request;
+  }
+
+  /**
+   * Realiza una petición POST genérica que retorna un Blob
+   * @param endpoint Endpoint relativo
+   * @param body Cuerpo de la petición
+   */
+  public postBlob(
+    endpoint: string,
+    body: unknown,
+    params?: ApiParams,
+    headers?: ApiHeaders,
+  ): Observable<Blob> {
+    return this._http.post(this._resolveUrl(endpoint), body, {
+      params,
+      headers,
+      responseType: 'blob'
     });
   }
 

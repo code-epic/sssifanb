@@ -1444,7 +1444,6 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       funcion: "IPSFA_UComponentes",
       parametros: `${cmp},${codIpsfanb},${cod_componente}`,
     };
-    console.log(body);
 
     this.apiService.post("crud", body).subscribe({
       next: (resp) => {

@@ -288,18 +288,32 @@
                         <div class="d-flex flex-column align-items-center justify-content-start">
                             <!-- Foto Pasaporte -->
                             <div class="avatar-container position-relative shadow-sm mt-2"
-                                style="border-radius: 8px; width: 100%; max-width: 215px; aspect-ratio: 3/4; background-color: #f8f9fe; margin: 0 auto; box-sizing: border-box;">
+                                style="border-radius: 8px; width: 100%; max-width: 215px; aspect-ratio: 3/4; background-color: #f1f5f9; margin: 0 auto; box-sizing: border-box; overflow: hidden; border: 1px solid #e2e8f0;">
 
                                 <!-- Foto Transicionable -->
-                                <img [src]="getFotoUrl()" class="w-100 h-100" id="fotoPrincipal"
-                                    style="object-fit: contain; position: absolute; top: 0; left: 0; z-index: 1; border-radius: 8px; transition: transform 0.3s;">
+                                <img *ngIf="fotoAfiliadoBlobUrl" [src]="fotoAfiliadoBlobUrl" class="w-100 h-100" id="fotoPrincipal"
+                                    style="object-fit: cover; object-position: center top; position: absolute; top: 0; left: 0; z-index: 1; border-radius: 8px; transition: transform 0.3s; background: #e9ecef;">
+                                
+                                <!-- Icono Placeholder -->
+                                <div *ngIf="!fotoAfiliadoBlobUrl" id="fotoPrincipal" class="w-100 h-100 d-flex justify-content-center align-items-center"
+                                    style="position: absolute; top: 0; left: 0; z-index: 1; border-radius: 8px; transition: transform 0.3s; background: #e2e8f0; color: #cbd5e1;">
+                                    <i class="fas fa-user" style="font-size: 8rem;"></i>
+                                </div>
+
+                                <!-- Spinner de Carga Minimalista -->
+                                <div *ngIf="isLoadingFoto" class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
+                                    style="top: 0; left: 0; z-index: 2; background: rgba(248,249,254,0.85); border-radius: 8px; backdrop-filter: blur(2px);">
+                                    <div class="spinner-border text-success" role="status" style="width: 1.5rem; height: 1.5rem; opacity: 0.8;">
+                                        <span class="sr-only">Cargando...</span>
+                                    </div>
+                                </div>
 
                                 <!-- Overlay Zoom -->
                                 <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
                                     style="top: 0; left: 0; z-index: 3; cursor: pointer; transition: background 0.3s ease; border-radius: 8px;"
                                     onmouseover="this.style.background='rgba(255,255,255,0.15)'; document.getElementById('fotoPrincipal').style.transform='scale(1.04)';"
                                     onmouseout="this.style.background='transparent'; document.getElementById('fotoPrincipal').style.transform='scale(1)';"
-                                    (dblclick)="triggerModal.click()" title="Doble clic para expandir">
+                                    (dblclick)="openModalZoomFoto(modalZoomFoto)" title="Doble clic para expandir">
                                 </div>
 
                                 <!-- Botón Cámara -->
@@ -307,14 +321,11 @@
                                     <button type="button"
                                         class="btn btn-sm text-white shadow-sm d-flex align-items-center justify-content-center"
                                         style="background: rgba(89, 140, 137, 0.9); border: none; border-radius: 50%; width: 32px; height: 32px; padding: 0;"
-                                        title="Actualizar Foto">
+                                        title="Actualizar Foto" (click)="openModalActualizarFoto(modalActualizarFoto)">
                                         <i class="fas fa-camera"></i>
                                     </button>
                                 </div>
-
-                                <button #triggerModal id="btnZoomModal"
-                                    style="opacity: 0; position: absolute; z-index: -1;" data-toggle="modal"
-                                    data-target="#modalZoomFoto"></button>
+                                <input type="file" id="fileUploadInput" accept="image/png, image/jpeg, image/jpg" style="display: none;" (change)="onFileSelected($event)">
                             </div>
                         </div>
 
@@ -355,7 +366,7 @@
                 <a class="nav-link" [class.active]="currentTab === 'antiguedad'" (click)="switchTab('antiguedad')">
                     <i class="fas fa-piggy-bank"></i>
                     <span class="d-none d-xxl-inline">Asignaciones</span>
-                    <span class="d-inline d-xxl-none">Asign.</span>
+                    <span class="d-inline d-xxl-none">Asignaciones</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -545,7 +556,7 @@
                                     </div>
                                     <h3 class="font-weight-500 mb-0"
                                         style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda }}
-                                        0.00</h3>
+                                        {{ (calculosBunker?.base?.sueldo_integral || 0) | number:'1.2-2' }}</h3>
                                 </div>
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush">
@@ -562,7 +573,7 @@
                                                     style="font-size: 0.95rem; color: #64748b;">Sueldo Base</span>
                                             </div>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.sueldo_base || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <!-- Item -->
                                         <li
@@ -577,7 +588,7 @@
                                                     style="font-size: 0.95rem; color: #64748b;">Sueldo Mensual</span>
                                             </div>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.sueldo_mensual || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <!-- List Divider -->
                                         <li class="list-group-item text-muted font-weight-500 text-uppercase py-2 px-4"
@@ -597,7 +608,7 @@
                                                     style="font-size: 0.95rem; color: #64748b;">Bono Fin de Año</span>
                                             </div>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.aguinaldos || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <!-- Item -->
                                         <li
@@ -611,7 +622,7 @@
                                                     style="font-size: 0.95rem; color: #64748b;">Bono Vacacional</span>
                                             </div>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.vacaciones || 0) | number:'1.2-2' }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -644,35 +655,35 @@
                                                     <td class="font-weight-500 pl-4 border-top-0 py-3"
                                                         style="font-size: 0.95rem;">Transporte</td>
                                                     <td class="text-right pr-4 font-weight-600 border-top-0 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_transporte || 0) | number:'1.2-2' }}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Descendencia</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_descendencia || 0) | number:'1.2-2' }}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Productividad</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_especial || 0) | number:'1.2-2' }}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Estabilidad</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_compensacion_especial || 0) | number:'1.2-2' }}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Profesionalización</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_profesionalizacion || 0) | number:'1.2-2' }}
                                                     </td>
                                                 </tr>
                                                 <tr class="bg-light">
@@ -681,7 +692,7 @@
                                                             class="fas fa-clock mr-2 opacity-5 mt-1"></i>Años de
                                                         Servicio</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3 text-muted"
-                                                        style="font-size: 1.05rem;">0</td>
+                                                        style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_tiemposervicio || 0) | number:'1.2-2' }}</td>
                                                 </tr>
                                                 <tr class="bg-light">
                                                     <td class="font-weight-500 pl-4 py-3 text-muted"
@@ -689,7 +700,7 @@
                                                             class="fas fa-times-circle mr-2 opacity-5 mt-1"></i>No
                                                         Ascenso</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3 text-muted"
-                                                        style="font-size: 1.05rem;">0</td>
+                                                        style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_noascenso || 0) | number:'1.2-2' }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -736,7 +747,7 @@
                                             Disponible Total</h6>
                                         <h3 class="mb-0 font-weight-600"
                                             style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda
-                                            }} 0.00</h3>
+                                            }} {{ (calculosBunker?.neto || 0) | number:'1.2-2' }}</h3>
                                     </div>
                                     <div class="icon-circle shadow-sm"
                                         style="width: 42px; height: 42px; background-color: rgba(89, 140, 137, 0.1); z-index: 1;">
@@ -764,35 +775,35 @@
                                                 style="font-size: 0.95rem; color: #64748b;">Asignación de
                                                 Antigüedad</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.calculo_aa || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <span class="font-weight-500"
                                                 style="font-size: 0.95rem; color: #64748b;">Depositado en Banco</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_aa || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <span class="font-weight-500"
                                                 style="font-size: 0.95rem; color: #64748b;">Capital en Banco</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.finiquito_capital_banco || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <span class="font-weight-500"
                                                 style="font-size: 0.95rem; color: #64748b;">Fondo de Garantías</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_de_garantias || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <span class="font-weight-500"
                                                 style="font-size: 0.95rem; color: #64748b;">Diferencia A.A.</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.finiquito_diferencia_aa || 0) | number:'1.2-2' }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -820,7 +831,7 @@
                                             <span class="text-primary-teal font-weight-500" style="font-size: 0.95rem;"><i
                                                     class="fas fa-ban mr-2 opacity-75"></i>Días adicionales</span>
                                             <span class="text-primary-teal font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                                style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.movimientos?.calculo_de_dias_adicionales || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
@@ -829,7 +840,7 @@
                                                     class="fas fa-hand-holding-usd mr-2 opacity-75"></i>Anticipos
                                                 Otorgados</span>
                                             <span class="text-warning font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem;">{{ moneda }} 0.00</span>
+                                                style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.movimientos?.anticipo || 0) | number:'1.2-2' }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -882,11 +893,11 @@
                                 style="border-radius: 12px; overflow: hidden;">
                                 <div class="card-body bg-white py-3 px-4 d-flex justify-content-around align-items-center font-weight-500"
                                     style="font-size: 0.85rem; color: #94a3b8;">
-                                     <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Fecha de Ult. Anticipo: DD/MM/AAAA</span>
-                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Comisión de Servicio: 0,00</span>
-                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Monto Recuperado: 0,00</span>
-                                    <span><i class="fas fa-plus-circle mr-2 opacity-50"></i>Medida Judicial: 0,00</span>
-                                    <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: 0.00</span>
+                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Fecha de Ult. Anticipo: {{ (calculosBunker?.movimientos?.ultima_modificacion | date:'dd/MM/yyyy') || 'DD/MM/AAAA' }}</span>
+                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Comisión de Servicio: {{ (calculosBunker?.movimientos?.comision_servicio || 0) | number:'1.2-2' }}</span>
+                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Monto Recuperado: {{ (calculosBunker?.movimientos?.monto_recuperado_activo || 0) | number:'1.2-2' }}</span>
+                                    <span><i class="fas fa-plus-circle mr-2 opacity-50"></i>Medida Judicial: {{ (calculosBunker?.movimientos?.embargo || 0) | number:'1.2-2' }}</span>
+                                    <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: {{ (calculosBunker?.porcentaje || 0) | number:'1.2-2' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -920,9 +931,9 @@
                                                     </div>
                                                     <div class="card-account-type">
                                                         <span class="badge-pastel-minimal"
-                                                            [ngClass]="identificacionForm.get('persona.datofinanciero.tipo').value === 'CA' ? 'green' : 'blue'">
+                                                            [ngClass]="identificacionForm.get('persona.datofinanciero.tipo')?.value === 'CA' ? 'green' : 'blue'">
                                                             {{
-                                                            identificacionForm.get('persona.datofinanciero.tipo').value
+                                                            identificacionForm.get('persona.datofinanciero.tipo')?.value
                                                             === 'CA' ? 'CORRIENTE' : 'AHORRO' }}
                                                         </span>
                                                     </div>
@@ -944,9 +955,9 @@
                                                         <div class="font-weight-bold text-dark"
                                                             style="font-size: 0.8rem; letter-spacing: -0.2px;">
                                                             {{
-                                                            identificacionForm.get('persona.datobasico.nombres').value
+                                                            identificacionForm.get('persona.datobasico.nombres')?.value
                                                             }} {{
-                                                            identificacionForm.get('persona.datobasico.apellidos').value
+                                                            identificacionForm.get('persona.datobasico.apellidos')?.value
                                                             }}
                                                         </div>
                                                         <small class="text-muted"
@@ -1027,7 +1038,7 @@
                                                 <button type="button"
                                                     class="btn-header-action green btn-block py-2 m-0 shadow-sm"
                                                     (click)="agregarCuenta()"
-                                                    [disabled]="!identificacionForm.get('persona.datofinanciero.cuenta').value || !identificacionForm.get('persona.datofinanciero.institucion').value">
+                                                    [disabled]="!identificacionForm.get('persona.datofinanciero.cuenta')?.value || !identificacionForm.get('persona.datofinanciero.institucion')?.value">
                                                     <i class="fas fa-plus-circle mr-2"></i>Vincular a Expediente
                                                 </button>
                                             </div>
@@ -1398,6 +1409,7 @@
             </tbody>
         </table>
     </div>
+    <br><br><br><br><br>
 </div>
 
 
@@ -1421,7 +1433,7 @@
                     <div class="col-lg-3 d-flex flex-column align-items-center border-right pr-4">
                         <div class="avatar-container position-relative overflow-hidden shadow-sm mb-4 w-100"
                             style="border-radius: 8px; aspect-ratio: 3/4; max-width: 190px;">
-                            <img src="assets/img/ipsfa/logo.webp" class="w-100 h-100"
+                            <img [src]="fotoAfiliadoBlobUrl || 'assets/img/ipsfa/logo.webp'" class="w-100 h-100"
                                 style="object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1;">
                             <div class="avatar-overlay d-flex align-items-end justify-content-center pb-4">
                                 <button type="button" class="btn btn-ok btn-sm rounded-pill px-4"
@@ -1519,38 +1531,36 @@
             </div>
             <div class="modal-footer bg-white border-top-0 px-4 py-3 d-flex justify-content-between" style="border-radius: 0 0 16px 16px;">
                 <button type="button" class="btn btn-cancel shadow-sm" data-dismiss="modal" style="border-radius: 8px;">Cancelar</button>
-                <button type="button" class="btn btn-ok shadow-sm" (click)="guardarFamiliar()" style="border-radius: 8px;">Guardar Expediente</button>
-            </div>
-        </div>
-    </div>
-</div>
+                <button type="button" class="btn btn-ok shadow-sm" (click)="guardarFamiliar()" style="border-radius: 8px;">Guard<!-- MODAL ZOOM FOTO PRINCIPAL (ELEGANCIA LIGHTBOX) -->
+<ng-template #modalZoomFoto let-modal>
+    <div class="modal-content border-0 bg-transparent text-center" style="box-shadow: none;">
 
-<!-- MODAL ZOOM FOTO PRINCIPAL (ELEGANCIA LIGHTBOX) -->
-<div class="modal fade" id="modalZoomFoto" tabindex="-1" role="dialog" aria-hidden="true"
-    style="background-color: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px);">
-    <div class="modal-dialog modal-dialog-centered modal-xl d-flex justify-content-center" role="document">
-        <div class="modal-content border-0 bg-transparent text-center" style="max-width: 900px; box-shadow: none;">
+        <!-- Boton de cierre Premium -->
+        <button type="button" class="close text-white position-absolute" (click)="modal.dismiss()" aria-label="Close"
+            style="right: 10px; top: 10px; z-index: 10; font-size: 2.2rem; opacity: 0.8; transition: opacity 0.2s; outline: none; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"
+            onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+            <i class="fas fa-times-circle"></i>
+        </button>
 
-            <!-- Boton de cierre Premium -->
-            <button type="button" class="close text-white position-absolute" data-dismiss="modal" aria-label="Close"
-                style="right: -10px; top: -30px; z-index: 10; font-size: 2.2rem; opacity: 0.7; transition: opacity 0.2s; outline: none; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"
-                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
-                <i class="fas fa-times-circle"></i>
-            </button>
+        <!-- Carrusel Fotográfico Visualizador -->
+        <div id="carouselFotoExpediente" class="carousel slide" data-ride="carousel" data-interval="false">
+            <div class="carousel-inner position-relative rounded-lg">
 
-            <!-- Carrusel Fotográfico Visualizador -->
-            <div id="carouselFotoExpediente" class="carousel slide" data-ride="carousel" data-interval="false">
-                <div class="carousel-inner position-relative rounded-lg">
-
-                    <!-- Slide Activo (Foto Principal Estilo Polaroid) -->
-                    <div class="carousel-item active d-flex justify-content-center align-items-center"
-                        style="min-height: 50vh;">
+                <!-- Slide Activo (Foto Principal Estilo Polaroid) -->
+                <div class="carousel-item" [class.active]="activeSlide === 0">
+                    <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
                         <div class="position-relative d-inline-block">
                             <!-- Marco Fotográfico Blanco Clásico -->
                             <div class="bg-white shadow-lg mx-auto"
                                 style="padding: 12px 12px 40px 12px; border-radius: 4px; border: 1px solid #e2e8f0; transform: rotate(-1deg);">
-                                <img [src]="getFotoUrl()" class="img-fluid"
-                                    style="object-fit: contain; max-height: 65vh; max-width: 100%; border: 1px solid #cbd5e1;">
+                                
+                                <img *ngIf="getFotoUrl()" [src]="getFotoUrl()" class="img-fluid"
+                                    style="object-fit: contain; max-height: 80vh; max-width: 100%; border: 1px solid #cbd5e1;">
+                                
+                                <div *ngIf="!getFotoUrl()" class="d-flex justify-content-center align-items-center"
+                                    style="width: 300px; height: 350px; background: #e2e8f0; color: #cbd5e1; border: 1px solid #cbd5e1;">
+                                    <i class="fas fa-user" style="font-size: 8rem;"></i>
+                                </div>
 
                                 <!-- El grado se acopla como una calcomanía institucional debajo -->
                                 <div class="position-absolute d-flex justify-content-center w-100"
@@ -1562,10 +1572,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Slide Secundario: Documentos PDF/DNI Futuro -->
-                    <div class="carousel-item d-flex justify-content-center align-items-center"
-                        style="min-height: 50vh;">
+                <!-- Slide Secundario: Documentos PDF/DNI Futuro -->
+                <div class="carousel-item" [class.active]="activeSlide === 1">
+                    <div class="d-flex justify-content-center align-items-center" style="min-height: 50vh;">
                         <div class="position-relative d-inline-block">
                             <div class="d-flex align-items-center justify-content-center flex-column shadow-lg"
                                 style="min-height: 65vh; width: 45vh; max-width: 100%; background: linear-gradient(135deg, #1e293b, #0f172a); padding: 15px; border-radius: 6px; border: 1px solid #334155; transform: rotate(1deg);">
@@ -1583,35 +1594,109 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- Controles Premium de Vidrio Esmaltado -->
-                <a class="carousel-control-prev" href="#carouselFotoExpediente" role="button" data-slide="prev"
-                    style="width: 15%; opacity: 1;">
-                    <div class="d-flex justify-content-center align-items-center shadow-lg"
-                        style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;"
-                        onmouseover="this.style.background='rgba(255,255,255,0.25)'"
-                        onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                        <i class="fas fa-chevron-left text-white" style="font-size: 1.5rem; margin-right: 4px;"></i>
-                    </div>
-                    <span class="sr-only">Anterior</span>
-                </a>
-                <a class="carousel-control-next" href="#carouselFotoExpediente" role="button" data-slide="next"
-                    style="width: 15%; opacity: 1;">
-                    <div class="d-flex justify-content-center align-items-center shadow-lg"
-                        style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;"
-                        onmouseover="this.style.background='rgba(255,255,255,0.25)'"
-                        onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                        <i class="fas fa-chevron-right text-white" style="font-size: 1.5rem; margin-left: 4px;"></i>
-                    </div>
-                    <span class="sr-only">Siguiente</span>
-                </a>
             </div>
 
+            <!-- Controles Premium de Vidrio Esmaltado -->
+            <a class="carousel-control-prev" href="javascript:void(0)" role="button" (click)="activeSlide = activeSlide === 0 ? 1 : 0"
+                style="width: 15%; opacity: 1;">
+                <div class="d-flex justify-content-center align-items-center shadow-lg"
+                    style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                    <i class="fas fa-chevron-left text-white" style="font-size: 1.5rem; margin-right: 4px;"></i>
+                </div>
+                <span class="sr-only">Anterior</span>
+            </a>
+            <a class="carousel-control-next" href="javascript:void(0)" role="button" (click)="activeSlide = activeSlide === 0 ? 1 : 0"
+                style="width: 15%; opacity: 1;">
+                <div class="d-flex justify-content-center align-items-center shadow-lg"
+                    style="width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                    <i class="fas fa-chevron-right text-white" style="font-size: 1.5rem; margin-left: 4px;"></i>
+                </div>
+                <span class="sr-only">Siguiente</span>
+            </a>
         </div>
     </div>
-</div>
+</ng-template>
+
+<!-- Modal Opciones Actualizar Foto -->
+<ng-template #modalActualizarFoto let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white" style="border-top: 5px solid #598c89;">
+            <div class="icon-circle shadow-sm mx-auto mb-3" style="width: 64px; height: 64px; background-color: rgba(89, 140, 137, 0.1);">
+                <i class="fas fa-portrait" style="font-size: 1.8rem; color: #598c89;"></i>
+            </div>
+            <h4 class="font-weight-bold text-verde-titulos mb-2" style="letter-spacing: -0.5px;">Actualizar Fotografía</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Seleccione el método para actualizar la imagen del afiliado.
+            </p>
+            
+            <div class="row px-2 mt-4">
+                <div class="col-6 mb-3">
+                    <div class="card shadow-sm border-0 h-100 ledger-card" style="cursor: pointer; border-radius: 12px; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(89,140,137,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'" (click)="seleccionarOpcionFoto('camara', modal)">
+                        <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
+                            <div class="icon-circle mb-3 transition-colors" style="width: 56px; height: 56px; background-color: rgba(89, 140, 137, 0.08);">
+                                <i class="fas fa-camera text-primary-teal" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="font-weight-600 text-dark mb-1" style="font-size: 1.05rem;">Cámara Web</h6>
+                            <small class="text-muted font-weight-500">Tomar nueva foto</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 mb-3">
+                    <div class="card shadow-sm border-0 h-100 ledger-card" style="cursor: pointer; border-radius: 12px; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 20px rgba(89,140,137,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)'" (click)="seleccionarOpcionFoto('archivo', modal)">
+                        <div class="card-body py-4 d-flex flex-column align-items-center justify-content-center">
+                            <div class="icon-circle mb-3 transition-colors" style="width: 56px; height: 56px; background-color: rgba(89, 140, 137, 0.08);">
+                                <i class="fas fa-file-upload text-primary-teal" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h6 class="font-weight-600 text-dark mb-1" style="font-size: 1.05rem;">Explorador</h6>
+                            <small class="text-muted font-weight-500">Subir archivo local</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-2 pt-3">
+                <button type="button" class="btn text-uppercase font-weight-bold" (click)="modal.dismiss('Cancel')" style="border-radius: 8px; background-color: #f1f5f9; color: #64748b; padding: 10px 24px; font-size: 0.85rem; letter-spacing: 0.5px; width: 100%; transition: all 0.2s;" onmouseover="this.style.backgroundColor='#e2e8f0'; this.style.color='#475569'" onmouseout="this.style.backgroundColor='#f1f5f9'; this.style.color='#64748b'">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<!-- Modal Webcam -->
+<ng-template #modalWebcam let-modal>
+    <div class="modal-content border-0 shadow-lg bg-dark text-white" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-header border-0 d-flex justify-content-between align-items-center p-4">
+            <h5 class="mb-0 font-weight-bold"><i class="fas fa-camera mr-2 text-info"></i> Capturar Fotografía</h5>
+            <button type="button" class="close text-white" (click)="detenerCamara()" style="outline: none;">
+                <span>&times;</span>
+            </button>
+        </div>
+        <div class="modal-body p-0 text-center bg-black position-relative" style="min-height: 400px; display: flex; align-items: center; justify-content: center; background: #000;">
+            <div *ngIf="!webcamActive" class="text-muted p-5">
+                <i class="fas fa-spinner fa-spin fa-3x mb-3 text-info"></i><br>
+                Inicializando cámara del sistema...
+            </div>
+            <video id="webcamVideo" autoplay playsinline muted style="width: 100%; max-height: 60vh; object-fit: cover;" [style.display]="webcamActive ? 'block' : 'none'"></video>
+            <canvas #canvasElement style="display: none;"></canvas>
+            
+            <!-- Marco Guía -->
+            <div *ngIf="webcamActive" class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center" style="top: 0; left: 0; pointer-events: none;">
+                <div style="border: 2px dashed rgba(255,255,255,0.5); width: 250px; height: 333px; border-radius: 12px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);"></div>
+            </div>
+        </div>
+        <div class="modal-footer border-0 p-4 bg-dark d-flex justify-content-center">
+            <button type="button" class="btn btn-info btn-lg rounded-pill shadow-sm px-5" (click)="capturarFoto()" [disabled]="!webcamActive">
+                <i class="fas fa-circle mr-2"></i> Tomar Foto
+            </button>
+        </div>
+    </div>
+</ng-template>
 
 <!-- Modal: Emitir TIM (Carnetización) -->
 <ng-template #modalEmitirTIM let-modal>

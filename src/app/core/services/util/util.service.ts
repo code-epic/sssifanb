@@ -13,6 +13,24 @@ export class UtilService {
 
   }
 
+  // Bancos Data
+  public bancos: any[] = [
+    { code: "0102", name: "BANCO DE VENEZUELA", color: "#b91c1c" },
+    { code: "0134", name: "BANESCO", color: "#16a34a" },
+    { code: "0105", name: "MERCANTIL", color: "#1d4ed8" },
+    { code: "0177", name: "BANFANB", color: "#15803d" },
+    { code: "0108", name: "PROVINCIAL", color: "#1e40af" },
+    { code: "0163", name: "BANCO DEL TESORO", color: "#be123c" },
+    { code: "0175", name: "BICENTENARIO", color: "#991b1b" },
+    { code: "0191", name: "BNC", color: "#1e293b" },
+    { code: "0172", name: "BANCAMIGA", color: "#0369a1" },
+    { code: "0114", name: "BANCARIBE", color: "#0369a1" },
+    { code: "0115", name: "EXTERIOR", color: "#1d4ed8" },
+    { code: "0151", name: "FONDO COMÚN", color: "#ca8a04" },
+    { code: "0174", name: "BANPLUS", color: "#0f172a" },
+    { code: "0157", name: "DEL SUR", color: "#15803d" },
+  ];
+
 
   /**
    * Fecha Actual del sistema desde la application
@@ -317,5 +335,96 @@ export class UtilService {
   //   return this.FechaMoment(fecha, "L")
   // }
 
+  public calcularTServicio(
+    fechaIngresoIso: string,
+    fechaRetiroIso: string,
+    situacion: string,
+  ): string {
+    if (!fechaIngresoIso) return "";
+
+    const fechaActual = new Date();
+    let annoA = fechaActual.getFullYear();
+    let mesA = fechaActual.getMonth() + 1;
+    let diaA = fechaActual.getDate();
+
+    if (situacion !== "ACT" && fechaRetiroIso) {
+      const fret = fechaRetiroIso.split("-");
+      if (fret.length === 3) {
+        annoA = parseInt(fret[0], 10);
+        mesA = parseInt(fret[1], 10);
+        diaA = parseInt(fret[2], 10);
+      }
+    }
+
+    const f = fechaIngresoIso.split("-");
+    if (f.length !== 3) return "";
+
+    let anoN = parseInt(f[0], 10);
+    let mesN = parseInt(f[1], 10);
+    let diaM = parseInt(f[2], 10);
+
+    let ano = annoA - anoN;
+    let mes = mesA - mesN;
+    let dia = diaA - diaM;
+
+    if (dia < 0) {
+      dia = 30 + dia;
+      mes--;
+    }
+    if (mes < 0) {
+      // Fix bug in original script which did mes <= 0
+      mes = 12 + mes;
+      ano--;
+    }
+
+    return `${ano}A ${mes}M ${dia}D`;
+  }
+
+  public calcularTServicioTotal(
+    fechaIngresoIso: string,
+    areconocido: number,
+    mreconocido: number,
+    dreconocido: number,
+  ): string {
+    const basic = this.calcularTServicio(fechaIngresoIso, "", "ACT");
+    if (!basic || !areconocido) return basic;
+
+    const parts = basic.match(/(\d+)A\s*(\d+)M\s*(\d+)D/);
+    if (!parts) return basic;
+
+    let anos = parseInt(parts[1], 10) + areconocido;
+    let meses = parseInt(parts[2], 10) + mreconocido;
+    let dias = parseInt(parts[3], 10) + dreconocido;
+
+    if (dias >= 30) {
+      dias = dias - 30;
+      meses++;
+    }
+    if (meses >= 12) {
+      meses = meses - 12;
+      anos++;
+    }
+
+    return `${anos}A ${meses}M ${dias}D`;
+  }
+
+  public resolvParentesco(parentesco: string, sexo: string = "M"): string {
+    const p = (parentesco || "").toUpperCase();
+    const s = (sexo || "M").toUpperCase();
+
+    switch (p) {
+      case "PD":
+        return s === "F" ? "MADRE" : "PADRE";
+      case "HJ":
+        return s === "F" ? "HIJA" : "HIJO";
+      case "ES":
+      case "EA":
+        return s === "M" ? "ESPOSO" : "ESPOSA";
+      case "HM":
+        return s === "F" ? "HERMANA" : "HERMANO";
+      default:
+        return p;
+    }
+  }
 
 }
