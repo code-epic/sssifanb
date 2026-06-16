@@ -28,6 +28,7 @@ export const environment = {
     LISTAR_FIDEICOMITENTES_POR_COMPONENTE:
       "IPSFA_LFideicomitentesPorComponente",
     LISTAR_GRADOS: "IPSFA_CComponentes",
+    LISTAR_ESTATUS: "IPSFA_CEstatus",
     LISTAR_REVISION_FIDEICOMITENTES: "IPSFA_CRevisionFidecomimites",
     LISTAR_TMP_AVIACION: "IPSFA_CTmpAviacion",
   },

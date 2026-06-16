@@ -12,6 +12,8 @@ import Swal from 'sweetalert2';
 import { UtilService } from '../util/util.service';
 import { jwtDecode } from 'jwt-decode';
 import { ROUTES } from '../../models/menu/menu-models';
+import { ComponenteService } from '../componente/componente.service';
+import { EstatusBeneficiarioService } from '../estatus/estatus-beneficiario.service';
 
 
 
@@ -57,7 +59,9 @@ export class LoginService {
     private apiService: ApiService,
     private router: Router,
     private sha256: Sha256Service,
-    private http: HttpClient) {
+    private http: HttpClient,
+    private componenteService: ComponenteService,
+    private estatusBeneficiarioService: EstatusBeneficiarioService) {
 
     this.Id = environment.ID;
     if (sessionStorage.getItem('token') != undefined) {
@@ -293,6 +297,12 @@ export class LoginService {
           this.utils.uuidv4();
 
           sessionStorage.setItem("crypt", texto);
+          this.componenteService.initComponentes().subscribe({
+            error: (err) => console.error('Error al inicializar componentes:', err)
+          });
+          this.estatusBeneficiarioService.initEstatus().subscribe({
+            error: (err) => console.error('Error al inicializar estatus de beneficiarios:', err)
+          });
           this.cargarMenu();
           this.router.navigate(["/principal"]).then(() => {
             window.location.reload();

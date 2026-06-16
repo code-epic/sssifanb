@@ -21,10 +21,8 @@ import { MdlFamiliarComponent } from "./mdl-familiar/mdl-familiar.component";
 import { LoginService } from "src/app/core/services/login/login.service";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import {
-  COMPONENTES_MILITARES,
-  GRADOS_MILITARES,
-} from "src/app/core/models/militar/militar.model";
+import { ComponenteService } from "src/app/core/services/componente/componente.service";
+import { EstatusBeneficiarioService } from "src/app/core/services/estatus/estatus-beneficiario.service";
 import { environment } from "src/environments/environment";
 import { ApiService } from "src/app/core/services/api.service";
 import { UtilService } from "src/app/core/services/util/util.service";
@@ -41,8 +39,9 @@ const pdfFonts = require("pdfmake/build/vfs_fonts");
 export class IdentificacionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  public componentes = COMPONENTES_MILITARES;
-  public grados = GRADOS_MILITARES;
+  public componentes: any[] = [];
+  public grados: any[] = [];
+  public estatusBeneficiarios: any[] = [];
 
   public identificacionForm: FormGroup;
   public familiares: any[] = []; // Lista para la tabla
@@ -115,6 +114,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     private utilService: UtilService,
     private apiService: ApiService,
     private zone: NgZone,
+    private componenteService: ComponenteService,
+    private estatusBeneficiarioService: EstatusBeneficiarioService,
   ) {
     // console.log(sessionStorage.getItem("menu"));
     this.trackId = this.utilService.GenerarId();
@@ -132,6 +133,19 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       alertSeverity: 2,
       showAlertsIcon: false,
     });
+
+    this.componentes = this.componenteService.dataComponente.map(c => ({
+      abreviatura: c.codigo,
+      nombre: c.nombre
+    }));
+
+    this.identificacionForm.get("componente")?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(val => {
+        this.onComponenteChange(val);
+      });
+
+    this.estatusBeneficiarios = this.estatusBeneficiarioService.estatusBeneficiarios;
 
     this.afiliadoService.afiliado$
       .pipe(takeUntil(this.destroy$))
@@ -237,6 +251,24 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       });
   }
 
+  public onComponenteChange(compAbreviatura: string) {
+    if (!compAbreviatura) {
+      this.grados = [];
+      return;
+    }
+    const originalComp = this.componenteService.dataComponente.find(
+      c => c.codigo === compAbreviatura
+    );
+    if (originalComp && originalComp.Grado) {
+      this.grados = originalComp.Grado.map(g => ({
+        abreviatura: g.codigo,
+        nombre: g.descripcion || g.nombre
+      }));
+    } else {
+      this.grados = [];
+    }
+  }
+
   @HostListener("document:click", ["$event"])
   closePrintDropdown(event: MouseEvent) {
     // Find if target is the print dropdown button
@@ -322,6 +354,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           ),
           sexo: data.persona?.datobasico?.sexo || "",
           estadocivil: data.persona?.datobasico?.estadocivil || "",
+          condicionmilitar: data.persona?.datobasico?.condicionmilitar || "",
+          estatus: data.persona?.datobasico?.estatus || "",
         },
         correo: {
           principal: data.persona?.correo?.principal || "",
@@ -1907,6 +1941,14 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       ) {
         this.calculosBunker = JSON.parse(newContent)[0];
         this.isBunkerSync = true;
+
+        if (this.calculosBunker && this.calculosBunker.status_id !== undefined) {
+          const datobasico = this.identificacionForm.get("persona.datobasico") as FormGroup;
+          if (datobasico) {
+            datobasico.get("estatus")?.setValue(String(this.calculosBunker.status_id));
+          }
+        }
+
         this.cdr.detectChanges();
         console.log("Datos de cálculo sincronizados", this.calculosBunker);
       }

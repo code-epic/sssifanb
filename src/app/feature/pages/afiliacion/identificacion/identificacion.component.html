@@ -199,11 +199,9 @@
                                                     class="fas fa-heart"></i></span></div>
                                         <select class="form-control" formControlName="estatus">
                                             <option value="">Seleccione...</option>
-                                            <option value="201">ACTIVO</option>
-                                            <option value="202">INACTIVO</option>
-                                            <option value="203">CANCELADO</option>
-                                            <option value="204">SUSPENDIDO</option>
-                                            <option value="205">PARALIZADO</option>
+                                            <option *ngFor="let est of estatusBeneficiarios" [value]="est.id">
+                                                {{ est.nombre | uppercase }}
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -409,7 +407,7 @@
                                     <select class="form-control" formControlName="componente">
                                         <option value="">Seleccione...</option>
                                         <option *ngFor="let comp of componentes" [value]="comp.abreviatura">
-                                            {{ comp.nombre }}
+                                            {{ comp.nombre | uppercase }}
                                         </option>
                                     </select>
                                 </div>
