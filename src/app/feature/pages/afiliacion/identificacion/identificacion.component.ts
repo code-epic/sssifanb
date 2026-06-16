@@ -29,6 +29,10 @@ import { environment } from "src/environments/environment";
 import { ApiService } from "src/app/core/services/api.service";
 import { UtilService } from "src/app/core/services/util/util.service";
 
+import * as pdfMake from "pdfmake/build/pdfmake";
+const pdfFonts = require("pdfmake/build/vfs_fonts");
+(pdfMake as any).vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
+
 @Component({
   selector: "app-afi-identificacion",
   templateUrl: "./identificacion.component.html",
@@ -97,6 +101,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public tiempoServicio: string = "";
   public tiempoServicioTotal: string = "";
 
+  public isBunkerSync: boolean = false;
   public observaciones: FormControl<any> = new FormControl("");
   public calculosBunker: any = null;
 
@@ -604,7 +609,718 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // TODO: Implementar lógica de generación y apertura en nueva pestaña
+    if (tipo === "hoja_vida") {
+      this.generarPDFHojaDeVida();
+      return;
+    }
+  }
+
+  async generarPDFHojaDeVida() {
+    let responsableStr = "NO IDENTIFICADO";
+    const tokenStr = sessionStorage.getItem("token");
+    if (tokenStr) {
+      try {
+        const payload = JSON.parse(atob(tokenStr.split(".")[1]));
+        responsableStr = payload?.Usuario?.correo || payload?.Usuario?.usuario || "SISTEMA";
+      } catch (e) {}
+    }
+
+    const cedula =
+      this.identificacionForm?.get("persona.datobasico.cedula")?.value || "";
+
+    // Obtenemos los valores desde identificacionForm y calculosBunker
+    const componenteStr =
+      this.identificacionForm?.get("componente")?.value || "";
+    const gradoStr = this.identificacionForm?.get("grado")?.value || "";
+
+    // Convertir abreviaturas a nombres completos
+    const compObj = this.componentes.find(
+      (c) => c.abreviatura === componenteStr,
+    );
+    const gradoObj = this.grados.find((g) => g.abreviatura === gradoStr);
+    const componenteFull = compObj ? compObj.nombre : componenteStr;
+    const gradoFull = gradoObj ? gradoObj.nombre : gradoStr;
+
+    // Bunker data
+    const bunker = this.calculosBunker || {};
+    const base = bunker.base || {};
+    const calculos = base.calculos || {};
+    const movimientos = bunker.movimientos || {};
+
+    // Obtener nombres directamente de Bunker para evitar errores asíncronos del formulario
+    const nombres = bunker.nombres || "";
+    const apellidos = bunker.apellidos || "";
+    const nombreCompleto =
+      `${nombres} ${apellidos}`.trim().toUpperCase() || "NO DISPONIBLE";
+
+    const numeroCuenta = bunker.numero_cuenta || "NO ASIGNADA";
+    const estatus = bunker.estatus || "ACTIVO";
+    const sexo =
+      bunker.sexo === "M"
+        ? "MASCULINO"
+        : bunker.sexo === "F"
+          ? "FEMENINO"
+          : bunker.sexo || "N/D";
+    const hijos =
+      this.identificacionForm?.get("numerohijos")?.value || base.hijos || 0;
+    const pprof = this.identificacionForm?.get("pprof")?.value || 0;
+    const arec = this.identificacionForm?.get("areconocido")?.value || 0;
+    const mrec = this.identificacionForm?.get("mreconocido")?.value || 0;
+    const drec = this.identificacionForm?.get("dreconocido")?.value || 0;
+
+    const fechaIngreso = bunker.f_ingreso_sistema
+      ? new Date(bunker.f_ingreso_sistema).toLocaleDateString("es-VE")
+      : "N/D";
+    const fechaRetiro = bunker.f_retiro
+      ? new Date(bunker.f_retiro).toLocaleDateString("es-VE")
+      : "N/D";
+    const ultAscenso = bunker.f_ult_ascenso
+      ? new Date(bunker.f_ult_ascenso).toLocaleDateString("es-VE")
+      : "N/D";
+
+    const formatter = new Intl.NumberFormat("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const fmt = (val: any) => formatter.format(Number(val) || 0);
+
+    // Convertir el logo WebP a PNG base64 y dibujarlo sobre un CÍRCULO BLANCO
+    const logoBase64 = await new Promise<string>((resolve) => {
+      const img = new Image();
+      img.src = "./assets/img/ipsfa/logo.webp";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const padding = 15;
+        // Hacer el canvas cuadrado asegurando que el círculo quede simétrico
+        const size = Math.max(img.width, img.height) + padding * 2;
+        canvas.width = size;
+        canvas.height = size;
+
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          // Dibujar el fondo circular blanco con borde verde pastel
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, (size / 2) - 2, 0, Math.PI * 2, true);
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = "#A7F3D0";
+          ctx.stroke();
+
+          // Centrar la imagen dentro del círculo
+          const x = (size - img.width) / 2;
+          const y = (size - img.height) / 2;
+          ctx.drawImage(img, x, y);
+          resolve(canvas.toDataURL("image/png"));
+        } else {
+          resolve("");
+        }
+      };
+      img.onerror = () => resolve("");
+    });
+
+    // Cargar también el escudo para usarlo como marca de agua
+    const escudoBase64 = await new Promise<string>((resolve) => {
+      const img = new Image();
+      img.src = "./assets/img/ipsfa/ipsfa-imagen.webp";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL("image/png"));
+        } else {
+          resolve("");
+        }
+      };
+      img.onerror = () => resolve("");
+    });
+
+    const docDefinition: any = {
+      pageSize: "LEGAL",
+      pageMargins: [40, 120, 40, 40],
+      header: function(currentPage: number, pageCount: number) {
+        return {
+          margin: [40, 20, 40, 0],
+          columns: [
+            ...(logoBase64
+              ? [
+                  {
+                    width: 70,
+                    image: "logo",
+                    fit: [60, 60],
+                    alignment: "left",
+                    margin: [0, 0, 10, 0]
+                  }
+                ]
+              : []),
+            {
+              width: "*",
+              text: "MINISTERIO DEL PODER POPULAR PARA LA DEFENSA\nVICEMINISTERIO DE SERVICIOS, PERSONAL Y LOGÍSTICA\nDIRECCIÓN GENERAL DE EMPRESAS\nINSTITUTO DE PREVISIÓN SOCIAL DE LA FUERZA ARMADA NACIONAL BOLIVARIANA\nSISTEMA DE SEGURIDAD SOCIAL INTEGRAL DE LA FANB",
+              fontSize: 7,
+              bold: true,
+              color: "#475569",
+              alignment: "left",
+              lineHeight: 1.2,
+              margin: [0, 5, 0, 0]
+            },
+            {
+              width: 80,
+              stack: [
+                {
+                  canvas: [
+                    {
+                      type: "rect",
+                      x: 0,
+                      y: 0,
+                      w: 80,
+                      h: 80,
+                      r: 4,
+                      lineColor: "#CBD5E1",
+                      lineWidth: 1
+                    }
+                  ]
+                },
+                {
+                  text: "ESPACIO QR",
+                  alignment: "center",
+                  fontSize: 7,
+                  color: "#94A3B8",
+                  margin: [0, -45, 0, 0]
+                }
+              ]
+            }
+          ]
+        };
+      },
+      footer: function(currentPage: number, pageCount: number) {
+        return {
+          margin: [40, 10, 40, 0],
+          columns: [
+            { text: `Generado por: ${responsableStr}`, fontSize: 8, color: '#94A3B8' },
+            { text: `Fecha y Hora: ${new Date().toLocaleString('es-VE')}`, fontSize: 8, color: '#94A3B8', alignment: 'right' }
+          ]
+        };
+      },
+      watermark: { text: 'IPSFANB - PACE', color: '#94A3B8', opacity: 0.1, bold: true },
+      images: {
+        ...(logoBase64 ? { logo: logoBase64 } : {}),
+        ...(escudoBase64 ? { escudo: escudoBase64 } : {}),
+      },
+      defaultStyle: {
+        fontSize: 10,
+        lineHeight: 1.2,
+        color: "#334155",
+      },
+      styles: {
+        cardTitle: {
+          fontSize: 13,
+          bold: true,
+          color: "#0F766E",
+          margin: [0, 15, 0, 8],
+          characterSpacing: 0.5,
+        },
+        label: {
+          bold: true,
+          color: "#64748B",
+          fontSize: 8,
+          characterSpacing: 0.2,
+        },
+        value: {
+          bold: true,
+          color: "#0F172A",
+          fontSize: 11,
+          margin: [0, 0, 0, 6],
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 10,
+          color: "#0F766E",
+          fillColor: "#F8FAFC",
+          margin: [5, 7, 5, 7],
+        },
+        tableCell: { margin: [5, 7, 5, 7] },
+        amount: { alignment: "right", bold: true },
+        bigAmountLabel: {
+          fontSize: 11,
+          bold: true,
+          color: "#64748B",
+          alignment: "right",
+          characterSpacing: 0.3,
+        },
+        bigAmountValue: {
+          fontSize: 16,
+          bold: true,
+          color: "#0F766E",
+          alignment: "right",
+        },
+      },
+      content: [
+        // TARJETA 1: PERFIL DEL AFILIADO
+        { text: "DATOS BÁSICOS DEL AFILIADO", style: "cardTitle" },
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: "#E2E8F0",
+            },
+          ],
+          margin: [0, 0, 0, 10],
+        },
+        {
+          columns: [
+            {
+              width: "40%",
+              stack: [
+                { text: "NOMBRE COMPLETO", style: "label" },
+                { text: nombreCompleto, style: "value", fontSize: 10 },
+                { text: "CÉDULA DE IDENTIDAD", style: "label" },
+                { text: `V-${cedula}`, style: "value" },
+                { text: "NÚMERO DE CUENTA (DEPÓSITO)", style: "label" },
+                { text: numeroCuenta, style: "value" },
+              ],
+            },
+            {
+              width: "30%",
+              stack: [
+                { text: "COMPONENTE", style: "label" },
+                { text: componenteFull || "N/D", style: "value" },
+                { text: "GRADO", style: "label" },
+                { text: gradoFull || "N/D", style: "value" },
+                { text: "TIEMPO DE SERVICIO", style: "label" },
+                { text: `${base.antiguedad || 0} Años`, style: "value" },
+              ],
+            },
+            {
+              width: "30%",
+              stack: [
+                { text: "ESTATUS", style: "label" },
+                {
+                  text: estatus,
+                  style: "value",
+                  color: estatus === "ACTIVO" ? "#059669" : "#DC2626",
+                },
+                { text: "FECHA INGRESO", style: "label" },
+                { text: fechaIngreso, style: "value" },
+                { text: "FECHA RETIRO", style: "label" },
+                { text: fechaRetiro, style: "value" },
+              ],
+            },
+          ],
+        },
+
+        // TARJETA 1.5: INFORMACION COMPLEMENTARIA
+        {
+          text: "INFORMACIÓN ADICIONAL Y TIEMPOS RECONOCIDOS",
+          style: "cardTitle",
+        },
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: 0,
+              y1: 0,
+              x2: 532,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: "#E2E8F0",
+            },
+          ],
+          margin: [0, 0, 0, 10],
+        },
+        {
+          columns: [
+            {
+              width: "33%",
+              stack: [
+                { text: "SEXO", style: "label" },
+                { text: sexo, style: "value" },
+                { text: "NÚMERO DE HIJOS", style: "label" },
+                { text: `${hijos}`, style: "value" },
+              ],
+            },
+            {
+              width: "33%",
+              stack: [
+                { text: "FECHA ÚLTIMO ASCENSO", style: "label" },
+                { text: ultAscenso, style: "value" },
+                { text: "ST. PROFESIÓN / PRODUCTIVIDAD", style: "label" },
+                { text: `${pprof}%`, style: "value" },
+              ],
+            },
+            {
+              width: "34%",
+              stack: [
+                { text: "AÑOS RECONOCIDOS", style: "label" },
+                { text: `${arec} Años`, style: "value" },
+                { text: "MESES Y DÍAS RECONOCIDOS", style: "label" },
+                { text: `${mrec} Meses / ${drec} Días`, style: "value" },
+              ],
+            },
+          ],
+        },
+
+        // TARJETA 2: DESGLOSE SALARIAL
+        { text: "DESGLOSE SALARIAL Y PRIMAS", style: "cardTitle" },
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: "#E2E8F0",
+            },
+          ],
+          margin: [0, 0, 0, 10],
+        },
+        {
+          columns: [
+            // Izquierda: Sueldos
+            {
+              width: "45%",
+              table: {
+                widths: ["*", "auto"],
+                body: [
+                  [
+                    { text: "Sueldo Básico", style: "tableCell" },
+                    {
+                      text: `Bs. ${fmt(base.sueldo_base)}`,
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    { text: "Sueldo Mensual", style: "tableCell" },
+                    {
+                      text: `Bs. ${fmt(base.sueldo_mensual)}`,
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    {
+                      text: "Sueldo Integral",
+                      style: "tableHeader",
+                      color: "#FFFFFF",
+                      fillColor: "#0F766E",
+                    },
+                    {
+                      text: `Bs. ${fmt(base.sueldo_integral)}`,
+                      style: ["tableHeader", "amount"],
+                      color: "#FFFFFF",
+                      fillColor: "#0F766E",
+                    },
+                  ],
+                ],
+              },
+              layout: "lightHorizontalLines",
+            },
+            { width: "5%", text: "" }, // Spacer
+            // Derecha: Primas
+            {
+              width: "50%",
+              table: {
+                widths: ["*", "auto"],
+                body: [
+                  // [{ text: 'Compensación Especial', style: 'tableCell' }, { text: fmt(calculos.prima_compensacion_especial), style: ['tableCell', 'amount'] }],
+                  [
+                    { text: "Tiempo de Servicio", style: "tableCell" },
+                    {
+                      text: fmt(calculos.prima_tiemposervicio),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    { text: "Profesionalización", style: "tableCell" },
+                    {
+                      text: fmt(calculos.prima_profesionalizacion),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    { text: "Descendencia", style: "tableCell" },
+                    {
+                      text: fmt(calculos.prima_descendencia),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  // [{ text: 'Estabilidad', style: 'tableCell' }, { text: fmt(calculos.prima_especial), style: ['tableCell', 'amount'] }],
+                  [
+                    { text: "Alicuota Bono Vacacional", style: "tableCell" },
+                    {
+                      text: fmt(base.vacaciones),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    { text: "Alicuota Bono Fin de Año", style: "tableCell" },
+                    {
+                      text: fmt(base.aguinaldos || calculos.aguinaldos),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                ],
+              },
+              layout: "lightHorizontalLines",
+            },
+          ],
+        },
+
+        // TARJETA 3: HABERES Y FIDEICOMISO
+        {
+          text: "ESTADO DE HABERES Y ASIGNACIÓN DE ANTIGÜEDAD",
+          style: "cardTitle",
+          margin: [0, 20, 0, 8],
+        },
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: 0,
+              y1: 0,
+              x2: 515,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: "#E2E8F0",
+            },
+          ],
+          margin: [0, 0, 0, 10],
+        },
+        {
+          columns: [
+            {
+              width: "60%",
+              table: {
+                widths: ["60%", "40%"],
+                body: [
+                  [
+                    { text: "Asignación de Antigüedad", style: "tableCell" },
+                    {
+                      text: fmt(movimientos.calculo_aa),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    { text: "Días Adicionales", style: "tableCell" },
+                    {
+                      text: fmt(movimientos.dias_adicionales),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    { text: "Diferencia de A.A.", style: "tableCell" },
+                    {
+                      text: fmt(movimientos.finiquito_diferencia_aa),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    { text: "Garantías", style: "tableCell" },
+                    {
+                      text: fmt(movimientos.deposito_de_garantias),
+                      style: ["tableCell", "amount"],
+                    },
+                  ],
+                  [
+                    {
+                      text: "Anticipos Solicitados",
+                      style: "tableCell",
+                      color: "#DC2626",
+                    },
+                    {
+                      text: `- ${fmt(movimientos.anticipo)}`,
+                      style: ["tableCell", "amount"],
+                      color: "#DC2626",
+                    },
+                  ],
+                  [
+                    {
+                      text: "Embargos Ejecutados",
+                      style: "tableCell",
+                      color: "#DC2626",
+                    },
+                    {
+                      text: `- ${fmt(movimientos.embargo)}`,
+                      style: ["tableCell", "amount"],
+                      color: "#DC2626",
+                    },
+                  ],
+                ],
+              },
+              layout: "lightHorizontalLines",
+            },
+            { width: "5%", text: "" },
+            {
+              width: "35%",
+              stack: [
+                {
+                  table: {
+                    widths: ["*"],
+                    body: [
+                      [
+                        {
+                          fillColor: "#F0FDF4", // Light Green
+                          margin: [10, 15, 10, 15],
+                          border: [true, true, true, true],
+                          borderColor: [
+                            "#22C55E",
+                            "#22C55E",
+                            "#22C55E",
+                            "#22C55E",
+                          ],
+                          stack: [
+                            {
+                              text: "SALDO DISPONIBLE",
+                              style: "bigAmountLabel",
+                            },
+                            {
+                              text: `Bs. ${fmt(bunker.neto)}`,
+                              style: "bigAmountValue",
+                            },
+                            {
+                              text: `Aportado al Fideicomiso: ${fmt(bunker.porcentaje)}%`,
+                              alignment: "right",
+                              fontSize: 8,
+                              color: "#64748B",
+                              margin: [0, 5, 0, 0],
+                            },
+                          ],
+                        },
+                      ],
+                    ],
+                  },
+                  layout: {
+                    hLineWidth: () => 1,
+                    vLineWidth: () => 1,
+                    hLineColor: () => "#22C55E",
+                    vLineColor: () => "#22C55E",
+                  },
+                },
+                {
+                  text: "Capital en Banco",
+                  style: "label",
+                  margin: [0, 15, 0, 2],
+                },
+                {
+                  text: `Bs. ${fmt(movimientos.finiquito_capital_banco)}`,
+                  style: "value",
+                },
+                {
+                  text: "Total Depositado",
+                  style: "label",
+                  margin: [0, 5, 0, 2],
+                },
+                { text: `Bs. ${fmt(movimientos.deposito_aa)}`, style: "value" },
+              ],
+            },
+          ],
+        },
+
+        // HISTORICO DE ANTICIPOS (EN SEGUNDA PÁGINA)
+        {
+          text: "HISTÓRICO DE MOVIMIENTOS",
+          style: "cardTitle",
+          margin: [0, 20, 0, 8],
+          pageBreak: "before",
+        },
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: 0,
+              y1: 0,
+              x2: 532,
+              y2: 0,
+              lineWidth: 1,
+              lineColor: "#E2E8F0",
+            },
+          ],
+          margin: [0, 0, 0, 10],
+        },
+        {
+          table: {
+            headerRows: 1,
+            widths: ["50%", "50%"],
+            body: [
+              [
+                { text: "FECHA DEL MOVIMIENTO", style: "tableHeader" },
+                {
+                  text: "MONTO (Bs.)",
+                  style: "tableHeader",
+                  alignment: "right",
+                },
+              ],
+              [
+                {
+                  text: movimientos.ultima_modificacion
+                    ? new Date(
+                        movimientos.ultima_modificacion,
+                      ).toLocaleDateString("es-VE")
+                    : "Registro Inicial",
+                  style: "tableCell",
+                },
+                {
+                  text: fmt(movimientos.anticipo),
+                  style: ["tableCell", "amount"],
+                },
+              ],
+            ],
+          },
+          layout: "lightHorizontalLines",
+        },
+
+        // FIRMAS
+        {
+          columns: [
+            {
+              text: "_________________________________\nCARLOS CONTRERAS MENESES\nTCNEL.\nJEFE DEL DPTO. DE FIDEICOMISO",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+              color: "#475569",
+            },
+            {
+              text: "_________________________________\nJOSÉ TRINIDAD DORANTE\nTCNEL.\nGERENTE DE BIENESTAR Y SEGURIDAD SOCIAL",
+              alignment: "center",
+              bold: true,
+              fontSize: 8,
+              color: "#475569",
+            },
+          ],
+          margin: [0, 60, 0, 0],
+        },
+      ],
+    };
+
+    pdfMake
+      .createPdf(docDefinition)
+      .getBase64()
+      .then((base64Data: string) => {
+        const dataUri = `data:application/pdf;base64,${base64Data}`;
+
+        if (window.parent && window !== window.parent) {
+          window.parent.postMessage(
+            {
+              type: "OPEN_PDF",
+              payload: {
+                fileName: `Hoja_Vida_${cedula}.pdf`,
+                data: dataUri,
+              },
+            },
+            "*",
+          );
+        } else {
+          pdfMake.createPdf(docDefinition).open();
+        }
+      });
   }
 
   guardarFamiliar() {
@@ -1190,6 +1906,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         JSON.parse(newContent).length > 0
       ) {
         this.calculosBunker = JSON.parse(newContent)[0];
+        this.isBunkerSync = true;
         this.cdr.detectChanges();
         console.log("Datos de cálculo sincronizados", this.calculosBunker);
       }

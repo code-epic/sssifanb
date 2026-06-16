@@ -90,13 +90,9 @@
                                             <i class="fas fa-file-invoice-dollar mr-3 opacity-75"
                                                 style="width: 20px; text-align: center;"></i> Constancia de ARC
                                         </a>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
-                                            style="transition: all 0.2s ease;" href="javascript:void(0);"
-                                            (click)="imprimirDocumento('hoja_vida', $event)"
-                                            onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
-                                            onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-address-card mr-3 opacity-75"
-                                                style="width: 20px; text-align: center;"></i> Hoja de Vida
+                                        <a class="dropdown-item" [class.disabled]="!isBunkerSync" [class.text-muted]="!isBunkerSync" href="javascript:void(0)" (click)="isBunkerSync && imprimirDocumento('hoja_vida', $event)">
+                                            <i class="fas fa-file-pdf mr-2" [class.text-danger]="isBunkerSync" style="width: 20px; text-align: center;"></i> Hoja de Vida
+                                            <span *ngIf="!isBunkerSync" class="ml-2 badge badge-warning"><i class="fas fa-spinner fa-spin"></i></span>
                                         </a>
 
                                     </div>
@@ -651,6 +647,7 @@
                                     <div class="table-responsive">
                                         <table class="table table-hover align-items-center mb-0 ledger-table">
                                             <tbody>
+                                                <!--
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 border-top-0 py-3"
                                                         style="font-size: 0.95rem;">Transporte</td>
@@ -658,6 +655,7 @@
                                                         style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_transporte || 0) | number:'1.2-2' }}
                                                     </td>
                                                 </tr>
+                                                -->
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Descendencia</td>
@@ -665,6 +663,7 @@
                                                         style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_descendencia || 0) | number:'1.2-2' }}
                                                     </td>
                                                 </tr>
+                                                <!--
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Productividad</td>
@@ -679,6 +678,7 @@
                                                         style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_compensacion_especial || 0) | number:'1.2-2' }}
                                                     </td>
                                                 </tr>
+                                                -->
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Profesionalización</td>
@@ -689,7 +689,7 @@
                                                 <tr class="bg-light">
                                                     <td class="font-weight-500 pl-4 py-3 text-muted"
                                                         style="font-size: 0.95rem;"><i
-                                                            class="fas fa-clock mr-2 opacity-5 mt-1"></i>Años de
+                                                            class="fas fa-clock mr-2 opacity-5 mt-1"></i>Tiempo de
                                                         Servicio</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3 text-muted"
                                                         style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_tiemposervicio || 0) | number:'1.2-2' }}</td>
@@ -747,7 +747,7 @@
                                             Disponible Total</h6>
                                         <h3 class="mb-0 font-weight-600"
                                             style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda
-                                            }} {{ (calculosBunker?.neto || 0) | number:'1.2-2' }}</h3>
+                                            }} {{ (calculosBunker?.base?.saldo_disponible || 0) | number:'1.2-2' }}</h3>
                                     </div>
                                     <div class="icon-circle shadow-sm"
                                         style="width: 42px; height: 42px; background-color: rgba(89, 140, 137, 0.1); z-index: 1;">
@@ -775,7 +775,7 @@
                                                 style="font-size: 0.95rem; color: #64748b;">Asignación de
                                                 Antigüedad</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.calculo_aa || 0) | number:'1.2-2' }}</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.asignacion_antiguedad || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
@@ -803,7 +803,7 @@
                                             <span class="font-weight-500"
                                                 style="font-size: 0.95rem; color: #64748b;">Diferencia A.A.</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.finiquito_diferencia_aa || 0) | number:'1.2-2' }}</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.diferencia_asignacion || 0) | number:'1.2-2' }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -831,7 +831,7 @@
                                             <span class="text-primary-teal font-weight-500" style="font-size: 0.95rem;"><i
                                                     class="fas fa-ban mr-2 opacity-75"></i>Días adicionales</span>
                                             <span class="text-primary-teal font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.movimientos?.calculo_de_dias_adicionales || 0) | number:'1.2-2' }}</span>
+                                                style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_de_dias_adicionales || 0) | number:'1.2-2' }}</span>
                                         </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
@@ -2191,3 +2191,4 @@
         </div>
     </div>
 </ng-template>
+
