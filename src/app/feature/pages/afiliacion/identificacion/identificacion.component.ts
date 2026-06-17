@@ -134,18 +134,20 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       showAlertsIcon: false,
     });
 
-    this.componentes = this.componenteService.dataComponente.map(c => ({
+    this.componentes = this.componenteService.dataComponente.map((c) => ({
       abreviatura: c.codigo,
-      nombre: c.nombre
+      nombre: c.nombre,
     }));
 
-    this.identificacionForm.get("componente")?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(val => {
+    this.identificacionForm
+      .get("componente")
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((val) => {
         this.onComponenteChange(val);
       });
 
-    this.estatusBeneficiarios = this.estatusBeneficiarioService.estatusBeneficiarios;
+    this.estatusBeneficiarios =
+      this.estatusBeneficiarioService.estatusBeneficiarios;
 
     this.afiliadoService.afiliado$
       .pipe(takeUntil(this.destroy$))
@@ -243,8 +245,11 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             }
           }
 
+          let f_retiro = this.formatDate(afiliadoData.fretiro);
+          console.log("Fecha de retiro:", f_retiro);
+
           this.getPhotoId();
-          this.getCalcId();
+          this.getDirectivaID();
           //   console.log("Iniciando metodo de carga");
           this.initMessagePort();
         }
@@ -257,12 +262,12 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       return;
     }
     const originalComp = this.componenteService.dataComponente.find(
-      c => c.codigo === compAbreviatura
+      (c) => c.codigo === compAbreviatura,
     );
     if (originalComp && originalComp.Grado) {
-      this.grados = originalComp.Grado.map(g => ({
+      this.grados = originalComp.Grado.map((g) => ({
         abreviatura: g.codigo,
-        nombre: g.descripcion || g.nombre
+        nombre: g.descripcion || g.nombre,
       }));
     } else {
       this.grados = [];
@@ -412,21 +417,46 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
   private formatDate(mongoDate: any): string {
     if (!mongoDate) return "";
-    let d: Date;
 
+    // Si es la fecha nula/por defecto de retiro "0000-12-31", devolver en blanco
     if (typeof mongoDate === "string") {
-      d = new Date(mongoDate);
+      if (mongoDate.includes("0000-12-31") || mongoDate.startsWith("0000")) {
+        return "";
+      }
     } else if (mongoDate.$date && typeof mongoDate.$date === "string") {
-      d = new Date(mongoDate.$date);
-    } else if (mongoDate.$date && mongoDate.$date.$numberLong) {
-      d = new Date(parseInt(mongoDate.$date.$numberLong));
-    } else {
-      return "";
+      if (
+        mongoDate.$date.includes("0000-12-31") ||
+        mongoDate.$date.startsWith("0000")
+      ) {
+        return "";
+      }
     }
 
-    if (isNaN(d.getTime())) return "";
+    let d: Date | null = null;
 
-    return d.toISOString().split("T")[0];
+    if (mongoDate instanceof Date) {
+      d = mongoDate;
+    } else if (typeof mongoDate === "string") {
+      d = new Date(mongoDate);
+    } else if (mongoDate && typeof mongoDate === "object") {
+      if (mongoDate.$date) {
+        if (typeof mongoDate.$date === "string") {
+          d = new Date(mongoDate.$date);
+        } else if (typeof mongoDate.$date === "number") {
+          d = new Date(mongoDate.$date);
+        } else if (mongoDate.$date.$numberLong) {
+          d = new Date(parseInt(mongoDate.$date.$numberLong, 10));
+        }
+      }
+    }
+
+    if (!d || isNaN(d.getTime())) return "";
+
+    const formatted = d.toISOString().split("T")[0];
+    if (formatted.startsWith("0000") || formatted === "0000-12-31") {
+      return "";
+    }
+    return formatted;
   }
 
   private initForms() {
@@ -655,7 +685,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     if (tokenStr) {
       try {
         const payload = JSON.parse(atob(tokenStr.split(".")[1]));
-        responsableStr = payload?.Usuario?.correo || payload?.Usuario?.usuario || "SISTEMA";
+        responsableStr =
+          payload?.Usuario?.correo || payload?.Usuario?.usuario || "SISTEMA";
       } catch (e) {}
     }
 
@@ -734,7 +765,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         if (ctx) {
           // Dibujar el fondo circular blanco con borde verde pastel
           ctx.beginPath();
-          ctx.arc(size / 2, size / 2, (size / 2) - 2, 0, Math.PI * 2, true);
+          ctx.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2, true);
           ctx.fillStyle = "#ffffff";
           ctx.fill();
           ctx.lineWidth = 4;
@@ -775,7 +806,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     const docDefinition: any = {
       pageSize: "LEGAL",
       pageMargins: [40, 120, 40, 40],
-      header: function(currentPage: number, pageCount: number) {
+      header: function (currentPage: number, pageCount: number) {
         return {
           margin: [40, 20, 40, 0],
           columns: [
@@ -786,8 +817,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
                     image: "logo",
                     fit: [60, 60],
                     alignment: "left",
-                    margin: [0, 0, 10, 0]
-                  }
+                    margin: [0, 0, 10, 0],
+                  },
                 ]
               : []),
             {
@@ -798,7 +829,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
               color: "#475569",
               alignment: "left",
               lineHeight: 1.2,
-              margin: [0, 5, 0, 0]
+              margin: [0, 5, 0, 0],
             },
             {
               width: 80,
@@ -813,32 +844,46 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
                       h: 80,
                       r: 4,
                       lineColor: "#CBD5E1",
-                      lineWidth: 1
-                    }
-                  ]
+                      lineWidth: 1,
+                    },
+                  ],
                 },
                 {
                   text: "ESPACIO QR",
                   alignment: "center",
                   fontSize: 7,
                   color: "#94A3B8",
-                  margin: [0, -45, 0, 0]
-                }
-              ]
-            }
-          ]
+                  margin: [0, -45, 0, 0],
+                },
+              ],
+            },
+          ],
         };
       },
-      footer: function(currentPage: number, pageCount: number) {
+      footer: function (currentPage: number, pageCount: number) {
         return {
           margin: [40, 10, 40, 0],
           columns: [
-            { text: `Generado por: ${responsableStr}`, fontSize: 8, color: '#94A3B8' },
-            { text: `Fecha y Hora: ${new Date().toLocaleString('es-VE')}`, fontSize: 8, color: '#94A3B8', alignment: 'right' }
-          ]
+            {
+              text: `Generado por: ${responsableStr}`,
+              fontSize: 8,
+              color: "#94A3B8",
+            },
+            {
+              text: `Fecha y Hora: ${new Date().toLocaleString("es-VE")}`,
+              fontSize: 8,
+              color: "#94A3B8",
+              alignment: "right",
+            },
+          ],
         };
       },
-      watermark: { text: 'IPSFANB - PACE', color: '#94A3B8', opacity: 0.1, bold: true },
+      watermark: {
+        text: "IPSFANB - PACE",
+        color: "#94A3B8",
+        opacity: 0.1,
+        bold: true,
+      },
       images: {
         ...(logoBase64 ? { logo: logoBase64 } : {}),
         ...(escudoBase64 ? { escudo: escudoBase64 } : {}),
@@ -1876,37 +1921,55 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Obtener los calculos de un beneficiario siempre que sea fideicomiso
-   *
-   */
-  getCalcId() {
+  getDirectivaID() {
     const cedula = this.identificacionForm?.get(
       "persona.datobasico.cedula",
     )?.value;
     if (cedula && cedula.toString().trim() !== "") {
-      const netInfo = JSON.parse(sessionStorage.getItem("net_info") || "{}");
-      const config = netInfo.config || {};
-
-      const fnx = {
-        funcion: "Fnx_ProcesarBeneficiario",
-        id_cliente: config.clientId,
-        aplicacion: "sandra.app.ipsfa",
-        trackid: this.trackId, //seguimiento para descargar y la carpeta que se va a crear
-        nombre: "NOMINA DE PRESTACIONES SOCIALES 2026",
-        autor: "Sandra",
-        ciclo: "03MAR2026",
-        cedula: cedula,
+      const payload = {
+        funcion: environment.funcion.OBTENER_BENEFICIARIO_DIRECTIVA_ID,
+        parametros: `${cedula}`,
       };
-
-      this.apiService.post("fnx", fnx).subscribe({
+      this.apiService.post("crud", payload).subscribe({
         next: (data: any) => {
-          //   console.log(data);
-          this.id = data.contenido.id; //id de la funcion fnx
+          let directivaId = data.Cuerpo[0].directiva_sueldo_id;
+          console.log("Directiva ID:", directivaId);
+          this.getCalcId(directivaId, cedula);
+          this.cdr.detectChanges();
         },
         error: (error) => {},
       });
     }
+  }
+
+  /**
+   * Obtener los calculos de un beneficiario siempre que sea fideicomiso
+   *
+   */
+  getCalcId(directivaId: number, cedula: string) {
+    const netInfo = JSON.parse(sessionStorage.getItem("net_info") || "{}");
+    const config = netInfo.config || {};
+
+    const fnx = {
+      funcion: "Fnx_ProcesarBeneficiario",
+      id_cliente: config.clientId,
+      aplicacion: "sandra.app.ipsfa",
+      trackid: this.trackId, //seguimiento para descargar y la carpeta que se va a crear
+      nombre: "NOMINA DE PRESTACIONES SOCIALES 2026",
+      autor: "Sandra",
+      ciclo: "03MAR2026",
+      cedula: cedula,
+      accion: "Parental",
+      directiva_id: directivaId,
+    };
+
+    this.apiService.post("fnx", fnx).subscribe({
+      next: (data: any) => {
+        //   console.log(data);
+        this.id = data.contenido.id; //id de la funcion fnx
+      },
+      error: (error) => {},
+    });
   }
 
   private initMessagePort(): void {
@@ -1942,10 +2005,17 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         this.calculosBunker = JSON.parse(newContent)[0];
         this.isBunkerSync = true;
 
-        if (this.calculosBunker && this.calculosBunker.status_id !== undefined) {
-          const datobasico = this.identificacionForm.get("persona.datobasico") as FormGroup;
+        if (
+          this.calculosBunker &&
+          this.calculosBunker.status_id !== undefined
+        ) {
+          const datobasico = this.identificacionForm.get(
+            "persona.datobasico",
+          ) as FormGroup;
           if (datobasico) {
-            datobasico.get("estatus")?.setValue(String(this.calculosBunker.status_id));
+            datobasico
+              .get("estatus")
+              ?.setValue(String(this.calculosBunker.status_id));
           }
         }
 
