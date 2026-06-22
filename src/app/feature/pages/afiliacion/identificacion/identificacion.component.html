@@ -715,7 +715,7 @@
                     <div class="row mb-4">
                         <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-3">
                             <h3 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
-                                Estado de Cuenta Fideicomiso <font color="red">( Con Medida Judicial  )</font>
+                                Estado de Cuenta Fideicomiso 
                             </h3>
                             <div class="btn-group shadow-sm" role="group" style="border-radius: 8px;">
                                 <button class="btn-pastel-icon pastel-success" type="button" style="border-radius: 8px 0 0 8px; border-right: 1px solid rgba(255,255,255,0.2);"
@@ -731,10 +731,10 @@
                     </div>
 
                     <div class="row">
-                        <!-- Haberes -->
-                        <div class="col-lg-7 mb-4">
+                        <!-- Hero Banner Full Width -->
+                        <div class="col-12 mb-3">
                             <!-- Hero Banner: Saldo Disponible -->
-                            <div class="card shadow-sm border-0 mb-3 hero-banner-soft"
+                            <div class="card shadow-sm border-0 hero-banner-soft"
                                 style="border-radius: 12px; overflow: hidden; position: relative; border-left: 4px solid #598c89 !important;">
                                 <i class="fas fa-chart-line"
                                     style="position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.03;"></i>
@@ -753,154 +753,164 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Ledger A. de Antigüedad -->
-                            <div class="card shadow-sm border-0 ledger-card"
-                                style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center"
-                                    style="border-color: #f4f5f7 !important;">
-                                    <div class="icon-circle mr-3"
-                                        style="width: 34px; height: 34px; background-color: rgba(89, 140, 137, 0.1);"><i
-                                            class="fas fa-coins" style="color: #598c89; font-size: 0.9rem;"></i></div>
-                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Haberes
-                                        y Depósitos</h6>
+                        <!-- Datos Asignación Antigüedad (Imagen Layout) -->
+                        <div class="col-12 mb-4">
+                            <div class="card shadow-sm border-0 ledger-card" style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center" style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3" style="width: 34px; height: 34px; background-color: rgba(89, 140, 137, 0.1);">
+                                        <i class="fas fa-file-invoice-dollar" style="color: #598c89; font-size: 0.9rem;"></i>
+                                    </div>
+                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Datos Asignación Antigüedad</h6>
                                 </div>
                                 <div class="card-body p-0">
-                                    <ul class="list-group list-group-flush">
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Asignación de
-                                                Antigüedad</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.asignacion_antiguedad || 0) | number:'1.2-2' }}</span>
-                                        </li>
-                                         <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Capital en Banco</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.deposito_banco || 0) | number:'1.2-2' }}</span>
-                                        </li>
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Depositado en Banco</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.depositado_en_banco || 0) | number:'1.2-2' }}</span>
-                                        </li>
-                                       
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Fondo de Garantías</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_de_garantias || 0) | number:'1.2-2' }}</span>
-                                        </li>
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Diferencia A.A.</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.diferencia_asignacion || 0) | number:'1.2-2' }}</span>
-                                        </li>
-                                    </ul>
+                                    <div class="row m-0">
+                                        <!-- Columna 1 -->
+                                        <div class="col-lg-4 p-0 border-right border-light">
+                                            <ul class="list-group list-group-flush h-100">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">A. de Antigüedad</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.asignacion_antiguedad || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Días Adicionales</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_de_dias_adicionales || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Diferencia A.A.</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.diferencia_asignacion || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Embargo</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.embargo || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Comisión S.</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.comision_servicio || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light bg-light" style="background-color: rgba(248, 250, 252, 0.5) !important;">
+                                                    <span class="font-weight-600" style="font-size: 0.90rem; color: #475569;">Total Calculados</span>
+                                                    <span class="font-weight-700 tracking-tight" style="font-size: 0.95rem; color: #334155;">-</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Fecha Último Depósito</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">-</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Columna 2 -->
+                                        <div class="col-lg-4 p-0 border-right border-light">
+                                            <ul class="list-group list-group-flush h-100">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Capital En Banco</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.deposito_banco || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Depositado en Banco</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.depositado_en_banco || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Fecha Último Dep.</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">-</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Anticipos</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.anticipo || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Monto Recuperado Act.</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.monto_recuperado_activo || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light bg-light" style="background-color: rgba(248, 250, 252, 0.5) !important;">
+                                                    <span class="font-weight-600" style="font-size: 0.90rem; color: #475569;">Total Cancelados</span>
+                                                    <span class="font-weight-700 tracking-tight" style="font-size: 0.95rem; color: #334155;">-</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">&nbsp;</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">&nbsp;</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Columna 3 -->
+                                        <div class="col-lg-4 p-0">
+                                            <ul class="list-group list-group-flush h-100">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Garantías</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_de_garantias || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Saldo Disponible</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.saldo_disponible || 0) | number:'1.2-2' }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">% Aportado</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ (calculosBunker?.base?.porcentaje_cancelado || 0) | number:'1.2-2' }} %</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Fecha U. Anticipo</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ fechaUltimoAnticipo }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">&nbsp;</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">&nbsp;</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light bg-light" style="background-color: rgba(248, 250, 252, 0.5) !important;">
+                                                    <span class="font-weight-600" style="font-size: 0.90rem; color: #475569;">Total Adeudado</span>
+                                                    <span class="font-weight-700 tracking-tight" style="font-size: 0.95rem; color: #334155;">-</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">&nbsp;</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">&nbsp;</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Cargas y Egresos -->
-                        <div class="col-lg-5 mb-4">
-                            <!-- Retenciones Card -->
-                            <div class="card shadow-sm border-0 mb-4 ledger-card"
-                                style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center"
-                                    style="border-color: #f4f5f7 !important;">
-                                    <div class="icon-circle mr-3"
-                                        style="width: 34px; height: 34px; background-color: rgba(244, 67, 54, 0.1);"><i
-                                            class="fas fa-exclamation-triangle text-danger"
-                                            style="font-size: 0.9rem;"></i></div>
-                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Cargos
-                                        y Retenciones</h6>
+                        <!-- Sección de Elementos Nuevos (Patria, etc) -->
+                        <div class="col-12 mb-4">
+                            <div class="card shadow-sm border-0 ledger-card" style="border-radius: 12px; overflow: hidden;">
+                                <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center" style="border-color: #f4f5f7 !important;">
+                                    <div class="icon-circle mr-3" style="width: 34px; height: 34px; background-color: rgba(71, 85, 105, 0.1);">
+                                        <i class="fas fa-info-circle" style="color: #475569; font-size: 0.9rem;"></i>
+                                    </div>
+                                    <h6 class="mb-0 font-weight-500" style="font-size: 1.05rem; color: #64748b;">Detalles Adicionales de Pago</h6>
                                 </div>
                                 <div class="card-body p-0">
-                                    <ul class="list-group list-group-flush">
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="text-primary-teal font-weight-500" style="font-size: 0.95rem;"><i
-                                                    class="fas fa-ban mr-2 opacity-75"></i>Días adicionales</span>
-                                            <span class="text-primary-teal font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_de_dias_adicionales || 0) | number:'1.2-2' }}</span>
-                                        </li>
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="text-warning font-weight-500 text-uppercase"
-                                                style="font-size: 0.75rem; letter-spacing: 0.5px;"><i
-                                                    class="fas fa-hand-holding-usd mr-2 opacity-75"></i>Anticipos
-                                                Otorgados</span>
-                                            <span class="text-warning font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.movimientos?.anticipo || 0) | number:'1.2-2' }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <!-- Intereses Card -->
-                            <div class="card shadow-sm border-0 ledger-card"
-                                style="border-radius: 12px; overflow: hidden;">
-                                
-                                <div class="card-body p-0">
-                                    <ul class="list-group list-group-flush">
-                                        
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Monto Pago Patria:</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
-                                        </li>
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Fecha del Pago a Patria:</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">DD/MM/YYYY</span>
-                                        </li>
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Beneficiario:</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">V-Benficiario</span>
-                                        </li>
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Observación:</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;"></span>
-                                        </li>
-                                        
-                                    </ul>
+                                    <div class="row m-0">
+                                        <div class="col-md-6 p-0 border-right border-light">
+                                            <ul class="list-group list-group-flush h-100">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Monto Pago Patria:</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">{{ moneda }} 0.00</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Fecha del Pago a Patria:</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">DD/MM/YYYY</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6 p-0">
+                                            <ul class="list-group list-group-flush h-100">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Beneficiario:</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;">V-Benficiario</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                                    <span class="font-weight-500" style="font-size: 0.95rem; color: #64748b;">Observación:</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 1.05rem; color: #475569;"></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Metadata Footer Spanning Full Width -->
-                        <div class="col-12 mt-2 mb-4">
-                            <div class="card shadow-sm border-0 ledger-card"
-                                style="border-radius: 12px; overflow: hidden;">
-                                <div class="card-body bg-white py-3 px-4 d-flex justify-content-around align-items-center font-weight-500"
-                                    style="font-size: 0.85rem; color: #94a3b8;">
-                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Fecha de Ult. Anticipo: {{ (calculosBunker?.movimientos?.ultima_modificacion | date:'dd/MM/yyyy') || 'DD/MM/AAAA' }}</span>
-                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Comisión de Servicio: {{ (calculosBunker?.movimientos?.comision_servicio || 0) | number:'1.2-2' }}</span>
-                                    <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Monto Recuperado: {{ (calculosBunker?.movimientos?.monto_recuperado_activo || 0) | number:'1.2-2' }}</span>
-                                    <span><i class="fas fa-plus-circle mr-2 opacity-50"></i>Medida Judicial: {{ (calculosBunker?.movimientos?.embargo || 0) | number:'1.2-2' }}</span>
-                                    <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: {{ (calculosBunker?.base?.porcentaje_cancelado || 0) | number:'1.2-2' }}</span>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 

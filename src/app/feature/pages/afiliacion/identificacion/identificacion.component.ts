@@ -87,6 +87,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public sueldosPorPagina: number = 5;
   public totalSueldos: number = 0;
   public totalPaginasSueldo: number = 0;
+  public movimientos: any;
+  public fechaUltimoAnticipo: any;
 
   // Bancos Data
   public get bancos(): any[] {
@@ -250,6 +252,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
           this.getPhotoId();
           this.getDirectivaID();
+          this.consultarMovimientos();
           //   console.log("Iniciando metodo de carga");
           this.initMessagePort();
         }
@@ -2019,6 +2022,19 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           }
         }
 
+        if (
+          this.calculosBunker &&
+          this.calculosBunker.base &&
+          this.calculosBunker.base.n_hijos !== undefined
+        ) {
+          this.identificacionForm
+            .get("numerohijos")
+            ?.setValue(this.calculosBunker.base.n_hijos);
+          this.identificacionForm
+            .get("pprof")
+            ?.setValue(this.calculosBunker.base.st_profesion);
+        }
+
         this.cdr.detectChanges();
         console.log("Datos de cálculo sincronizados", this.calculosBunker);
       }
@@ -2028,6 +2044,35 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       //     { type: "START_DOWNLOAD", id: this.id, trackingId: this.trackId },
       //     "*",
       //   );
+    });
+  }
+
+  consultarMovimientos() {
+    const cedula = this.identificacionForm?.get(
+      "persona.datobasico.cedula",
+    )?.value;
+    const payload = {
+      funcion: environment.funcion.CONSULTAR_MOVIMIENTOS,
+      parametros: `${cedula},5`,
+    };
+    this.apiService.post("crud", payload).subscribe({
+      next: (data: any) => {
+        if (data.Cuerpo && data.Cuerpo.length > 0) {
+          this.movimientos = data.Cuerpo;
+          const f_contable = this.movimientos[0].f_contable;
+          if (f_contable) {
+            const d = new Date(f_contable);
+            this.fechaUltimoAnticipo = isNaN(d.getTime())
+              ? "DD/MM/AAAA"
+              : `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+          } else {
+            this.fechaUltimoAnticipo = "DD/MM/AAAA";
+          }
+        }
+        this.cdr.detectChanges();
+        console.log("Movimientos sincronizados", this.movimientos);
+      },
+      error: (error) => {},
     });
   }
 }

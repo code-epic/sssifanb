@@ -32,6 +32,7 @@ export const environment = {
     LISTAR_REVISION_FIDEICOMITENTES: "IPSFA_CRevisionFidecomimites",
     OBTENER_BENEFICIARIO_DIRECTIVA_ID: "IPSFA_CBeneficiarioDirectivaID",
     LISTAR_TMP_AVIACION: "IPSFA_CTmpAviacion",
+    CONSULTAR_MOVIMIENTOS: "IPSFA_CMovimientosTipo",
   },
   subPath: {
     login: "wusuario/loginV2",
