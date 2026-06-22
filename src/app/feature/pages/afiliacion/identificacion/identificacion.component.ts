@@ -1959,7 +1959,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       autor: "Sandra",
       ciclo: "03MAR2026",
       cedula: cedula,
-      accion: "Parental",
+      accion: "track",
       directiva_id: directivaId,
     };
 

@@ -775,20 +775,21 @@
                                             <span class="font-weight-600 tracking-tight"
                                                 style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.asignacion_antiguedad || 0) | number:'1.2-2' }}</span>
                                         </li>
+                                         <li
+                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
+                                            <span class="font-weight-500"
+                                                style="font-size: 0.95rem; color: #64748b;">Capital en Banco</span>
+                                            <span class="font-weight-600 tracking-tight"
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.deposito_banco || 0) | number:'1.2-2' }}</span>
+                                        </li>
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <span class="font-weight-500"
                                                 style="font-size: 0.95rem; color: #64748b;">Depositado en Banco</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_aa || 0) | number:'1.2-2' }}</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.depositado_en_banco || 0) | number:'1.2-2' }}</span>
                                         </li>
-                                        <li
-                                            class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
-                                            <span class="font-weight-500"
-                                                style="font-size: 0.95rem; color: #64748b;">Capital en Banco</span>
-                                            <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.finiquito_capital_banco || 0) | number:'1.2-2' }}</span>
-                                        </li>
+                                       
                                         <li
                                             class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light">
                                             <span class="font-weight-500"
@@ -801,7 +802,7 @@
                                             <span class="font-weight-500"
                                                 style="font-size: 0.95rem; color: #64748b;">Diferencia A.A.</span>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.diferencia_asignacion || 0) | number:'1.2-2' }}</span>
+                                                style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.diferencia_asignacion || 0) | number:'1.2-2' }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -895,7 +896,7 @@
                                     <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Comisión de Servicio: {{ (calculosBunker?.movimientos?.comision_servicio || 0) | number:'1.2-2' }}</span>
                                     <span><i class="far fa-calendar-alt mr-2 opacity-50"></i>Monto Recuperado: {{ (calculosBunker?.movimientos?.monto_recuperado_activo || 0) | number:'1.2-2' }}</span>
                                     <span><i class="fas fa-plus-circle mr-2 opacity-50"></i>Medida Judicial: {{ (calculosBunker?.movimientos?.embargo || 0) | number:'1.2-2' }}</span>
-                                    <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: {{ (calculosBunker?.porcentaje || 0) | number:'1.2-2' }}</span>
+                                    <span><i class="fas fa-percentage mr-2 opacity-50"></i>Aportado: {{ (calculosBunker?.base?.porcentaje_cancelado || 0) | number:'1.2-2' }}</span>
                                 </div>
                             </div>
                         </div>

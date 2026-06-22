@@ -24,7 +24,9 @@
             "tsConfig": "src/tsconfig.app.json",
             "allowedCommonJsDependencies": [
               "chart.js",
-              "sweetalert2"
+              "sweetalert2",
+              "zstd-codec",
+              "uuid"
             ],
             "assets": [
               "src/favicon.ico",

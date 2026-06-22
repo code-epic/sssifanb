@@ -1,5 +1,5 @@
 
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, Injector, NgZone } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { from, Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
@@ -22,7 +22,7 @@ export class AuthInterceptorService implements HttpInterceptor {
 
 
   constructor(
-    private _login: LoginService,
+    private injector: Injector,
     private sha256: Sha256Service,
     private securityQueue: SecurityQueueService,
     private zone: NgZone
@@ -260,7 +260,8 @@ export class AuthInterceptorService implements HttpInterceptor {
     // }).then((result) => {
     //   this.isClosingSession = false;
     //   if (result.isConfirmed) {
-    this._login.logout();
+    const loginService = this.injector.get(LoginService);
+    loginService.logout();
     //   }
     // });
   }
