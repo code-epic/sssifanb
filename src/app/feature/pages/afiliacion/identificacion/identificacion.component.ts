@@ -1899,7 +1899,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     if (cedula && cedula.toString().trim() !== "") {
       this.isLoadingFoto = true;
       const payload = {
-        ruta: "imagenes/" + cedula + "/",
+        ruta: "img/temp/" + cedula + "/",
         archivo: "foto.jpg",
       };
       this.apiService.postBlob("dwscdn", payload).subscribe({
