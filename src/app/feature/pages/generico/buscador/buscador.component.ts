@@ -15,6 +15,8 @@ import { AfiListarComponent } from "../../afiliacion/afi-listar/afi-listar.compo
 import { SecurityQueueService } from "src/app/core/services/util/security-queue.service";
 import { Subscription } from "rxjs";
 import { environment } from "src/environments/environment";
+import { jwtDecode } from "jwt-decode";
+import { isArrayBuffer } from "util/types";
 
 @Component({
   selector: "app-buscador",
@@ -42,6 +44,7 @@ export class BuscadorComponent implements OnInit, OnDestroy {
   public isLoading: boolean = false;
   public errorMessage: string = "";
   public militares: IAfiliado[] = [];
+  public componenteCodigo: string = "";
 
   constructor(
     private apiService: ApiService,
@@ -119,25 +122,47 @@ export class BuscadorComponent implements OnInit, OnDestroy {
     if (isNumeric) {
       this.buscarCedula(valor);
     } else {
-      this.buscarCadena(valor);
+      if (this.getCargo() == "") {
+        this.buscarCadena(valor);
+      } else {
+        this.isLoading = false;
+        this.militares = [];
+      }
     }
   }
 
   buscarCedula(cedula: string) {
-    const payload = {
-      funcion: environment.funcion.CONSULTAR_IDENTIFICACION_MILITAR,
-      parametros: cedula,
-    };
+    let payload = {};
+    if (this.getCargo() != "") {
+      payload = {
+        funcion:
+          environment.funcion.CONSULTAR_IDENTIFICACION_MILITAR_COMPONENTE,
+        parametros: `${cedula},${this.getCargo()}`,
+      };
+    } else {
+      payload = {
+        funcion: environment.funcion.CONSULTAR_IDENTIFICACION_MILITAR,
+        parametros: cedula,
+      };
+    }
+
     this.militares = [];
     sessionStorage.removeItem("buscador_session"); // Clear session on direct ID search
     this.apiService.post("crud", payload).subscribe({
       next: (data: IAfiliado) => {
         this.isLoading = false;
         if (data) {
-          this.afiliadoService.setAfiliado(data);
-          this.router.navigate(["/afiliacion/identificacion"]);
-        } else {
-          this.errorMessage = "No se encontró el afiliado.";
+          if (this.getCargo() == "") {
+            this.afiliadoService.setAfiliado(data);
+            this.router.navigate(["/afiliacion/identificacion"]);
+          } else {
+            if (Array.isArray(data) && data.length > 0) {
+              this.afiliadoService.setAfiliado(data);
+              this.router.navigate(["/afiliacion/identificacion"]);
+            } else {
+              this.buscar = "";
+            }
+          }
         }
       },
       error: (error) => {
@@ -190,5 +215,59 @@ export class BuscadorComponent implements OnInit, OnDestroy {
 
   open(content) {
     this.modalService.open(content, { size: "lg" });
+  }
+
+  getCargo(): string {
+    let cargo = "";
+
+    if (this.loginService && this.loginService.Usuario) {
+      const u = this.loginService.Usuario;
+      cargo =
+        u.cargo ||
+        u.denominacion ||
+        u.descripcion ||
+        (u.Perfil && u.Perfil.descripcion) ||
+        "";
+    }
+
+    if (!cargo) {
+      const tokenStr = sessionStorage.getItem("token");
+      if (tokenStr) {
+        try {
+          const decoded: any = jwtDecode(tokenStr);
+          const usr = decoded?.Usuario || decoded || {};
+          cargo =
+            usr.cargo ||
+            usr.denominacion ||
+            usr.descripcion ||
+            (usr.Perfil && usr.Perfil.descripcion) ||
+            "";
+        } catch (e) {
+          console.error("Error decoding token for bienvenidos text:", e);
+        }
+      }
+    }
+
+    if (cargo) {
+      const cargoUpper = cargo.toUpperCase();
+      if (cargoUpper.includes("EJÉRCITO") || cargoUpper.includes("EJERCITO")) {
+        return "EJ";
+      } else if (cargoUpper.includes("ARMADA")) {
+        return "AN";
+      } else if (
+        cargoUpper.includes("AVIACIÓN") ||
+        cargoUpper.includes("AVIACION")
+      ) {
+        return "AV";
+      } else if (
+        cargoUpper.includes("GUARDIA") ||
+        cargoUpper.includes("GNB") ||
+        cargoUpper.includes("G.N.")
+      ) {
+        return "GN";
+      }
+    }
+
+    return "";
   }
 }

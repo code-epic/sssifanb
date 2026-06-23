@@ -105,6 +105,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public isBunkerSync: boolean = false;
   public observaciones: FormControl<any> = new FormControl("");
   public calculosBunker: any = null;
+  public permisos: { [key: string]: boolean } = {};
 
   constructor(
     private layoutService: LayoutService,
@@ -257,6 +258,22 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           this.initMessagePort();
         }
       });
+
+    this.cargarPermisologia();
+  }
+
+  cargarPermisologia() {
+    let privilegios = this.loginService.obtenerPrivilegiosMenu("/principal");
+    console.log(privilegios);
+    if (privilegios) {
+      Object.keys(privilegios).forEach((key) => {
+        privilegios[key].forEach((p: any) => {
+          if (p.codigo) {
+            this.permisos[p.codigo] = true;
+          }
+        });
+      });
+    }
   }
 
   public onComponenteChange(compAbreviatura: string) {
@@ -2008,31 +2025,36 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         this.calculosBunker = JSON.parse(newContent)[0];
         this.isBunkerSync = true;
 
-        if (
-          this.calculosBunker &&
-          this.calculosBunker.status_id !== undefined
-        ) {
-          const datobasico = this.identificacionForm.get(
-            "persona.datobasico",
-          ) as FormGroup;
-          if (datobasico) {
-            datobasico
-              .get("estatus")
-              ?.setValue(String(this.calculosBunker.status_id));
+        if (this.calculosBunker && this.calculosBunker.base) {
+          if (this.calculosBunker.base.status_id !== undefined) {
+            const datobasico = this.identificacionForm.get(
+              "persona.datobasico",
+            ) as FormGroup;
+            if (datobasico) {
+              datobasico
+                .get("estatus")
+                ?.setValue(String(this.calculosBunker.base.status_id));
+            }
+          } else if (this.calculosBunker.status_id !== undefined) {
+            // Fallback en caso de que venga en la raíz
+            const datobasico = this.identificacionForm.get(
+              "persona.datobasico",
+            ) as FormGroup;
+            if (datobasico) {
+              datobasico
+                .get("estatus")
+                ?.setValue(String(this.calculosBunker.status_id));
+            }
           }
-        }
 
-        if (
-          this.calculosBunker &&
-          this.calculosBunker.base &&
-          this.calculosBunker.base.n_hijos !== undefined
-        ) {
-          this.identificacionForm
-            .get("numerohijos")
-            ?.setValue(this.calculosBunker.base.n_hijos);
-          this.identificacionForm
-            .get("pprof")
-            ?.setValue(this.calculosBunker.base.st_profesion);
+          if (this.calculosBunker.base.n_hijos !== undefined) {
+            this.identificacionForm
+              .get("numerohijos")
+              ?.setValue(this.calculosBunker.base.n_hijos);
+            this.identificacionForm
+              .get("pprof")
+              ?.setValue(this.calculosBunker.base.st_profesion);
+          }
         }
 
         this.cdr.detectChanges();

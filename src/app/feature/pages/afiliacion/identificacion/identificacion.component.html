@@ -350,14 +350,14 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" [class.active]="currentTab === 'sueldo'" (click)="switchTab('sueldo')">
+                <a class="nav-link" *ngIf="permisos['fiddatossueldo']" [class.active]="currentTab === 'sueldo'" (click)="switchTab('sueldo')">
                     <i class="fas fa-money-bill-wave"></i>
                     <span class="d-none d-xxl-inline">Datos Sueldo</span>
                     <span class="d-inline d-xxl-none">Sueldo</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" [class.active]="currentTab === 'antiguedad'" (click)="switchTab('antiguedad')">
+                <a class="nav-link" *ngIf="permisos['fidasignaciones']" [class.active]="currentTab === 'antiguedad'" (click)="switchTab('antiguedad')">
                     <i class="fas fa-piggy-bank"></i>
                     <span class="d-none d-xxl-inline">Asignaciones</span>
                     <span class="d-inline d-xxl-none">Asignaciones</span>
@@ -388,7 +388,7 @@
             <div class="card-body">
 
                 <!-- MILITAR (Root level fields) -->
-                <div *ngIf="currentTab === 'militar'" class="fade-in">
+                <div   *ngIf="currentTab === 'militar'" class="fade-in">
                     <!-- Fila 1: Fecha Ingreso, Componente, Grado -->
                     <div class="row">
                         <div class="col-md-3">
@@ -1318,15 +1318,15 @@
     <div class="card shadow-none bg-transparent border-0 mb-4">
         <div class="row">
             <div class="col text-right d-flex justify-content-end align-items-center">
-                <button type="button" class="btn-header-action blue mr-3 shadow-none"
+                <button *ngIf="permisos['benconsultarnetos']" type="button" class="btn-header-action blue mr-3 shadow-none"
                     (click)="openModalConsultarNetos(modalConsultarNetos)">
                     <i class="fas fa-money-bill-wave"></i> Consultar Netos
                 </button>
-                <button type="button" class="btn-header-action amber mr-3 shadow-none"
+                <button *ngIf="permisos['bencreartim']" type="button" class="btn-header-action amber mr-3 shadow-none"
                     (click)="openModalEmitirTIM(modalEmitirTIM)">
                     <i class="fas fa-id-card"></i> Emitir TIM
                 </button>
-                <button type="button" class="btn-header-action teal shadow-none"
+                <button *ngIf="permisos['bencrear']" type="button" class="btn-header-action teal shadow-none"
                     (click)="openModalConfirmarGuardar(modalConfirmarGuardar)">
                     <i class="fas fa-save"></i> Guardar Cambios
                 </button>
@@ -1341,7 +1341,7 @@
         <h3 class="mb-0 text-dark font-weight-bold">
             <i class="fas fa-users mr-2 text-verde-titulos"></i>Grupo Familiar
         </h3>
-        <button class="btn-pastel-icon pastel-success shadow-sm" type="button"
+        <button *ngIf="permisos['bennuevofamiliar']" class="btn-pastel-icon pastel-success shadow-sm" type="button"
             (click)="openModalAgregarFamiliar(modalAgregarFamiliar)" title="Agregar Familiar">
             <i class="fas fa-plus"></i>
         </button>
