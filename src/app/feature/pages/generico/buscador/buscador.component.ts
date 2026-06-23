@@ -16,7 +16,6 @@ import { SecurityQueueService } from "src/app/core/services/util/security-queue.
 import { Subscription } from "rxjs";
 import { environment } from "src/environments/environment";
 import { jwtDecode } from "jwt-decode";
-import { isArrayBuffer } from "util/types";
 
 @Component({
   selector: "app-buscador",

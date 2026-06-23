@@ -37,8 +37,9 @@
                                     <span class="text-danger">{{ fechaVencimientoTIM | date:'dd/MM/yyyy' }}</span>
                                 </div>
                                 <!-- Botón de Impresión de Documentos -->
-                                <div class="dropdown" [class.show]="showPrintDropdown" *ngIf="tiempoServicio">
+                                <div class="dropdown" [class.show]="showPrintDropdown" *ngIf="tiempoServicio" >
                                     <button
+                                        *ngIf="getCargo() == '' "
                                         class="btn btn-sm shadow-sm dropdown-toggle-no-caret d-flex align-items-center justify-content-center"
                                         type="button" id="printDocsDropdown"
                                         (click)="showPrintDropdown = !showPrintDropdown; $event.stopPropagation()"
@@ -90,7 +91,7 @@
                                             <i class="fas fa-file-invoice-dollar mr-3 opacity-75"
                                                 style="width: 20px; text-align: center;"></i> Constancia de ARC
                                         </a>
-                                        <a class="dropdown-item" [class.disabled]="!isBunkerSync" [class.text-muted]="!isBunkerSync" href="javascript:void(0)" (click)="isBunkerSync && imprimirDocumento('hoja_vida', $event)">
+                                        <a  *ngIf="permisos['benconsultarnetos']" class="dropdown-item" [class.disabled]="!isBunkerSync" [class.text-muted]="!isBunkerSync" href="javascript:void(0)" (click)="isBunkerSync && imprimirDocumento('hoja_vida', $event)">
                                             <i class="fas fa-file-pdf mr-2" [class.text-danger]="isBunkerSync" style="width: 20px; text-align: center;"></i> Hoja de Vida
                                             <span *ngIf="!isBunkerSync" class="ml-2 badge badge-warning"><i class="fas fa-spinner fa-spin"></i></span>
                                         </a>

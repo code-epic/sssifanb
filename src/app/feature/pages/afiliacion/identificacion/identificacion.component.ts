@@ -26,6 +26,7 @@ import { EstatusBeneficiarioService } from "src/app/core/services/estatus/estatu
 import { environment } from "src/environments/environment";
 import { ApiService } from "src/app/core/services/api.service";
 import { UtilService } from "src/app/core/services/util/util.service";
+import { jwtDecode } from "jwt-decode";
 
 import * as pdfMake from "pdfmake/build/pdfmake";
 const pdfFonts = require("pdfmake/build/vfs_fonts");
@@ -2096,5 +2097,59 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       },
       error: (error) => {},
     });
+  }
+
+  getCargo(): string {
+    let cargo = "";
+
+    if (this.loginService && this.loginService.Usuario) {
+      const u = this.loginService.Usuario;
+      cargo =
+        u.cargo ||
+        u.denominacion ||
+        u.descripcion ||
+        (u.Perfil && u.Perfil.descripcion) ||
+        "";
+    }
+
+    if (!cargo) {
+      const tokenStr = sessionStorage.getItem("token");
+      if (tokenStr) {
+        try {
+          const decoded: any = jwtDecode(tokenStr);
+          const usr = decoded?.Usuario || decoded || {};
+          cargo =
+            usr.cargo ||
+            usr.denominacion ||
+            usr.descripcion ||
+            (usr.Perfil && usr.Perfil.descripcion) ||
+            "";
+        } catch (e) {
+          console.error("Error decoding token for bienvenidos text:", e);
+        }
+      }
+    }
+
+    if (cargo) {
+      const cargoUpper = cargo.toUpperCase();
+      if (cargoUpper.includes("EJÉRCITO") || cargoUpper.includes("EJERCITO")) {
+        return "EJ";
+      } else if (cargoUpper.includes("ARMADA")) {
+        return "AR";
+      } else if (
+        cargoUpper.includes("AVIACIÓN") ||
+        cargoUpper.includes("AVIACION")
+      ) {
+        return "AV";
+      } else if (
+        cargoUpper.includes("GUARDIA") ||
+        cargoUpper.includes("GNB") ||
+        cargoUpper.includes("G.N.")
+      ) {
+        return "GN";
+      }
+    }
+
+    return "";
   }
 }
