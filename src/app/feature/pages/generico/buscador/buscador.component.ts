@@ -253,7 +253,7 @@ export class BuscadorComponent implements OnInit, OnDestroy {
       if (cargoUpper.includes("EJÉRCITO") || cargoUpper.includes("EJERCITO")) {
         return "EJ";
       } else if (cargoUpper.includes("ARMADA")) {
-        return "AN";
+        return "AR";
       } else if (
         cargoUpper.includes("AVIACIÓN") ||
         cargoUpper.includes("AVIACION")
