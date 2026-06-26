@@ -40,6 +40,7 @@ export class AdminLayoutComponent implements OnInit {
   public pagina: string = '';
   public showCards: boolean = true;
   public isBlurActive: boolean = false;
+  public isBusqueda: boolean = false;
 
   public headerConfig: IHeaderConfig;
 
@@ -108,6 +109,7 @@ export class AdminLayoutComponent implements OnInit {
         
         if (cargo && (cargo.toUpperCase().includes('BUSQUEDA') || cargo.toUpperCase().includes('BÚSQUEDA'))) {
           this.layoutService.toggleCards(false);
+          this.isBusqueda = true;
         }
       } catch (e) {
         console.error('Error decoding token:', e);
