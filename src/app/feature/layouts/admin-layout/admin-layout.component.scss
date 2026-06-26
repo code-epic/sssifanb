@@ -31,6 +31,11 @@ app-navbar {
     &.header-compact {
         padding-bottom: 4.5rem !important;
     }
+
+    &.header-busqueda {
+        padding-bottom: 2rem !important;
+        padding-top: 4.5rem !important;
+    }
 }
 
 // Estilo de Tarjetas Superiores (Stats)
