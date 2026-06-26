@@ -1,26 +1,26 @@
-// Host fills full viewport — prevents any body/html background from showing
+// Host fills full viewport — display block so it stretches to fill its parent
 :host {
   display: block;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
+// The layout uses a flex-column structure so the header is sticky at the top
+// and the body-content is the ONLY scrollable element.
+// This is the correct pattern for iOS Safari (position:fixed inside overflow containers
+// breaks on iOS — sticky on a flex child does NOT have this problem).
 .mobile-layout-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
   width: 100vw;
-  position: relative;
-  overflow: hidden;
-  // No background here — each child page sets its own background
+  height: 100vh;
+  height: 100dvh;           // Dynamic viewport height (respects iOS address bar)
+  overflow: hidden;          // Clip at wrapper — only .mobile-body-content scrolls
   font-family: 'Nunito', sans-serif;
   box-sizing: border-box;
 
   &.active-blur {
-    .mobile-body-content, .mobile-top-header, .mobile-bottom-navbar {
+    .mobile-body-content, .mobile-top-header {
       filter: blur(5px);
       pointer-events: none;
       transition: filter 0.3s ease;
@@ -28,17 +28,19 @@
   }
 }
 
-// Fixed Top Header (SSSIFANB Green Theme)
+// Sticky Top Header — uses position sticky inside flex-column (iOS-safe)
+// Note: NOT position:fixed. The header is the first flex child,
+// so it stays at top while .mobile-body-content scrolls below it.
 .mobile-top-header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;            // Never compress — always 60px tall
   height: 60px;
   background: linear-gradient(135deg, #598c89 0%, #3a5c5a 100%) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   z-index: 1010;
+  box-sizing: border-box;
 
   .header-title {
     font-size: 0.95rem;
@@ -80,22 +82,23 @@
   }
 }
 
-// Scrollable Body Content
+// Scrollable Body Content — this is the ONLY element that scrolls
+// No padding-top needed because header is a flex sibling, not position:fixed
 .mobile-body-content {
-  flex: 1;
-  overflow-y: auto;
-  padding-top: 60px; // Offset for Top Header
-  padding-bottom: 24px; // Offset without Bottom Nav
+  flex: 1;                          // Takes remaining height after the header
+  overflow-y: auto;                 // Only this scrolls
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   width: 100%;
   box-sizing: border-box;
-  -webkit-overflow-scrolling: touch;
-  background-color: #eef5f3; // Background only here, not on wrapper
+  background-color: #eef5f3;
+
+  // No padding-top here — the header is a flex sibling, not position:fixed
+  // padding-bottom for comfortable last-item breathing room
+  padding-bottom: 24px;
 
   &.full-page {
-    padding-top: 0 !important;
     padding-bottom: 0 !important;
-    background-color: transparent; // Let the child page (login) control its bg
-    overflow-y: auto;
-    height: 100%;
+    background-color: transparent; // Login/logout control their own background
   }
 }
