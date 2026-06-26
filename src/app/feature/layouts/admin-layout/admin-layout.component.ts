@@ -10,6 +10,7 @@ import { GlassCardComponent } from '../../../shared/components/glass-card/glass-
 
 import { LayoutService, IHeaderConfig } from 'src/app/core/services/layout/layout.service';
 import { AfiliadoService } from 'src/app/core/services/afiliacion/afiliado.service';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-admin-layout',
@@ -97,6 +98,21 @@ export class AdminLayoutComponent implements OnInit {
   ngOnInit() {
     const pagina = this.ruta.url.split("/") // Fix previous logic assumption if possible, but keeping it
     this.pagina = pagina[1] ? pagina[1].toUpperCase() : ''
+
+    const tokenStr = sessionStorage.getItem('token');
+    if (tokenStr) {
+      try {
+        const decoded: any = jwtDecode(tokenStr);
+        const usr = decoded?.Usuario || decoded || {};
+        const cargo = usr.cargo || usr.denominacion || usr.descripcion || (usr.Perfil && usr.Perfil.descripcion) || '';
+        
+        if (cargo && (cargo.toUpperCase().includes('BUSQUEDA') || cargo.toUpperCase().includes('BÚSQUEDA'))) {
+          this.layoutService.toggleCards(false);
+        }
+      } catch (e) {
+        console.error('Error decoding token:', e);
+      }
+    }
 
     this.msj.contenido$.subscribe(e => {
       console.log(e)
