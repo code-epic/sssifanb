@@ -47,7 +47,7 @@
         <div *ngFor="let step of steps" class="logout-step-row d-flex align-items-center py-2">
           
           <!-- Status icon selector -->
-          <span class="step-status-icon me-3">
+          <span class="step-status-icon mr-3">
             <i class="far fa-circle text-muted" *ngIf="step.status === 'pending'"></i>
             <i class="fas fa-circle-notch fa-spin text-teal" *ngIf="step.status === 'in-progress'"></i>
             <i class="fas fa-check-circle text-success" *ngIf="step.status === 'done'"></i>

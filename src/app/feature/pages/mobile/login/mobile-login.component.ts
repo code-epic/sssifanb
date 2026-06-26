@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Inject, ElementRef, ViewChildren, QueryList } from "@angular/core";
+import { Component, OnInit, OnDestroy, Inject, ElementRef, ViewChildren, QueryList, HostListener } from "@angular/core";
 import { Router } from "@angular/router";
 import { CommonModule, DatePipe, DOCUMENT } from "@angular/common";
 import { FormsModule } from "@angular/forms";
@@ -21,6 +21,11 @@ export class MobileLoginComponent implements OnInit, OnDestroy {
   public fecha: string = "";
   public version: string = "";
   public fechafinal: string = "";
+
+  public screenHeight: number = window.innerHeight;
+  public screenWidth: number = window.innerWidth;
+  public isKeyboardOpen: boolean = false;
+  private initialHeight: number = window.innerHeight;
 
   public usuario: string = "";
   public clave: string = "";
@@ -63,6 +68,10 @@ export class MobileLoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.screenHeight = window.innerHeight;
+    this.screenWidth = window.innerWidth;
+    this.initialHeight = window.innerHeight;
+
     this.version = environment.version;
     this.fechafinal = environment.buildDateTime;
 
@@ -70,6 +79,32 @@ export class MobileLoginComponent implements OnInit, OnDestroy {
     this.timerInterval = setInterval(() => {
       this.updateTime();
     }, 1000);
+  }
+
+  @HostListener("window:resize", ["$event"])
+  onResize(event: any): void {
+    this.screenHeight = window.innerHeight;
+    this.screenWidth = window.innerWidth;
+
+    // Detect if keyboard is open by measuring dynamic height reduction (threshold of 150px)
+    if (this.initialHeight - this.screenHeight > 150) {
+      this.isKeyboardOpen = true;
+    } else {
+      this.isKeyboardOpen = false;
+      if (this.screenHeight > this.initialHeight) {
+        this.initialHeight = this.screenHeight;
+      }
+    }
+  }
+
+  get sizeClass(): string {
+    if (this.screenHeight >= 800) {
+      return "size-tall";
+    } else if (this.screenHeight >= 680) {
+      return "size-medium";
+    } else {
+      return "size-short";
+    }
   }
 
   ngOnDestroy(): void {

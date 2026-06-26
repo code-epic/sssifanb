@@ -1,11 +1,21 @@
+// Host fills full viewport — prevents any body/html background from showing
+:host {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
 .mobile-layout-wrapper {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   position: relative;
   overflow: hidden;
-  background-color: #eef5f3;
+  // No background here — each child page sets its own background
   font-family: 'Nunito', sans-serif;
   box-sizing: border-box;
 
@@ -79,9 +89,13 @@
   width: 100%;
   box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
+  background-color: #eef5f3; // Background only here, not on wrapper
 
   &.full-page {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    background-color: transparent; // Let the child page (login) control its bg
+    overflow-y: auto;
+    height: 100%;
   }
 }

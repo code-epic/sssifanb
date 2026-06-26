@@ -51,7 +51,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
   public fotosMilitares: { [cedula: string]: string } = {};
 
   // Pagination properties
-  public pageSize: number = 8;
+  public pageSize: number = 6;
   public currentPage: number = 1;
 
   public get totalPages(): number {
@@ -142,6 +142,12 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
 
   consultar(event?: any): void {
     if (event) event.preventDefault();
+    
+    // Dismiss virtual keyboard on mobile devices
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
     this.errorMessage = "";
 
     const inputVal = this.validarEntrada(this.buscar);

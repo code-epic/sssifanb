@@ -1,7 +1,17 @@
+// Host element must be block so it fills 100% of the parent layout container
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, #1f3735 0%, #3d6662 100%);
+}
+
 .mobile-login-wrapper {
   position: relative;
   width: 100%;
   min-height: 100vh;
+  min-height: 100dvh;
   min-height: -webkit-fill-available;
   background: linear-gradient(135deg, #1f3735 0%, #3d6662 100%);
   overflow-y: auto;
@@ -10,6 +20,7 @@
   align-items: center;
   font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 // Glowing background circles for visual depth (Premium Glassmorphism)
@@ -35,7 +46,9 @@
   flex-direction: column;
   justify-content: space-between;
   min-height: 100vh;
+  min-height: 100dvh;
   box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 // Clock & Date Header (Visual priority, now contrasting on dark background)
@@ -358,4 +371,167 @@
 @keyframes successPop {
   from { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
   to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+// Responsive layout scaling based on window size and keyboard states
+.mobile-login-wrapper {
+  // Tall screens (height >= 800px)
+  &.size-tall {
+    .mobile-login-container {
+      padding: 3rem 1.8rem;
+    }
+    .mobile-clock-header {
+      margin-top: 3rem;
+      margin-bottom: 3.5rem;
+      .mobile-time {
+        font-size: 3.2rem;
+      }
+      .mobile-date {
+        font-size: 0.78rem;
+      }
+    }
+    .mobile-login-card {
+      padding: 3rem 2rem;
+      border-radius: 32px;
+    }
+    .mobile-logo img {
+      height: 65px;
+    }
+  }
+
+  // Medium screens (680px <= height < 800px)
+  &.size-medium {
+    .mobile-login-container {
+      padding: 2.2rem 1.6rem;
+    }
+    .mobile-clock-header {
+      margin-top: 1.8rem;
+      margin-bottom: 2.8rem;
+      .mobile-time {
+        font-size: 2.8rem;
+      }
+      .mobile-date {
+        font-size: 0.72rem;
+      }
+    }
+    .mobile-login-card {
+      padding: 2.5rem 1.8rem;
+      border-radius: 28px;
+    }
+    .mobile-logo img {
+      height: 60px;
+    }
+  }
+
+  // Short screens (height < 680px)
+  &.size-short {
+    .mobile-login-container {
+      padding: 1rem 1.2rem;
+    }
+    .mobile-clock-header {
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      .mobile-time {
+        font-size: 2.2rem;
+        margin-bottom: 0.15rem;
+      }
+      .mobile-date {
+        font-size: 0.65rem;
+      }
+    }
+    .mobile-login-card {
+      padding: 1.8rem 1.4rem;
+      border-radius: 20px;
+    }
+    .mobile-logo {
+      margin-bottom: 1rem !important;
+      img {
+        height: 48px;
+      }
+      .mobile-logo-title {
+        font-size: 1rem;
+        margin-top: 0.25rem !important;
+      }
+    }
+    .mobile-card-subtitle {
+      margin-bottom: 1rem !important;
+    }
+    .mobile-form-group {
+      margin-bottom: 0.8rem !important;
+    }
+    .mobile-input-wrapper {
+      height: 48px;
+      border-radius: 12px;
+    }
+    .btn-mobile-primary {
+      height: 48px;
+      padding-top: 0.8rem !important;
+      padding-bottom: 0.8rem !important;
+    }
+    .mobile-login-footer {
+      margin-top: 1rem !important;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  // Override when virtual keyboard is active (viewport shrinks significantly)
+  &.keyboard-open {
+    align-items: flex-start;
+    
+    .mobile-login-container {
+      padding: 0.5rem 1rem;
+      justify-content: center;
+      min-height: auto;
+      height: 100%;
+    }
+
+    .mobile-clock-header {
+      display: none !important;
+    }
+
+    .mobile-login-card {
+      padding: 1.2rem 1.2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .mobile-logo {
+      margin-bottom: 0.5rem !important;
+      img {
+        height: 36px;
+      }
+      .mobile-logo-title {
+        font-size: 0.95rem;
+        margin-top: 0.15rem !important;
+      }
+    }
+
+    .mobile-card-subtitle {
+      display: none !important;
+    }
+
+    .mobile-form-group {
+      margin-bottom: 0.6rem !important;
+    }
+
+    .mobile-input-wrapper {
+      height: 44px;
+      border-radius: 10px;
+      padding: 0 0.8rem;
+    }
+
+    .d-grid {
+      margin-top: 0.8rem !important;
+    }
+
+    .btn-mobile-primary {
+      height: 44px;
+      padding-top: 0.6rem !important;
+      padding-bottom: 0.6rem !important;
+    }
+
+    .mobile-login-footer {
+      display: none !important;
+    }
+  }
 }
