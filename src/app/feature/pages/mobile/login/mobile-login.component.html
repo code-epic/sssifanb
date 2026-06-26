@@ -1,0 +1,118 @@
+<div class="mobile-login-wrapper">
+  
+  <!-- Subtle Gradient Background -->
+  <div class="mobile-bg-glow"></div>
+
+  <div class="mobile-login-container">
+    
+    <!-- Prominent Clock & Date Header (Important for Mobile) -->
+    <div class="mobile-clock-header text-center">
+      <div class="mobile-time">{{ time | date: 'hh:mm:ss a' }}</div>
+      <div class="mobile-date">{{ time | date: 'EEEE, d \'de\' MMMM, yyyy' : '' : 'es' | uppercase }}</div>
+    </div>
+
+    <!-- Main Glassmorphic Card -->
+    <div class="mobile-login-card shadow-premium">
+      
+      <!-- Brand Logo -->
+      <div class="mobile-logo text-center mb-4">
+        <img src="./assets/img/ipsfa/logo.webp" alt="Logo SSSIFANB" class="img-fluid">
+        <h5 class="mobile-logo-title mt-2">SSSIFANB</h5>
+      </div>
+
+      <ng-container *ngIf="!showTotpSection; else totpSection">
+        <h6 class="mobile-card-subtitle text-center mb-4">INICIO DE SESIÓN</h6>
+        
+        <form (ngSubmit)="login()">
+          <!-- Username Input Group -->
+          <div class="mobile-form-group mb-3">
+            <div class="mobile-input-wrapper">
+              <span class="mobile-input-icon"><i class="fas fa-user"></i></span>
+              <input type="text" class="mobile-input-control" placeholder="Nombre de Usuario"
+                     [(ngModel)]="usuario" name="usuario" autocomplete="username" required>
+            </div>
+          </div>
+
+          <!-- Password Input Group -->
+          <div class="mobile-form-group mb-4">
+            <div class="mobile-input-wrapper">
+              <span class="mobile-input-icon"><i class="fas fa-lock"></i></span>
+              <input [type]="isHidden ? 'password' : 'text'" class="mobile-input-control" placeholder="Contraseña"
+                     [(ngModel)]="clave" name="clave" autocomplete="current-password" required>
+              <button type="button" class="mobile-input-toggle border-0 bg-transparent" (click)="isHidden = !isHidden">
+                <i class="fas" [ngClass]="isHidden ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-mobile-primary py-3 rounded-12 shadow-premium font-weight-bold" 
+                    [disabled]="loading || !usuario || !clave">
+              <span *ngIf="!loading">INGRESAR <i class="fas fa-arrow-right ms-2"></i></span>
+              <span *ngIf="loading"><i class="fas fa-circle-notch fa-spin me-2"></i> VERIFICANDO...</span>
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <!-- Dynamic Security Code (TOTP) Section -->
+      <ng-template #totpSection>
+        <div class="mobile-totp-wrapper text-center">
+          <div class="mobile-totp-icon mb-3">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h6 class="font-weight-bold text-dark mb-2">Verificación de Identidad</h6>
+          <p class="text-muted small mb-4">
+            Ingrese el código dinámico generado por su aplicación de seguridad.
+          </p>
+
+          <!-- 6-Digit OTP Boxes -->
+          <div class="mobile-otp-container" [class.shake-anim]="isOtpInvalid">
+            <div class="mobile-otp-inputs">
+              <input #otpInput *ngFor="let cell of otp; let idx = index" 
+                     type="tel" class="mobile-otp-box" maxlength="1"
+                     (input)="onInput($event, idx)" (keydown)="onKeydown($event, idx)" (paste)="onPaste($event)">
+            </div>
+            <div *ngIf="isOtpInvalid" class="text-danger small mt-2 font-weight-bold">
+              Código incorrecto
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button class="btn btn-mobile-link text-muted" (click)="goBackToLogin()">
+              <i class="fas fa-arrow-left me-1"></i> Cancelar
+            </button>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
+
+    <!-- App Version & Copyright Footer -->
+    <div class="mobile-login-footer text-center mt-4">
+      <small class="d-block text-muted">&copy; {{ fecha }} SSSIFANB</small>
+      <small class="text-muted-light">Versión {{ version }}</small>
+    </div>
+
+  </div>
+
+  <!-- Fullscreen Glassmorphic Loader Overlay -->
+  <div class="mobile-loader-overlay d-flex align-items-center justify-content-center" *ngIf="verifying">
+    <div class="mobile-loader-card text-center p-4">
+      <div class="mobile-loader-icon mb-3">
+        <i class="fas fa-shield-alt icon-bg"></i>
+        <i class="fas fa-lock active-lock" *ngIf="!verified"></i>
+        <i class="fas fa-check-circle success-lock" *ngIf="verified"></i>
+      </div>
+      <h6 class="font-weight-bold mb-1" [class.text-success]="verified">
+        {{ verified ? 'ACCESO AUTORIZADO' : 'VERIFICANDO CREDENCIALES' }}
+      </h6>
+      <p class="text-muted small mb-0" *ngIf="!verified">
+        Espere un momento por favor...
+      </p>
+      <div class="spinner-border spinner-border-sm text-teal mt-3" *ngIf="!verified" role="status"></div>
+    </div>
+  </div>
+
+</div>

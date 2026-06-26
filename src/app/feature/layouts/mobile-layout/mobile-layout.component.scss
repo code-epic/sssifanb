@@ -1,0 +1,87 @@
+.mobile-layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  background-color: #eef5f3;
+  font-family: 'Nunito', sans-serif;
+  box-sizing: border-box;
+
+  &.active-blur {
+    .mobile-body-content, .mobile-top-header, .mobile-bottom-navbar {
+      filter: blur(5px);
+      pointer-events: none;
+      transition: filter 0.3s ease;
+    }
+  }
+}
+
+// Fixed Top Header (SSSIFANB Green Theme)
+.mobile-top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(135deg, #598c89 0%, #3a5c5a 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 1010;
+
+  .header-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.2px;
+  }
+
+  .brand-logo-img {
+    height: 34px;
+    width: auto;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  }
+
+  .btn-header-action {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+    outline: none;
+
+    &:active {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  .avatar-header {
+    color: #ffffff;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+  }
+}
+
+// Scrollable Body Content
+.mobile-body-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 60px; // Offset for Top Header
+  padding-bottom: 24px; // Offset without Bottom Nav
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+
+  &.full-page {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}

@@ -1,0 +1,361 @@
+.mobile-login-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  background: linear-gradient(135deg, #1f3735 0%, #3d6662 100%);
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+}
+
+// Glowing background circles for visual depth (Premium Glassmorphism)
+.mobile-bg-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  background: radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 45%),
+              radial-gradient(circle at 85% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 45%);
+}
+
+.mobile-login-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+// Clock & Date Header (Visual priority, now contrasting on dark background)
+.mobile-clock-header {
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
+
+  .mobile-time {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 0.35rem;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  }
+
+  .mobile-date {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #b2dfdb;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Main Glass Card
+.mobile-login-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 28px;
+  padding: 2.5rem 1.8rem;
+  box-shadow: 0 20px 45px rgba(89, 140, 137, 0.06);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+// Logo & Brand Header
+.mobile-logo {
+  img {
+    height: 60px;
+    width: auto;
+    filter: drop-shadow(0 6px 12px rgba(89, 140, 137, 0.15));
+  }
+  
+  .mobile-logo-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #455a64;
+    letter-spacing: 2px;
+  }
+}
+
+.mobile-card-subtitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #78909c;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+// Form Elements (Touch & Thumb optimized)
+.mobile-form-group {
+  position: relative;
+  width: 100%;
+}
+
+.mobile-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(89, 140, 137, 0.04);
+  border: 1.5px solid rgba(89, 140, 137, 0.08);
+  border-radius: 16px;
+  height: 54px;
+  padding: 0 1rem;
+  transition: all 0.3s ease;
+
+  &:focus-within {
+    border-color: #598c89;
+    background: #ffffff;
+    box-shadow: 0 10px 20px rgba(89, 140, 137, 0.06);
+  }
+
+  .mobile-input-icon {
+    color: #598c89;
+    font-size: 1rem;
+    margin-right: 0.75rem;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-input-control {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #37474f;
+    font-size: 0.95rem;
+    font-weight: 600;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    outline: none;
+
+    &::placeholder {
+      color: #90a4ae;
+      font-weight: 500;
+    }
+  }
+
+  .mobile-input-toggle {
+    color: #90a4ae;
+    padding: 0 0.25rem;
+    outline: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+}
+
+// Primary Tactile Button
+.btn-mobile-primary {
+  background: linear-gradient(135deg, #598c89 0%, #4a7572 100%);
+  color: #ffffff;
+  border: none;
+  height: 54px;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover, &:focus {
+    color: #ffffff;
+    background: linear-gradient(135deg, #629a97 0%, #598c89 100%);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    background: #cbd5e0;
+    opacity: 0.6;
+    box-shadow: none;
+  }
+}
+
+// TOTP Validation styles
+.mobile-totp-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(89, 140, 137, 0.1);
+  color: #598c89;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.mobile-otp-inputs {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 1rem;
+}
+
+.mobile-otp-box {
+  width: 44px;
+  height: 48px;
+  background: rgba(89, 140, 137, 0.03);
+  border: 1.5px solid rgba(89, 140, 137, 0.1);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #37474f;
+  outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    background: #ffffff;
+    border-color: #598c89;
+    box-shadow: 0 4px 12px rgba(89, 140, 137, 0.12);
+  }
+}
+
+.btn-mobile-link {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: transparent;
+  border: none;
+  outline: none;
+  
+  &:active {
+    opacity: 0.6;
+  }
+}
+
+// Copyright Footer
+.mobile-login-footer {
+  margin-bottom: 1rem;
+  
+  small {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  .text-muted-light {
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-size: 0.72rem;
+  }
+}
+
+// Fullscreen tactile loader overlay
+.mobile-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(244, 248, 247, 0.8);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 999;
+  animation: overlayFadeIn 0.3s ease-out;
+}
+
+.mobile-loader-card {
+  width: 80%;
+  max-width: 300px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 15px 35px rgba(89, 140, 137, 0.12);
+  border: 1px solid rgba(89, 140, 137, 0.05);
+  animation: cardScaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  .mobile-loader-icon {
+    position: relative;
+    width: 65px;
+    height: 65px;
+    margin: 0 auto;
+
+    .icon-bg {
+      font-size: 4rem;
+      color: rgba(89, 140, 137, 0.06);
+    }
+
+    .active-lock, .success-lock {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.7rem;
+    }
+
+    .active-lock {
+      color: #598c89;
+      animation: pulseKey 1.5s infinite;
+    }
+
+    .success-lock {
+      color: #2dce89;
+      animation: successPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  }
+
+  h6 {
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .text-teal {
+    color: #598c89;
+  }
+}
+
+.shadow-premium {
+  box-shadow: 0 12px 30px rgba(89, 140, 137, 0.08);
+}
+
+// Shake animation for invalid OTP entry
+.shake-anim {
+  animation: shakeKey 0.35s ease-in-out;
+}
+
+@keyframes shakeKey {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cardScaleUp {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseKey {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.8; }
+}
+
+@keyframes successPop {
+  from { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}

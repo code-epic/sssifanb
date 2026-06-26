@@ -1,0 +1,52 @@
+<div class="mobile-layout-wrapper" [class.active-blur]="isBlurActive" [class.no-nav]="!showNavigation || headerConfig?.hideHeader">
+  
+  <!-- Mobile Sticky Top Header -->
+  <header *ngIf="showNavigation && !headerConfig?.hideHeader" class="mobile-top-header d-flex align-items-center justify-content-between px-3">
+    <div class="header-left d-flex align-items-center">
+      <!-- Back button -->
+      <button *ngIf="headerConfig?.showBackButton" 
+              class="btn-header-action mr-3" 
+              (click)="goBack()" 
+              type="button" 
+              aria-label="Volver">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <span class="header-brand-logo">
+        <img src="./assets/img/ipsfa/logo.webp" alt="SSSIFANB Logo" class="brand-logo-img">
+      </span>
+    </div>
+
+    <!-- Dynamic Title -->
+    <div class="header-center text-center flex-grow-1">
+      <h6 class="header-title mb-0 text-truncate">
+        {{ headerConfig?.title || 'SSSIFANB' }}
+      </h6>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-right d-flex align-items-center">
+      <!-- Home Button to return to dashboard -->
+      <button class="btn-header-action mr-3" 
+              (click)="goHome()" 
+              type="button" 
+              aria-label="Inicio">
+        <i class="fas fa-home"></i>
+      </button>
+      <!-- Logout Button directly -->
+      <button class="btn-header-action" 
+              (click)="logout()" 
+              type="button" 
+              aria-label="Cerrar Sesión">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Scrollable Main Page Area -->
+  <main class="mobile-body-content" [class.full-page]="!showNavigation || headerConfig?.hideHeader">
+    <div class="container-fluid px-3 pt-3 pb-5" [class.p-0]="!showNavigation || headerConfig?.hideHeader">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+</div>

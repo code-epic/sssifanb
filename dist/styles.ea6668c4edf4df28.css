@@ -1122,6 +1122,41 @@ ngb-datepicker {
     background-position: -200% 0;
   }
 }
+.fullscreen-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #1f3735 0%, #3d6662 100%) !important;
+  z-index: 99999 !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.fullscreen-loading .loading-logo-wrapper {
+  animation: breathe 3s ease-in-out infinite;
+}
+.fullscreen-loading .loading-logo {
+  height: 80px;
+  width: auto;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+}
+.fullscreen-loading .spinner-grow.text-teal {
+  background-color: #598c89 !important;
+  color: #598c89 !important;
+}
+.fullscreen-loading .text-white {
+  color: #ffffff !important;
+}
+.fullscreen-loading .text-white-50 {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+.fullscreen-loading .animate-pulse {
+  animation: pulse 1.8s infinite ease-in-out;
+}
 @charset "UTF-8";
 /*!
 

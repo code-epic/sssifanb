@@ -295,21 +295,116 @@ $input-border: #cfd8dc;
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+// Estilo Premium del Botón y Campos de Entrada (Acorde a Guía UX/UI)
+.btn-pastel {
+  background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%) !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(94, 170, 168, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: none;
+  font-weight: 600;
+  
+  &:hover {
+    background: linear-gradient(135deg, #4a8b89 0%, #3e7371 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(94, 170, 168, 0.45) !important;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    background: #b0bec5 !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
 
-// Responsive
+.custom-input-group {
+  transition: all 0.3s ease;
+  border: 1px solid #cfd8dc !important;
+  border-radius: 8px !important;
+  
+  &:focus-within {
+    border-color: #5eaaa8 !important;
+    box-shadow: 0 0 0 3px rgba(94, 170, 168, 0.15) !important;
+    
+    .input-group-text {
+      color: #4a8b89 !important;
+    }
+  }
+}
+
+// Responsive - Vista Móvil Creativa Premium
 @media (max-width: 576px) {
+  .login-wrapper {
+    padding: 15px;
+    align-items: center;
+    background: linear-gradient(135deg, #425863 0%, #004d40 100%); // Fondo inmersivo más profundo
+  }
+  
+  .login-content {
+    padding: 0 10px;
+  }
+
   .card-login-modern {
-    padding: 40px 25px;
-    width: 95%;
+    padding: 30px 24px 24px 24px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    border-radius: 16px; // Esquinas más suaves y premium
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(94, 170, 168, 0.35); // Borde con el color de marca
+    box-shadow: 0 15px 35px rgba(0, 77, 64, 0.2), 0 0 0 1px rgba(94, 170, 168, 0.1);
   }
+
   .logo-container {
-    width: 120px;
-    height: 120px;
+    width: 90px;
+    height: 90px;
+    padding: 10px;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 8px 20px rgba(94, 170, 168, 0.25);
+    border: 2px solid rgba(94, 170, 168, 0.15);
   }
+
   .clock-floating {
-      top: -30px; // Ajuste móvil
-      right: 10px;
-      font-size: 0.9rem;
+      display: none !important; // Vista limpia sin elementos flotantes desalineados
+  }
+
+  .welcome-container {
+    margin-bottom: 1.2rem;
+    h3 {
+      font-size: 1.25rem;
+      color: #3e7371; // Color de la marca
+      font-weight: 700;
+    }
+    p {
+      font-size: 0.8rem;
+    }
+  }
+
+  .login-title {
+    margin-bottom: 1.2rem;
+    font-size: 0.95rem;
+    color: #4a8b89; // Color de la marca
+    
+    &::after {
+      background: linear-gradient(90deg, #5eaaa8, #4a8b89);
+      width: 50px;
+      height: 3px;
+      border-radius: 2px;
+    }
+  }
+
+  .simple-footer {
+    margin-top: 15px;
+    h6 {
+      font-size: 0.75rem !important;
+    }
+    small {
+      font-size: 0.65rem !important;
+    }
   }
 }
 
@@ -319,17 +414,20 @@ $input-border: #cfd8dc;
   flex-direction: column;
   align-items: center;
   margin: 15px 0;
+  width: 100%;
 }
 .otp-wrapper {
   display: flex;
   gap: 8px;
   justify-content: center;
+  width: 100%;
+  max-width: 320px;
 }
 .otp-box {
-  width: 48px;
-  height: 56px;
+  width: 44px;
+  height: 52px;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   border: 1px solid $input-border;
   border-radius: 8px; // Mas formal
   background-color: white;
@@ -343,10 +441,26 @@ $input-border: #cfd8dc;
   }
 }
 .otp-divider {
-  width: 10px;
+  width: 8px;
   height: 2px;
   background-color: #b0bec5;
   margin: auto 4px;
+}
+
+@media (max-width: 400px) {
+  .otp-wrapper {
+    gap: 4px;
+  }
+  .otp-box {
+    width: 32px;
+    height: 42px;
+    font-size: 1.1rem;
+    border-radius: 6px;
+  }
+  .otp-divider {
+    width: 6px;
+    margin: auto 2px;
+  }
 }
 // --- LOADER OVERLAY ELEGANT ---
 .loader-overlay {

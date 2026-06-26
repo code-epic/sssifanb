@@ -1,0 +1,139 @@
+<div class="mobile-dashboard-wrapper fade-in">
+
+  <!-- Fullscreen Loading Overlay -->
+  <div *ngIf="isLoading" class="fullscreen-loading d-flex flex-column align-items-center justify-content-center">
+    <div class="loading-logo-wrapper mb-4">
+      <img src="./assets/img/ipsfa/logo.webp" alt="SSSIFANB" class="loading-logo">
+    </div>
+    <i class="fas fa-spinner fa-spin text-teal mb-4" style="font-size: 3.5rem; color: #598c89 !important;"></i>
+    <h4 class="text-white font-weight-bold mb-2 animate-pulse">Cargando y Evaluando</h4>
+    <p class="text-white-50 small text-center px-4">Por favor espere mientras procesamos los registros en tiempo real...</p>
+  </div>
+  
+  <!-- Welcome Banner -->
+  <div class="welcome-banner p-4 rounded-24 mb-4 position-relative overflow-hidden">
+    <i class="fas fa-shield-alt banner-bg-icon"></i>
+    <div class="position-relative" style="z-index: 2;">
+      <span class="badge bg-white text-teal rounded-pill px-3 py-1 font-weight-bold mb-2 shadow-sm" style="font-size: 0.7rem;">
+        {{ roleName | uppercase }}
+      </span>
+      <h4 class="text-white font-weight-bold mb-1">¡Hola, {{ userName }}!</h4>
+      <p class="text-white-50 small mb-0">Bienvenido al Panel Móvil de SSSIFANB.</p>
+    </div>
+  </div>
+
+  <!-- Search Input Bar (Loads Immediately) -->
+  <div class="search-bar-container mb-4 shadow-premium">
+    <form (ngSubmit)="consultar()">
+      <div class="search-input-wrapper">
+        <span class="search-icon"><i class="fas fa-search"></i></span>
+        <input type="text" 
+               class="search-input" 
+               placeholder="Cédula, RIF o Apellido..." 
+               [(ngModel)]="buscar" 
+               name="buscar"
+               autocomplete="off"
+               required>
+        <button *ngIf="buscar" type="button" class="btn-clear-search border-0 bg-transparent text-muted me-2" (click)="limpiarBusqueda()">
+          <i class="fas fa-times-circle"></i>
+        </button>
+        <button type="submit" class="btn-search-trigger border-0 bg-transparent text-teal" [disabled]="isLoading">
+          <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-arrow-right'"></i>
+        </button>
+      </div>
+    </form>
+    <div *ngIf="errorMessage" class="text-danger small mt-2 px-2 font-weight-bold">
+      <i class="fas fa-exclamation-circle me-1"></i> {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Search Results list -->
+  <div class="search-results-section" *ngIf="militares.length > 0">
+    <span class="results-count mb-3 d-block font-weight-bold text-muted">
+      {{ militares.length }} COINCIDENCIAS ENCONTRADAS <span *ngIf="militares.length > pageSize" class="small text-muted-light font-weight-normal">(Página {{ currentPage }} de {{ totalPages }})</span>
+    </span>
+
+    <div class="d-flex flex-column gap-3">
+      <button *ngFor="let militar of militares | slice:((currentPage - 1) * pageSize):(currentPage * pageSize)" 
+              class="result-list-item d-flex align-items-center p-3 rounded-20 border-0 bg-white text-start shadow-premium w-100"
+              (click)="seleccionarMilitar(militar)"
+              type="button">
+        
+        <!-- Component avatar or photo thumbnail -->
+        <div class="component-avatar rounded-15 mr-3 text-center d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width: 44px; height: 44px; background: rgba(89, 140, 137, 0.06);">
+          <img *ngIf="fotosMilitares[militar.persona?.datobasico?.cedula || militar.cedula || militar.id]" 
+               [src]="fotosMilitares[militar.persona?.datobasico?.cedula || militar.cedula || militar.id]" 
+               class="w-100 h-100 object-fit-cover" 
+               alt="Foto">
+          <i *ngIf="!fotosMilitares[militar.persona?.datobasico?.cedula || militar.cedula || militar.id]" 
+             class="fas fa-shield-alt text-teal"></i>
+        </div>
+
+        <!-- Details -->
+        <div class="flex-grow-1 min-width-0">
+          <h6 class="result-name mb-0 text-dark font-weight-bold text-truncate">
+            {{ militar.persona?.datobasico?.nombreprimero }} {{ militar.persona?.datobasico?.apellidoprimero }}
+            <span *ngIf="!militar.persona?.datobasico?.nombreprimero">
+              {{ militar.nombre || militar.apellidos || 'Militar Registrado' }}
+            </span>
+          </h6>
+          <p class="result-meta mb-0 text-muted small text-truncate">
+            C.I: {{ militar.persona?.datobasico?.cedula || militar.cedula || militar.id || 'N/A' }} &bull; {{ militar.componente?.abreviatura || militar.Componente?.abreviatura || 'GN' }} &bull; {{ militar.grado?.abreviatura || militar.Grado?.abreviatura || 'Grado' }}
+          </p>
+        </div>
+
+        <div class="result-action text-muted pr-1">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+
+      </button>
+    </div>
+
+    <!-- Paginator buttons -->
+    <div *ngIf="totalPages > 1" class="d-flex align-items-center justify-content-between mt-3 px-3 py-2 bg-white rounded-15 shadow-premium">
+      <button type="button" 
+              class="btn btn-link text-teal border-0 p-2 d-flex align-items-center justify-content-center" 
+              [disabled]="currentPage === 1" 
+              (click)="prevPage()"
+              style="width: 40px; height: 40px; border-radius: 50%; background: rgba(89, 140, 137, 0.05); cursor: pointer;">
+        <i class="fas fa-chevron-left" style="font-size: 1rem;"></i>
+      </button>
+      <span class="small font-weight-bold text-muted">
+        Página {{ currentPage }} de {{ totalPages }}
+      </span>
+      <button type="button" 
+              class="btn btn-link text-teal border-0 p-2 d-flex align-items-center justify-content-center" 
+              [disabled]="currentPage === totalPages" 
+              (click)="nextPage()"
+              style="width: 40px; height: 40px; border-radius: 50%; background: rgba(89, 140, 137, 0.05); cursor: pointer;">
+        <i class="fas fa-chevron-right" style="font-size: 1rem;"></i>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Default State: show quick indicators if no search results -->
+  <ng-container *ngIf="false">
+    <!-- Real-Time Metrics -->
+    <div class="row g-3 mb-4">
+      <div class="col-6" *ngFor="let card of indicatorCards">
+        <div class="metric-card p-3 rounded-20 shadow-premium" [class]="card.color">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="metric-icon-circle"><i [class]="card.icon"></i></span>
+          </div>
+          <h3 class="font-weight-bold mb-1 mt-2 text-dark">{{ card.count }}</h3>
+          <span class="metric-title text-muted d-block">{{ card.title }}</span>
+          <small class="text-muted-light d-block" style="font-size: 0.65rem;">{{ card.desc }}</small>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Logout Button -->
+  <div *ngIf="false" class="text-center mt-5 mb-3">
+    <button class="btn btn-mobile-logout px-4 py-2.5 rounded-15" (click)="logout()">
+      <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+    </button>
+  </div>
+
+</div>

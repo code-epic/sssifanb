@@ -7,6 +7,7 @@ export interface IHeaderConfig {
     showCardsToggle: boolean; // Icono para mostrar/ocultar tarjetas desde el header
     showAlertsIcon: boolean;
     alertSeverity: number; // 1: Normal, 2: Warning (Blue Shadow), 3: Critical (Red)
+    hideHeader?: boolean;
 }
 
 @Injectable({

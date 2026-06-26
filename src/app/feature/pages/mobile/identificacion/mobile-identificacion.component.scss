@@ -1,0 +1,266 @@
+.mobile-afi-page {
+  animation: fadeIn 0.4s ease-out;
+  padding-bottom: 2rem;
+}
+
+// Search Prompt placeholder
+.no-militar-selected {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 3rem 1.5rem;
+  border: 1px solid rgba(89, 140, 137, 0.04);
+  box-shadow: 0 10px 25px rgba(89, 140, 137, 0.04);
+  
+  .no-militar-icon {
+    font-size: 3.8rem;
+    color: #cbd5e0;
+  }
+}
+
+// Glassmorphic Titular Card (SSSIFANB Green Theme)
+.militar-card {
+  background: linear-gradient(135deg, #598c89 0%, #3a5c5a 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 30px rgba(89, 140, 137, 0.18);
+  padding: 16px 20px !important; // Balanced padding
+  
+  .watermark-icon {
+    position: absolute;
+    right: -10px;
+    bottom: -15px;
+    font-size: 7rem;
+    color: rgba(255, 255, 255, 0.03);
+    z-index: 1;
+  }
+
+  .militar-card-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .militar-avatar-container {
+    width: 72px; // Slightly larger for better visual balance on mobile
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-right: 18px; // Explicit margin-right in SCSS
+    flex-shrink: 0;
+
+    .militar-profile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center; // Perfect face centering
+    }
+
+    .militar-profile-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .militar-text-container {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .badge-militar-status {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.25) !important;
+      color: #ffffff !important;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border-radius: 6px;
+      padding: 4px 8px;
+      margin-bottom: 6px; // Vertical spacing
+      display: inline-block;
+    }
+
+    .militar-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px; // Vertical spacing
+      line-height: 1.25;
+      letter-spacing: -0.2px;
+    }
+
+    .militar-id {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 0;
+    }
+  }
+}
+
+.grado-badge-img {
+  height: 20px;
+  width: auto;
+  border-radius: 2px;
+  object-fit: contain;
+}
+
+// Section headers
+.section-title {
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  color: #718096;
+}
+
+// Military Read-only Info List
+.info-card {
+  border: 1px solid rgba(89, 140, 137, 0.03);
+  
+  .info-row {
+    border-bottom-color: rgba(89, 140, 137, 0.05) !important;
+    
+    .info-label {
+      font-weight: 600;
+      color: #718096;
+    }
+    
+    .info-value {
+      text-align: right;
+    }
+  }
+}
+
+// Family Accordion styling
+.familiar-accordion-card {
+  border: 1px solid rgba(89, 140, 137, 0.03);
+  transition: all 0.25s ease;
+
+  .accordion-header-btn {
+    outline: none;
+    cursor: pointer;
+
+    &:active {
+      background-color: rgba(89, 140, 137, 0.02) !important;
+    }
+  }
+
+  .familiar-avatar {
+    width: 36px;
+    height: 36px;
+    background: rgba(89, 140, 137, 0.08);
+    color: #598c89;
+    font-size: 0.75rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .familiar-name {
+    font-size: 0.88rem;
+    letter-spacing: -0.1px;
+    max-width: 140px;
+  }
+
+  .accordion-arrow {
+    font-size: 0.85rem;
+    
+    &.rotated {
+      transform: rotate(180deg);
+    }
+  }
+
+  .accordion-content {
+    border-top-color: rgba(89, 140, 137, 0.05) !important;
+    
+    .text-muted {
+      font-weight: 600;
+    }
+  }
+}
+
+// Badges
+.badge-pastel-teal {
+  background-color: rgba(89, 140, 137, 0.08);
+  color: #598c89;
+}
+
+.badge-pastel-gray {
+  background-color: #f7fafc;
+  color: #a0aec0;
+}
+
+.text-teal {
+  color: #598c89 !important;
+}
+
+.shadow-premium {
+  box-shadow: 0 10px 25px rgba(89, 140, 137, 0.04);
+}
+
+.rounded-20 { border-radius: 20px !important; }
+.rounded-24 { border-radius: 24px !important; }
+.gap-2 { gap: 8px !important; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// Fullscreen Photo Zoom Overlay (Lightbox)
+.zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 2000;
+  animation: overlayFadeIn 0.3s ease-out;
+
+  .zoom-card {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #ffffff;
+    max-width: 90vw;
+    box-sizing: border-box;
+  }
+
+  .btn-close-zoom {
+    font-size: 1.5rem;
+    color: #90a4ae;
+    cursor: pointer;
+    transition: color 0.2s;
+
+    &:hover, &:active {
+      color: #37474f;
+    }
+  }
+
+  .zoom-img {
+    max-height: 70vh;
+    max-width: 100%;
+    object-fit: contain;
+  }
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.88); }
+  to { opacity: 1; transform: scale(1); }
+}

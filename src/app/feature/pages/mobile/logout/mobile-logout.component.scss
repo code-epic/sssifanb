@@ -1,0 +1,158 @@
+.mobile-logout-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #1f3735 0%, #3d6662 100%);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Nunito', sans-serif;
+  box-sizing: border-box;
+}
+
+.btn-mobile-logout-confirm {
+  background: linear-gradient(135deg, #598c89 0%, #4a7572 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  outline: none;
+
+  &:hover, &:focus {
+    color: #ffffff;
+    background: linear-gradient(135deg, #629a97 0%, #598c89 100%);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.btn-mobile-logout-cancel {
+  background: rgba(89, 140, 137, 0.08);
+  color: #598c89;
+  border: 1px solid rgba(89, 140, 137, 0.15);
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  outline: none;
+
+  &:hover, &:focus {
+    background: rgba(89, 140, 137, 0.14);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.mobile-bg-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 50%, rgba(89, 140, 137, 0.08) 0%, transparent 60%);
+}
+
+.mobile-logout-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 380px;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.mobile-logout-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 28px;
+  padding: 2.2rem 1.8rem;
+  width: 100%;
+  box-sizing: border-box;
+  animation: cardScaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.logout-icon-container {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto;
+
+  .icon-bg {
+    font-size: 4.4rem;
+    color: rgba(89, 140, 137, 0.05);
+  }
+
+  .active-icon, .success-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.8rem;
+  }
+
+  .active-icon {
+    color: #598c89;
+    animation: rotatePulse 2s infinite ease-in-out;
+  }
+
+  .success-icon {
+    color: #2dce89;
+    animation: successPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+}
+
+.logout-steps-list {
+  background: rgba(89, 140, 137, 0.03);
+  border: 1px solid rgba(89, 140, 137, 0.06);
+  border-radius: 18px;
+  padding: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.logout-step-row {
+  &:not(:last-child) {
+    border-bottom: 1.5px dashed rgba(89, 140, 137, 0.05);
+  }
+
+  .step-status-icon {
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .text-teal {
+    color: #598c89 !important;
+  }
+}
+
+.shadow-premium {
+  box-shadow: 0 15px 35px rgba(89, 140, 137, 0.08);
+}
+
+@keyframes cardScaleUp {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes rotatePulse {
+  0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.15); }
+  100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+}
+
+@keyframes successPop {
+  from { transform: translate(-50%, -50%) scale(0.6); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}

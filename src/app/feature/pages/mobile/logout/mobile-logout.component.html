@@ -1,0 +1,80 @@
+<div class="mobile-logout-wrapper">
+  
+  <div class="mobile-bg-glow"></div>
+
+  <div class="mobile-logout-container d-flex align-items-center justify-content-center">
+    
+    <!-- State 1: Confirmation -->
+    <div *ngIf="confirmLogout" class="mobile-logout-card p-4 text-center shadow-premium fade-in">
+      <div class="logout-icon-container mb-4">
+        <i class="fas fa-shield-alt icon-bg"></i>
+        <i class="fas fa-power-off active-icon text-danger" style="animation: none; font-size: 2.2rem; transform: translate(-50%, -50%);"></i>
+      </div>
+      <h5 class="font-weight-bold text-dark mb-3">¿Cerrar Sesión Móvil?</h5>
+      <p class="text-muted small mb-4">
+        ¿Está seguro que desea salir y proteger sus credenciales en este dispositivo?
+      </p>
+      
+      <div class="d-flex flex-column gap-2">
+        <button class="btn btn-mobile-logout-confirm py-2.5 rounded-15 w-100 font-weight-bold" (click)="confirmAndLogout()">
+          SÍ, CERRAR SESIÓN
+        </button>
+        <button class="btn btn-mobile-logout-cancel py-2.5 rounded-15 w-100 mt-2 font-weight-bold" (click)="cancelLogout()">
+          CANCELAR
+        </button>
+      </div>
+    </div>
+
+    <!-- State 2: Progress Checklist -->
+    <div *ngIf="!confirmLogout" class="mobile-logout-card p-4 text-center shadow-premium fade-in">
+      
+      <!-- Animated status icon -->
+      <div class="logout-icon-container mb-4">
+        <i class="fas fa-shield-alt icon-bg"></i>
+        <i class="fas fa-sign-out-alt active-icon" *ngIf="!finalMessage"></i>
+        <i class="fas fa-check-circle success-icon" *ngIf="finalMessage"></i>
+      </div>
+
+      <h5 class="font-weight-bold text-dark mb-2">
+        {{ finalMessage ? 'Hasta Luego' : 'Cerrando Módulo Móvil' }}
+      </h5>
+      <p class="text-muted small mb-4">
+        Por favor espere mientras resguardamos sus credenciales...
+      </p>
+
+      <!-- Checklist Progress -->
+      <div class="logout-steps-list text-start">
+        <div *ngFor="let step of steps" class="logout-step-row d-flex align-items-center py-2">
+          
+          <!-- Status icon selector -->
+          <span class="step-status-icon me-3">
+            <i class="far fa-circle text-muted" *ngIf="step.status === 'pending'"></i>
+            <i class="fas fa-circle-notch fa-spin text-teal" *ngIf="step.status === 'in-progress'"></i>
+            <i class="fas fa-check-circle text-success" *ngIf="step.status === 'done'"></i>
+            <i class="fas fa-exclamation-circle text-danger" *ngIf="step.status === 'error'"></i>
+          </span>
+          
+          <span class="step-label small" [ngClass]="{
+            'text-muted': step.status === 'pending',
+            'text-dark font-weight-bold': step.status === 'in-progress',
+            'text-success font-weight-bold': step.status === 'done',
+            'text-danger font-weight-bold': step.status === 'error'
+          }">
+            {{ step.label }}
+          </span>
+
+        </div>
+      </div>
+
+      <!-- Action status message -->
+      <div class="mt-4 pt-2 border-top" style="border-top-color: rgba(89, 140, 137, 0.08) !important;">
+        <small class="text-muted font-weight-bold d-block text-uppercase" style="letter-spacing: 0.5px;">
+          {{ statusText || finalMessage || 'Procesando...' }}
+        </small>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

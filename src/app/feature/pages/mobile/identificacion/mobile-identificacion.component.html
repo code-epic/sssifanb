@@ -1,0 +1,183 @@
+<div class="mobile-afi-page fade-in">
+
+  <!-- If no affiliate loaded, show search prompt -->
+  <div class="no-militar-selected text-center py-5" *ngIf="!militar">
+    <div class="no-militar-icon mb-3">
+      <i class="fas fa-id-badge"></i>
+    </div>
+    <h6 class="font-weight-bold text-muted">Ficha militar no cargada</h6>
+    <p class="text-muted-light small px-4 mb-4">
+      Para consultar la información de un militar y sus familiares, por favor use el buscador primero.
+    </p>
+    <a routerLink="/buscador" class="btn btn-mobile-primary px-4 py-2.5 rounded-15 text-decoration-none">
+      <i class="fas fa-search me-1"></i> Ir al Buscador
+    </a>
+  </div>
+  <div class="militar-profile-container" *ngIf="militar">
+    
+    <!-- Titular Card (Glassmorphic Green Gradient Theme) -->
+    <div class="militar-card rounded-24 mb-4 shadow-premium position-relative overflow-hidden">
+      <!-- Watermark logo -->
+      <i class="fas fa-user-shield watermark-icon"></i>
+      
+      <div class="militar-card-content position-relative" style="z-index: 2;">
+        
+        <!-- Avatar Photo circular container -->
+        <div class="militar-avatar-container position-relative" 
+             [style.cursor]="fotoAfiliadoBlobUrl ? 'zoom-in' : 'default'"
+             (click)="fotoAfiliadoBlobUrl ? openZoom(fotoAfiliadoBlobUrl) : null" 
+             title="Ampliar foto">
+          <img *ngIf="fotoAfiliadoBlobUrl" [src]="fotoAfiliadoBlobUrl" class="militar-profile-img animate-fade-in" alt="Foto Militar">
+          <div *ngIf="!fotoAfiliadoBlobUrl" class="militar-profile-placeholder d-flex align-items-center justify-content-center">
+            <i class="fas fa-user-shield text-white" style="font-size: 1.6rem; opacity: 0.65;"></i>
+          </div>
+          <div *ngIf="isLoadingFoto" class="militar-profile-spinner spinner-border text-white position-absolute" role="status" style="width: 1.25rem; height: 1.25rem; top: calc(50% - 0.625rem); left: calc(50% - 0.625rem); border-width: 2px;"></div>
+        </div>
+
+        <div class="militar-text-container">
+          <span class="badge badge-militar-status">
+            {{ militarSituacion | uppercase }}
+          </span>
+          <h4 class="militar-name text-truncate">
+            {{ militarNombre }}
+          </h4>
+          <p class="militar-id">
+            C.I. V-{{ militarCedula }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Datos Militares (Read Only) -->
+    <div class="section-container mb-4">
+      <h6 class="section-title mb-3 text-uppercase font-weight-bold">
+        <i class="fas fa-shield-alt text-teal me-2"></i> Datos Militares
+      </h6>
+      
+      <div class="info-card p-3 rounded-20 bg-white shadow-premium">
+        <div class="info-row d-flex justify-content-between py-2 border-bottom">
+          <span class="info-label text-muted small">Componente:</span>
+          <span class="info-value text-dark font-weight-bold small">
+            {{ militarComponente }}
+          </span>
+        </div>
+        <div class="info-row d-flex justify-content-between py-2 border-bottom align-items-center">
+          <span class="info-label text-muted small">Grado:</span>
+          <span class="info-value text-dark font-weight-bold small d-flex align-items-center">
+            <img *ngIf="getGradoBadgePath()" [src]="getGradoBadgePath()" class="grado-badge-img me-2" alt="Grado Badge" style="height: 20px; width: auto; vertical-align: middle;">
+            {{ militarGrado }}
+          </span>
+        </div>
+        <div class="info-row d-flex justify-content-between py-2 border-bottom">
+          <span class="info-label text-muted small">Categoría / Clase:</span>
+          <span class="info-value text-dark font-weight-bold small">
+            {{ militarCategoria }} &bull; {{ militarClase }}
+          </span>
+        </div>
+        <div class="info-row d-flex justify-content-between py-2 border-bottom">
+          <span class="info-label text-muted small">Ingreso / Ascenso:</span>
+          <span class="info-value text-dark font-weight-bold small">
+            {{ militarFingreso | date:'dd/MM/yyyy' }} &bull; {{ militarFascenso | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+        <div class="info-row d-flex justify-content-between py-2 border-bottom" *ngIf="tiempoServicio">
+          <span class="info-label text-muted small">Tiempo Servicio:</span>
+          <span class="info-value text-dark font-weight-bold small">
+            {{ tiempoServicio }}
+          </span>
+        </div>
+        <div class="info-row d-flex justify-content-between py-2" *ngIf="tiempoServicioTotal">
+          <span class="info-label text-muted small">Servicio Total (c/ Reconocido):</span>
+          <span class="info-value text-dark font-weight-bold small">
+            {{ tiempoServicioTotal }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Grupo Familiar (Read Only Accordion) -->
+    <div class="section-container mb-4">
+      <h6 class="section-title mb-3 text-uppercase font-weight-bold">
+        <i class="fas fa-users text-teal me-2"></i> Grupo Familiar ({{ familiares.length }})
+      </h6>
+
+      <!-- Empty state for family -->
+      <div class="text-center py-4 bg-white rounded-20 shadow-premium" *ngIf="familiares.length === 0">
+        <p class="text-muted-light small mb-0">No se encontraron familiares registrados.</p>
+      </div>
+
+      <!-- Family List -->
+      <div class="d-flex flex-column gap-2" *ngIf="familiares.length > 0">
+        <div *ngFor="let familiar of familiares; let idx = index" 
+             class="familiar-accordion-card rounded-20 bg-white shadow-premium overflow-hidden">
+          
+          <!-- Accordion Header -->
+          <button type="button" 
+                  class="accordion-header-btn w-100 d-flex align-items-center justify-content-between p-3 border-0 bg-transparent"
+                  (click)="toggleFamiliar(idx)">
+            
+            <div class="d-flex align-items-center text-start">
+              <!-- Avatar placeholder or actual photo -->
+              <div class="familiar-avatar mr-3 rounded-pill text-center d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" 
+                   [style.cursor]="familiar.fotoUrl ? 'zoom-in' : 'default'"
+                   (click)="zoomFamiliar(familiar.fotoUrl, $event)"
+                   style="width: 36px; height: 36px; background: rgba(89, 140, 137, 0.08);">
+                <img *ngIf="familiar.fotoUrl" [src]="familiar.fotoUrl" class="w-100 h-100 object-fit-cover" alt="Foto">
+                <span *ngIf="!familiar.fotoUrl">{{ familiar.parentescoAbrev | uppercase }}</span>
+              </div>
+              <div>
+                <h6 class="familiar-name mb-0 text-dark font-weight-bold text-truncate" style="max-width: 160px;">{{ familiar.nombres }}</h6>
+                <span class="badge bg-light text-muted small border px-2 py-0.5 rounded-pill">{{ familiar.parentesco }}</span>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <span class="badge rounded-pill me-2 px-2.5 py-1 text-uppercase" 
+                    [ngClass]="familiar.beneficiario === 'SÍ' ? 'badge-pastel-teal' : 'badge-pastel-gray'" style="font-size: 0.65rem;">
+                {{ familiar.beneficiario === 'SÍ' ? 'Beneficiario' : 'No Benef.' }}
+              </span>
+              <span class="accordion-arrow text-muted transition-all" [class.rotated]="expandedFamiliarIdx === idx">
+                <i class="fas fa-chevron-down"></i>
+              </span>
+            </div>
+
+          </button>
+
+          <!-- Accordion Content -->
+          <div class="accordion-content px-3 pb-3 pt-1 border-top" *ngIf="expandedFamiliarIdx === idx">
+            <div class="d-flex flex-column gap-2 mt-2">
+              <div class="d-flex justify-content-between">
+                <span class="text-muted small">Cédula:</span>
+                <span class="text-dark font-weight-bold small">V-{{ familiar.cedula }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted small">Género / Edo. Civil:</span>
+                <span class="text-dark font-weight-bold small">{{ familiar.sexo }} &bull; {{ familiar.estadoCivil }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted small">Fecha Ingreso:</span>
+                <span class="text-dark font-weight-bold small">{{ familiar.fingreso | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted small">Es Militar:</span>
+                <span class="text-dark font-weight-bold small">{{ familiar.esmilitar }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+  </div>
+
+  <!-- Fullscreen Photo Zoom Overlay (Lightbox) -->
+  <div *ngIf="isZoomActive && zoomPhotoUrl" class="zoom-overlay d-flex align-items-center justify-content-center" (click)="closeZoom()">
+    <div class="zoom-card p-2 bg-white rounded-24 shadow-premium animate-scale-up" (click)="$event.stopPropagation()">
+      <div class="d-flex justify-content-end p-2 pb-0">
+        <button class="btn btn-close-zoom border-0 bg-transparent text-muted" (click)="closeZoom()">
+          <i class="fas fa-times-circle" style="font-size: 1.55rem;"></i>
+        </button>
+      </div>
+      <img [src]="zoomPhotoUrl" class="zoom-img img-fluid rounded-20 shadow-sm" alt="Zoom Foto" style="max-height: 70vh; max-width: 85vw; object-fit: contain;">
+    </div>
+  </div>
+</div>
