@@ -33,7 +33,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
 
   public userName: string = "Usuario";
   public roleName: string = "Consultor";
-  public descripcion: string = "";
+  public observaciones: string = "";
 
   // Search properties
   public buscar: string = "";
@@ -125,7 +125,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
         const user = decoded?.Usuario || {};
         this.userName = user.nombre || user.login || "Usuario";
         this.roleName = user.nombre_rol || "Usuario";
-        this.descripcion = user.descripcion;
+        this.observaciones = user.observaciones;
       } catch (e) {
         console.error("Error decoding token in mobile principal", e);
       }
