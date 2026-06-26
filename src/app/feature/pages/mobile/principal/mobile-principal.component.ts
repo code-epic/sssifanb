@@ -33,10 +33,11 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
 
   public userName: string = "Usuario";
   public roleName: string = "Consultor";
+  public descripcion: string = "";
 
   // Search properties
   public buscar: string = "";
-  
+
   private _isLoading: boolean = false;
   public get isLoading(): boolean {
     return this._isLoading;
@@ -93,7 +94,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.layoutService.toggleCards(false);
     this.layoutService.updateHeader({
-      title: "Panel SSSIFANB",
+      title: "SSSIFANB",
       showBackButton: false,
       showCardsToggle: false,
       showAlertsIcon: false,
@@ -124,6 +125,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
         const user = decoded?.Usuario || {};
         this.userName = user.nombre || user.login || "Usuario";
         this.roleName = user.nombre_rol || "Usuario";
+        this.descripcion = user.descripcion;
       } catch (e) {
         console.error("Error decoding token in mobile principal", e);
       }
@@ -142,7 +144,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
 
   consultar(event?: any): void {
     if (event) event.preventDefault();
-    
+
     // Dismiss virtual keyboard on mobile devices
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
@@ -174,7 +176,8 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
 
     if (cargo !== "") {
       payload = {
-        funcion: environment.funcion.CONSULTAR_IDENTIFICACION_MILITAR_COMPONENTE,
+        funcion:
+          environment.funcion.CONSULTAR_IDENTIFICACION_MILITAR_COMPONENTE,
         parametros: `${cedula},${cargo}`,
       };
     } else {
@@ -196,7 +199,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
             list = [data];
           }
           this.militares = list;
-          
+
           if (this.militares.length === 1) {
             this.seleccionarMilitar(this.militares[0]);
           } else {
@@ -253,7 +256,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.errorMessage = "Cédula no registrada o error de red.";
         this.cdr.markForCheck();
-      }
+      },
     });
   }
 
@@ -270,10 +273,10 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
         (militar) => {
           this.militares.push(militar);
           this.cdr.detectChanges();
-        }
+        },
       );
       this.isLoading = false;
-      
+
       if (this.militares.length === 0) {
         this.errorMessage = "No se encontraron coincidencias.";
       } else {
@@ -281,7 +284,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
         try {
           sessionStorage.setItem(
             "buscador_session_mobile",
-            JSON.stringify({ q: cadena, res: this.militares })
+            JSON.stringify({ q: cadena, res: this.militares }),
           );
         } catch (e) {
           console.warn("Storage quota exceeded", e);
@@ -301,11 +304,17 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
     this.militares.sort((a, b) => {
       const persA = a.persona || a.Persona || {};
       const dbA = persA.datobasico || persA.DatoBasico || {};
-      const nameA = `${dbA.apellidoprimero || a.apellidos || ''} ${dbA.nombreprimero || a.nombre || ''}`.trim().toUpperCase();
+      const nameA =
+        `${dbA.apellidoprimero || a.apellidos || ""} ${dbA.nombreprimero || a.nombre || ""}`
+          .trim()
+          .toUpperCase();
 
       const persB = b.persona || b.Persona || {};
       const dbB = persB.datobasico || persB.DatoBasico || {};
-      const nameB = `${dbB.apellidoprimero || b.apellidos || ''} ${dbB.nombreprimero || b.nombre || ''}`.trim().toUpperCase();
+      const nameB =
+        `${dbB.apellidoprimero || b.apellidos || ""} ${dbB.nombreprimero || b.nombre || ""}`
+          .trim()
+          .toUpperCase();
 
       return nameA.localeCompare(nameB);
     });
@@ -321,11 +330,11 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
       const pers = militar.persona || militar.Persona || {};
       const db = pers.datobasico || pers.DatoBasico || {};
       const cedula = db.cedula || militar.cedula || militar.id;
-      
+
       if (cedula && !this.fotosMilitares[cedula]) {
         const payload = {
           ruta: "img/temp/" + cedula + "/",
-          archivo: "foto.jpg"
+          archivo: "foto.jpg",
         };
         this.apiService.postBlob("dwscdn", payload).subscribe({
           next: (data: Blob) => {
@@ -336,7 +345,7 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
           },
           error: () => {
             this.fotosMilitares[cedula] = "";
-          }
+          },
         });
       }
     });
@@ -351,7 +360,12 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
     let cargo = "";
     if (this.loginService && this.loginService.Usuario) {
       const u = this.loginService.Usuario;
-      cargo = u.cargo || u.denominacion || u.descripcion || (u.Perfil && u.Perfil.descripcion) || "";
+      cargo =
+        u.cargo ||
+        u.denominacion ||
+        u.descripcion ||
+        (u.Perfil && u.Perfil.descripcion) ||
+        "";
     }
     if (!cargo) {
       const tokenStr = sessionStorage.getItem("token");
@@ -359,22 +373,34 @@ export class MobilePrincipalComponent implements OnInit, OnDestroy {
         try {
           const decoded: any = jwtDecode(tokenStr);
           const usr = decoded?.Usuario || decoded || {};
-          cargo = usr.cargo || usr.denominacion || usr.descripcion || (usr.Perfil && usr.Perfil.descripcion) || "";
+          cargo =
+            usr.cargo ||
+            usr.denominacion ||
+            usr.descripcion ||
+            (usr.Perfil && usr.Perfil.descripcion) ||
+            "";
         } catch (e) {
           console.error("Error decoding token", e);
         }
       }
     }
-    
+
     if (cargo) {
       const cargoUpper = cargo.toUpperCase();
       if (cargoUpper.includes("EJÉRCITO") || cargoUpper.includes("EJERCITO")) {
         return "EJ";
       } else if (cargoUpper.includes("ARMADA")) {
         return "AR";
-      } else if (cargoUpper.includes("AVIACIÓN") || cargoUpper.includes("AVIACION")) {
+      } else if (
+        cargoUpper.includes("AVIACIÓN") ||
+        cargoUpper.includes("AVIACION")
+      ) {
         return "AV";
-      } else if (cargoUpper.includes("GUARDIA") || cargoUpper.includes("GNB") || cargoUpper.includes("G.N.")) {
+      } else if (
+        cargoUpper.includes("GUARDIA") ||
+        cargoUpper.includes("GNB") ||
+        cargoUpper.includes("G.N.")
+      ) {
         return "GN";
       }
     }
