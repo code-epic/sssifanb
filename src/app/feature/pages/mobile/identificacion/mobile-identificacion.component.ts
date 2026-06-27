@@ -13,6 +13,7 @@ import { AfiliadoService } from "src/app/core/services/afiliacion/afiliado.servi
 import { LayoutService } from "src/app/core/services/layout/layout.service";
 import { UtilService } from "src/app/core/services/util/util.service";
 import { ApiService } from "src/app/core/services/api.service";
+import { Sha256Service } from "src/app/core/services/util/sha256";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { LoginService } from "src/app/core/services/login/login.service";
@@ -31,6 +32,7 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
   private utilService = inject(UtilService);
   private apiService = inject(ApiService);
   private cdr = inject(ChangeDetectorRef);
+  private sha256 = inject(Sha256Service);
   private destroy$ = new Subject<void>();
 
   public militar: any = null;
@@ -303,26 +305,95 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  copiarDatosMilitar(event: Event): void {
+  getUsuarioLogin(): string {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        return payload?.Usuario?.usuario || payload?.Usuario?.correo || "SISTEMA";
+      } catch (e) {}
+    }
+    return "SISTEMA";
+  }
+
+  encodeSteganography(userLogin: string): string {
+    let binary = "";
+    for (let i = 0; i < userLogin.length; i++) {
+      const charCode = userLogin.charCodeAt(i);
+      const charBinary = charCode.toString(2).padStart(8, "0");
+      binary += charBinary;
+    }
+    
+    // Codificación: '0' -> \u200B (Zero-width space), '1' -> \u200C (Zero-width non-joiner)
+    let encoded = "\u200D"; // Start marker (Zero-width joiner)
+    for (let i = 0; i < binary.length; i++) {
+      encoded += binary[i] === "0" ? "\u200B" : "\u200C";
+    }
+    encoded += "\u200D"; // End marker (Zero-width joiner)
+    return encoded;
+  }
+
+  watermarkLabel(label: string): string {
+    // Reemplaza de forma constante algunas letras con homóglifos cirílicos idénticos visualmente
+    return label
+      .replace(/a/g, "\u0430") // Latin 'a' -> Cyrillic 'a'
+      .replace(/e/g, "\u0435") // Latin 'e' -> Cyrillic 'e'
+      .replace(/o/g, "\u043e") // Latin 'o' -> Cyrillic 'o'
+      .replace(/c/g, "\u0441"); // Latin 'c' -> Cyrillic 'c'
+  }
+
+  async copiarDatosMilitar(event: Event): Promise<void> {
     if (event) {
       event.stopPropagation(); // Evitar otros clicks
     }
     if (!this.militar) return;
 
-    let texto = `Datos del Militar (SSSIFANB):
-- Nombre: ${this.militarNombre}
-- C.I.: V-${this.militarCedula}
-- Componente: ${this.militarComponente}
-- Grado: ${this.militarGrado}
-- Categoría: ${this.militarCategoria}
-- Situación: ${this.militarSituacion}`;
+    const fIng = this.formatToISODate(this.militar.fingreso);
+    const fIngFormatted = fIng ? fIng.split("-").reverse().join("/") : "N/D";
+
+    // Obtener la firma esteganográfica del login (caracteres invisibles)
+    const login = this.getUsuarioLogin();
+    const stegoSignature = this.encodeSteganography(login);
+
+    // Aplicar marcas de homóglifos al inicio (cabecera)
+    const headerWatermarked = this.watermarkLabel("Datos del Militar (SSSIFANB):");
+
+    let texto = `${headerWatermarked}${stegoSignature}
+- Nombre: ${this.militarNombre}${stegoSignature}
+- C.I.: V-${this.militarCedula}${stegoSignature}
+- Componente: ${this.militarComponente}${stegoSignature}
+- Grado: ${this.militarGrado}${stegoSignature}
+- Categoría: ${this.militarCategoria}${stegoSignature}
+- Situación: ${this.militarSituacion}${stegoSignature}
+- Fecha de Ingreso: ${fIngFormatted}${stegoSignature}
+- Antigüedad: ${this.tiempoServicio || "N/D"}${stegoSignature}`;
+
+    if (this.tiempoServicioTotal) {
+      texto += `\n- Antigüedad Total (c/ Reconocido): ${this.tiempoServicioTotal}${stegoSignature}`;
+    }
 
     if (this.familiares && this.familiares.length > 0) {
-      texto += `\n\nGrupo Familiar:`;
+      const familyHeaderWatermarked = this.watermarkLabel("Grupo Familiar:");
+      texto += `\n\n${familyHeaderWatermarked}${stegoSignature}`;
       this.familiares.forEach((f: any, idx: number) => {
-        texto += `\n${idx + 1}. ${f.nombres} - C.I: ${f.cedula} - Parentesco: ${f.parentesco} - Beneficiario: ${f.beneficiario}`;
+        texto += `\n${idx + 1}. ${f.nombres} - C.I: ${f.cedula} - Parentesco: ${f.parentesco} - Beneficiario: ${f.beneficiario}${stegoSignature}`;
       });
     }
+
+    // 1. Calcular firma digital del contenido para verificación de integridad (Evita alteración de C.I. o datos)
+    const contentToHash = `${this.militarNombre}|${this.militarCedula}|${this.militarSituacion}|${fIngFormatted}|${this.tiempoServicio}`;
+    const contentHash = await this.sha256.hash(contentToHash);
+    const shortContentHash = contentHash.substring(0, 4).toUpperCase();
+
+    // 2. Calcular firma del login del operador para auditoría robusta (sobrevive al filtrado de WhatsApp)
+    const userHash = await this.sha256.hash(login);
+    const shortUserHash = userHash.substring(0, 4).toUpperCase();
+
+    // Código de seguridad visible e inmune (ej: SSS-F3A1-C8D2)
+    const securityCode = `SSS-${shortContentHash}-${shortUserHash}`;
+    const footerLabelWatermarked = this.watermarkLabel("- Código de Seguridad:");
+
+    texto += `\n\n${footerLabelWatermarked} ${securityCode}${stegoSignature}`;
 
     navigator.clipboard.writeText(texto).then(() => {
       this.utilService.AlertMini("top-end", "success", "Datos copiados al portapapeles", 2000);
