@@ -27,6 +27,7 @@ import { environment } from "src/environments/environment";
 import { ApiService } from "src/app/core/services/api.service";
 import { UtilService } from "src/app/core/services/util/util.service";
 import { jwtDecode } from "jwt-decode";
+import { ConstanciaAfiliacionComponent } from "./pdf/constancia-afiliacion.component";
 
 import * as pdfMake from "pdfmake/build/pdfmake";
 const pdfFonts = require("pdfmake/build/vfs_fonts");
@@ -40,6 +41,9 @@ const pdfFonts = require("pdfmake/build/vfs_fonts");
 export class IdentificacionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
+  @ViewChild("constanciaAfiliacion") constanciaPdf!: ConstanciaAfiliacionComponent;
+
+  public militar: any = null;
   public componentes: any[] = [];
   public grados: any[] = [];
   public estatusBeneficiarios: any[] = [];
@@ -164,6 +168,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             return;
           }
 
+          this.militar = afiliadoData;
           // console.log('Datos Crudos Normalizados:', afiliadoData);
           const parsedData = this.parseData(afiliadoData);
           // console.log('Datos Procesados (ready to patch):', parsedData);
@@ -696,6 +701,15 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
     if (tipo === "hoja_vida") {
       this.generarPDFHojaDeVida();
+      return;
+    }
+
+    if (tipo === "constancia_afiliacion") {
+      if (this.constanciaPdf) {
+        this.constanciaPdf.generarPDFConstancia();
+      } else {
+        console.warn("Componente de constancia de afiliación no disponible.");
+      }
       return;
     }
   }

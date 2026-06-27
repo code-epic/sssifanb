@@ -255,6 +255,20 @@
   animation: scaleUp 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+@keyframes animateFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.action-banner {
+  border: 1px solid rgba(89, 140, 137, 0.04);
+  transition: all 0.2s ease;
+  &:active {
+    transform: scale(0.98);
+    background-color: #f8fafc !important;
+  }
+}
+
 @keyframes overlayFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

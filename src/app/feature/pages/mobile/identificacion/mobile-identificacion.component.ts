@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
+import { ConstanciaAfiliacionComponent } from "../../afiliacion/identificacion/pdf/constancia-afiliacion.component";
 import { AfiliadoService } from "src/app/core/services/afiliacion/afiliado.service";
 import { LayoutService } from "src/app/core/services/layout/layout.service";
 import { UtilService } from "src/app/core/services/util/util.service";
@@ -13,7 +14,7 @@ import { takeUntil } from "rxjs/operators";
   templateUrl: "./mobile-identificacion.component.html",
   styleUrls: ["./mobile-identificacion.component.scss"],
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ConstanciaAfiliacionComponent],
 })
 export class MobileIdentificacionComponent implements OnInit, OnDestroy {
   private afiliadoService = inject(AfiliadoService);
@@ -260,6 +261,16 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
       this.expandedFamiliarIdx = null;
     } else {
       this.expandedFamiliarIdx = index;
+    }
+  }
+
+  @ViewChild("constanciaAfiliacion") constanciaPdf!: ConstanciaAfiliacionComponent;
+
+  generarConstanciaPDF(): void {
+    if (this.constanciaPdf) {
+      this.constanciaPdf.generarPDFConstancia();
+    } else {
+      console.warn("Componente de constancia de afiliación no disponible.");
     }
   }
 }

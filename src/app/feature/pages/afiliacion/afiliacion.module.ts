@@ -12,6 +12,7 @@ import { IndicadoresComponent } from './indicadores/indicadores.component';
 import { LiberacionesComponent } from './liberaciones/liberaciones.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicTableComponent } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
+import { ConstanciaAfiliacionComponent } from './identificacion/pdf/constancia-afiliacion.component';
 
 @NgModule({
     declarations: [
@@ -30,7 +31,8 @@ import { DynamicTableComponent } from 'src/app/shared/components/dynamic-table/d
         ReactiveFormsModule,
         PastelDatepickerComponent,
         NgbDropdownModule,
-        DynamicTableComponent
+        DynamicTableComponent,
+        ConstanciaAfiliacionComponent
     ]
 })
 export class AfiliacionModule { }

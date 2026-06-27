@@ -231,6 +231,20 @@ export class ApiService {
   }
 
   /**
+   * Obtiene la fotografía de un afiliado (militar titular o familiar) en formato Blob.
+   * @param militarCedula Cédula del militar titular.
+   * @param familiarCedula Cédula opcional del familiar. Si se suministra, se busca foto[familiarCedula].jpg
+   */
+  public getPhotoId(militarCedula: string, familiarCedula?: string): Observable<Blob> {
+    const filename = familiarCedula ? `foto${familiarCedula}.jpg` : "foto.jpg";
+    const payload = {
+      ruta: `img/temp/${militarCedula}/`,
+      archivo: filename,
+    };
+    return this.postBlob("dwscdn", payload);
+  }
+
+  /**
    * Realiza una petición POST procesando la respuesta como Stream (Chunked).
    * Útil para grandes conjuntos de datos enviados por el backend en fragmentos.
    * @param endpoint Endpoint relativo
