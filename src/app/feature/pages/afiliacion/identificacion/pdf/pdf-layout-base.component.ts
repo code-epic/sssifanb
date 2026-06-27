@@ -15,6 +15,8 @@ export class PdfLayoutBase {
 
   protected logoBase64: string = "";
   protected watermarkBase64: string = "";
+  protected firmaBase64: string = "";
+  protected selloBase64: string = "";
 
   /**
    * Carga el logotipo de la institución en base64 de forma directa
@@ -33,6 +35,56 @@ export class PdfLayoutBase {
           ctx.drawImage(img, 0, 0);
           this.logoBase64 = canvas.toDataURL("image/png");
           resolve(this.logoBase64);
+        } else {
+          resolve("");
+        }
+      };
+      img.onerror = () => resolve("");
+    });
+  }
+
+  /**
+   * Carga la firma del presidente autorizante en base64
+   */
+  protected async loadFirma(): Promise<string> {
+    if (this.firmaBase64) return this.firmaBase64;
+    return new Promise<string>((resolve) => {
+      const img = new Image();
+      img.src = "./assets/img/ipsfa/firma.webp";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          this.firmaBase64 = canvas.toDataURL("image/png");
+          resolve(this.firmaBase64);
+        } else {
+          resolve("");
+        }
+      };
+      img.onerror = () => resolve("");
+    });
+  }
+
+  /**
+   * Carga el sello oficial de afiliación en base64
+   */
+  protected async loadSello(): Promise<string> {
+    if (this.selloBase64) return this.selloBase64;
+    return new Promise<string>((resolve) => {
+      const img = new Image();
+      img.src = "./assets/img/ipsfa/selloafiliacion2.webp";
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          this.selloBase64 = canvas.toDataURL("image/png");
+          resolve(this.selloBase64);
         } else {
           resolve("");
         }
@@ -97,9 +149,14 @@ export class PdfLayoutBase {
   /**
    * Obtiene la fotografía del afiliado mediante el API central
    */
-  protected async loadPhotoBase64(militarCedula: string, familiarCedula?: string): Promise<string> {
+  protected async loadPhotoBase64(
+    militarCedula: string,
+    familiarCedula?: string,
+  ): Promise<string> {
     try {
-      const blob = await lastValueFrom(this.apiService.getPhotoId(militarCedula, familiarCedula));
+      const blob = await lastValueFrom(
+        this.apiService.getPhotoId(militarCedula, familiarCedula),
+      );
       if (!blob || blob.size === 0) return "";
       return new Promise<string>((resolve) => {
         const reader = new FileReader();
@@ -108,7 +165,11 @@ export class PdfLayoutBase {
         reader.readAsDataURL(blob);
       });
     } catch (e) {
-      console.warn("Fallo al cargar la foto:", familiarCedula || militarCedula, e);
+      console.warn(
+        "Fallo al cargar la foto:",
+        familiarCedula || militarCedula,
+        e,
+      );
       return "";
     }
   }
@@ -118,7 +179,9 @@ export class PdfLayoutBase {
    */
   protected async loadQRBase64(datos: any): Promise<string> {
     try {
-      const blob = await lastValueFrom(this.apiService.postBlob("makeqr", datos));
+      const blob = await lastValueFrom(
+        this.apiService.postBlob("makeqr", datos),
+      );
       if (!blob || blob.size === 0) return "";
       return new Promise<string>((resolve) => {
         const reader = new FileReader();
@@ -141,6 +204,8 @@ export class PdfLayoutBase {
     qrImg?: string;
     watermarkImg?: string;
     gradoBadgeImg?: string;
+    firmaImg?: string;
+    selloImg?: string;
     title: string;
     bodyContent: any[];
   }): Promise<any> {
@@ -151,6 +216,14 @@ export class PdfLayoutBase {
     return {
       pageSize: "LETTER",
       pageMargins: [36, 115, 36, 68], // Incrementado a 115pt para evitar superposiciones del contenido
+      info: {
+        title: options.title,
+        author: "I.P.S.F.A.N.B. - Sistema de Seguridad Social (SSSIFANB)",
+        subject: "Constancia Oficial de Afiliación",
+        keywords: "ipsfanb, constancia, afiliacion, sssifanb, militar",
+        creator: "SSSIFANB Core Engine v2.1.0",
+        producer: "pdfMake Engine",
+      },
       background: (currentPage: number, pageCount: number) => {
         if (!this.isWatermarkEnabled) return {};
         if (options.watermarkImg) {
@@ -193,12 +266,29 @@ export class PdfLayoutBase {
             {
               width: "*",
               stack: [
-                { text: "REPÚBLICA BOLIVARIANA DE VENEZUELA", bold: true, fontSize: 8 },
-                { text: "MINISTERIO DEL PODER POPULAR PARA LA DEFENSA", fontSize: 7 },
-                { text: "VICEMINISTERIO DE SERVICIOS PARA LA DEFENSA", fontSize: 7 },
-                { text: "DIRECCIÓN GENERAL DE EMPRESAS Y SERVICIOS", fontSize: 7 },
+                {
+                  text: "REPÚBLICA BOLIVARIANA DE VENEZUELA",
+                  bold: true,
+                  fontSize: 8,
+                },
+                {
+                  text: "MINISTERIO DEL PODER POPULAR PARA LA DEFENSA",
+                  fontSize: 7,
+                },
+                {
+                  text: "VICEMINISTERIO DE SERVICIOS PARA LA DEFENSA",
+                  fontSize: 7,
+                },
+                {
+                  text: "DIRECCIÓN GENERAL DE EMPRESAS Y SERVICIOS",
+                  fontSize: 7,
+                },
                 { text: "INSTITUTO DE PREVISIÓN SOCIAL DE LA", fontSize: 7 },
-                { text: "FUERZA ARMADA NACIONAL BOLIVARIANA", bold: true, fontSize: 8.5 },
+                {
+                  text: "FUERZA ARMADA NACIONAL BOLIVARIANA",
+                  bold: true,
+                  fontSize: 8.5,
+                },
                 { text: "RIF: G-20003692-3", color: "#64748B", fontSize: 7 },
               ],
               alignment: "center",
@@ -332,6 +422,8 @@ export class PdfLayoutBase {
         ...(options.qrImg ? { qr: options.qrImg } : {}),
         ...(options.watermarkImg ? { watermark: options.watermarkImg } : {}),
         ...(options.gradoBadgeImg ? { gradoBadge: options.gradoBadgeImg } : {}),
+        ...(options.firmaImg ? { firma: options.firmaImg } : {}),
+        ...(options.selloImg ? { sello: options.selloImg } : {}),
       },
       defaultStyle: {
         font: "Roboto",
@@ -377,7 +469,9 @@ export class PdfLayoutBase {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
-        return payload?.Usuario?.correo || payload?.Usuario?.usuario || "SISTEMA";
+        return (
+          payload?.Usuario?.correo || payload?.Usuario?.usuario || "SISTEMA"
+        );
       } catch (e) {}
     }
     return "SISTEMA IPSFA";
@@ -392,11 +486,12 @@ export class PdfLayoutBase {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
         // Mapeo flexible del campo firmadigital.sesion
-        const sesion = payload?.Usuario?.firmadigital?.sesion || 
-                       payload?.firmadigital?.sesion || 
-                       payload?.Usuario?.usuario ||
-                       payload?.Usuario?.id ||
-                       "IPSFA-SIGN-DIGITAL-9812";
+        const sesion =
+          payload?.Usuario?.firmadigital?.sesion ||
+          payload?.firmadigital?.sesion ||
+          payload?.Usuario?.usuario ||
+          payload?.Usuario?.id ||
+          "IPSFA-SIGN-DIGITAL-9812";
         return sesion;
       } catch (e) {}
     }

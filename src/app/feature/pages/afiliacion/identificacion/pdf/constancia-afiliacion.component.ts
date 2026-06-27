@@ -54,11 +54,13 @@ export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
     };
 
     // 1. Cargar assets en paralelo (Omitiendo watermarkImg para usar la marca de agua textual I.P.S.F.A.N.B)
-    const [logoImg, photoImg, gradoBadgeImg, qrImg] = await Promise.all([
+    const [logoImg, photoImg, gradoBadgeImg, qrImg, firmaImg, selloImg] = await Promise.all([
       this.loadLogo(),
       this.loadPhotoBase64(cedulaTitular),
       this.loadGradoBadgeBase64(abrevGrado),
       this.loadQRBase64(qrPayload),
+      this.loadFirma(),
+      this.loadSello(),
     ]);
 
     // 2. Construir el cuerpo dinámico del PDF
@@ -70,6 +72,8 @@ export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
       photoImg,
       gradoBadgeImg,
       qrImg,
+      firmaImg,
+      selloImg,
       title: "CONSTANCIA DE AFILIACIÓN",
       bodyContent,
     });
@@ -433,11 +437,35 @@ export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
 
       // 6. Firma y Sello (Alineado más abajo mediante un margen superior aumentado)
       {
-        margin: [0, 55, 0, 0], // Aumentado a 55pt para empujar la firma más abajo calculando el espacio disponible
+        margin: [0, 10, 0, 0],
         columns: [
           {
             width: "*",
             stack: [
+              // Contenedor de firma y sello superpuestos
+              ...(this.firmaBase64
+                ? [
+                    {
+                      columns: [
+                        { width: "*", text: "" },
+                        {
+                          image: "firma",
+                          width: 185, // Más alargada horizontalmente
+                          height: 64,
+                          alignment: "center",
+                        },
+                        {
+                          image: "sello",
+                          width: 115,  // Aún más ancho para mayor notoriedad
+                          height: 62,
+                          margin: [-60, -2, 0, 0], // Incrementamos el solapamiento a la izquierda
+                        },
+                        { width: "*", text: "" },
+                      ],
+                      margin: [60, 0, 0, -18], // Desplazamos la firma y el sello 60pt a la derecha, cerca de la línea
+                    },
+                  ]
+                : []),
               {
                 text: "_______________________________________",
                 alignment: "center",
