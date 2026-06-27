@@ -50,6 +50,7 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
 
   // Accordion control for family members list
   public expandedFamiliarIdx: number | null = null;
+  public isGeneratingPdf: boolean = false;
 
   ngOnInit(): void {
     this.layoutService.toggleCards(false);
@@ -114,7 +115,20 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     this.militarClase = this.militar.clase || "N/A";
     
     // Situacion & Dates
-    this.militarSituacion = this.militar.situacion || "N/A";
+    const sitCode = String(this.militar.situacion || "").toUpperCase().trim();
+    if (sitCode === "ACT") {
+      this.militarSituacion = "ACTIVO";
+    } else if (sitCode === "RCP") {
+      this.militarSituacion = "RETIRADO CON PENSIÓN";
+    } else if (sitCode === "RSP") {
+      this.militarSituacion = "RETIRADO SIN PENSIÓN";
+    } else if (sitCode === "PG") {
+      this.militarSituacion = "PENSIONADO DE GRACIA";
+    } else if (sitCode === "I") {
+      this.militarSituacion = "INVALIDEZ";
+    } else {
+      this.militarSituacion = this.militar.situacion || "N/A";
+    }
     this.militarFingreso = this.militar.fingreso || "";
     this.militarFascenso = this.militar.fascenso || "";
 
@@ -266,9 +280,16 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
 
   @ViewChild("constanciaAfiliacion") constanciaPdf!: ConstanciaAfiliacionComponent;
 
-  generarConstanciaPDF(): void {
+  async generarConstanciaPDF(): Promise<void> {
     if (this.constanciaPdf) {
-      this.constanciaPdf.generarPDFConstancia();
+      this.isGeneratingPdf = true;
+      try {
+        await this.constanciaPdf.generarPDFConstancia();
+      } catch (e) {
+        console.error("Error al generar PDF:", e);
+      } finally {
+        this.isGeneratingPdf = false;
+      }
     } else {
       console.warn("Componente de constancia de afiliación no disponible.");
     }

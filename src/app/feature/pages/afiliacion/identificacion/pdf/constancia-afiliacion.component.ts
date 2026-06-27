@@ -83,7 +83,23 @@ export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
             "*",
           );
         } else {
-          pdfMake.createPdf(docDefinition).open();
+          // Descarga usando blob para máxima compatibilidad con navegadores y webviews móviles
+          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          if (isMobile) {
+            pdfMake.createPdf(docDefinition).getBlob().then((blob: Blob) => {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.style.display = "none";
+              a.href = url;
+              a.download = fileName;
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+              document.body.removeChild(a);
+            });
+          } else {
+            pdfMake.createPdf(docDefinition).open();
+          }
         }
       });
   }
@@ -200,10 +216,24 @@ export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
 
     let situacion = "N/D";
     if (this.militar.situacion) {
-      if (typeof this.militar.situacion === "string") {
-        situacion = this.militar.situacion === "ACT" ? "ACTIVO" : this.militar.situacion === "RET" ? "RETIRO" : this.militar.situacion;
-      } else if (this.militar.situacion.nombre) {
-        situacion = this.militar.situacion.nombre;
+      const code = String(
+        typeof this.militar.situacion === "string"
+          ? this.militar.situacion
+          : this.militar.situacion.nombre || this.militar.situacion.abreviatura || ""
+      ).toUpperCase().trim();
+
+      if (code === "ACT") {
+        situacion = "ACTIVO";
+      } else if (code === "RCP") {
+        situacion = "RETIRADO CON PENSIÓN";
+      } else if (code === "RSP") {
+        situacion = "RETIRADO SIN PENSIÓN";
+      } else if (code === "PG") {
+        situacion = "PENSIONADO DE GRACIA";
+      } else if (code === "I") {
+        situacion = "INVALIDEZ";
+      } else {
+        situacion = code || "N/D";
       }
     }
 
