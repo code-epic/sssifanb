@@ -150,7 +150,7 @@ export class PdfLayoutBase {
 
     return {
       pageSize: "LETTER",
-      pageMargins: [36, 105, 36, 68],
+      pageMargins: [36, 115, 36, 68], // Incrementado a 115pt para evitar superposiciones del contenido
       background: (currentPage: number, pageCount: number) => {
         if (!this.isWatermarkEnabled) return {};
         if (options.watermarkImg) {
@@ -175,7 +175,7 @@ export class PdfLayoutBase {
       },
       header: (currentPage: number, pageCount: number) => {
         return {
-          margin: [36, 15, 36, 0],
+          margin: [36, 12, 36, 0], // Margen superior de cabecera ajustado para dar altura
           columns: [
             // Cabecera Zona 1: Logo Oficial (Agrandado y directo sin círculo)
             ...(options.logoImg
@@ -205,7 +205,7 @@ export class PdfLayoutBase {
               lineHeight: 1.15,
               color: "#1E293B",
             },
-            // Cabecera Zona 3: Foto del Militar/Afiliado (Agrandada + Grado debajo)
+            // Cabecera Zona 3: Foto del Militar/Afiliado (Agrandada + Grado superpuesto al frente)
             {
               width: 70,
               stack: [
@@ -240,14 +240,14 @@ export class PdfLayoutBase {
                         margin: [0, -42, 0, 0],
                       },
                     ]),
-                // Grado gráfico debajo de la foto
+                // Grado gráfico al pie de la foto, posicionado debajo
                 ...(options.gradoBadgeImg
                   ? [
                       {
                         image: "gradoBadge",
                         fit: [55, 18],
                         alignment: "center",
-                        margin: [0, 4, 0, 0],
+                        margin: [0, 4, 0, 0], // Posiciona la insignia debajo de la foto sin superposición
                       },
                     ]
                   : []),

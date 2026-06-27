@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ViewChild } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  inject,
+  ChangeDetectorRef,
+  ViewChild,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
 import { ConstanciaAfiliacionComponent } from "../../afiliacion/identificacion/pdf/constancia-afiliacion.component";
@@ -8,6 +15,7 @@ import { UtilService } from "src/app/core/services/util/util.service";
 import { ApiService } from "src/app/core/services/api.service";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
+import { LoginService } from "src/app/core/services/login/login.service";
 
 @Component({
   selector: "app-mobile-identificacion",
@@ -19,6 +27,7 @@ import { takeUntil } from "rxjs/operators";
 export class MobileIdentificacionComponent implements OnInit, OnDestroy {
   private afiliadoService = inject(AfiliadoService);
   private layoutService = inject(LayoutService);
+  private loginService = inject(LoginService);
   private utilService = inject(UtilService);
   private apiService = inject(ApiService);
   private cdr = inject(ChangeDetectorRef);
@@ -26,7 +35,7 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
 
   public militar: any = null;
   public familiares: any[] = [];
-  
+
   public tiempoServicio: string = "";
   public tiempoServicioTotal: string = "";
   public fechaVencimientoTIM: string = "";
@@ -51,6 +60,7 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
   // Accordion control for family members list
   public expandedFamiliarIdx: number | null = null;
   public isGeneratingPdf: boolean = false;
+  public permisos: { [key: string]: boolean } = {};
 
   ngOnInit(): void {
     this.layoutService.toggleCards(false);
@@ -82,11 +92,26 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }
       });
+    this.cargarPermisologia();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  cargarPermisologia() {
+    let privilegios = this.loginService.obtenerPrivilegiosMenu("/principal");
+    // console.log(privilegios);
+    if (privilegios) {
+      Object.keys(privilegios).forEach((key) => {
+        privilegios[key].forEach((p: any) => {
+          if (p.codigo) {
+            this.permisos[p.codigo] = true;
+          }
+        });
+      });
+    }
   }
 
   private procesarDatosMilitar(): void {
@@ -95,27 +120,42 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     // Normalise Persona / DatoBasico (casing resilience)
     const pers = this.militar.persona || this.militar.Persona || {};
     const db = pers.datobasico || pers.DatoBasico || {};
-    
-    this.militarCedula = db.cedula || this.militar.cedula || this.militar.id || "N/A";
-    
+
+    this.militarCedula =
+      db.cedula || this.militar.cedula || this.militar.id || "N/A";
+
     const primerNombre = db.nombreprimero || db.nombrefirst || "";
     const primerApellido = db.apellidoprimero || db.apellidofirst || "";
-    this.militarNombre = db.nombrecompleto || `${primerNombre} ${primerApellido}`.trim() || "Militar Titular";
-    
+    this.militarNombre =
+      db.nombrecompleto ||
+      `${primerNombre} ${primerApellido}`.trim() ||
+      "Militar Titular";
+
     // Normalise Componente
     const comp = this.militar.componente || this.militar.Componente || {};
     this.militarComponente = comp.descripcion || comp.nombre || "N/A";
-    
+
     // Normalise Grado
     const grad = this.militar.grado || this.militar.Grado || {};
     this.militarGrado = grad.descripcion || grad.nombre || "N/A";
-    
+
     // Categoria & Clase
-    this.militarCategoria = this.militar.categoria || "N/A";
+    const catCode = String(this.militar.categoria || "")
+      .toUpperCase()
+      .trim();
+    if (catCode === "EFE") {
+      this.militarCategoria = "EFECTIVO";
+    } else if (catCode === "ASI") {
+      this.militarCategoria = "ASIMILADO";
+    } else {
+      this.militarCategoria = this.militar.categoria || "N/A";
+    }
     this.militarClase = this.militar.clase || "N/A";
-    
+
     // Situacion & Dates
-    const sitCode = String(this.militar.situacion || "").toUpperCase().trim();
+    const sitCode = String(this.militar.situacion || "")
+      .toUpperCase()
+      .trim();
     if (sitCode === "ACT") {
       this.militarSituacion = "ACTIVO";
     } else if (sitCode === "RCP") {
@@ -136,20 +176,24 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     const fingreso = this.militar.fingreso || "";
     const fretiro = this.militar.fretiro || "";
     const situacion = this.militar.situacion || "";
-    
-    this.tiempoServicio = this.utilService.calcularTServicio(fingreso, fretiro, situacion);
-    
+
+    this.tiempoServicio = this.utilService.calcularTServicio(
+      fingreso,
+      fretiro,
+      situacion,
+    );
+
     const tieneReconocido =
       this.militar.areconocido > 0 ||
       this.militar.mreconocido > 0 ||
       this.militar.dreconocido > 0;
-      
+
     this.tiempoServicioTotal = tieneReconocido
       ? this.utilService.calcularTServicioTotal(
           fingreso,
           this.militar.areconocido || 0,
           this.militar.mreconocido || 0,
-          this.militar.dreconocido || 0
+          this.militar.dreconocido || 0,
         )
       : "";
 
@@ -162,12 +206,14 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
       const fpers = f.persona || f.Persona || {};
       const fdb = fpers.datobasico || fpers.DatoBasico || {};
       const fcedula = fdb.cedula || f.cedula || "N/A";
-      const fNombre1 = fdb.nombreprimero || fdb.nombrecompleto || fdb.nombrefirst || "";
+      const fNombre1 =
+        fdb.nombreprimero || fdb.nombrecompleto || fdb.nombrefirst || "";
       const fApellido1 = fdb.apellidoprimero || fdb.apellidofirst || "";
-      const fnombres = `${fNombre1} ${fApellido1}`.trim() || f.nombre || "Familiar";
+      const fnombres =
+        `${fNombre1} ${fApellido1}`.trim() || f.nombre || "Familiar";
       const fsexo = fdb.sexo || "M";
       const fparentesco = f.parentesco || "";
-      
+
       // Load familiar photo asynchronously
       this.loadFamiliarPhoto(this.militarCedula, fcedula, index);
 
@@ -180,8 +226,18 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
         fingreso: f.fechaafiliacion || f.fingreso || "N/A",
         beneficiario: f.beneficio ? "SÍ" : "NO",
         esmilitar: f.esmilitar ? "SÍ" : "NO",
-        estadoCivil: fdb.estadocivil === "S" ? "Soltero(a)" : fdb.estadocivil === "C" ? "Casado(a)" : fdb.estadocivil || "N/A",
-        fotoUrl: ""
+        estadoCivil:
+          fdb.estadocivil === "S"
+            ? "Soltero(a)"
+            : fdb.estadocivil === "C"
+              ? "Casado(a)"
+              : fdb.estadocivil || "N/A",
+        fotoUrl: "",
+        fechanacimiento: fdb.fechanacimiento || "",
+        inactivo:
+          f.beneficio === false ||
+          String(f.beneficio).toLowerCase() === "false" ||
+          f.beneficio === 0,
       };
     });
 
@@ -218,8 +274,17 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadFamiliarPhoto(militarCedula: string, familiarCedula: string, index: number): void {
-    if (militarCedula && familiarCedula && familiarCedula !== "N/A" && familiarCedula !== "") {
+  loadFamiliarPhoto(
+    militarCedula: string,
+    familiarCedula: string,
+    index: number,
+  ): void {
+    if (
+      militarCedula &&
+      familiarCedula &&
+      familiarCedula !== "N/A" &&
+      familiarCedula !== ""
+    ) {
       const payload = {
         ruta: "img/temp/" + militarCedula + "/",
         archivo: "foto" + familiarCedula + ".jpg",
@@ -235,7 +300,7 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           // Silently ignore if familiar has no photo
-        }
+        },
       });
     }
   }
@@ -262,7 +327,8 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
   }
 
   getGradoBadgePath(): string {
-    const abrev = this.militar?.grado?.abreviatura || this.militar?.Grado?.abreviatura;
+    const abrev =
+      this.militar?.grado?.abreviatura || this.militar?.Grado?.abreviatura;
     if (!abrev) return "";
     let badge = String(abrev).toLowerCase().trim();
     if (badge === "1er tte") badge = "ptte";
@@ -278,7 +344,8 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  @ViewChild("constanciaAfiliacion") constanciaPdf!: ConstanciaAfiliacionComponent;
+  @ViewChild("constanciaAfiliacion")
+  constanciaPdf!: ConstanciaAfiliacionComponent;
 
   async generarConstanciaPDF(): Promise<void> {
     if (this.constanciaPdf) {

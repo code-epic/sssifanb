@@ -85,7 +85,7 @@ export class ApiService {
     return this._http.post(this._resolveUrl(endpoint), body, {
       params,
       headers,
-      responseType: 'blob'
+      responseType: "blob",
     });
   }
 
@@ -231,11 +231,22 @@ export class ApiService {
   }
 
   /**
+   * @param tipo png | base64
+   * @returns QR
+   */
+  public MakeQR_Libre(objeto: { id: string; ruta: string }): Observable<any> {
+    return this.get("genqr-libre/" + objeto.id + "/" + objeto.ruta);
+  }
+
+  /**
    * Obtiene la fotografía de un afiliado (militar titular o familiar) en formato Blob.
    * @param militarCedula Cédula del militar titular.
    * @param familiarCedula Cédula opcional del familiar. Si se suministra, se busca foto[familiarCedula].jpg
    */
-  public getPhotoId(militarCedula: string, familiarCedula?: string): Observable<Blob> {
+  public getPhotoId(
+    militarCedula: string,
+    familiarCedula?: string,
+  ): Observable<Blob> {
     const filename = familiarCedula ? `foto${familiarCedula}.jpg` : "foto.jpg";
     const payload = {
       ruta: `img/temp/${militarCedula}/`,

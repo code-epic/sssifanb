@@ -49,7 +49,10 @@
     </div>
 
     <!-- Action Banner: Generar Constancia (Mobile Optimized) -->
-    <div class="action-banner p-3 rounded-20 bg-white shadow-premium mb-4 d-flex justify-content-between align-items-center">
+    <div *ngIf="permisos['bencontanciaafiliacion']" class="action-banner p-3 rounded-20 bg-white shadow-premium mb-4 d-flex justify-content-between align-items-center position-relative overflow-hidden"
+         [class.loading]="isGeneratingPdf"
+         [class.disabled-banner]="isGeneratingPdf"
+         (click)="!isGeneratingPdf && generarConstanciaPDF()">
       <div class="d-flex align-items-center">
         <div class="action-icon-circle mr-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: rgba(229, 62, 62, 0.08); border-radius: 50%;">
           <i class="fas fa-file-pdf text-danger" style="font-size: 1.25rem;"></i>
@@ -59,10 +62,15 @@
           <p class="text-muted small mb-0" style="font-size: 0.72rem;">Descargar constancia oficial en PDF</p>
         </div>
       </div>
-      <button type="button" class="btn btn-mobile-primary d-flex align-items-center justify-content-center rounded-12 p-0" [disabled]="isGeneratingPdf" (click)="generarConstanciaPDF()" style="width: 40px; height: 40px;">
+      <button type="button" class="btn btn-mobile-primary d-flex align-items-center justify-content-center rounded-12 p-0" [disabled]="isGeneratingPdf" style="width: 40px; height: 40px;">
         <i *ngIf="!isGeneratingPdf" class="fas fa-file-download" style="font-size: 1rem;"></i>
         <span *ngIf="isGeneratingPdf" class="spinner-border spinner-border-sm text-white" role="status" style="width: 1.15rem; height: 1.15rem; border-width: 2px;"></span>
       </button>
+
+      <!-- Elegant horizontal progress bar indicator -->
+      <div class="action-banner-progress">
+        <div class="progress-bar-indicator"></div>
+      </div>
     </div>
 
     <!-- Section 1: Datos Militares (Read Only) -->
