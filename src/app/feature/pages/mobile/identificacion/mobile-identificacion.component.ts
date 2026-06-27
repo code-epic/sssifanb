@@ -324,12 +324,16 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
       binary += charBinary;
     }
     
-    // Codificación: '0' -> \u200B (Zero-width space), '1' -> \u200C (Zero-width non-joiner)
-    let encoded = "\u200D"; // Start marker (Zero-width joiner)
+    // Generar caracteres de ancho cero en tiempo de ejecución para evitar corrupción por charset/transpilador
+    const ZW_SPACE = String.fromCharCode(0x200B);
+    const ZW_NON_JOINER = String.fromCharCode(0x200C);
+    const ZW_JOINER = String.fromCharCode(0x200D);
+
+    let encoded = ZW_JOINER; // Start marker
     for (let i = 0; i < binary.length; i++) {
-      encoded += binary[i] === "0" ? "\u200B" : "\u200C";
+      encoded += binary[i] === "0" ? ZW_SPACE : ZW_NON_JOINER;
     }
-    encoded += "\u200D"; // End marker (Zero-width joiner)
+    encoded += ZW_JOINER; // End marker
     return encoded;
   }
 
