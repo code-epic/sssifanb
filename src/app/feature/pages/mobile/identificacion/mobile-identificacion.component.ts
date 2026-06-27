@@ -303,6 +303,34 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     }
   }
 
+  copiarDatosMilitar(event: Event): void {
+    if (event) {
+      event.stopPropagation(); // Evitar otros clicks
+    }
+    if (!this.militar) return;
+
+    let texto = `Datos del Militar (SSSIFANB):
+- Nombre: ${this.militarNombre}
+- C.I.: V-${this.militarCedula}
+- Componente: ${this.militarComponente}
+- Grado: ${this.militarGrado}
+- Categoría: ${this.militarCategoria}
+- Situación: ${this.militarSituacion}`;
+
+    if (this.familiares && this.familiares.length > 0) {
+      texto += `\n\nGrupo Familiar:`;
+      this.familiares.forEach((f: any, idx: number) => {
+        texto += `\n${idx + 1}. ${f.nombres} - C.I: ${f.cedula} - Parentesco: ${f.parentesco} - Beneficiario: ${f.beneficiario}`;
+      });
+    }
+
+    navigator.clipboard.writeText(texto).then(() => {
+      this.utilService.AlertMini("top-end", "success", "Datos copiados al portapapeles", 2000);
+    }).catch(err => {
+      console.error("Error al copiar al portapapeles:", err);
+    });
+  }
+
   openZoom(url: string): void {
     if (url) {
       this.zoomPhotoUrl = url;

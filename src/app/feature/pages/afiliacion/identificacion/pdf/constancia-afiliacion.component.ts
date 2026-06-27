@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { PdfLayoutBase } from "./pdf-layout-base.component";
 import * as pdfMake from "pdfmake/build/pdfmake";
 import { Sha256Service } from "src/app/core/services/util/sha256";
+import { UtilService } from "src/app/core/services/util/util.service";
 
 @Component({
   selector: "app-constancia-afiliacion",
@@ -16,6 +17,7 @@ import { Sha256Service } from "src/app/core/services/util/sha256";
 })
 export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
   private sha256 = inject(Sha256Service);
+  private utilService = inject(UtilService);
 
   @Input() public militar: any;
   @Input() public familiares: any[] = [];
@@ -318,7 +320,23 @@ export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
     // Formateo estricto a DD/MM/YYYY para fechas de servicio
     const fIngreso = this.formatToDDMMYYYY(this.militar.fingreso);
     const fAscenso = this.formatToDDMMYYYY(this.militar.fascenso);
-    const anosServicio = this.militar.tiempodeservicio || "N/D";
+    // Calcular dinámicamente los años de servicio alineado con la lógica de la WEB
+    let fingresoIso = "";
+    let fretiroIso = "";
+    if (this.militar.fingreso) {
+      const dateVal = this.militar.fingreso.$date || this.militar.fingreso;
+      if (typeof dateVal === "string") {
+        fingresoIso = dateVal.split("T")[0];
+      }
+    }
+    if (this.militar.fretiro) {
+      const dateVal = this.militar.fretiro.$date || this.militar.fretiro;
+      if (typeof dateVal === "string") {
+        fretiroIso = dateVal.split("T")[0];
+      }
+    }
+    const sitCode = String(this.militar.situacion || "").toUpperCase().trim();
+    const anosServicio = this.utilService.calcularTServicio(fingresoIso, fretiroIso, sitCode) || "N/D";
 
     const fechaHoyString = this.getFechaHoyTexto();
 
@@ -410,6 +428,8 @@ export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
             [
               { text: "Años Servicio", style: "tableHeader" },
               { text: anosServicio, colSpan: 3, fontSize: 8.5 },
+              {},
+              {},
             ],
           ],
         },

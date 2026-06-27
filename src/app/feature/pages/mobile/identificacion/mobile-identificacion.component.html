@@ -41,9 +41,17 @@
           <h4 class="militar-name text-truncate">
             {{ militarNombre }}
           </h4>
-          <p class="militar-id">
-            C.I. V-{{ militarCedula }}
-          </p>
+          <div class="d-flex align-items-center">
+            <p class="militar-id mb-0">
+              C.I. V-{{ militarCedula }}
+            </p>
+            <button type="button" class="btn btn-link p-0 d-inline-flex align-items-center" 
+                    (click)="copiarDatosMilitar($event)" 
+                    title="Copiar datos para Whatsapp" 
+                    style="margin-left: 8px; border: none; background: transparent; outline: none; box-shadow: none; cursor: pointer;">
+              <i class="far fa-copy text-white" style="font-size: 0.88rem; opacity: 0.8;"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -62,10 +70,10 @@
           <p class="text-muted small mb-0" style="font-size: 0.72rem;">Descargar constancia oficial en PDF</p>
         </div>
       </div>
-      <button type="button" class="btn btn-mobile-primary d-flex align-items-center justify-content-center rounded-12 p-0" [disabled]="isGeneratingPdf" style="width: 40px; height: 40px;">
-        <i *ngIf="!isGeneratingPdf" class="fas fa-file-download" style="font-size: 1rem;"></i>
-        <span *ngIf="isGeneratingPdf" class="spinner-border spinner-border-sm text-white" role="status" style="width: 1.15rem; height: 1.15rem; border-width: 2px;"></span>
-      </button>
+      <div class="d-flex align-items-center justify-content-center mr-2" style="width: 24px; height: 24px;">
+        <span *ngIf="isGeneratingPdf" class="spinner-border spinner-border-sm text-danger" role="status" style="width: 1.15rem; height: 1.15rem; border-width: 2px;"></span>
+        <i *ngIf="!isGeneratingPdf" class="fas fa-chevron-right text-muted" style="font-size: 0.9rem; opacity: 0.5;"></i>
+      </div>
 
       <!-- Elegant horizontal progress bar indicator -->
       <div class="action-banner-progress">

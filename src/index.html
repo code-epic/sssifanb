@@ -264,7 +264,24 @@
 
       xhr.addEventListener('loadend', function () {
         if (xhr.status >= 400) {
-          let responseBody = xhr.responseText || '[No Body]';
+          // Ignorar de forma elegante los códigos 409 de dwscdn para evitar falsos positivos
+          if (url && url.indexOf('dwscdn') !== -1 && xhr.status === 409) {
+            return;
+          }
+
+          let responseBody = '[No Body]';
+          if (xhr.responseType === '' || xhr.responseType === 'text') {
+            try {
+              responseBody = xhr.responseText || '[No Body]';
+            } catch (e) {
+              responseBody = '[Error reading responseText]';
+            }
+          } else if (xhr.responseType === 'blob') {
+            responseBody = '[Blob Content]';
+          } else {
+            responseBody = `[Response Type: ${xhr.responseType}]`;
+          }
+
           if (responseBody.length > 5000) responseBody = responseBody.substring(0, 5000) + '... (truncated)';
 
           const msg = `XHR Error ${xhr.status} ${method} ${url}`;
