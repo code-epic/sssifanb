@@ -110,7 +110,7 @@
         <div class="info-row d-flex justify-content-between py-2 border-bottom">
           <span class="info-label text-muted small">Ingreso / Ascenso:</span>
           <span class="info-value text-dark font-weight-bold small">
-            {{ militarFingreso | date:'dd/MM/yyyy' }} &bull; {{ militarFascenso | date:'dd/MM/yyyy' }}
+            {{ militarFingreso }} &bull; {{ militarFascenso }}
           </span>
         </div>
         <div class="info-row d-flex justify-content-between py-2 border-bottom" *ngIf="tiempoServicio">
@@ -189,7 +189,7 @@
               </div>
               <div class="d-flex justify-content-between">
                 <span class="text-muted small">Fecha Ingreso:</span>
-                <span class="text-dark font-weight-bold small">{{ familiar.fingreso | date:'dd/MM/yyyy' }}</span>
+                <span class="text-dark font-weight-bold small">{{ familiar.fingreso }}</span>
               </div>
               <div class="d-flex justify-content-between">
                 <span class="text-muted small">Es Militar:</span>

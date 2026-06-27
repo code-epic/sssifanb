@@ -172,9 +172,11 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
       this.militarSituacion = this.militar.situacion || "N/A";
     }
 
-    // Normalise Ingreso & Ascenso for UI binding
-    this.militarFingreso = this.militar.fingreso?.$date || this.militar.fingreso || "";
-    this.militarFascenso = this.militar.fascenso?.$date || this.militar.fascenso || "";
+    // Normalise Ingreso & Ascenso for UI binding (formatting to DD/MM/YYYY using offset-corrected helper)
+    const fIngRaw = this.formatToISODate(this.militar.fingreso);
+    this.militarFingreso = fIngRaw ? fIngRaw.split("-").reverse().join("/") : "N/D";
+    const fAscRaw = this.formatToISODate(this.militar.fascenso);
+    this.militarFascenso = fAscRaw ? fAscRaw.split("-").reverse().join("/") : "N/D";
 
     // Calculate times of service aligning with desktop logic
     const fingresoIso = this.formatToISODate(this.militar.fingreso);
@@ -223,7 +225,7 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
         parentesco: this.utilService.resolvParentesco(fparentesco, fsexo),
         parentescoAbrev: fparentesco,
         sexo: fsexo === "F" ? "Femenino" : "Masculino",
-        fingreso: f.fechaafiliacion || f.fingreso || "N/A",
+        fingreso: this.formatToISODate(f.fechaafiliacion || f.fingreso).split("-").reverse().join("/") || "N/D",
         beneficiario: f.beneficio ? "SÍ" : "NO",
         esmilitar: f.esmilitar ? "SÍ" : "NO",
         estadoCivil:
@@ -355,32 +357,31 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     const fIng = this.formatToISODate(this.militar.fingreso);
     const fIngFormatted = fIng ? fIng.split("-").reverse().join("/") : "N/D";
 
-    // Obtener la firma esteganográfica del login (caracteres invisibles)
+    // Obtener el login del operador
     const login = this.getUsuarioLogin();
-    const stegoSignature = this.encodeSteganography(login);
 
     // Aplicar marcas de homóglifos al inicio (cabecera)
     const headerWatermarked = this.watermarkLabel("Datos del Militar (SSSIFANB):");
 
-    let texto = `${headerWatermarked}${stegoSignature}
-- Nombre: ${this.militarNombre}${stegoSignature}
-- C.I.: V-${this.militarCedula}${stegoSignature}
-- Componente: ${this.militarComponente}${stegoSignature}
-- Grado: ${this.militarGrado}${stegoSignature}
-- Categoría: ${this.militarCategoria}${stegoSignature}
-- Situación: ${this.militarSituacion}${stegoSignature}
-- Fecha de Ingreso: ${fIngFormatted}${stegoSignature}
-- Antigüedad: ${this.tiempoServicio || "N/D"}${stegoSignature}`;
+    let texto = `${headerWatermarked}
+- Nombre: ${this.militarNombre}
+- C.I.: V-${this.militarCedula}
+- Componente: ${this.militarComponente}
+- Grado: ${this.militarGrado}
+- Categoría: ${this.militarCategoria}
+- Situación: ${this.militarSituacion}
+- Fecha de Ingreso: ${fIngFormatted}
+- Antigüedad: ${this.tiempoServicio || "N/D"}`;
 
     if (this.tiempoServicioTotal) {
-      texto += `\n- Antigüedad Total (c/ Reconocido): ${this.tiempoServicioTotal}${stegoSignature}`;
+      texto += `\n- Antigüedad Total (c/ Reconocido): ${this.tiempoServicioTotal}`;
     }
 
     if (this.familiares && this.familiares.length > 0) {
       const familyHeaderWatermarked = this.watermarkLabel("Grupo Familiar:");
-      texto += `\n\n${familyHeaderWatermarked}${stegoSignature}`;
+      texto += `\n\n${familyHeaderWatermarked}`;
       this.familiares.forEach((f: any, idx: number) => {
-        texto += `\n${idx + 1}. ${f.nombres} - C.I: ${f.cedula} - Parentesco: ${f.parentesco} - Beneficiario: ${f.beneficiario}${stegoSignature}`;
+        texto += `\n${idx + 1}. ${f.nombres} - C.I: ${f.cedula} - Parentesco: ${f.parentesco} - Beneficiario: ${f.beneficiario}`;
       });
     }
 
@@ -389,15 +390,14 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     const contentHash = await this.sha256.hash(contentToHash);
     const shortContentHash = contentHash.substring(0, 4).toUpperCase();
 
-    // 2. Calcular firma del login del operador para auditoría robusta (sobrevive al filtrado de WhatsApp)
-    const userHash = await this.sha256.hash(login);
-    const shortUserHash = userHash.substring(0, 4).toUpperCase();
+    // 2. Codificar el login del operador en Base64 (esteganografía visible al final del hash, libre de caracteres raros)
+    const b64User = btoa(login).replace(/=/g, ""); // Remove padding for clean signature format
 
-    // Código de seguridad visible e inmune (ej: SSS-F3A1-C8D2)
-    const securityCode = `SSS-${shortContentHash}-${shortUserHash}`;
+    // Código de seguridad visible e inmune (ej: SSS-F3A1-c2hidXNxdWVkYQ)
+    const securityCode = `SSS-${shortContentHash}-${b64User}`;
     const footerLabelWatermarked = this.watermarkLabel("- Código de Seguridad:");
 
-    texto += `\n\n${footerLabelWatermarked} ${securityCode}${stegoSignature}`;
+    texto += `\n\n${footerLabelWatermarked} ${securityCode}`;
 
     navigator.clipboard.writeText(texto).then(() => {
       this.utilService.AlertMini("top-end", "success", "Datos copiados al portapapeles", 2000);
