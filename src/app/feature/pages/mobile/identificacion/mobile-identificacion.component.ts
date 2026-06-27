@@ -169,31 +169,29 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     } else {
       this.militarSituacion = this.militar.situacion || "N/A";
     }
-    this.militarFingreso = this.militar.fingreso || "";
-    this.militarFascenso = this.militar.fascenso || "";
 
-    // Calculate times of service
-    const fingreso = this.militar.fingreso || "";
-    const fretiro = this.militar.fretiro || "";
+    // Normalise Ingreso & Ascenso for UI binding
+    this.militarFingreso = this.militar.fingreso?.$date || this.militar.fingreso || "";
+    this.militarFascenso = this.militar.fascenso?.$date || this.militar.fascenso || "";
+
+    // Calculate times of service aligning with desktop logic
+    const fingresoIso = this.formatToISODate(this.militar.fingreso);
+    const fretiroIso = this.formatToISODate(this.militar.fretiro);
     const situacion = this.militar.situacion || "";
-
-    this.tiempoServicio = this.utilService.calcularTServicio(
-      fingreso,
-      fretiro,
-      situacion,
-    );
-
+    
+    this.tiempoServicio = this.utilService.calcularTServicio(fingresoIso, fretiroIso, situacion);
+    
     const tieneReconocido =
       this.militar.areconocido > 0 ||
       this.militar.mreconocido > 0 ||
       this.militar.dreconocido > 0;
-
+      
     this.tiempoServicioTotal = tieneReconocido
       ? this.utilService.calcularTServicioTotal(
-          fingreso,
+          fingresoIso,
           this.militar.areconocido || 0,
           this.militar.mreconocido || 0,
-          this.militar.dreconocido || 0,
+          this.militar.dreconocido || 0
         )
       : "";
 
@@ -359,6 +357,37 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
       }
     } else {
       console.warn("Componente de constancia de afiliación no disponible.");
+    }
+  }
+
+  /**
+   * Normaliza cualquier formato de fecha de MongoDB (Date, string, objeto $date) a formato ISO YYYY-MM-DD
+   */
+  private formatToISODate(mongoDate: any): string {
+    if (!mongoDate) return "";
+    try {
+      let date: Date;
+      if (typeof mongoDate === "string") {
+        date = new Date(mongoDate);
+      } else if (mongoDate.$date && typeof mongoDate.$date === "string") {
+        date = new Date(mongoDate.$date);
+      } else {
+        date = new Date(mongoDate);
+      }
+
+      if (isNaN(date.getTime())) return "";
+
+      // Añadir la zona horaria de Venezuela para evitar desfases de un día
+      const offset = date.getTimezoneOffset();
+      date.setMinutes(date.getMinutes() + offset);
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      return "";
     }
   }
 }

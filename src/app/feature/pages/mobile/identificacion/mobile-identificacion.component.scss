@@ -1,6 +1,10 @@
 .mobile-afi-page {
   animation: fadeIn 0.4s ease-out;
-  padding-bottom: 2rem;
+  padding: 16px 16px 2.5rem 16px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 // Search Prompt placeholder
