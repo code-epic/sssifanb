@@ -35,6 +35,9 @@ export const environment = {
     OBTENER_BENEFICIARIO_DIRECTIVA_ID: "IPSFA_CBeneficiarioDirectivaID",
     LISTAR_TMP_AVIACION: "IPSFA_CTmpAviacion",
     CONSULTAR_MOVIMIENTOS: "IPSFA_CMovimientosTipo",
+    CONSULTAR_MOVIMIENTOS_INDIVIDUAL: "IPSFA_CMovimientosIndividual",
+    CONSULTAR_ORDENES: "IPSFA_COrdenes",
+    CONSULTAR_SUELDOS: "IPSFA_CHistorialSueldo",
   },
   subPath: {
     login: "wusuario/loginV2",

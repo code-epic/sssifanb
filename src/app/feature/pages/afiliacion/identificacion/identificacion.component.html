@@ -38,7 +38,7 @@
                                 </div>
                                 <!-- Botón de Impresión de Documentos -->
                                 <div class="dropdown" [class.show]="showPrintDropdown" *ngIf="tiempoServicio" >
-                                    <button
+                                    <button 
                                         *ngIf="getCargo() == '' "
                                         class="btn btn-sm shadow-sm dropdown-toggle-no-caret d-flex align-items-center justify-content-center"
                                         type="button" id="printDocsDropdown"
@@ -59,7 +59,9 @@
                                                 style="width: 20px; text-align: center;"></i>DOCUMENTOS Y REPORTES</h6>
                                         <div class="dropdown-divider mb-1"
                                             style="border-top-color: rgba(89, 140, 137, 0.1);"></div>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                        <a 
+                                            *ngIf="permisos['benhojaruta']"
+                                            class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
                                             style="transition: all 0.2s ease;" href="javascript:void(0);"
                                             (click)="imprimirDocumento('hoja_ruta', $event)"
                                             onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
@@ -67,7 +69,9 @@
                                             <i class="fas fa-map mr-3 opacity-75"
                                                 style="width: 20px; text-align: center;"></i> Hoja de Ruta
                                         </a>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                        <a 
+                                            *ngIf="permisos['benconsultarnetos']"
+                                            class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
                                             style="transition: all 0.2s ease;" href="javascript:void(0);"
                                             (click)="imprimirDocumento('consultar_netos', $event)"
                                             onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
@@ -76,7 +80,9 @@
                                                 style="width: 20px; text-align: center;"></i> Consultar Netos
                                         </a>
                                         
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                        <a 
+                                            *ngIf="permisos['benconstanciaarc']"
+                                            class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
                                             style="transition: all 0.2s ease;" href="javascript:void(0);"
                                             (click)="imprimirDocumento('constancia_arc', $event)"
                                             onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
@@ -84,16 +90,23 @@
                                             <i class="fas fa-file-invoice-dollar mr-3 opacity-75"
                                                 style="width: 20px; text-align: center;"></i> Constancia de ARC
                                         </a>
-                                        <a class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
+                                        <a 
+                                            *ngIf="permisos['bencontanciaafiliacion']"
+                                            class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
                                             style="transition: all 0.2s ease;" href="javascript:void(0);"
-                                            (click)="imprimirDocumento('constancia_afiliacion', $event)"
+                                            (click)="!isGeneratingPdf && imprimirDocumento('constancia_afiliacion', $event)"
+                                            [class.disabled]="isGeneratingPdf"
                                             onmouseover="this.style.backgroundColor='rgba(89, 140, 137, 0.05)'; this.style.color='#598c89'"
                                             onmouseout="this.style.backgroundColor='transparent'; this.style.color=''">
-                                            <i class="fas fa-file-pdf mr-3 opacity-75"
-                                                style="width: 20px; text-align: center;"></i> Constancia de Afiliación
+                                            <i *ngIf="isGeneratingPdf && pdfTypeGenerating === 'constancia_afiliacion'" class="fas fa-spinner fa-spin mr-3 opacity-75" style="width: 20px; text-align: center;"></i>
+                                            <i *ngIf="!isGeneratingPdf || pdfTypeGenerating !== 'constancia_afiliacion'" class="fas fa-file-pdf mr-3 opacity-75" style="width: 20px; text-align: center;"></i> Constancia de Afiliación
                                         </a>
-                                        <a  *ngIf="permisos['benconsultarnetos']" class="dropdown-item" [class.disabled]="!isBunkerSync" [class.text-muted]="!isBunkerSync" href="javascript:void(0)" (click)="isBunkerSync && imprimirDocumento('hoja_vida', $event)">
-                                            <i class="fas fa-file-pdf mr-2" [class.text-danger]="isBunkerSync" style="width: 20px; text-align: center;"></i> Hoja de Vida
+                                        <a *ngIf="permisos['benhojavida']" class="dropdown-item py-2 d-flex align-items-center font-weight-500 cursor-pointer" 
+                                            [class.disabled]="!isBunkerSync || isGeneratingPdf" 
+                                            [class.text-muted]="!isBunkerSync" href="javascript:void(0)" 
+                                            (click)="isBunkerSync && !isGeneratingPdf && imprimirDocumento('hoja_vida', $event)">
+                                            <i *ngIf="isGeneratingPdf && pdfTypeGenerating === 'hoja_vida'" class="fas fa-spinner fa-spin mr-3" [class.text-danger]="isBunkerSync" style="width: 20px; text-align: center;"></i>
+                                            <i *ngIf="!isGeneratingPdf || pdfTypeGenerating !== 'hoja_vida'" class="fas fa-file-pdf mr-3" [class.text-danger]="isBunkerSync" style="width: 20px; text-align: center;"></i> Hoja de Vida
                                             <span *ngIf="!isBunkerSync" class="ml-2 badge badge-warning"><i class="fas fa-spinner fa-spin"></i></span>
                                         </a>
 
@@ -1941,18 +1954,15 @@
         <div class="modal-body p-4 bg-white">
             <!-- Filtro -->
             <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="modern-form-group mb-0 text-left">
-                        <label class="text-dark font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">TIPO DE MOVIMIENTO</label>
-                        <div class="input-group">
+                <div class="col-md-6 offset-md-6">
+                    <div class="modern-form-group mb-0 text-right">
+                        <div class="input-group" style="box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden;">
                             <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-filter text-success"></i></span>
+                                <span class="input-group-text bg-white border-0"><i class="fas fa-filter text-muted"></i></span>
                             </div>
-                            <select class="form-control" [(ngModel)]="tipoMovimientoFiltro" (change)="filtrarMovimientos()">
-                                <option value="">TODOS</option>
-                                <option value="INGRESO">INGRESO</option>
-                                <option value="EGRESO">EGRESO</option>
-                                <option value="AJUSTE">AJUSTE</option>
+                            <select class="form-control border-0 bg-white" [(ngModel)]="tipoMovimientoFiltro" (change)="filtrarMovimientos()" style="color: #475569; font-weight: 500; cursor: pointer;">
+                                <option value="">Todos los movimientos</option>
+                                <option *ngFor="let grupo of gruposMovimientos" [value]="grupo">{{ grupo | uppercase}}</option>
                             </select>
                         </div>
                     </div>
@@ -1966,7 +1976,7 @@
                         <tr>
                             <th class="text-uppercase text-dark font-weight-bold mb-0 pl-4" style="font-size: 0.75rem; letter-spacing: 1px;">Fecha / Hora</th>
                             <th class="text-uppercase text-dark font-weight-bold mb-0" style="font-size: 0.75rem; letter-spacing: 1px;">Monto</th>
-                            <th class="text-right text-uppercase text-dark font-weight-bold mb-0 pr-4" style="font-size: 0.75rem; letter-spacing: 1px;">Descripción</th>
+                            <th *ngIf="!tipoMovimientoFiltro" class="text-right text-uppercase text-dark font-weight-bold mb-0 pr-4" style="font-size: 0.75rem; letter-spacing: 1px;">Descripción</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1975,20 +1985,15 @@
                                 <div>{{ mov.fecha | date:'dd/MM/yyyy' }}</div>
                                 <small class="text-muted"><i class="far fa-clock mr-1"></i> {{ mov.fecha | date:'hh:mm a' }}</small>
                             </td>
-                            <td class="font-weight-600 py-3" style="font-size: 1.05rem;" [ngClass]="{'text-success': mov.monto > 0, 'text-danger': mov.monto < 0, 'text-dark': mov.monto === 0}">
-                                {{ mov.monto > 0 ? '+' : '' }}{{ mov.monto | number:'1.2-2' }} {{ moneda }}
+                            <td class="font-weight-600 py-3" style="font-size: 1.05rem;" [ngStyle]="{'color': mov.monto > 0 ? '#34d399' : (mov.monto < 0 ? '#fb7185' : '#94a3b8')}">
+                                {{ (mov.monto > 0 ? mov.monto : (mov.monto * -1)) | number:'1.2-2' }} {{ moneda }}
                             </td>
-                            <td class="text-right pr-4 font-weight-500 py-3" style="font-size: 0.95rem; color: #64748b;">
-                                <span class="badge badge-pill mr-2" 
-                                    [ngClass]="{'badge-success': mov.tipo === 'INGRESO', 'badge-danger': mov.tipo === 'EGRESO', 'badge-warning': mov.tipo === 'AJUSTE'}"
-                                    style="font-size: 0.65rem; padding: 0.3em 0.6em;">
-                                    {{ mov.tipo }}
-                                </span>
+                            <td *ngIf="!tipoMovimientoFiltro" class="text-right pr-4 font-weight-500 py-3" style="font-size: 0.95rem; color: #64748b;">
                                 {{ mov.descripcion }}
                             </td>
                         </tr>
                         <tr *ngIf="movimientosPaginados.length === 0">
-                            <td colspan="3" class="text-center py-4 text-muted font-weight-500">
+                            <td [attr.colspan]="tipoMovimientoFiltro ? 2 : 3" class="text-center py-4 text-muted font-weight-500">
                                 <i class="fas fa-inbox mb-2" style="font-size: 1.5rem; opacity: 0.5; display: block;"></i>
                                 No se encontraron movimientos.
                             </td>
@@ -2153,7 +2158,7 @@
                             <td class="font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">
                                 {{ sld.sueldoBase | number:'1.2-2' }} {{ moneda }}
                             </td>
-                            <td class="text-right pr-4 font-weight-600 py-3" style="font-size: 1.05rem;" class="text-success">
+                            <td class="text-right pr-4 font-weight-600 py-3 text-success" style="font-size: 1.05rem;">
                                 {{ sld.sueldoMensual | number:'1.2-2' }} {{ moneda }}
                             </td>
                         </tr>
@@ -2204,4 +2209,5 @@
 </ng-template>
 
 <app-constancia-afiliacion #constanciaAfiliacion [militar]="militar" [familiares]="familiares"></app-constancia-afiliacion>
+<app-hoja-vida #hojaVidaPdf [militar]="militar" [calculosBunker]="calculosBunker" [fechaUltimoAnticipo]="fechaUltimoAnticipo" [movimientos]="movimientos"></app-hoja-vida>
 

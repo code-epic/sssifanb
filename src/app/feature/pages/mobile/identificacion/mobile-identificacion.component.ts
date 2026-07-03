@@ -174,28 +174,36 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
 
     // Normalise Ingreso & Ascenso for UI binding (formatting to DD/MM/YYYY using offset-corrected helper)
     const fIngRaw = this.formatToISODate(this.militar.fingreso);
-    this.militarFingreso = fIngRaw ? fIngRaw.split("-").reverse().join("/") : "N/D";
+    this.militarFingreso = fIngRaw
+      ? fIngRaw.split("-").reverse().join("/")
+      : "N/D";
     const fAscRaw = this.formatToISODate(this.militar.fascenso);
-    this.militarFascenso = fAscRaw ? fAscRaw.split("-").reverse().join("/") : "N/D";
+    this.militarFascenso = fAscRaw
+      ? fAscRaw.split("-").reverse().join("/")
+      : "N/D";
 
     // Calculate times of service aligning with desktop logic
     const fingresoIso = this.formatToISODate(this.militar.fingreso);
     const fretiroIso = this.formatToISODate(this.militar.fretiro);
     const situacion = this.militar.situacion || "";
-    
-    this.tiempoServicio = this.utilService.calcularTServicio(fingresoIso, fretiroIso, situacion);
-    
+
+    this.tiempoServicio = this.utilService.calcularTServicio(
+      fingresoIso,
+      fretiroIso,
+      situacion,
+    );
+
     const tieneReconocido =
       this.militar.areconocido > 0 ||
       this.militar.mreconocido > 0 ||
       this.militar.dreconocido > 0;
-      
+
     this.tiempoServicioTotal = tieneReconocido
       ? this.utilService.calcularTServicioTotal(
           fingresoIso,
           this.militar.areconocido || 0,
           this.militar.mreconocido || 0,
-          this.militar.dreconocido || 0
+          this.militar.dreconocido || 0,
         )
       : "";
 
@@ -225,7 +233,11 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
         parentesco: this.utilService.resolvParentesco(fparentesco, fsexo),
         parentescoAbrev: fparentesco,
         sexo: fsexo === "F" ? "Femenino" : "Masculino",
-        fingreso: this.formatToISODate(f.fechaafiliacion || f.fingreso).split("-").reverse().join("/") || "N/D",
+        fingreso:
+          this.formatToISODate(f.fechaafiliacion || f.fingreso)
+            .split("-")
+            .reverse()
+            .join("/") || "N/D",
         beneficiario: f.beneficio ? "SÍ" : "NO",
         esmilitar: f.esmilitar ? "SÍ" : "NO",
         estadoCivil:
@@ -312,7 +324,9 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
-        return payload?.Usuario?.usuario || payload?.Usuario?.correo || "SISTEMA";
+        return (
+          payload?.Usuario?.usuario || payload?.Usuario?.correo || "SISTEMA"
+        );
       } catch (e) {}
     }
     return "SISTEMA";
@@ -325,11 +339,11 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
       const charBinary = charCode.toString(2).padStart(8, "0");
       binary += charBinary;
     }
-    
+
     // Generar caracteres de ancho cero en tiempo de ejecución para evitar corrupción por charset/transpilador
-    const ZW_SPACE = String.fromCharCode(0x200B);
-    const ZW_NON_JOINER = String.fromCharCode(0x200C);
-    const ZW_JOINER = String.fromCharCode(0x200D);
+    const ZW_SPACE = String.fromCharCode(0x200b);
+    const ZW_NON_JOINER = String.fromCharCode(0x200c);
+    const ZW_JOINER = String.fromCharCode(0x200d);
 
     let encoded = ZW_JOINER; // Start marker
     for (let i = 0; i < binary.length; i++) {
@@ -361,7 +375,9 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
     const login = this.getUsuarioLogin();
 
     // Aplicar marcas de homóglifos al inicio (cabecera)
-    const headerWatermarked = this.watermarkLabel("Datos del Militar (SSSIFANB):");
+    const headerWatermarked = this.watermarkLabel(
+      "Datos del Militar (SSSIFANB):",
+    );
 
     let texto = `${headerWatermarked}
 - Nombre: ${this.militarNombre}
@@ -395,15 +411,25 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
 
     // Código de seguridad visible e inmune (ej: SSS-F3A1-c2hidXNxdWVkYQ)
     const securityCode = `SSS-${shortContentHash}-${b64User}`;
-    const footerLabelWatermarked = this.watermarkLabel("- Código de Seguridad:");
+    const footerLabelWatermarked = this.watermarkLabel(
+      "- Código de Seguridad:",
+    );
 
     texto += `\n\n${footerLabelWatermarked} ${securityCode}`;
 
-    navigator.clipboard.writeText(texto).then(() => {
-      this.utilService.AlertMini("top-end", "success", "Datos copiados al portapapeles", 2000);
-    }).catch(err => {
-      console.error("Error al copiar al portapapeles:", err);
-    });
+    navigator.clipboard
+      .writeText(texto)
+      .then(() => {
+        this.utilService.AlertMini(
+          "top-end",
+          "success",
+          "Datos copiados al portapapeles",
+          2000,
+        );
+      })
+      .catch((err) => {
+        console.error("Error al copiar al portapapeles:", err);
+      });
   }
 
   openZoom(url: string): void {

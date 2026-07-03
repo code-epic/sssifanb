@@ -1,7 +1,7 @@
 <!-- MAIN VIEW: MAILBOX LAYOUT -->
 <app-mailbox-layout #mailboxLayout *ngIf="!isNewAnticipoView" [tabs]="workflowTabs" [currentTabId]="currentTabId"
     [isLoadingTabs]="isLoadingData" [showToolbar]="true" [allSelected]="allSelected"
-    [searchPlaceholder]="'Buscar por cédula o código...'" (search)="onMailboxSearch($event)"
+    [searchPlaceholder]="'Buscar por cédula...'" (search)="onMailboxSearch($event)"
     (tabSwitch)="onMailboxTabSwitch($event)" (refresh)="onMailboxRefresh()" (selectAll)="onMailboxSelectAll($event)">
 
     <ng-container toolbar-actions>
@@ -21,10 +21,10 @@
             <label>Rango de Fechas</label>
             <div class="row align-items-center">
                 <div class="col-6 pr-2">
-                    <app-pastel-datepicker iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                    <app-pastel-datepicker [(ngModel)]="fechaDesde" iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
                 </div>
                 <div class="col-6 pl-2">
-                    <app-pastel-datepicker iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                    <app-pastel-datepicker [(ngModel)]="fechaHasta" iconClass="fas fa-calendar-check"></app-pastel-datepicker>
                 </div>
             </div>
         </div>
@@ -35,10 +35,10 @@
                 <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt text-verde-titulos"></i></span></div>
                 <select class="form-control" style="font-size: 0.85rem;">
                     <option value="" selected>Todos los Componentes...</option>
-                    <option value="ejb">Ejército Bolivariano</option>
-                    <option value="arb">Armada Bolivariana</option>
-                    <option value="amb">Aviación Militar</option>
-                    <option value="gnb">Guardia Nacional</option>
+                    <option value="EJ">Ejército Bolivariano</option>
+                    <option value="AR">Armada Bolivariana</option>
+                    <option value="AM">Aviación Militar</option>
+                    <option value="GN">Guardia Nacional</option>
                 </select>
             </div>
         </div>
@@ -67,14 +67,21 @@
                 style="background-color: #598c89; color: white; border-radius: 8px; font-size: 0.85rem; padding: 0.5rem;"
                 onmouseover="this.style.transform='translateY(-1px)'"
                 onmouseout="this.style.transform='translateY(0)'"
-                (click)="mailboxLayout.filterDropdown.close()">Aplicar Filtros
+                (click)="mailboxLayout.filterDropdown.close(); loadPendingData()">Aplicar Filtros
             </button>
         </div>
     </ng-container>
 
     <!-- BODY MAILBOX (LA TABLA DINÁMICA) -->
     <ng-container mailbox-body>
-        <app-dynamic-table [config]="pendingTableConfig" [data]="pendingTableData"
+        <div *ngIf="isTableLoading" class="d-flex justify-content-center align-items-center flex-column" style="height: 300px;">
+            <div class="spinner-border" style="width: 3rem; height: 3rem; color: #598c89;" role="status">
+                <span class="sr-only">Cargando...</span>
+            </div>
+            <span class="mt-3 text-muted font-weight-500" style="font-size: 0.95rem;">Cargando registros...</span>
+        </div>
+
+        <app-dynamic-table *ngIf="!isTableLoading" [config]="pendingTableConfig" [data]="pendingTableData"
             (actionClicked)="onPendingTableAction($event)">
         </app-dynamic-table>
     </ng-container>
@@ -99,8 +106,11 @@
             <div class="modern-form-group">
                 <label>Cédula de Identidad</label>
                 <div class="input-group">
-                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-id-card"></i></span></div>
-                    <input type="text" class="form-control" placeholder="Ej. 12345678" [(ngModel)]="searchCedula" (keyup.enter)="buscarMilitar()">
+                    <div class="input-group-prepend"><span class="input-group-text">
+                        <i *ngIf="!isSearching" class="fas fa-id-card"></i>
+                        <i *ngIf="isSearching" class="fas fa-circle-notch fa-spin text-info"></i>
+                    </span></div>
+                    <input type="text" class="form-control" name="searchCedula" placeholder="Ej. 12345678" [(ngModel)]="searchCedula" (keyup.enter)="buscarMilitar()">
                     <div class="input-group-append p-1">
                         <button class="btn btn-header-action teal shadow-none m-0 d-flex align-items-center justify-content-center" 
                             style="border-radius: 6px; padding: 0 1.2rem; height: 100%; border: none;" type="button" (click)="buscarMilitar()">
@@ -117,7 +127,7 @@
                 <label>Nombres y Apellidos</label>
                 <div class="input-group">
                     <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user text-verde-titulos"></i></span></div>
-                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.nombres || ''" readonly>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.persona?.datobasico?.nombrecompleto || ''" readonly>
                 </div>
             </div>
         </div>
@@ -127,49 +137,20 @@
                 <label>Sexo</label>
                 <div class="input-group">
                     <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-venus-mars text-verde-titulos"></i></span></div>
-                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.sexo || ''" readonly>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.persona?.datobasico?.sexo || ''" readonly>
                 </div>
             </div>
-        </div>
-        
-       
+        </div>       
     </div>
 
 
-    <!-- <div class="row px-3 mt-1">
-        
-        
-        <div class="col-md-3">
-            <div class="modern-form-group mb-0">
-                <label>Último Ascenso</label>
-                <div class="input-group">
-                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-medal text-verde-titulos"></i></span></div>
-                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.fechaAscenso || ''" readonly>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="modern-form-group mb-0">
-                <label>Fecha de Nacimiento</label>
-                <div class="input-group">
-                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-birthday-cake text-verde-titulos"></i></span></div>
-                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.fechaNacimiento || ''" readonly>
-                </div>
-            </div>
-        </div>
-        
-       
-    </div> -->
 
     <div class="row px-3">
         <div class="col-md-3">
             <div class="modern-form-group mb-0">
                 <label>Fecha de Ingreso</label>
-                <div class="input-group">
-                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-calendar-alt text-verde-titulos"></i></span></div>
-                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.fechaIngreso || ''" readonly>
-                </div>
+                <app-pastel-datepicker [ngModel]="militarData?.fingreso"
+                    iconClass="fas fa-calendar-check"></app-pastel-datepicker>
             </div>
         </div>
          <div class="col-md-5">
@@ -177,7 +158,7 @@
                 <label>Componente</label>
                 <div class="input-group">
                     <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt text-verde-titulos"></i></span></div>
-                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.componente || ''" readonly>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.componente.descripcion || ''" readonly>
                 </div>
             </div>
         </div>
@@ -187,7 +168,7 @@
                 <label>Grado</label>
                 <div class="input-group">
                     <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star text-verde-titulos"></i></span></div>
-                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.grado || ''" readonly>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.grado.descripcion || ''" readonly>
                 </div>
             </div>
         </div>
@@ -197,8 +178,10 @@
 
 
     <div class="text-right mt-5 mb-4 px-3" *ngIf="militarData">
-        <button class="btn btn-header-action teal shadow-sm px-5" (click)="solicitarAnticipo()">
-            <i class="fas fa-check-circle mr-2"></i> Solicitar Anticipo
+        <button class="btn btn-header-action teal shadow-sm px-5" (click)="solicitarAnticipo()" [disabled]="!calculosData">
+            <i class="fas fa-check-circle mr-2" *ngIf="calculosData"></i>
+            <i class="fas fa-spinner fa-spin mr-2" *ngIf="!calculosData"></i>
+            {{ calculosData ? 'Solicitar Anticipo' : 'Generando Cálculos...' }}
         </button>
     </div>
 
@@ -326,7 +309,7 @@
                         <label>Garantías</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-file-contract text-verde-titulos"></i></span></div>
-                            <input type="text" class="form-control text-dark font-weight-bold" value="Bs. 25,000.00" readonly>
+                            <input type="text" class="form-control text-dark font-weight-bold" [value]="calculosData ? 'Bs. ' + ((calculosData?.movimientos?.deposito_de_garantias || 0) | number:'1.2-2') : 'Bs. 0.00'" readonly>
                         </div>
                     </div>
                 </div>
@@ -335,7 +318,7 @@
                         <label>Capital en Banco</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-university text-verde-titulos"></i></span></div>
-                            <input type="text" class="form-control text-dark font-weight-bold" value="Bs. 10,000.00" readonly>
+                            <input type="text" class="form-control text-dark font-weight-bold" [value]="calculosData ? 'Bs. ' + ((calculosData?.base?.deposito_banco || 0) | number:'1.2-2') : 'Bs. 0.00'" readonly>
                         </div>
                     </div>
                 </div>
@@ -348,7 +331,7 @@
                         <label>Anticipos Acumulados</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-history text-verde-titulos"></i></span></div>
-                            <input type="text" class="form-control text-dark font-weight-bold" value="Bs. 5,000.00" readonly>
+                            <input type="text" class="form-control text-dark font-weight-bold" [value]="calculosData ? 'Bs. ' + ((calculosData?.movimientos?.anticipo || 0) | number:'1.2-2') : 'Bs. 0.00'" readonly>
                         </div>
                     </div>
                 </div>
@@ -357,7 +340,7 @@
                         <label>Asignación Depositada</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-piggy-bank text-verde-titulos"></i></span></div>
-                            <input type="text" class="form-control text-dark font-weight-bold" value="Bs. 3,500.00" readonly>
+                            <input type="text" class="form-control text-dark font-weight-bold" [value]="calculosData ? 'Bs. ' + ((calculosData?.base?.depositado_en_banco || 0) | number:'1.2-2') : 'Bs. 0.00'" readonly>
                         </div>
                     </div>
                 </div>
@@ -370,7 +353,7 @@
                         <label>M/J Activas</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-gavel text-danger"></i></span></div>
-                            <input type="text" class="form-control font-weight-bold" style="color: #ef4444;" value="0.00" readonly>
+                            <input type="text" class="form-control font-weight-bold" style="color: #ef4444;" [value]="((calculosData?.movimientos?.embargo || 0) | number:'1.2-2')" readonly>
                         </div>
                     </div>
                 </div>
@@ -379,8 +362,8 @@
                         <label>Motivo del Anticipo</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-list-ul text-verde-titulos"></i></span></div>
-                            <select class="form-control text-dark font-weight-500">
-                                <option value="" selected disabled>Seleccione un Motivo...</option>
+                            <select class="form-control text-dark font-weight-500" [(ngModel)]="motivoAnticipo">
+                                <option value="" disabled>Seleccione un Motivo...</option>
                                 <option value="1">Adquisición de Vivienda</option>
                                 <option value="2">Reparación de Vivienda</option>
                                 <option value="3">Gastos Médicos Mayores</option>
@@ -398,7 +381,7 @@
                     <div class="modern-form-group mb-0">
                         <label>Cálculo por Porcentaje (%)</label>
                         <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
-                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" style="font-size: 1.15rem; border: none; color: #0f172a;">
+                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="porcentajeAnticipo" (ngModelChange)="calcularPorPorcentaje()">
                             <div class="input-group-append p-1">
                                 <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 
                                         style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button">
@@ -412,7 +395,7 @@
                     <div class="modern-form-group mb-0">
                         <label>Cálculo por Monto (Bs.)</label>
                         <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
-                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" style="font-size: 1.15rem; border: none; color: #0f172a;">
+                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="montoAnticipo" (ngModelChange)="calcularPorMonto()">
                             <div class="input-group-append p-1">
                                 <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 
                                         style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button">

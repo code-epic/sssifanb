@@ -166,6 +166,65 @@ export class UtilService {
         `;
   }
 
+  /**
+   * Analiza una fecha genérica o fecha de MongoDB y la retorna en formato DD/MM/YYYY
+   * Útil para unificar el parsing de fechas en todos los formularios
+   * @param mongoDate Dato de tipo fecha o cadena o MongoDate
+   */
+  public formatDate(mongoDate: any): string {
+    if (!mongoDate) return "";
+
+    // Si es la fecha nula/por defecto de retiro "0000-12-31", devolver en blanco
+    if (typeof mongoDate === "string") {
+      if (mongoDate.includes("0000-12-31") || mongoDate.startsWith("0000")) {
+        return "";
+      }
+    } else if (mongoDate.$date && typeof mongoDate.$date === "string") {
+      if (
+        mongoDate.$date.includes("0000-12-31") ||
+        mongoDate.$date.startsWith("0000")
+      ) {
+        return "";
+      }
+    }
+
+    let d: Date | null = null;
+    if (mongoDate instanceof Date) {
+      d = mongoDate;
+    } else if (typeof mongoDate === "string") {
+      d = new Date(mongoDate);
+    } else if (mongoDate && typeof mongoDate === "object") {
+      if (mongoDate.$date) {
+        if (typeof mongoDate.$date === "string") {
+          d = new Date(mongoDate.$date);
+        } else if (typeof mongoDate.$date === "number") {
+          d = new Date(mongoDate.$date);
+        } else if (mongoDate.$date.$numberLong) {
+          d = new Date(parseInt(mongoDate.$date.$numberLong, 10));
+        }
+      }
+    }
+
+    if (!d || isNaN(d.getTime())) return "";
+
+    const isoDate = d.toISOString().split("T")[0];
+    if (isoDate.startsWith("0000") || isoDate === "0000-12-31") {
+      return "";
+    }
+    return isoDate;
+  }
+
+  /**
+   * Toma una fecha genérica o en formato YYYY-MM-DD y la devuelve en DD/MM/YYYY
+   * Útil para mostrar fechas en tablas y vistas
+   */
+  public formatDateDDMMYYYY(mongoDate: any): string {
+    const formatted = this.formatDate(mongoDate);
+    if (!formatted) return "";
+    const [year, month, day] = formatted.split("-");
+    return `${day}/${month}/${year}`;
+  }
+
   isDateColumn(colName: string): boolean {
     const name = colName.toLowerCase();
     return (

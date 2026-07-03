@@ -13,6 +13,7 @@ import { LiberacionesComponent } from './liberaciones/liberaciones.component';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicTableComponent } from 'src/app/shared/components/dynamic-table/dynamic-table.component';
 import { ConstanciaAfiliacionComponent } from './identificacion/pdf/constancia-afiliacion.component';
+import { HojaVidaComponent } from './identificacion/pdf/hoja-vida.component';
 
 @NgModule({
     declarations: [
@@ -32,7 +33,8 @@ import { ConstanciaAfiliacionComponent } from './identificacion/pdf/constancia-a
         PastelDatepickerComponent,
         NgbDropdownModule,
         DynamicTableComponent,
-        ConstanciaAfiliacionComponent
+        ConstanciaAfiliacionComponent,
+        HojaVidaComponent
     ]
 })
 export class AfiliacionModule { }

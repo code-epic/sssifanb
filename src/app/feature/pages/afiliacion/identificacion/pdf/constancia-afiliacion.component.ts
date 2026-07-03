@@ -80,50 +80,59 @@ export class ConstanciaAfiliacionComponent extends PdfLayoutBase {
       bodyContent,
     });
 
-    // 4. Renderizar y transmitir el PDF al contenedor principal (Tauri/Browser)
-    pdfMake
-      .createPdf(docDefinition)
-      .getBase64()
-      .then((base64Data: string) => {
-        const dataUri = `data:application/pdf;base64,${base64Data}`;
-        const fileName = `Constancia_Afiliacion_${cedulaTitular}.pdf`;
+    return new Promise<void>((resolve, reject) => {
+      try {
+        // 4. Renderizar y transmitir el PDF al contenedor principal (Tauri/Browser)
+        pdfMake
+          .createPdf(docDefinition)
+          .getBase64()
+          .then((base64Data: string) => {
+            const dataUri = `data:application/pdf;base64,${base64Data}`;
+            const fileName = `Constancia_Afiliacion_${cedulaTitular}.pdf`;
 
-        if (window.parent && window !== window.parent) {
-          window.parent.postMessage(
-            {
-              type: "OPEN_PDF",
-              payload: {
-                fileName,
-                base64: dataUri,
-              },
-            },
-            "*",
-          );
-        } else {
-          // Descarga usando blob para máxima compatibilidad con navegadores y webviews móviles
-          const isMobile = /iPhone|iPad|iPod|Android/i.test(
-            navigator.userAgent,
-          );
-          if (isMobile) {
-            pdfMake
-              .createPdf(docDefinition)
-              .getBlob()
-              .then((blob: Blob) => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.style.display = "none";
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-              });
-          } else {
-            pdfMake.createPdf(docDefinition).open();
-          }
-        }
-      });
+            if (window.parent && window !== window.parent) {
+              window.parent.postMessage(
+                {
+                  type: "OPEN_PDF",
+                  payload: {
+                    fileName,
+                    data: dataUri,
+                  },
+                },
+                "*",
+              );
+              resolve();
+            } else {
+              // Descarga usando blob para máxima compatibilidad con navegadores y webviews móviles
+              const isMobile = /iPhone|iPad|iPod|Android/i.test(
+                navigator.userAgent,
+              );
+              if (isMobile) {
+                pdfMake
+                  .createPdf(docDefinition)
+                  .getBlob()
+                  .then((blob: Blob) => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    resolve();
+                  });
+              } else {
+                pdfMake.createPdf(docDefinition).open();
+                resolve();
+              }
+            }
+          });
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 
   /**

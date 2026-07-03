@@ -19,10 +19,12 @@ export class SidebarComponent implements OnInit {
   public isCollapsed = true;
   public logoUrl: string = './assets/img/ipsfa/logo.webp';
   public activeSubMenu: string | null = null;
+  public usuario: string = '';
+  public cargo: string = '';
 
   constructor(
     private router: Router,
-    private loginService: LoginService,
+    public loginService: LoginService,
     private afiliadoService: AfiliadoService
   ) { }
 
@@ -39,6 +41,11 @@ export class SidebarComponent implements OnInit {
     // Si ROUTES está vacío (ej. F5), intentar recargarlo desde le sesión
     if (ROUTES.length == 0) {
       this.loginService.cargarMenu();
+    }
+
+    if (this.loginService.Usuario) {
+      this.usuario = this.loginService.Usuario.nombre || '';
+      this.cargo = this.loginService.Usuario.cargo || '';
     }
 
     this.router.events.subscribe((event) => {

@@ -613,7 +613,7 @@ export class FideicomitentesComponent
   }
 
   public confirmarAprobacion(): void {
-    alert(`Fideicomitente ${this.selectedItem?.id} aprobado.`);
+    // alert(`Fideicomitente ${this.selectedItem?.id} aprobado.`);
 
     this.isLoadingData = true;
     const netInfo = JSON.parse(sessionStorage.getItem("net_info") || "{}");

@@ -218,11 +218,11 @@ export class PdfLayoutBase {
       pageMargins: [36, 115, 36, 68], // Incrementado a 115pt para evitar superposiciones del contenido
       info: {
         title: options.title,
-        author: "I.P.S.F.A.N.B. - Sistema de Seguridad Social (SSSIFANB)",
-        subject: "Constancia Oficial de Afiliación",
+        author: "Sandra Ecosystem",
+        subject: "Sistema de Seguridad Social (SSSIFANB)",
         keywords: "ipsfanb, constancia, afiliacion, sssifanb, militar",
         creator: "SSSIFANB Core Engine v2.1.0",
-        producer: "pdfMake Engine",
+        producer: "Sandra Server",
       },
       background: (currentPage: number, pageCount: number) => {
         if (!this.isWatermarkEnabled) return {};
@@ -273,23 +273,23 @@ export class PdfLayoutBase {
                 },
                 {
                   text: "MINISTERIO DEL PODER POPULAR PARA LA DEFENSA",
-                  fontSize: 7,
+                  fontSize: 8,
                 },
                 {
                   text: "VICEMINISTERIO DE SERVICIOS PARA LA DEFENSA",
-                  fontSize: 7,
+                  fontSize: 8,
                 },
                 {
                   text: "DIRECCIÓN GENERAL DE EMPRESAS Y SERVICIOS",
-                  fontSize: 7,
+                  fontSize: 8,
                 },
-                { text: "INSTITUTO DE PREVISIÓN SOCIAL DE LA", fontSize: 7 },
+                { text: "INSTITUTO DE PREVISIÓN SOCIAL DE LA", fontSize: 8 },
                 {
                   text: "FUERZA ARMADA NACIONAL BOLIVARIANA",
                   bold: true,
                   fontSize: 8.5,
                 },
-                { text: "RIF: G-20003692-3", color: "#64748B", fontSize: 7 },
+                { text: "RIF: G-20003692-3", color: "#64748B", fontSize: 8 },
               ],
               alignment: "center",
               lineHeight: 1.15,
