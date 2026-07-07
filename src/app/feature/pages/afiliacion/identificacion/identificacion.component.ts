@@ -255,6 +255,24 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
                     nestedControl.patchValue(parsedData.persona[pKey]);
                   }
                 });
+
+                // Cargar cuenta principal de SSSIFANB al portafolio de inmediato
+                const datoFinanciero = parsedData.persona.datofinanciero;
+                if (datoFinanciero && datoFinanciero.cuenta && datoFinanciero.institucion) {
+                  const existe = this.cuentasBancarias.find(c => c.cuenta === datoFinanciero.cuenta);
+                  if (!existe) {
+                    const bancoObj = this.bancos.find((b: any) => b.code === datoFinanciero.institucion);
+                    this.cuentasBancarias.push({
+                      institucion: datoFinanciero.institucion,
+                      nombreInstitucion: bancoObj ? bancoObj.name : "OTRA",
+                      tipo: datoFinanciero.tipo || 'CA',
+                      cuenta: datoFinanciero.cuenta,
+                      color: bancoObj ? bancoObj.color : "#598c89",
+                      archivo: null,
+                      origen: 'SSSIFANB'
+                    });
+                  }
+                }
               }
 
               this.cdr.detectChanges();
@@ -567,6 +585,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           institucion: [""],
           tipo: ["CA"],
           cuenta: [""],
+          origen: ["SSSIFANB"],
         }),
       }),
     });
@@ -584,6 +603,33 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       fecha: ["", Validators.required],
       descripcion: ["", Validators.required],
     });
+
+    // Listener para el selector de origen
+    const origenControl = this.identificacionForm.get(
+      "persona.datofinanciero.origen",
+    );
+    origenControl?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((origen) => {
+        // Buscar si ya existe una cuenta en el portafolio con ese origen
+        const cuentaExistente = this.cuentasBancarias.find(c => c.origen === origen);
+        
+        if (cuentaExistente) {
+          this.identificacionForm.get('persona.datofinanciero.cuenta')?.setValue(cuentaExistente.cuenta);
+          this.identificacionForm.get('persona.datofinanciero.institucion')?.setValue(cuentaExistente.institucion);
+          this.identificacionForm.get('persona.datofinanciero.tipo')?.setValue(cuentaExistente.tipo);
+        } else if (origen === 'PRESTACIONES SOCIALES (PACE)' && this.calculosBunker?.numero_cuenta) {
+          // Si es PACE y viene del cálculo, pero no está en portafolio aún
+          this.identificacionForm.get('persona.datofinanciero.cuenta')?.setValue(this.calculosBunker.numero_cuenta);
+          this.identificacionForm.get('persona.datofinanciero.institucion')?.setValue('0102');
+          this.identificacionForm.get('persona.datofinanciero.tipo')?.setValue('AH');
+        } else {
+          // Si no hay cuenta, limpiar para que ingresen una nueva
+          this.identificacionForm.get('persona.datofinanciero.cuenta')?.setValue('');
+          this.identificacionForm.get('persona.datofinanciero.institucion')?.setValue('');
+          this.identificacionForm.get('persona.datofinanciero.tipo')?.setValue('CA');
+        }
+      });
 
     // Listener para formateo de cuenta bancaria y detección de banco
     const cuentaControl = this.identificacionForm.get(
@@ -615,6 +661,11 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public agregarCuenta() {
     const form = this.identificacionForm.get("persona.datofinanciero");
     if (form && form.get("cuenta")?.value && form.get("institucion")?.value) {
+      const origenActual = form.get("origen")?.value || "SSSIFANB";
+      
+      // Verificar si ya existe una cuenta con este origen para actualizarla o prevenir duplicados
+      const indexExistente = this.cuentasBancarias.findIndex(c => c.origen === origenActual && c.cuenta === form.get("cuenta")?.value);
+      
       const nuevaCuenta = {
         institucion: form.get("institucion")?.value,
         nombreInstitucion: this.bancoSeleccionado?.name || "OTRA",
@@ -622,8 +673,14 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         cuenta: form.get("cuenta")?.value,
         color: this.bancoSeleccionado?.color || "#64748b",
         archivo: null,
+        origen: origenActual,
       };
-      this.cuentasBancarias.push(nuevaCuenta);
+
+      if (indexExistente !== -1) {
+        this.cuentasBancarias[indexExistente] = nuevaCuenta;
+      } else {
+        this.cuentasBancarias.push(nuevaCuenta);
+      }
 
       // Limpiar campos para nueva entrada
       form.get("cuenta")?.setValue("");
@@ -632,8 +689,30 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     }
   }
 
-  public eliminarCuenta(index: number) {
-    this.cuentasBancarias.splice(index, 1);
+  public modificarCuenta(cta: any) {
+    const form = this.identificacionForm.get('persona.datofinanciero');
+    if (form) {
+      // Usar emitEvent: false para no disparar el listener de auto-llenado
+      form.get('origen')?.setValue(cta.origen || 'SSSIFANB', { emitEvent: false });
+      form.get('cuenta')?.setValue(cta.cuenta);
+      form.get('institucion')?.setValue(cta.institucion);
+      form.get('tipo')?.setValue(cta.tipo);
+      
+      // Actualizar visual del banco si es necesario
+      this.detectarBanco(cta.cuenta.substring(0, 4));
+      
+      // Hacer scroll hacia arriba para mostrar el formulario (opcional pero útil UX)
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  public getCuentasByOrigen(origen: string): any[] {
+    return this.cuentasBancarias.filter(c => c.origen === origen);
+  }
+
+  public getOrigenesConCuentas(): string[] {
+    const origenes = this.cuentasBancarias.map(c => c.origen || 'SSSIFANB');
+    return Array.from(new Set(origenes));
   }
 
   public adjuntarCertificado(index: number) {
@@ -1367,6 +1446,22 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             this.identificacionForm
               .get("pprof")
               ?.setValue(this.calculosBunker.base.st_profesion);
+          }
+        }
+        
+        if (this.calculosBunker && this.calculosBunker.numero_cuenta) {
+          const cuentaPace = this.calculosBunker.numero_cuenta;
+          const existe = this.cuentasBancarias.find(c => c.cuenta === cuentaPace && c.origen === 'PRESTACIONES SOCIALES (PACE)');
+          if (!existe) {
+            this.cuentasBancarias.push({
+              institucion: '0102',
+              nombreInstitucion: 'BANCO DE VENEZUELA',
+              tipo: 'AH',
+              cuenta: cuentaPace,
+              color: '#d60d0d', // Un color rojo/distintivo para Venezuela
+              archivo: null,
+              origen: 'PRESTACIONES SOCIALES (PACE)'
+            });
           }
         }
 

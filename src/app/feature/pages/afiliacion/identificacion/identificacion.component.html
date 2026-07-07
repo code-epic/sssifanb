@@ -70,7 +70,7 @@
                                                 style="width: 20px; text-align: center;"></i> Hoja de Ruta
                                         </a>
                                         <a 
-                                            *ngIf="permisos['benconsultarnetos']"
+                                            *ngIf="permisos['benconsultarnetosx']"
                                             class="dropdown-item py-2 d-flex align-items-center text-muted font-weight-500 cursor-pointer"
                                             style="transition: all 0.2s ease;" href="javascript:void(0);"
                                             (click)="imprimirDocumento('consultar_netos', $event)"
@@ -934,13 +934,21 @@
                     <div formGroupName="persona">
                         <div formGroupName="datofinanciero">
                             <div class="row align-items-center">
-                                <!-- Columna de Visualización (Tarjeta Digital Minimalista) -->
+                                <!-- Columna de Visualización (Tarjeta Digital Minimalista Dinámica) -->
                                 <div class="col-lg-5 mb-4 mb-lg-0">
                                     <div class="bank-card-container">
                                         <div class="digital-bank-card minimalist shadow-sm"
-                                            [style.border-top-color]="bancoSeleccionado?.color || '#598c89'">
+                                            [ngStyle]="{
+                                                'border-top-color': identificacionForm.get('persona.datofinanciero.origen')?.value === 'PRESTACIONES SOCIALES (PACE)' ? '#f5b041' : 
+                                                                    (identificacionForm.get('persona.datofinanciero.origen')?.value === 'BIENESTAR SOCIAL (CIS)' ? '#3498db' : 
+                                                                    (bancoSeleccionado?.color || '#598c89'))
+                                            }"
+                                            style="transition: all 0.3s ease;">
                                             <div
-                                                class="card-content d-flex flex-column justify-content-between h-100 p-4">
+                                                class="card-content d-flex flex-column justify-content-between h-100 p-4"
+                                                [ngStyle]="{
+                                                    'background': identificacionForm.get('persona.datofinanciero.origen')?.value === 'PRESTACIONES SOCIALES (PACE)' ? 'linear-gradient(145deg, #fffdf8 0%, #ffffff 100%)' : '#ffffff'
+                                                }">
                                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                                     <div class="bank-logo-area">
                                                         <div *ngIf="bancoSeleccionado" class="bank-logo-wrapper">
@@ -953,7 +961,14 @@
                                                             <i class="fas fa-university text-muted opacity-4"></i>
                                                         </div>
                                                     </div>
-                                                    <div class="card-account-type">
+                                                    
+                                                    <div class="d-flex flex-column align-items-end">
+                                                        <!-- Badge de Origen Dinámico -->
+                                                        <span class="badge mb-1" 
+                                                              [ngClass]="identificacionForm.get('persona.datofinanciero.origen')?.value === 'PRESTACIONES SOCIALES (PACE)' ? 'badge-light-warning text-warning' : (identificacionForm.get('persona.datofinanciero.origen')?.value === 'BIENESTAR SOCIAL (CIS)' ? 'badge-light-primary text-primary' : 'badge-light-success text-success')"
+                                                              style="font-size: 0.55rem; letter-spacing: 0.5px; padding: 0.2rem 0.4rem;">
+                                                            {{ identificacionForm.get('persona.datofinanciero.origen')?.value || 'SSSIFANB' }}
+                                                        </span>
                                                         <span class="badge-pastel-minimal"
                                                             [ngClass]="identificacionForm.get('persona.datofinanciero.tipo')?.value === 'CA' ? 'green' : 'blue'">
                                                             {{
@@ -996,11 +1011,34 @@
                                     </div>
                                 </div>
 
-                                <!-- Columna de Formulario (Compacto y Siguiendo Patrones) -->
+                                <!-- Columna de Formulario (Origen de Primero) -->
                                 <div class="col-lg-7">
                                     <div class="form-container-minimal p-4 border-0 bg-light-pastel"
                                         style="border-radius: 12px;">
                                         <div class="row">
+                                            
+                                            <!-- ORIGEN DE CUENTA COMO PRIMER SELECTOR -->
+                                            <div class="col-12 mb-3">
+                                                <div class="modern-form-group mb-0">
+                                                    <label class="text-uppercase font-weight-bold"
+                                                        style="font-size: 0.7rem; color: #598c89; letter-spacing: 0.5px;">Origen de la Cuenta</label>
+                                                    <div class="input-group shadow-sm">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-white border-right-0"><i
+                                                                    class="fas fa-share-alt" [ngClass]="identificacionForm.get('persona.datofinanciero.origen')?.value === 'PRESTACIONES SOCIALES (PACE)' ? 'text-warning' : 'text-success'"></i></span>
+                                                        </div>
+                                                        <select class="form-control border-left-0 font-weight-bold"
+                                                            formControlName="origen" style="font-size: 0.85rem; cursor: pointer;">
+                                                            <option value="SSSIFANB">SSSIFANB</option>
+                                                            <option value="PRESTACIONES SOCIALES (PACE)">PRESTACIONES SOCIALES (PACE)</option>
+                                                            <option value="BIENESTAR SOCIAL (CIS)">BIENESTAR SOCIAL (CIS)</option>
+                                                            <option value="PENSION">PENSIÓN</option>
+                                                            <option value="OTROS">OTROS</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <div class="col-12 mb-3">
                                                 <div class="modern-form-group mb-0">
                                                     <label class="text-uppercase font-weight-bold"
@@ -1030,7 +1068,7 @@
                                                                     class="fas fa-university text-success"></i></span>
                                                         </div>
                                                         <select class="form-control border-left-0 font-weight-bold"
-                                                            formControlName="institucion" style="font-size: 0.85rem;">
+                                                            formControlName="institucion" style="font-size: 0.85rem; cursor: pointer;">
                                                             <option value="">Seleccione...</option>
                                                             <option *ngFor="let b of bancos" [value]="b.code">{{ b.name
                                                                 }}</option>
@@ -1050,7 +1088,7 @@
                                                                     class="fas fa-tags text-success"></i></span>
                                                         </div>
                                                         <select class="form-control border-left-0 font-weight-bold"
-                                                            formControlName="tipo" style="font-size: 0.85rem;">
+                                                            formControlName="tipo" style="font-size: 0.85rem; cursor: pointer;">
                                                             <option value="CA">CORRIENTE</option>
                                                             <option value="AH">AHORRO</option>
                                                         </select>
@@ -1071,38 +1109,69 @@
                                 </div>
                             </div>
 
-                            <!-- Lista de Cuentas (Vista Compacta) -->
+                            <!-- Lista de Cuentas (Vista Unificada y Clasificada por Etiquetas) -->
                             <div class="mt-5" *ngIf="cuentasBancarias.length > 0">
-                                <h6 class="text-muted font-weight-bold mb-3"
-                                    style="font-size: 0.7rem; letter-spacing: 1.2px; text-transform: uppercase;">
-                                    Cuentas Vinculadas <span class="badge badge-pill badge-light-success ml-1">{{
-                                        cuentasBancarias.length }}/4</span>
-                                </h6>
-
-                                <div class="row">
-                                    <div class="col-md-6 col-xl-4 mb-3"
-                                        *ngFor="let cta of cuentasBancarias; let i = index">
-                                        <div class="account-item-minimal d-flex align-items-center">
-                                            <div class="bank-dot-minimal" [style.background-color]="cta.color"></div>
-                                            <div class="flex-grow-1 px-3 py-2 overflow-hidden">
-                                                <div class="text-dark font-weight-bold text-truncate"
-                                                    style="font-size: 0.8rem;">{{ cta.nombreInstitucion }}</div>
-                                                <div class="text-muted"
-                                                    style="font-size: 0.7rem; font-family: 'Roboto Mono'; opacity: 0.8;">
-                                                    {{ cta.cuenta }}</div>
-                                            </div>
-                                            <div class="d-flex pr-2">
-                                                <button class="btn-icon-minimal btn-attach"
-                                                    (click)="adjuntarCertificado(i)" [ngClass]="{'active': cta.archivo}"
-                                                    title="Certificado">
-                                                    <i class="fas"
-                                                        [ngClass]="cta.archivo ? 'fa-check-circle' : 'fa-file-upload'"></i>
-                                                </button>
-                                                <button class="btn-icon-minimal btn-remove" (click)="eliminarCuenta(i)"
-                                                    title="Eliminar">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
+                                <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+                                    <div class="card-header border-0 bg-white d-flex justify-content-between align-items-center py-3">
+                                        <h6 class="text-muted font-weight-bold m-0"
+                                            style="font-size: 0.75rem; letter-spacing: 1.2px; text-transform: uppercase;">
+                                            <i class="fas fa-wallet mr-2"></i> Portafolio de Cuentas Vinculadas
+                                        </h6>
+                                        <span class="badge badge-pill badge-light-success shadow-sm px-3 py-2">
+                                            Total: {{ cuentasBancarias.length }}
+                                        </span>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div class="table-responsive">
+                                            <table class="table align-items-center table-flush mb-0">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th scope="col" style="font-size: 0.65rem; letter-spacing: 1px;">Institución</th>
+                                                        <th scope="col" style="font-size: 0.65rem; letter-spacing: 1px;">Número de Cuenta</th>
+                                                        <th scope="col" style="font-size: 0.65rem; letter-spacing: 1px;">Origen / Aplicación</th>
+                                                        <th scope="col" class="text-right" style="font-size: 0.65rem; letter-spacing: 1px;">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let cta of cuentasBancarias; let i = index" class="hover-shadow-sm" style="transition: all 0.2s;">
+                                                        <th scope="row">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="bank-dot-minimal mr-3 shadow-sm" [style.background-color]="cta.color"></div>
+                                                                <div>
+                                                                    <span class="text-dark font-weight-bold d-block" style="font-size: 0.8rem;">{{ cta.nombreInstitucion }}</span>
+                                                                    <span class="text-muted" style="font-size: 0.65rem;"><i class="fas fa-tags mr-1"></i> {{ cta.tipo === 'CA' ? 'CORRIENTE' : 'AHORRO' }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </th>
+                                                        <td>
+                                                            <span class="text-muted font-weight-bold" style="font-family: 'Roboto Mono', monospace; font-size: 0.85rem; letter-spacing: 1px;">
+                                                                {{ cta.cuenta }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge badge-pill" 
+                                                                  [ngClass]="cta.origen === 'PRESTACIONES SOCIALES (PACE)' ? 'badge-light-warning text-warning' : (cta.origen === 'SSSIFANB' ? 'badge-light-success text-success' : 'badge-light-primary text-primary')" 
+                                                                  style="padding: 0.35rem 0.6rem; font-size: 0.65rem; letter-spacing: 0.5px;">
+                                                                <i class="fas mr-1" [ngClass]="cta.origen === 'PRESTACIONES SOCIALES (PACE)' ? 'fa-chart-line' : (cta.origen === 'SSSIFANB' ? 'fa-check-circle' : 'fa-info-circle')"></i> 
+                                                                {{ cta.origen || 'SSSIFANB' }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-right">
+                                                            <button class="btn btn-sm btn-icon-only rounded-circle mr-2 shadow-sm"
+                                                                (click)="adjuntarCertificado(i)" 
+                                                                [ngClass]="cta.archivo ? 'btn-success' : 'btn-outline-secondary'"
+                                                                title="Certificado">
+                                                                <i class="fas" [ngClass]="cta.archivo ? 'fa-check' : 'fa-upload'"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-primary btn-icon-only rounded-circle shadow-sm" 
+                                                                (click)="modificarCuenta(cta)"
+                                                                title="Modificar">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>

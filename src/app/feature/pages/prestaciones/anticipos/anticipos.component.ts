@@ -342,6 +342,40 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
 
   public loadPendingData(): void {
     const statusId = this.currentTabId || "101";
+    
+    // Configurar acciones dinámicamente según el estatus (101 = Pendientes)
+    if (statusId === "101") {
+      this.pendingTableConfig.actions = [
+        {
+          name: "aprobar",
+          icon: "fa-check",
+          tooltip: "Aprobar Anticipo",
+          buttonClass: "btn-circular btn-success-soft shadow-sm ml-2",
+        },
+        {
+          name: "rechazar",
+          icon: "fa-times",
+          tooltip: "Rechazar Anticipo",
+          buttonClass: "btn-circular btn-danger-soft shadow-sm ml-2",
+        },
+        {
+          name: "ver",
+          icon: "fa-eye",
+          tooltip: "Ver Expediente",
+          buttonClass: "btn-circular btn-amber-soft shadow-sm ml-2",
+        },
+      ];
+    } else {
+      this.pendingTableConfig.actions = [
+        {
+          name: "ver",
+          icon: "fa-eye",
+          tooltip: "Ver Detalles",
+          buttonClass: "btn-circular btn-amber-soft shadow-sm ml-2",
+        },
+      ];
+    }
+
     const payload = {
       funcion: environment.funcion.CONSULTAR_ORDENES,
       parametros: `${statusId},${this.fechaDesde},${this.fechaHasta}`,
