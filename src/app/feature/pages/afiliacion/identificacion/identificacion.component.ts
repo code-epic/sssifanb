@@ -103,6 +103,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public totalPaginasSueldo: number = 0;
   public movimientos: any;
   public fechaUltimoAnticipo: any;
+  lstMedidas: any;
+  fechaUltimoDepositoEnBanco: string;
 
   // Bancos Data
   public get bancos(): any[] {
@@ -120,6 +122,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public observaciones: FormControl<any> = new FormControl("");
   public calculosBunker: any = null;
   public permisos: { [key: string]: boolean } = {};
+  public poseemedida = false;
 
   constructor(
     private layoutService: LayoutService,
@@ -258,18 +261,26 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
                 // Cargar cuenta principal de SSSIFANB al portafolio de inmediato
                 const datoFinanciero = parsedData.persona.datofinanciero;
-                if (datoFinanciero && datoFinanciero.cuenta && datoFinanciero.institucion) {
-                  const existe = this.cuentasBancarias.find(c => c.cuenta === datoFinanciero.cuenta);
+                if (
+                  datoFinanciero &&
+                  datoFinanciero.cuenta &&
+                  datoFinanciero.institucion
+                ) {
+                  const existe = this.cuentasBancarias.find(
+                    (c) => c.cuenta === datoFinanciero.cuenta,
+                  );
                   if (!existe) {
-                    const bancoObj = this.bancos.find((b: any) => b.code === datoFinanciero.institucion);
+                    const bancoObj = this.bancos.find(
+                      (b: any) => b.code === datoFinanciero.institucion,
+                    );
                     this.cuentasBancarias.push({
                       institucion: datoFinanciero.institucion,
                       nombreInstitucion: bancoObj ? bancoObj.name : "OTRA",
-                      tipo: datoFinanciero.tipo || 'CA',
+                      tipo: datoFinanciero.tipo || "CA",
                       cuenta: datoFinanciero.cuenta,
                       color: bancoObj ? bancoObj.color : "#598c89",
                       archivo: null,
-                      origen: 'SSSIFANB'
+                      origen: "SSSIFANB",
                     });
                   }
                 }
@@ -285,8 +296,10 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           console.log("Fecha de retiro:", f_retiro);
 
           this.getPhotoId();
+          this.getMedidasJudiciales();
           this.getDirectivaID();
-          this.consultarMovimientos();
+          this.consultarFechaUltimoAnticipo();
+          this.consultarFechaUtimoDepositoEnBanco();
           //   console.log("Iniciando metodo de carga");
           this.initMessagePort();
         }
@@ -612,22 +625,45 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((origen) => {
         // Buscar si ya existe una cuenta en el portafolio con ese origen
-        const cuentaExistente = this.cuentasBancarias.find(c => c.origen === origen);
-        
+        const cuentaExistente = this.cuentasBancarias.find(
+          (c) => c.origen === origen,
+        );
+
         if (cuentaExistente) {
-          this.identificacionForm.get('persona.datofinanciero.cuenta')?.setValue(cuentaExistente.cuenta);
-          this.identificacionForm.get('persona.datofinanciero.institucion')?.setValue(cuentaExistente.institucion);
-          this.identificacionForm.get('persona.datofinanciero.tipo')?.setValue(cuentaExistente.tipo);
-        } else if (origen === 'PRESTACIONES SOCIALES (PACE)' && this.calculosBunker?.numero_cuenta) {
+          this.identificacionForm
+            .get("persona.datofinanciero.cuenta")
+            ?.setValue(cuentaExistente.cuenta);
+          this.identificacionForm
+            .get("persona.datofinanciero.institucion")
+            ?.setValue(cuentaExistente.institucion);
+          this.identificacionForm
+            .get("persona.datofinanciero.tipo")
+            ?.setValue(cuentaExistente.tipo);
+        } else if (
+          origen === "PRESTACIONES SOCIALES (PACE)" &&
+          this.calculosBunker?.numero_cuenta
+        ) {
           // Si es PACE y viene del cálculo, pero no está en portafolio aún
-          this.identificacionForm.get('persona.datofinanciero.cuenta')?.setValue(this.calculosBunker.numero_cuenta);
-          this.identificacionForm.get('persona.datofinanciero.institucion')?.setValue('0102');
-          this.identificacionForm.get('persona.datofinanciero.tipo')?.setValue('AH');
+          this.identificacionForm
+            .get("persona.datofinanciero.cuenta")
+            ?.setValue(this.calculosBunker.numero_cuenta);
+          this.identificacionForm
+            .get("persona.datofinanciero.institucion")
+            ?.setValue("0102");
+          this.identificacionForm
+            .get("persona.datofinanciero.tipo")
+            ?.setValue("AH");
         } else {
           // Si no hay cuenta, limpiar para que ingresen una nueva
-          this.identificacionForm.get('persona.datofinanciero.cuenta')?.setValue('');
-          this.identificacionForm.get('persona.datofinanciero.institucion')?.setValue('');
-          this.identificacionForm.get('persona.datofinanciero.tipo')?.setValue('CA');
+          this.identificacionForm
+            .get("persona.datofinanciero.cuenta")
+            ?.setValue("");
+          this.identificacionForm
+            .get("persona.datofinanciero.institucion")
+            ?.setValue("");
+          this.identificacionForm
+            .get("persona.datofinanciero.tipo")
+            ?.setValue("CA");
         }
       });
 
@@ -662,10 +698,13 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     const form = this.identificacionForm.get("persona.datofinanciero");
     if (form && form.get("cuenta")?.value && form.get("institucion")?.value) {
       const origenActual = form.get("origen")?.value || "SSSIFANB";
-      
+
       // Verificar si ya existe una cuenta con este origen para actualizarla o prevenir duplicados
-      const indexExistente = this.cuentasBancarias.findIndex(c => c.origen === origenActual && c.cuenta === form.get("cuenta")?.value);
-      
+      const indexExistente = this.cuentasBancarias.findIndex(
+        (c) =>
+          c.origen === origenActual && c.cuenta === form.get("cuenta")?.value,
+      );
+
       const nuevaCuenta = {
         institucion: form.get("institucion")?.value,
         nombreInstitucion: this.bancoSeleccionado?.name || "OTRA",
@@ -690,28 +729,30 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   }
 
   public modificarCuenta(cta: any) {
-    const form = this.identificacionForm.get('persona.datofinanciero');
+    const form = this.identificacionForm.get("persona.datofinanciero");
     if (form) {
       // Usar emitEvent: false para no disparar el listener de auto-llenado
-      form.get('origen')?.setValue(cta.origen || 'SSSIFANB', { emitEvent: false });
-      form.get('cuenta')?.setValue(cta.cuenta);
-      form.get('institucion')?.setValue(cta.institucion);
-      form.get('tipo')?.setValue(cta.tipo);
-      
+      form
+        .get("origen")
+        ?.setValue(cta.origen || "SSSIFANB", { emitEvent: false });
+      form.get("cuenta")?.setValue(cta.cuenta);
+      form.get("institucion")?.setValue(cta.institucion);
+      form.get("tipo")?.setValue(cta.tipo);
+
       // Actualizar visual del banco si es necesario
       this.detectarBanco(cta.cuenta.substring(0, 4));
-      
+
       // Hacer scroll hacia arriba para mostrar el formulario (opcional pero útil UX)
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 
   public getCuentasByOrigen(origen: string): any[] {
-    return this.cuentasBancarias.filter(c => c.origen === origen);
+    return this.cuentasBancarias.filter((c) => c.origen === origen);
   }
 
   public getOrigenesConCuentas(): string[] {
-    const origenes = this.cuentasBancarias.map(c => c.origen || 'SSSIFANB');
+    const origenes = this.cuentasBancarias.map((c) => c.origen || "SSSIFANB");
     return Array.from(new Set(origenes));
   }
 
@@ -1448,19 +1489,23 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
               ?.setValue(this.calculosBunker.base.st_profesion);
           }
         }
-        
+
         if (this.calculosBunker && this.calculosBunker.numero_cuenta) {
           const cuentaPace = this.calculosBunker.numero_cuenta;
-          const existe = this.cuentasBancarias.find(c => c.cuenta === cuentaPace && c.origen === 'PRESTACIONES SOCIALES (PACE)');
+          const existe = this.cuentasBancarias.find(
+            (c) =>
+              c.cuenta === cuentaPace &&
+              c.origen === "PRESTACIONES SOCIALES (PACE)",
+          );
           if (!existe) {
             this.cuentasBancarias.push({
-              institucion: '0102',
-              nombreInstitucion: 'BANCO DE VENEZUELA',
-              tipo: 'AH',
+              institucion: "0102",
+              nombreInstitucion: "BANCO DE VENEZUELA",
+              tipo: "AH",
               cuenta: cuentaPace,
-              color: '#d60d0d', // Un color rojo/distintivo para Venezuela
+              color: "#d60d0d", // Un color rojo/distintivo para Venezuela
               archivo: null,
-              origen: 'PRESTACIONES SOCIALES (PACE)'
+              origen: "PRESTACIONES SOCIALES (PACE)",
             });
           }
         }
@@ -1477,7 +1522,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  consultarMovimientos() {
+  consultarFechaUltimoAnticipo() {
     const cedula = this.identificacionForm?.get(
       "persona.datobasico.cedula",
     )?.value;
@@ -1491,16 +1536,63 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           this.movimientos = data.Cuerpo;
           const f_contable = this.movimientos[0].f_contable;
           if (f_contable) {
-            const d = new Date(f_contable);
-            this.fechaUltimoAnticipo = isNaN(d.getTime())
-              ? "DD/MM/AAAA"
-              : `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+            if (typeof f_contable === "string" && f_contable.includes("-")) {
+              const parts = f_contable.substring(0, 10).split("-");
+              if (parts.length === 3) {
+                this.fechaUltimoAnticipo = `${parts[2]}/${parts[1]}/${parts[0]}`;
+              } else {
+                this.fechaUltimoAnticipo = "DD/MM/AAAA";
+              }
+            } else {
+              const d = new Date(f_contable);
+              this.fechaUltimoAnticipo = isNaN(d.getTime())
+                ? "DD/MM/AAAA"
+                : `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+            }
           } else {
             this.fechaUltimoAnticipo = "DD/MM/AAAA";
           }
         }
         this.cdr.detectChanges();
-        console.log("Movimientos sincronizados", this.movimientos);
+        // console.log("Movimientos sincronizados", this.movimientos);
+      },
+      error: (error) => {},
+    });
+  }
+
+  consultarFechaUtimoDepositoEnBanco() {
+    const cedula = this.identificacionForm?.get(
+      "persona.datobasico.cedula",
+    )?.value;
+    const payload = {
+      funcion: environment.funcion.CONSULTAR_MOVIMIENTOS,
+      parametros: `${cedula},3`,
+    };
+    this.apiService.post("crud", payload).subscribe({
+      next: (data: any) => {
+        if (data.Cuerpo && data.Cuerpo.length > 0) {
+          this.movimientos = data.Cuerpo;
+          const f_contable = this.movimientos[0].f_contable;
+          if (f_contable) {
+            if (typeof f_contable === "string" && f_contable.includes("-")) {
+              const parts = f_contable.substring(0, 10).split("-");
+              if (parts.length === 3) {
+                this.fechaUltimoDepositoEnBanco = `${parts[2]}/${parts[1]}/${parts[0]}`;
+              } else {
+                this.fechaUltimoDepositoEnBanco = "DD/MM/AAAA";
+              }
+            } else {
+              const d = new Date(f_contable);
+              this.fechaUltimoDepositoEnBanco = isNaN(d.getTime())
+                ? "DD/MM/AAAA"
+                : `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+            }
+          } else {
+            this.fechaUltimoDepositoEnBanco = "DD/MM/AAAA";
+          }
+        }
+        this.cdr.detectChanges();
+        // console.log("Movimientos sincronizados", this.movimientos);
       },
       error: (error) => {},
     });
@@ -1558,5 +1650,34 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     }
 
     return "";
+  }
+
+  public getMedidasJudiciales(): void {
+    let payload = {};
+    const cedula = this.identificacionForm?.get(
+      "persona.datobasico.cedula",
+    )?.value;
+    payload = {
+      funcion: environment.funcion.CONSULTAR_MEDIDAS_JUDICIALES,
+      parametros: `${cedula}`,
+    };
+
+    this.apiService.post("crud", payload).subscribe({
+      next: (data: any) => {
+        console.log(data);
+        if (data && data.Cuerpo) {
+          this.lstMedidas = data.Cuerpo;
+          this.poseemedida = this.lstMedidas.length > 0;
+          console.log(this.lstMedidas);
+        } else {
+          this.poseemedida = false;
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        console.error("Error HTTP al consultar medidas judiciales", err);
+        this.poseemedida = false;
+      },
+    });
   }
 }

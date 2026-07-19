@@ -540,7 +540,7 @@
                     <div class="row">
                         <div class="col-12 d-flex justify-content-between align-items-center border-bottom pb-3">
                             <h4 class="text-verde-titulos font-weight-bold mb-0" style="letter-spacing: -0.5px;">
-                                Resumen Salarial
+                                Resumen Salarial <font style="color: red;" *ngIf="poseemedida"> Posee Medida Judicial</font>
                             </h4>
                             <button class="btn-pastel-icon pastel-success shadow-sm" type="button"
                                 (click)="openModalHistorialSueldo(modalHistorialSueldo, $event)" title="Ver Historial">
@@ -828,7 +828,7 @@
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Fecha Último Dep.</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">-</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ fechaUltimoDepositoEnBanco }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Anticipos</span>
