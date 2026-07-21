@@ -1656,7 +1656,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       "persona.datobasico.cedula",
     )?.value;
     payload = {
-      funcion: environment.funcion.CONSULTAR_MEDIDAS_JUDICIALES,
+      funcion: environment.funcion.CONSULTAR_MEDIDAS_JUDICIALES_ID,
       parametros: `${cedula}`,
     };
 
