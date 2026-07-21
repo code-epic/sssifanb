@@ -39,6 +39,7 @@ export const environment = {
     CONSULTAR_ORDENES: "IPSFA_COrdenes",
     CONSULTAR_SUELDOS: "IPSFA_CHistorialSueldo",
     CONSULTAR_MOTIVOS_MEDIDA_JUDICIAL: "IPSFA_CMotivosMedidaJudicial",
+    CONSULTAR_MEDIDAS_JUDICIALES_ID: "IPSFA_CMedidasJudicialesID",
     CONSULTAR_MEDIDAS_JUDICIALES: "IPSFA_CMedidasJudiciales",
   },
   subPath: {

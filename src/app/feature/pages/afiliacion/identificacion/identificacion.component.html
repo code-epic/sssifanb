@@ -549,6 +549,69 @@
                         </div>
                     </div>
 
+                    <!-- Datos resumen de la persona para cálculo -->
+                    <div class="row mt-4 mb-2">
+                        <!-- Grado -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm h-100 widget-card" style="border-radius: 12px; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                                <div class="card-body p-3 d-flex align-items-center">
+                                    <div class="icon-circle shadow-sm mr-3 d-flex justify-content-center align-items-center" style="background: linear-gradient(135deg, #598c89, #406562); width: 44px; height: 44px; border-radius: 12px;">
+                                        <i class="fas fa-user-shield text-white" style="font-size: 1.15rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-uppercase mb-1" style="color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;">Grado</div>
+                                        <div class="font-weight-bold text-truncate" style="color: #334155; font-size: 1.05rem; line-height: 1; max-width: 130px;" title="{{ calculosBunker?.base?.grado_id || 'N/A' }}">{{ calculosBunker?.base?.grado_id || 'N/A' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fecha de Ingreso -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm h-100 widget-card" style="border-radius: 12px; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                                <div class="card-body p-3 d-flex align-items-center">
+                                    <div class="icon-circle shadow-sm mr-3 d-flex justify-content-center align-items-center" style="background: linear-gradient(135deg, #3b82f6, #2563eb); width: 44px; height: 44px; border-radius: 12px;">
+                                        <i class="fas fa-calendar-plus text-white" style="font-size: 1.15rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-uppercase mb-1" style="color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;">Ingreso</div>
+                                        <div class="font-weight-bold" style="color: #334155; font-size: 1.05rem; line-height: 1;">{{ (calculosBunker?.base?.fecha_ingreso | date:'dd/MM/yyyy':'UTC') || 'N/A' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Último Ascenso -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm h-100 widget-card" style="border-radius: 12px; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                                <div class="card-body p-3 d-flex align-items-center">
+                                    <div class="icon-circle shadow-sm mr-3 d-flex justify-content-center align-items-center" style="background: linear-gradient(135deg, #f59e0b, #d97706); width: 44px; height: 44px; border-radius: 12px;">
+                                        <i class="fas fa-medal text-white" style="font-size: 1.15rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-uppercase mb-1" style="color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;">Últ. Ascenso</div>
+                                        <div class="font-weight-bold" style="color: #334155; font-size: 1.05rem; line-height: 1;">{{ (calculosBunker?.base?.f_ult_ascenso | date:'dd/MM/yyyy':'UTC') || 'N/A' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fecha de Retiro -->
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-0 shadow-sm h-100 widget-card" style="border-radius: 12px; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                                <div class="card-body p-3 d-flex align-items-center">
+                                    <div class="icon-circle shadow-sm mr-3 d-flex justify-content-center align-items-center" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: 44px; height: 44px; border-radius: 12px;">
+                                        <i class="fas fa-calendar-times text-white" style="font-size: 1.15rem;"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-uppercase mb-1" style="color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;">Retiro</div>
+                                        <div class="font-weight-bold" style="color: #334155; font-size: 1.05rem; line-height: 1;">{{ (calculosBunker?.base?.f_retiro | date:'dd/MM/yyyy':'UTC') || 'N/A' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row" style="margin-top: 20px;">
                         <!-- Columna Ingresos Principales (Ledger Card) -->
                         <div class="col-lg-6 mb-4">
@@ -808,10 +871,10 @@
                                                     <span class="font-weight-600" style="font-size: 0.90rem; color: #475569;">Total Calculados</span>
                                                     <span class="font-weight-700 tracking-tight" style="font-size: 0.95rem; color: #334155;">-</span>
                                                 </li>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
+                                                <!-- <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Fecha Último Depósito</span>
                                                     <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">-</span>
-                                                </li>
+                                                </li> -->
                                             </ul>
                                         </div>
 

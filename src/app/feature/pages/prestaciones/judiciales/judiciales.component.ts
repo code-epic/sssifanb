@@ -43,7 +43,7 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
     rowClickable: true,
     showPagination: true,
     pageSize: 10,
-    hoverActions: true,
+    hoverActions: false,
     tableClass: "mailbox-table w-100 mb-0",
     containerClass: "p-0 border-0 shadow-none",
     columns: [
@@ -65,21 +65,21 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
         key: "tipo",
         header: "Tipo",
         type: "text",
-        align: "center",
+        align: "left",
         cssClass: "align-middle",
       },
       {
         key: "oficio",
         header: "Oficio",
         type: "text",
-        align: "center",
+        align: "left",
         cssClass: "align-middle",
       },
       {
         key: "expediente",
         header: "Expediente",
         type: "text",
-        align: "center",
+        align: "left",
         cssClass: "align-middle font-weight-bold",
       },
       {
@@ -89,21 +89,8 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
         align: "right",
         cssClass: "align-middle pr-4",
       },
-      {
-        key: "estatusFormat",
-        header: "Estatus",
-        type: "html",
-        align: "center",
-        cssClass: "align-middle",
-      },
     ],
     actions: [
-      {
-        name: "aprobar",
-        icon: "fa-check",
-        tooltip: "Ejecutar Medida",
-        buttonClass: "btn-circular btn-success-soft shadow-sm ml-2",
-      },
       {
         name: "ver",
         icon: "fa-eye",
@@ -153,13 +140,6 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
         align: "center",
         cssClass: "text-muted align-middle",
       },
-      {
-        key: "estatusFormat",
-        header: "Estatus",
-        type: "html",
-        align: "center",
-        cssClass: "align-middle",
-      },
     ],
     actions: [
       {
@@ -174,6 +154,9 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   public historyTableData: any[] = [];
   public lstMedidas: any;
   public medidaForm: any = {};
+  fechaDesde: string;
+  fechaHasta: string;
+  lstMedidasID: any;
 
   constructor(
     protected override apiService: ApiService,
@@ -192,6 +175,10 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   }
 
   protected override onInitExtension(): void {
+    const today = new Date();
+    this.fechaDesde = `${today.getFullYear()}-01-01`;
+    this.fechaHasta = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
     this.loadTabs();
     this.loadData();
     this.getMotivosJudiciales();
@@ -200,12 +187,7 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   private loadTabs(): void {
     this.isLoadingData = true;
     setTimeout(() => {
-      this.workflowTabs = [
-        { id: "RECIBIDO", nombre: "Recibidos" },
-        { id: "PROCESO", nombre: "En Proceso" },
-        { id: "EJECUTADO", nombre: "Ejecutados" },
-        { id: "SUSPENDIDO", nombre: "Suspendidos" },
-      ];
+      this.workflowTabs = [{ id: "RECIBIDO", nombre: "Recibidos" }];
       this.currentTabId = "RECIBIDO";
       this.isLoadingData = false;
     }, 300);
@@ -243,36 +225,50 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   public loadData(): void {
     this.isLoadingData = true;
     setTimeout(() => {
-      const rawData = [
-        {
-          cedula: "15442331",
-          nombre: "ADRIANZA PAREDES LUIS",
-          tipo: "ANTIGÜEDAD",
-          oficio: "OF-2023-99",
-          expediente: "EXP-9922",
-          monto: 12500.0,
-          estatus: "Pendiente",
-        },
-        {
-          cedula: "10223112",
-          nombre: "MENDEZ RIVAS JOSE",
-          tipo: "INTERESES",
-          oficio: "OF-2023-45",
-          expediente: "EXP-4501",
-          monto: 3400.5,
-          estatus: "Ejecutado",
-        },
-      ];
-
-      this.masterData = rawData.map((item) => ({
-        ...item,
-        cedulaFormat: `<span class="badge badge-pill bg-light text-muted border shadow-sm font-weight-bold px-2 py-1">${item.cedula}</span>`,
-        montoFormat: `<span class="font-weight-bold" style="color: #0f172a;">${item.monto.toLocaleString("es-VE")}</span>`,
-        estatusFormat: this.getStatusBadge(item.estatus),
-      }));
-      this.mainTableData = [...this.masterData];
+      this.getMedidasJudiciales();
       this.isLoadingData = false;
     }, 500);
+  }
+
+  public getMedidasJudiciales(): void {
+    let payload = {
+      funcion: environment.funcion.CONSULTAR_MEDIDAS_JUDICIALES,
+      parametros: `${this.fechaDesde},${this.fechaHasta}`,
+    };
+
+    this.apiService.post("crud", payload).subscribe({
+      next: (data: any) => {
+        if (data && data.Cuerpo && data.Cuerpo.length > 0) {
+          this.lstMedidas = data.Cuerpo;
+          console.log(this.lstMedidas);
+
+          this.masterData = this.lstMedidas.map((item: any) => {
+            let tipoName = "MEDIDA JUDICIAL";
+            if (item.tipo_medida_id == 1) tipoName = "ASIG. ANTIGUEDAD";
+            else if (item.tipo_medida_id == 2) tipoName = "INTERESES";
+
+            return {
+              ...item,
+              cedulaFormat: `<span class="badge badge-pill bg-light text-muted border shadow-sm font-weight-bold px-2 py-1">${item.cedula}</span>`,
+              nombre: (item.n_beneficiario || "S/N").toUpperCase(),
+              tipo: tipoName,
+              oficio: (item.nro_oficio || "S/N").toUpperCase(),
+              expediente: (item.nro_expediente || "S/N").toUpperCase(),
+              montoFormat: `<span class="font-weight-bold" style="color: #0f172a; font-size: 1.05rem;">Bs. ${Number(item.total_monto || 0).toLocaleString("es-VE")}</span>`,
+            };
+          });
+          this.mainTableData = [...this.masterData];
+        } else {
+          this.lstMedidas = [];
+          this.masterData = [];
+          this.mainTableData = [];
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        console.error("Error HTTP al consultar medidas judiciales", err);
+      },
+    });
   }
 
   public buscarMilitar(): void {
@@ -307,7 +303,7 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
               }
 
               // Consultar historial judicial
-              this.getMedidasJudiciales();
+              this.getMedidasJudicialesID();
             } else {
               alert("No se encontraron resultados para la cédula ingresada.");
             }
@@ -423,19 +419,19 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
     });
   }
 
-  public getMedidasJudiciales(): void {
+  public getMedidasJudicialesID(): void {
     let payload = {};
     payload = {
-      funcion: environment.funcion.CONSULTAR_MEDIDAS_JUDICIALES,
+      funcion: environment.funcion.CONSULTAR_MEDIDAS_JUDICIALES_ID,
       parametros: `${this.searchCedula}`,
     };
 
     this.apiService.post("crud", payload).subscribe({
       next: (data: any) => {
         if (data && data.Cuerpo && data.Cuerpo.length > 0) {
-          this.lstMedidas = data.Cuerpo;
-          console.log(this.lstMedidas);
-          this.historyTableData = this.lstMedidas.map((item: any) => {
+          this.lstMedidasID = data.Cuerpo;
+          console.log(this.lstMedidasID);
+          this.historyTableData = this.lstMedidasID.map((item: any) => {
             let fechaStr = "N/A";
             if (
               item.f_documento &&
@@ -447,23 +443,20 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
                 fechaStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
 
-            let tipoName = "Medida Judicial";
-            if (item.tipo_medida_id == 1) tipoName = "ASIGNACIÓN DE ANTIGÜEDAD";
+            let tipoName = "MEDIDA JUDICIAL";
+            if (item.tipo_medida_id == 1) tipoName = "ASIG. ANTIGUEDAD";
             else if (item.tipo_medida_id == 2) tipoName = "INTERESES";
-
-            let estatusName = item.status_id == 1 ? "Pendiente" : "Ejecutado";
 
             return {
               ...item,
-              oficio: item.nro_oficio || "S/N",
+              oficio: (item.nro_oficio || "S/N").toUpperCase(),
               tipo: tipoName,
-              montoFormat: `<span class="font-weight-bold" style="font-size: 1.05rem;">Bs ${Number(item.total_monto || 0).toLocaleString("es-VE")}</span>`,
+              montoFormat: `<span class="font-weight-bold" style="font-size: 1.05rem;">Bs. ${Number(item.total_monto || 0).toLocaleString("es-VE")}</span>`,
               fecha: fechaStr,
-              estatusFormat: this.getStatusBadge(estatusName),
             };
           });
         } else {
-          this.lstMedidas = [];
+          this.lstMedidasID = [];
           this.historyTableData = [];
         }
         this.cdr.markForCheck();

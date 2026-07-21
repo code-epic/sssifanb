@@ -16,7 +16,6 @@ import {
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { LayoutService } from "src/app/core/services/layout/layout.service";
 import { AfiliadoService } from "src/app/core/services/afiliacion/afiliado.service";
-import { IAfiliado } from "src/app/core/models/afiliacion/afiliado.model";
 import { MdlFamiliarComponent } from "./mdl-familiar/mdl-familiar.component";
 import { LoginService } from "src/app/core/services/login/login.service";
 import { Subject } from "rxjs";
@@ -292,8 +291,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             }
           }
 
-          let f_retiro = this.formatDate(afiliadoData.fretiro);
-          console.log("Fecha de retiro:", f_retiro);
+          // let f_retiro = this.formatDate(afiliadoData.fretiro);
+          // console.log("Fecha de retiro:", f_retiro);
 
           this.getPhotoId();
           this.getMedidasJudiciales();
@@ -310,7 +309,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
   cargarPermisologia() {
     let privilegios = this.loginService.obtenerPrivilegiosMenu("/principal");
-    console.log(privilegios);
+    // console.log(privilegios);
     if (privilegios) {
       Object.keys(privilegios).forEach((key) => {
         privilegios[key].forEach((p: any) => {
@@ -1386,7 +1385,6 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       this.apiService.post("crud", payload).subscribe({
         next: (data: any) => {
           let directivaId = data.Cuerpo[0].directiva_sueldo_id;
-          console.log("Directiva ID:", directivaId);
           this.getCalcId(directivaId, cedula);
           this.cdr.detectChanges();
         },
@@ -1664,11 +1662,11 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
     this.apiService.post("crud", payload).subscribe({
       next: (data: any) => {
-        console.log(data);
+        // console.log(data);
         if (data && data.Cuerpo) {
           this.lstMedidas = data.Cuerpo;
           this.poseemedida = this.lstMedidas.length > 0;
-          console.log(this.lstMedidas);
+          // console.log(this.lstMedidas);
         } else {
           this.poseemedida = false;
         }
