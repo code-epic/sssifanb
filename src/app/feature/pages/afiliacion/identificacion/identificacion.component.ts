@@ -122,6 +122,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public calculosBunker: any = null;
   public permisos: { [key: string]: boolean } = {};
   public poseemedida = false;
+  public grado_id: string = "";
 
   constructor(
     private layoutService: LayoutService,
@@ -1384,7 +1385,10 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       };
       this.apiService.post("crud", payload).subscribe({
         next: (data: any) => {
+          console.log(data);
           let directivaId = data.Cuerpo[0].directiva_sueldo_id;
+          this.grado_id = data.Cuerpo[0].grado_id;
+
           this.getCalcId(directivaId, cedula);
           this.cdr.detectChanges();
         },
@@ -1412,6 +1416,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       cedula: cedula,
       accion: "track",
       directiva_id: directivaId,
+      grado_id: this.grado_id,
     };
 
     this.apiService.post("fnx", fnx).subscribe({
@@ -1432,7 +1437,10 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         // console.log("[LotesComponent] Canal MessagePort establecido.");
       }
       if (msg && msg.type === "EXEC_FNX_FINALIZADO") {
-        this.notifyCompletion(msg);
+        const taskId = msg.payload?.taskId || msg.taskId;
+        if (taskId === this.id) {
+          this.notifyCompletion(msg);
+        }
       }
     });
   }
@@ -1441,7 +1449,10 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
   private handlePortMessage(event: MessageEvent) {
     if (event.data && event.data.type === "EXEC_FNX_FINALIZADO") {
-      this.notifyCompletion(event.data);
+      const taskId = event.data.payload?.taskId || event.data.taskId;
+      if (taskId === this.id) {
+        this.notifyCompletion(event.data);
+      }
     }
   }
 

@@ -41,6 +41,7 @@ export const environment = {
     CONSULTAR_MOTIVOS_MEDIDA_JUDICIAL: "IPSFA_CMotivosMedidaJudicial",
     CONSULTAR_MEDIDAS_JUDICIALES_ID: "IPSFA_CMedidasJudicialesID",
     CONSULTAR_MEDIDAS_JUDICIALES: "IPSFA_CMedidasJudiciales",
+    LISTAR_DIRECTIVAS: "IPSFA_CDirectivas",
   },
   subPath: {
     login: "wusuario/loginV2",

@@ -11,6 +11,8 @@
          #dp="ngbDatepicker"
          [container]="container === 'null' ? null : container"
          [placement]="placement"
+         [minDate]="$any(minDateStruct)"
+         [maxDate]="$any(maxDateStruct)"
          (click)="dp.toggle()"
          (focus)="onInputFocus($event)"
          (keydown)="onKeyDown($event)"

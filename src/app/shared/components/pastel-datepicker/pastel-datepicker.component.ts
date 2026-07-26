@@ -63,7 +63,9 @@ export class PastelDatepickerComponent implements ControlValueAccessor {
     @Input() placeholder: string = 'DD/MM/YYYY';
     @Input() iconClass: string = 'fas fa-calendar-alt';
     @Input() placement: string = 'bottom-left bottom-right top-left top-right';
-    @Input() container: string | null = 'body';
+    @Input() container: 'body' | 'null' | null = 'body';
+    @Input() minDate: string | null = null;
+    @Input() maxDate: string | null = null;
 
     dateStruct: NgbDateStruct | null = null;
     private focusedAndValued: boolean = false;
@@ -72,25 +74,34 @@ export class PastelDatepickerComponent implements ControlValueAccessor {
     private onTouched: () => void = () => { };
 
     writeValue(val: string): void {
-        if (val) {
-            // Intentar parsear YYYY-MM-DD
-            if (val.includes('-')) {
-                const parts = val.split('-');
-                if (parts.length >= 3) {
-                    const year = parseInt(parts[0]);
-                    const month = parseInt(parts[1]);
-                    const day = parseInt(parts[2].substr(0, 2));
-                    this.dateStruct = { year, month, day };
-                }
-            } else if (val.includes('/')) {
-                const parts = val.split('/');
-                if (parts.length >= 3) {
-                    this.dateStruct = { year: parseInt(parts[2]), month: parseInt(parts[1]), day: parseInt(parts[0]) };
-                }
+        this.dateStruct = this.parseToStruct(val);
+    }
+
+    private parseToStruct(val: string | null): NgbDateStruct | null {
+        if (!val) return null;
+        if (val.includes('-')) {
+            const parts = val.split('-');
+            if (parts.length >= 3) {
+                const year = parseInt(parts[0]);
+                const month = parseInt(parts[1]);
+                const day = parseInt(parts[2].substr(0, 2));
+                return { year, month, day };
             }
-        } else {
-            this.dateStruct = null;
+        } else if (val.includes('/')) {
+            const parts = val.split('/');
+            if (parts.length >= 3) {
+                return { year: parseInt(parts[2]), month: parseInt(parts[1]), day: parseInt(parts[0]) };
+            }
         }
+        return null;
+    }
+
+    get minDateStruct(): NgbDateStruct | null {
+        return this.parseToStruct(this.minDate);
+    }
+
+    get maxDateStruct(): NgbDateStruct | null {
+        return this.parseToStruct(this.maxDate);
     }
 
     registerOnChange(fn: any): void {
