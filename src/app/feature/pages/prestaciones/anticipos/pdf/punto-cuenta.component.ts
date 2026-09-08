@@ -25,10 +25,14 @@ export class PuntoCuentaComponent extends PdfLayoutBase {
   /**
    * Genera el PDF del Punto de Cuenta para la solicitud de anticipo aprobada
    */
-  public async generarPDFPuntoCuenta(ordenParam?: any): Promise<void> {
+  public async generarPDFPuntoCuenta(
+    ordenParam?: any,
+    militarParam?: any,
+    calculosParam?: any
+  ): Promise<void> {
     const orden = ordenParam || this.ordenPago || {};
-    const militarObj = this.militar || {};
-    const bunker = this.calculosBunker || {};
+    const militarObj = militarParam || this.militar || {};
+    const bunker = calculosParam || this.calculosBunker || {};
 
     const cedula =
       orden.cedula ||

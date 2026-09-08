@@ -1,13 +1,502 @@
-<div class="prestaciones-container fade-in">
-    <div class="hero-summary mb-4">
-        <div class="hero-info">
-            <h1>Finiquitos</h1>
-            <p>Cierre y liquidación definitiva de prestaciones.</p>
+<!-- MAIN VIEW: MAILBOX LAYOUT -->
+<app-mailbox-layout #mailboxLayout *ngIf="!isNewFiniquitoView" [tabs]="workflowTabs" [currentTabId]="currentTabId"
+    [isLoadingTabs]="isLoadingData" [showToolbar]="true" [allSelected]="allSelected"
+    [searchPlaceholder]="'Buscar por cédula...'" (search)="onMailboxSearch($event)"
+    (tabSwitch)="onMailboxTabSwitch($event)" (refresh)="onMailboxRefresh()" (selectAll)="onMailboxSelectAll($event)">
+
+    <ng-container toolbar-actions>
+        <button class="btn btn-pastel-icon-circle mr-2 fade-in tooltip-action btn-nuevo-pastel" 
+            (click)="toggleView()" ngbTooltip="Nuevo Finiquito">
+            <i class="fas fa-plus"></i>
+        </button>
+        <button class="btn btn-pastel-icon-circle fade-in tooltip-action btn-csv-emerald" 
+            (click)="mostrarConfirmacionCSV()" ngbTooltip="Exportar CSV">
+            <i class="fas fa-file-excel"></i>
+        </button>
+    </ng-container>
+
+    <!-- FILTROS INYECTADOS EN EL NGB-DROPDOWN DEL MAILBOX -->
+    <ng-container mailbox-filters>
+        <div class="modern-form-group">
+            <label>Rango de Fechas</label>
+            <div class="row align-items-center">
+                <div class="col-6 pr-2">
+                    <app-pastel-datepicker [(ngModel)]="fechaDesde" iconClass="fas fa-calendar-alt"></app-pastel-datepicker>
+                </div>
+                <div class="col-6 pl-2">
+                    <app-pastel-datepicker [(ngModel)]="fechaHasta" iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modern-form-group">
+            <label>Componente Militar</label>
+            <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt text-verde-titulos"></i></span></div>
+                <select class="form-control" style="font-size: 0.85rem;">
+                    <option value="" selected>Todos los Componentes...</option>
+                    <option value="EJ">Ejército Bolivariano</option>
+                    <option value="AR">Armada Bolivariana</option>
+                    <option value="AM">Aviación Militar</option>
+                    <option value="GN">Guardia Nacional</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="modern-form-group mb-1">
+            <label>Grado Jerárquico</label>
+            <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star text-verde-titulos"></i></span></div>
+                <select class="form-control" style="font-size: 0.85rem;">
+                    <option value="" selected>Todos los Grados...</option>
+                    <option>General / Almirante</option>
+                    <option>Oficial Superior</option>
+                    <option>Oficial Subalterno</option>
+                    <option>Tropa Profesional</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-end mt-4 pt-2" style="border-top: 1px solid #f1f5f9;">
+            <button class="btn btn-light shadow-sm font-weight-bold px-4 mr-2" 
+                style="border-radius: 8px; font-size: 0.85rem; padding: 0.5rem; color: #64748b;" 
+                (click)="mailboxLayout.filterDropdown.close()">
+                Cancelar
+            </button>
+            <button class="btn font-weight-bold shadow-sm transition-all px-4"
+                style="background-color: #598c89; color: white; border-radius: 8px; font-size: 0.85rem; padding: 0.5rem;"
+                onmouseover="this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.transform='translateY(0)'"
+                (click)="mailboxLayout.filterDropdown.close(); loadPendingData()">Aplicar Filtros
+            </button>
+        </div>
+    </ng-container>
+
+    <!-- BODY MAILBOX (TABLA DINÁMICA) -->
+    <ng-container mailbox-body>
+        <div *ngIf="isTableLoading" class="d-flex justify-content-center align-items-center flex-column" style="height: 300px;">
+            <div class="spinner-border" style="width: 3rem; height: 3rem; color: #598c89;" role="status">
+                <span class="sr-only">Cargando...</span>
+            </div>
+            <span class="mt-3 text-muted font-weight-500" style="font-size: 0.95rem;">Cargando registros de finiquito...</span>
+        </div>
+
+        <app-dynamic-table *ngIf="!isTableLoading" [config]="pendingTableConfig" [data]="pendingTableData"
+            (actionClicked)="onPendingTableAction($event)">
+        </app-dynamic-table>
+    </ng-container>
+</app-mailbox-layout>
+
+<!-- SECONDARY VIEW: FORMULARIO Y REGISTRO DE NUEVO FINIQUITO -->
+<div class="new-finiquito-view fade-in" *ngIf="isNewFiniquitoView">
+
+    <!-- HEADER VOLVER -->
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-2 px-2">
+        <h4 class="mb-0 text-dark font-weight-bold" style="letter-spacing: -0.5px;">Registro de Finiquito</h4>
+        <button class="btn shadow-sm font-weight-600 px-4 rounded-pill bg-white border text-dark"
+            style="border-color: #cbd5e1 !important;" (click)="toggleView()">
+            <i class="fas fa-arrow-left mr-2" style="color: #5eaaa8;"></i> Volver a Bandeja
+        </button>
+    </div>
+
+    <div class="row px-3">
+        <div class="col-md-4">
+            <div class="modern-form-group">
+                <label>Cédula de Identidad</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text">
+                        <i *ngIf="!isSearching" class="fas fa-id-card"></i>
+                        <i *ngIf="isSearching" class="fas fa-circle-notch fa-spin text-info"></i>
+                    </span></div>
+                    <input type="text" class="form-control" name="searchCedula" placeholder="Ej. 12345678" [(ngModel)]="searchCedula" (keyup.enter)="buscarMilitar()">
+                    <div class="input-group-append p-1">
+                        <button class="btn btn-header-action teal shadow-none m-0 d-flex align-items-center justify-content-center" 
+                            style="border-radius: 6px; padding: 0 1.2rem; height: 100%; border: none;" type="button" (click)="buscarMilitar()">
+                            <i class="fas fa-search m-0" style="font-size: 0.9rem;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="modern-form-group">
+                <label>Nombres y Apellidos</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-user text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.persona?.datobasico?.nombrecompleto || ''" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="modern-form-group mb-0">
+                <label>Sexo</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-venus-mars text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.persona?.datobasico?.sexo || ''" readonly>
+                </div>
+            </div>
+        </div>       
+    </div>
+
+    <div class="row px-3">
+        <div class="col-md-3">
+            <div class="modern-form-group mb-0">
+                <label>Fecha de Ingreso</label>
+                <app-pastel-datepicker [ngModel]="militarData?.fingreso"
+                    iconClass="fas fa-calendar-check"></app-pastel-datepicker>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="modern-form-group">
+                <label>Componente</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.componente.descripcion || ''" readonly>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="modern-form-group">
+                <label>Grado</label>
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star text-verde-titulos"></i></span></div>
+                    <input type="text" class="form-control text-dark font-weight-bold" [value]="militarData?.grado.descripcion || ''" readonly>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="card shadow-sm border-0" style="border-radius: 20px;">
-        <div class="card-body p-4">
-            <p class="text-muted">Módulo de Finiquitos en desarrollo...</p>
+
+    <div class="text-right mt-5 mb-4 px-3" *ngIf="militarData">
+        <button class="btn btn-header-action teal shadow-sm px-5" (click)="solicitarFiniquito()" [disabled]="!calculosData">
+            <i class="fas fa-check-circle mr-2" *ngIf="calculosData"></i>
+            <i class="fas fa-spinner fa-spin mr-2" *ngIf="!calculosData"></i>
+            {{ calculosData ? 'Procesar Finiquito' : 'Generando Cálculos...' }}
+        </button>
+    </div>
+
+    <!-- CARD: Histórico de Finiquitos (Aparece al consultar cédula) -->
+    <div class="card shadow-sm border-0 fade-in" style="border-radius: 20px; background: rgba(255, 255, 255, 0.95);"
+        *ngIf="militarData">
+        <div class="card-header bg-transparent border-0 pt-4 pb-2 px-4 d-flex align-items-center">
+            <div class="icon-circle shadow-sm rounded-circle d-flex align-items-center justify-content-center text-white mr-3"
+                style="width: 44px; height: 44px; background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);">
+                <i class="fas fa-history"></i>
+            </div>
+            <div>
+                <h6 class="mb-0 text-dark font-weight-bold">Histórico de Finiquitos</h6>
+                <small class="text-muted">{{ militarData.nombres }}</small>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <app-dynamic-table [config]="historyTableConfig" [data]="historyTableData">
+            </app-dynamic-table>
         </div>
     </div>
 </div>
+
+<!-- Modal: CSV -->
+<ng-template #modalCSV let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Exportar a CSV?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Desea generar y descargar el listado de Finiquitos en formato CSV?
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action shadow-none w-100" style="background-color: #f1fdf6; color: #10b981; border: 1px solid #d1fae5;" (click)="confirmarCSV()">
+                    Generar CSV
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Aprobar Finiquito -->
+<ng-template #modalAprobar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse teal">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Aprobar Finiquito?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Está seguro que desea aprobar la liquidación definitiva de <strong>{{ selectedMilitar?.nombre }}</strong>? Esta acción actualizará el estatus formalmente.
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action teal shadow-none w-100" (click)="confirmarAprobacion()">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Rechazar Finiquito -->
+<ng-template #modalRechazar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse red">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Rechazar Finiquito?</h4>
+            <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
+                ¿Está seguro que desea rechazar el finiquito de <strong>{{ selectedMilitar?.nombre }}</strong>?
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action red shadow-none w-100" (click)="confirmarRechazo()">
+                    Rechazar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Registrar Finiquito Definitivo -->
+<ng-template #modalSolicitar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+        
+        <!-- Header del Modal -->
+        <div class="modal-header border-0 pb-3 pt-4 px-4 bg-white d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <div class="icon-pulse-header mr-3" style="width: 48px; height: 48px; border-radius: 14px; background: rgba(89, 140, 137, 0.12); display: flex; align-items: center; justify-content: center; color: #598c89;">
+                    <i class="fas fa-file-invoice-dollar" style="font-size: 1.4rem;"></i>
+                </div>
+                <div>
+                    <h5 class="modal-title font-weight-bold text-dark mb-0" style="font-size: 1.25rem;">Registrar Finiquito Definitivo</h5>
+                    <p class="text-muted small mb-0 font-weight-500">Liquidación Final de Prestaciones Sociales FANB</p>
+                </div>
+            </div>
+            <button type="button" class="close text-muted hover-dark border-0 bg-transparent p-2" style="font-size: 1.5rem; outline: none;" (click)="modal.dismiss()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="modal-body p-4 bg-white">
+            
+            <!-- Resumen del Militar (Si existe data) -->
+            <div *ngIf="militarData" class="militar-modal-card mb-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle mr-3" style="width: 44px; height: 44px; border-radius: 50%; background: #598c89; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; box-shadow: 0 4px 8px rgba(89, 140, 137, 0.25);">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h6 class="font-weight-bold text-dark mb-0">
+                                {{ militarData?.persona?.datobasico?.nombres || militarData?.nombres }} {{ militarData?.persona?.datobasico?.apellidos || militarData?.apellidos }}
+                            </h6>
+                            <div class="d-flex align-items-center mt-1">
+                                <span class="badge badge-pill bg-light text-muted border mr-2 font-weight-600">
+                                    C.I: {{ formatCedula(searchCedula || militarData?.cedula) }}
+                                </span>
+                                <span class="badge badge-pill bg-secondary-soft text-secondary font-weight-600 mr-2">
+                                    {{ militarData?.grado?.nombre || militarData?.nombre_grado || 'MILITAR' }}
+                                </span>
+                                <span class="badge badge-pill bg-info-soft text-info font-weight-600">
+                                    {{ militarData?.componente?.nombre || militarData?.nombre_componente || 'FANB' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-muted small d-block font-weight-500">Fecha de Ingreso</span>
+                        <span class="font-weight-bold text-dark" style="font-size: 0.9rem;">
+                            <i class="far fa-calendar-alt text-muted mr-1"></i> {{ militarData?.fingreso || 'N/D' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjetas Resumen de Cálculos Financieros -->
+            <div class="row align-items-stretch mb-4">
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="finiquito-kpi-card">
+                        <div class="kpi-title-wrapper">
+                            <span class="kpi-title">Asig. Antigüedad</span>
+                            <i class="fas fa-coins text-info" style="font-size: 0.9rem;"></i>
+                        </div>
+                        <div class="kpi-value">
+                            Bs. {{ totalAsignacionAntiguedad | number:'1.2-2' }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="finiquito-kpi-card">
+                        <div class="kpi-title-wrapper">
+                            <span class="kpi-title">Depositado Banco</span>
+                            <i class="fas fa-university text-primary" style="font-size: 0.9rem;"></i>
+                        </div>
+                        <div class="kpi-value">
+                            Bs. {{ totalDepositadoBanco | number:'1.2-2' }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="finiquito-kpi-card">
+                        <div class="kpi-title-wrapper">
+                            <span class="kpi-title">Total Embargos</span>
+                            <i class="fas fa-minus-circle text-amber" style="font-size: 0.9rem;"></i>
+                        </div>
+                        <div class="kpi-value text-amber">
+                            Bs. {{ totalEmbargos | number:'1.2-2' }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-2">
+                    <div class="finiquito-kpi-card neto-highlight">
+                        <div class="kpi-title-wrapper">
+                            <span class="kpi-title">Neto Liquidado</span>
+                            <i class="fas fa-check-circle text-emerald" style="font-size: 0.9rem;"></i>
+                        </div>
+                        <div class="kpi-value">
+                            Bs. {{ montoNetoLiquidado | number:'1.2-2' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Configuración del Finiquito -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label class="font-weight-600 text-dark">
+                            <i class="fas fa-list-alt text-muted mr-1"></i> Motivo de Finiquito
+                        </label>
+                        <div class="input-group">
+                            <select class="form-control" [(ngModel)]="motivoFiniquito">
+                                <option value="RETIRO POR TIEMPO DE SERVICIO">RETIRO POR TIEMPO DE SERVICIO</option>
+                                <option value="CAUSA DE MUERTE / FALLECIMIENTO">CAUSA DE MUERTE / FALLECIMIENTO</option>
+                                <option value="INVALIDEZ O INCAPACIDAD">INVALIDEZ O INCAPACIDAD</option>
+                                <option value="CESE DE FUNCIONES">CESE DE FUNCIONES</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label class="font-weight-600 text-dark">
+                            <i class="fas fa-file-invoice text-muted mr-1"></i> Partida Presupuestaria
+                        </label>
+                        <div class="input-group">
+                            <select class="form-control" [(ngModel)]="partidaPresupuestaria">
+                                <option value="01.01.02.01">01.01.02.01 - LIQUIDACIONES Y FINIQUITOS</option>
+                                <option value="01.01.01.01">01.01.01.01 - GASTOS DE PERSONAL MILITAR</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label class="font-weight-600 text-dark">
+                            <i class="far fa-calendar-alt text-muted mr-1"></i> Fecha Efectiva de Retiro / Cese
+                        </label>
+                        <div class="input-group">
+                            <input type="date" class="form-control" [(ngModel)]="fechaRetiro">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label class="font-weight-600 text-dark">
+                            <i class="fas fa-percentage text-muted mr-1"></i> Ajuste por Intereses (Bs.)
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-plus text-success"></i></span>
+                            </div>
+                            <input type="number" class="form-control" [(ngModel)]="ajusteIntereses" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label class="font-weight-600 text-dark">
+                            <i class="fas fa-balance-scale-left text-muted mr-1"></i> Monto por Deuda (Bs.)
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-minus text-danger"></i></span>
+                            </div>
+                            <input type="number" class="form-control" [(ngModel)]="montoDeuda" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group">
+                        <label class="font-weight-600 text-dark">
+                            <i class="fas fa-hand-holding-usd text-muted mr-1"></i> Monto a Recuperar (Bs.)
+                        </label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-minus text-danger"></i></span>
+                            </div>
+                            <input type="number" class="form-control" [(ngModel)]="montoRecuperar" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Banner Informativo por Muerte / Beneficiarios -->
+            <div *ngIf="motivoFiniquito === 'CAUSA DE MUERTE / FALLECIMIENTO'" class="p-3 mb-4 rounded-16 border" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.25) !important;">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-users text-amber mr-3" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <h6 class="font-weight-bold text-dark mb-0">Distribución a Beneficiarios / Herederos Legales</h6>
+                        <p class="text-muted small mb-0 font-weight-500">
+                            Según Ley Orgánica de Seguridad Social FANB (Ley Negro Primero), la liquidación final se prorrateará entre los beneficiarios con derecho.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="modern-form-group mb-2">
+                <label class="font-weight-600 text-dark">
+                    <i class="fas fa-comment-alt text-muted mr-1"></i> Observaciones / Justificación Legal
+                </label>
+                <div class="input-group">
+                    <textarea class="form-control" rows="2" [(ngModel)]="observacion" placeholder="Ingrese detalles o justificación de la liquidación definitiva..." style="height: auto; padding-top: 0.75rem;"></textarea>
+                </div>
+            </div>
+
+            <!-- Footer del Modal -->
+            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                <div>
+                    <span class="text-muted small d-block">Monto Final a Procesar</span>
+                    <h5 class="font-weight-bold text-emerald mb-0">
+                        Bs. {{ montoNetoLiquidado | number:'1.2-2' }}
+                    </h5>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn btn-light shadow-sm font-weight-bold px-4 mr-3" style="border-radius: 10px; color: #64748b;" (click)="modal.dismiss()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-header-action teal shadow-sm px-4 m-0" (click)="procesarSolicitud()">
+                        <i class="fas fa-check-double mr-2"></i> Procesar Finiquito
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</ng-template>

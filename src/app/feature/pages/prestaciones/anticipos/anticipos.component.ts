@@ -749,16 +749,77 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     }
   }
 
+  public async cargarDatosYPuntoCuenta(orden: any): Promise<void> {
+    if (!this.puntoCuentaPdf || !orden) return;
+
+    const cedula =
+      orden.cedula_beneficiario || orden.cedula_afiliado || orden.cedula || "";
+
+    let militarObj = this.militarData;
+    let calculosObj = this.calculosData;
+
+    const mCedula = militarObj?.cedula || militarObj?.persona?.datobasico?.cedula;
+    const isSameCedula = mCedula && String(mCedula) === String(cedula);
+
+    if (!isSameCedula) {
+      militarObj = null;
+      calculosObj = null;
+      if (cedula) {
+        try {
+          const resMilitar = await lastValueFrom(
+            this.prestacionesService.buscarMilitarPorCedula(cedula)
+          );
+          militarObj = Array.isArray(resMilitar) ? resMilitar[0] : resMilitar;
+        } catch (e) {
+          console.warn("No se pudo obtener militarData para Punto de Cuenta:", e);
+        }
+      }
+    }
+
+    if (!calculosObj && cedula) {
+      try {
+        const dirData: any = await lastValueFrom(
+          this.prestacionesService.obtenerDirectivaId(cedula)
+        );
+        const directivaObj = dirData?.Cuerpo?.[0];
+        const directivaId = directivaObj?.directiva_sueldo_id || 1;
+        const gradoId =
+          directivaObj?.grado_id ||
+          militarObj?.grado_id ||
+          militarObj?.grado?.id;
+
+        const calculoPromise = new Promise<any>((resolve) => {
+          const sub = this.prestacionesService.calculos$.subscribe((data) => {
+            sub.unsubscribe();
+            resolve(data);
+          });
+          setTimeout(() => {
+            sub.unsubscribe();
+            resolve(null);
+          }, 3500);
+        });
+
+        this.prestacionesService
+          .iniciarCalculosPrestaciones(directivaId, cedula, "", gradoId)
+          .subscribe();
+
+        calculosObj = await calculoPromise;
+      } catch (e) {
+        console.warn("No se pudieron obtener cálculos para Punto de Cuenta:", e);
+      }
+    }
+
+    await this.puntoCuentaPdf.generarPDFPuntoCuenta(orden, militarObj, calculosObj);
+  }
+
   public async confirmarAprobacion(): Promise<void> {
     const militar = this.selectedMilitar;
     this.modalService.dismissAll();
 
-    if (this.puntoCuentaPdf) {
-      try {
-        await this.puntoCuentaPdf.generarPDFPuntoCuenta(militar);
-      } catch (e) {
-        console.error("Error generando PDF de Punto de Cuenta:", e);
-      }
+    try {
+      await this.cargarDatosYPuntoCuenta(militar);
+    } catch (e) {
+      console.error("Error generando PDF de Punto de Cuenta:", e);
     }
   }
 
