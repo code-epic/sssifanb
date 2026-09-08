@@ -201,6 +201,7 @@ export class PdfLayoutBase {
   protected async buildDocDefinition(options: {
     logoImg?: string;
     photoImg?: string;
+    hidePhoto?: boolean;
     qrImg?: string;
     watermarkImg?: string;
     gradoBadgeImg?: string;
@@ -296,53 +297,57 @@ export class PdfLayoutBase {
               color: "#1E293B",
             },
             // Cabecera Zona 3: Foto del Militar/Afiliado (Agrandada + Grado superpuesto al frente)
-            {
-              width: 70,
-              stack: [
-                ...(options.photoImg
-                  ? [
-                      {
-                        image: "photo",
-                        fit: [60, 72],
-                        alignment: "center",
-                      },
-                    ]
-                  : [
-                      {
-                        canvas: [
-                          {
-                            type: "rect",
-                            x: 0,
-                            y: 0,
-                            w: 60,
-                            h: 72,
-                            r: 2,
-                            lineColor: "#CBD5E1",
-                            lineWidth: 1,
-                          },
-                        ],
-                      },
-                      {
-                        text: "FOTO",
-                        alignment: "center",
-                        fontSize: 8,
-                        color: "#94A3B8",
-                        margin: [0, -42, 0, 0],
-                      },
-                    ]),
-                // Grado gráfico al pie de la foto, posicionado debajo
-                ...(options.gradoBadgeImg
-                  ? [
-                      {
-                        image: "gradoBadge",
-                        fit: [55, 18],
-                        alignment: "center",
-                        margin: [0, 4, 0, 0], // Posiciona la insignia debajo de la foto sin superposición
-                      },
-                    ]
-                  : []),
-              ],
-            },
+            ...(options.hidePhoto
+              ? []
+              : [
+                  {
+                    width: 70,
+                    stack: [
+                      ...(options.photoImg
+                        ? [
+                            {
+                              image: "photo",
+                              fit: [60, 72],
+                              alignment: "center",
+                            },
+                          ]
+                        : [
+                            {
+                              canvas: [
+                                {
+                                  type: "rect",
+                                  x: 0,
+                                  y: 0,
+                                  w: 60,
+                                  h: 72,
+                                  r: 2,
+                                  lineColor: "#CBD5E1",
+                                  lineWidth: 1,
+                                },
+                              ],
+                            },
+                            {
+                              text: "FOTO",
+                              alignment: "center",
+                              fontSize: 8,
+                              color: "#94A3B8",
+                              margin: [0, -42, 0, 0],
+                            },
+                          ]),
+                      // Grado gráfico al pie de la foto, posicionado debajo
+                      ...(options.gradoBadgeImg
+                        ? [
+                            {
+                              image: "gradoBadge",
+                              fit: [55, 18],
+                              alignment: "center",
+                              margin: [0, 4, 0, 0], // Posiciona la insignia debajo de la foto sin superposición
+                            },
+                          ]
+                        : []),
+                    ],
+                  },
+                ]),
           ],
         };
       },

@@ -2,6 +2,7 @@ import { Injectable, NgZone } from "@angular/core";
 import { ApiService } from "../api.service";
 import { environment } from "src/environments/environment";
 import { Observable, Subject } from "rxjs";
+import { tap } from "rxjs/operators";
 
 @Injectable({
   providedIn: "root",
@@ -13,6 +14,7 @@ export class PrestacionesSharedService {
 
   private port: MessagePort | null = null;
   private isMessagePortInitialized = false;
+  private currentTaskId: string | null = null;
 
   constructor(
     private apiService: ApiService,
@@ -47,6 +49,13 @@ export class PrestacionesSharedService {
   }
 
   private notifyCompletion(msg: any) {
+    const taskId = msg.payload?.taskId || msg.taskId;
+    if (this.currentTaskId && taskId && taskId !== this.currentTaskId) {
+      console.log(
+        `[PrestacionesSharedService] Ignorando taskId no coincidente (${taskId} vs ${this.currentTaskId})`,
+      );
+      return;
+    }
     this.zone.run(() => {
       const newContent = msg.payload?.data || msg.data;
       if (newContent) {
@@ -118,17 +127,19 @@ export class PrestacionesSharedService {
    * @param directivaId ID de la directiva de sueldo
    * @param cedula Cédula del militar
    * @param trackId ID de seguimiento (opcional, generado si no se provee)
+   * @param gradoId ID del grado del militar (opcional)
    */
   public iniciarCalculosPrestaciones(
     directivaId: number,
     cedula: string,
     trackId: string = "",
+    gradoId?: number,
   ): Observable<any> {
     const netInfo = JSON.parse(sessionStorage.getItem("net_info") || "{}");
     const config = netInfo.config || {};
     const tId = trackId || `CALC_${new Date().getTime()}`;
 
-    const fnx = {
+    const fnx: any = {
       funcion: "Fnx_ProcesarBeneficiario",
       id_cliente: config.clientId,
       aplicacion: "sandra.app.ipsfa",
@@ -141,6 +152,16 @@ export class PrestacionesSharedService {
       directiva_id: directivaId,
     };
 
-    return this.apiService.post("fnx", fnx);
+    if (gradoId !== undefined && gradoId !== null) {
+      fnx.grado_id = gradoId;
+    }
+
+    return this.apiService.post("fnx", fnx).pipe(
+      tap((res: any) => {
+        if (res && res.contenido && res.contenido.id) {
+          this.currentTaskId = res.contenido.id;
+        }
+      }),
+    );
   }
 }

@@ -15,6 +15,34 @@ import { PrestacionesSharedService } from "src/app/core/services/prestaciones/pr
 import { LoginService } from "src/app/core/services/login/login.service";
 import { Subscription } from "rxjs";
 import { environment } from "src/environments/environment";
+import { IAPICore } from "src/app/core/models/api/api-model";
+
+export interface IAnticipo {
+  usr_modificacion?: string;
+  emisor?: string;
+  porcentaje?: number;
+  observacion?: string;
+  cedula_afiliado?: string;
+  cedula_beneficiario?: string;
+  fecha?: string;
+  usr_creacion?: string;
+  status_id?: number;
+  monto?: number;
+  apellidos_beneficiario?: string;
+  movimiento_id?: number;
+  observ_ult_modificacion?: string;
+  autoriza?: string;
+  tipo_id?: number;
+  nombres_beneficiario?: string;
+  tipoan?: number;
+  revision?: string;
+  motivo?: string;
+  f_creacion?: string;
+  f_ult_modificacion?: string;
+}
+
+import { PuntoCuentaComponent } from "./pdf/punto-cuenta.component";
+import { CartaBancoComponent } from "./pdf/carta-banco.component";
 
 @Component({
   selector: "app-prest-anticipos",
@@ -26,6 +54,8 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   @ViewChild("modalRechazar") modalRechazar!: TemplateRef<any>;
   @ViewChild("modalCSV") modalCSV!: TemplateRef<any>;
   @ViewChild("modalSolicitar") modalSolicitar!: TemplateRef<any>;
+  @ViewChild("puntoCuentaPdf") puntoCuentaPdf!: PuntoCuentaComponent;
+  @ViewChild("cartaBancoPdf") cartaBancoPdf!: CartaBancoComponent;
 
   public isNewAnticipoView: boolean = false;
   public searchCedula: string = "";
@@ -120,12 +150,6 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
         tooltip: "Rechazar Anticipo",
         buttonClass: "btn-circular btn-danger-soft shadow-sm ml-2",
       },
-      {
-        name: "ver",
-        icon: "fa-eye",
-        tooltip: "Ver Expediente",
-        buttonClass: "btn-circular btn-amber-soft shadow-sm ml-2",
-      },
     ],
   };
 
@@ -201,8 +225,8 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   // Gancho de inicio desde BaseWorkflowClass
   protected override onInitExtension(): void {
     const today = new Date();
-    this.fechaDesde = `${today.getFullYear()}-01-01`;
-    this.fechaHasta = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    this.fechaDesde = `${today.getFullYear()}-01-01 00:00:00`;
+    this.fechaHasta = `${today.getFullYear() + 1}-01-01 00:00:00`;
 
     this.loadMockTabs(); // Aquí podrías hacer: this.loadWorkflowTabs('API_FUNCTION', '1');
     this.loadPendingData();
@@ -246,61 +270,86 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     }
   }
 
-  public calcularPorPorcentaje(): void {
-    if (!this.calculosData) return;
-
-    if (this.porcentajeAnticipo > 75) this.porcentajeAnticipo = 75;
-    if (this.porcentajeAnticipo < 0) this.porcentajeAnticipo = 0;
-
-    const monto_disponible = Number(
-      this.calculosData.base?.depositado_en_banco || 0,
+  private getMontoDisponible(): number {
+    if (!this.calculosData || !this.calculosData.base) return 0;
+    return Number(
+      this.calculosData.base.depositado_en_banco ||
+        this.calculosData.base.deposito_banco ||
+        this.calculosData.base.saldo_disponible ||
+        0,
     );
-    const anticipos_aux = Number(this.calculosData.movimientos?.anticipo || 0);
-    const dem = Number(this.calculosData.movimientos?.embargo || 0);
+  }
+
+  private getMaxMontoAnticipoDisponible(): number {
+    const monto_disponible = this.getMontoDisponible();
+    if (monto_disponible <= 0) return 0;
+
+    const anticipos_aux = Number(this.calculosData?.movimientos?.anticipo || 0);
+    const dem = Number(this.calculosData?.movimientos?.embargo || 0);
 
     const mt = monto_disponible * 0.25;
     const monto_resguardo = dem > mt ? dem - mt : 0;
 
-    const cantidad =
-      (monto_disponible * this.porcentajeAnticipo) / 100 -
-      anticipos_aux -
-      monto_resguardo;
+    const max_disponible =
+      monto_disponible * 0.75 - anticipos_aux - monto_resguardo;
+    return max_disponible > 0 ? parseFloat(max_disponible.toFixed(2)) : 0;
+  }
 
-    this.montoAnticipo = cantidad > 0 ? parseFloat(cantidad.toFixed(2)) : 0;
+  public calcularPorPorcentaje(): void {
+    if (!this.calculosData) return;
+
+    let pct = Number(this.porcentajeAnticipo);
+    if (isNaN(pct) || pct <= 0) {
+      this.porcentajeAnticipo = 0;
+      this.montoAnticipo = 0;
+      return;
+    }
+
+    const monto_disponible = this.getMontoDisponible();
+    if (monto_disponible <= 0) {
+      this.porcentajeAnticipo = 0;
+      this.montoAnticipo = 0;
+      return;
+    }
+
+    const max_monto = this.getMaxMontoAnticipoDisponible();
+    let montoCalculado = (monto_disponible * pct) / 100;
+
+    if (montoCalculado > max_monto) {
+      montoCalculado = max_monto;
+      this.porcentajeAnticipo = parseFloat(
+        ((max_monto * 100) / monto_disponible).toFixed(2),
+      );
+    }
+
+    this.montoAnticipo = parseFloat(montoCalculado.toFixed(2));
   }
 
   public calcularPorMonto(): void {
     if (!this.calculosData) return;
 
-    const monto_disponible = Number(
-      this.calculosData.base?.depositado_en_banco || 0,
-    );
-    const anticipos_aux = Number(this.calculosData.movimientos?.anticipo || 0);
-    const dem = Number(this.calculosData.movimientos?.embargo || 0);
-
-    const mt = monto_disponible * 0.25;
-    const monto_resguardo = dem > mt ? dem - mt : 0;
-
-    const max_cantidad =
-      (monto_disponible * 75) / 100 - anticipos_aux - monto_resguardo;
-
-    if (this.montoAnticipo > max_cantidad) {
-      this.montoAnticipo =
-        max_cantidad > 0 ? parseFloat(max_cantidad.toFixed(2)) : 0;
+    let monto = Number(this.montoAnticipo);
+    if (isNaN(monto) || monto <= 0) {
+      this.porcentajeAnticipo = 0;
+      return;
     }
 
-    if (this.montoAnticipo < 0) this.montoAnticipo = 0;
-
-    let calculoPorcentaje = 0;
-    const baseCalculo = monto_disponible / 100;
-    if (baseCalculo > 0) {
-      calculoPorcentaje =
-        ((this.montoAnticipo + anticipos_aux + monto_resguardo) * 100) /
-        monto_disponible;
+    const monto_disponible = this.getMontoDisponible();
+    if (monto_disponible <= 0) {
+      this.montoAnticipo = 0;
+      this.porcentajeAnticipo = 0;
+      return;
     }
 
-    this.porcentajeAnticipo =
-      calculoPorcentaje > 75 ? 75 : parseFloat(calculoPorcentaje.toFixed(2));
+    const max_monto = this.getMaxMontoAnticipoDisponible();
+
+    if (monto > max_monto) {
+      monto = max_monto;
+      this.montoAnticipo = monto;
+    }
+
+    const pct = (monto * 100) / monto_disponible;
+    this.porcentajeAnticipo = parseFloat(pct.toFixed(2));
   }
 
   // Eventos interceptados desde el Mailbox Layout
@@ -340,9 +389,25 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   // LÓGICA DE DATOS MOCKEADOS
   // ------------------------------------
 
+  public formatCedula(cedula: any): string {
+    if (!cedula) return "";
+    const str = String(cedula).trim();
+    const match = str.match(/^([VvEeJjGgP-]+)?\s*(\d+)$/);
+    if (match) {
+      const prefix = match[1] ? match[1].toUpperCase() + "-" : "";
+      const num = Number(match[2]);
+      return prefix + num.toLocaleString("de-DE");
+    }
+    const cleanNum = str.replace(/\D/g, "");
+    if (cleanNum) {
+      return Number(cleanNum).toLocaleString("de-DE");
+    }
+    return str;
+  }
+
   public loadPendingData(): void {
     const statusId = this.currentTabId || "101";
-    
+
     // Configurar acciones dinámicamente según el estatus (101 = Pendientes)
     if (statusId === "101") {
       this.pendingTableConfig.actions = [
@@ -358,10 +423,19 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
           tooltip: "Rechazar Anticipo",
           buttonClass: "btn-circular btn-danger-soft shadow-sm ml-2",
         },
+      ];
+    } else if (statusId === "100") {
+      this.pendingTableConfig.actions = [
+        {
+          name: "cartaBanco",
+          icon: "fa-file-pdf",
+          tooltip: "Carta a Banco",
+          buttonClass: "btn-circular btn-info-soft shadow-sm ml-2",
+        },
         {
           name: "ver",
           icon: "fa-eye",
-          tooltip: "Ver Expediente",
+          tooltip: "Ver Detalles",
           buttonClass: "btn-circular btn-amber-soft shadow-sm ml-2",
         },
       ];
@@ -376,9 +450,20 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
       ];
     }
 
+    const fDesde = this.fechaDesde
+      ? this.fechaDesde.includes(" ")
+        ? this.fechaDesde
+        : `${this.fechaDesde} 00:00:00`
+      : `${new Date().getFullYear()}-01-01 00:00:00`;
+    const fHasta = this.fechaHasta
+      ? this.fechaHasta.includes(" ")
+        ? this.fechaHasta
+        : `${this.fechaHasta} 00:00:00`
+      : `${new Date().getFullYear() + 1}-01-01 00:00:00`;
+
     const payload = {
       funcion: environment.funcion.CONSULTAR_ORDENES,
-      parametros: `${statusId},${this.fechaDesde},${this.fechaHasta}`,
+      parametros: `${statusId},${fDesde},${fHasta}`,
     };
 
     this.isTableLoading = true;
@@ -410,7 +495,7 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
               fecha: fechaStr,
               estatus: item.nombre_anticipo || "PENDIENTE",
 
-              cedulaFormat: `<span class="badge badge-pill bg-light text-muted border border-secondary shadow-sm font-weight-bold px-2 py-1">${item.cedula_beneficiario}</span>`,
+              cedulaFormat: `<span class="badge badge-pill bg-light text-muted border border-secondary shadow-sm font-weight-bold px-2 py-1">${this.formatCedula(item.cedula_beneficiario)}</span>`,
               gradoFormat: `<span style="color: #64748b; font-weight: 500;">${item.nombre_grado || ""}</span>`,
               componenteFormat: this.getComponentBadge(
                 item.nombre_componente || "",
@@ -450,7 +535,11 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     if (this.isSearching) {
       return;
     }
-    if (this.searchCedula === this.lastSearchedCedula) {
+    if (
+      this.searchCedula === this.lastSearchedCedula &&
+      this.militarData &&
+      this.calculosData
+    ) {
       return;
     }
 
@@ -459,6 +548,8 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     this.militarData = null;
     this.historyTableData = [];
     this.calculosData = null;
+    this.porcentajeAnticipo = 0;
+    this.montoAnticipo = 0;
 
     const cargo = this.loginService.Usuario?.cargo || "";
 
@@ -468,7 +559,7 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
         next: (data: any) => {
           try {
             if (data && (!Array.isArray(data) || data.length > 0)) {
-              this.militarData = data[0];
+              this.militarData = Array.isArray(data) ? data[0] : data;
               if (this.militarData.fingreso) {
                 this.militarData.fingreso = this.utilService.formatDate(
                   this.militarData.fingreso,
@@ -478,22 +569,33 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
               // Consultar movimientos
               this.cargarMovimientos();
 
-              // Obtener directivaID modularizado
+              // Obtener directivaID y gradoID modularizado (similar a identificación)
               this.prestacionesService
                 .obtenerDirectivaId(this.searchCedula)
                 .subscribe({
                   next: (dirData: any) => {
-                    const directivaId =
-                      dirData.Cuerpo?.[0]?.directiva_sueldo_id || 1;
+                    const directivaObj = dirData.Cuerpo?.[0];
+                    const directivaId = directivaObj?.directiva_sueldo_id || 1;
+                    const gradoId =
+                      directivaObj?.grado_id ||
+                      this.militarData?.grado_id ||
+                      this.militarData?.grado?.id;
 
-                    // Iniciar cálculos de prestaciones
+                    // Iniciar cálculos de prestaciones enviando directivaId y gradoId
                     this.prestacionesService
                       .iniciarCalculosPrestaciones(
                         directivaId,
                         this.searchCedula,
+                        "",
+                        gradoId,
                       )
                       .subscribe({
-                        next: (calcRes) => {},
+                        next: (calcRes) => {
+                          console.log(
+                            "fnx registrado exitosamente para cálculos:",
+                            calcRes,
+                          );
+                        },
                         error: (calcErr) =>
                           console.error(
                             "Error en iniciarCalculosPrestaciones:",
@@ -567,6 +669,17 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     this.modalService.dismissAll();
   }
 
+  public async generarCartaBanco(item?: any): Promise<void> {
+    if (this.cartaBancoPdf) {
+      try {
+        const list = item ? [item] : this.pendingTableData || [];
+        await this.cartaBancoPdf.generarPDFCartaBanco(list);
+      } catch (e) {
+        console.error("Error generando Carta a Banco Memorandum:", e);
+      }
+    }
+  }
+
   public onPendingTableAction(event: any): void {
     this.selectedMilitar = event.row;
     if (event.actionName === "aprobar") {
@@ -581,16 +694,24 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
         size: "md",
         windowClass: "pastel-modal",
       });
+    } else if (event.actionName === "cartaBanco") {
+      this.generarCartaBanco(event.row);
     } else if (event.actionName === "ver") {
-      alert(`Ver expediente de ${event.row.nombre}`);
+      alert(`Ver detalles de ${event.row.nombre || event.row.nombres_beneficiario || 'solicitud'}`);
     }
   }
 
-  public confirmarAprobacion(): void {
-    alert(
-      `Anticipo de ${this.selectedMilitar?.nombre} aprobado satisfactoriamente.`,
-    );
+  public async confirmarAprobacion(): Promise<void> {
+    const militar = this.selectedMilitar;
     this.modalService.dismissAll();
+
+    if (this.puntoCuentaPdf) {
+      try {
+        await this.puntoCuentaPdf.generarPDFPuntoCuenta(militar);
+      } catch (e) {
+        console.error("Error generando PDF de Punto de Cuenta:", e);
+      }
+    }
   }
 
   public confirmarRechazo(): void {
@@ -599,6 +720,10 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   }
 
   public solicitarAnticipo(): void {
+    this.porcentajeAnticipo = 0;
+    this.montoAnticipo = 0;
+    this.motivoAnticipo = "";
+    this.cdr.detectChanges();
     this.modalService.open(this.modalSolicitar, {
       centered: true,
       size: "lg",
@@ -607,9 +732,100 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   }
 
   public procesarSolicitud(): void {
-    alert("La nueva solicitud de anticipo fue registrada con éxito.");
-    this.modalService.dismissAll();
-    this.toggleView();
+    this.insertarAnticipo();
+  }
+
+  public get anticipoData(): IAnticipo {
+    const now = new Date();
+    const fechaDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const timestampStr = `${fechaDate} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+
+    const cedula = this.militarData?.cedula || this.searchCedula || "";
+    const datobasico = this.militarData?.persona?.datobasico || {};
+    const nombres = (
+      datobasico.nombres ||
+      datobasico.nombrecompleto ||
+      this.militarData?.nombres ||
+      ""
+    ).trim();
+    const apellidos = (
+      datobasico.apellidos ||
+      datobasico.apellidocompleto ||
+      this.militarData?.apellidos ||
+      ""
+    ).trim();
+    const usuario =
+      this.loginService.Usuario?.usuario ||
+      this.loginService.Usuario?.login ||
+      "SYSTEM";
+
+    const motivosMap: { [key: string]: string } = {
+      "1": "Adquisición de Vivienda",
+      "2": "Reparación de Vivienda",
+      "3": "Gastos Médicos Mayores",
+      "4": "Educación",
+    };
+    const motivoTexto =
+      motivosMap[this.motivoAnticipo] || this.motivoAnticipo || "";
+
+    return {
+      usr_modificacion: "",
+      emisor: "",
+      porcentaje: Math.round(this.porcentajeAnticipo || 0),
+      observacion: "",
+      cedula_afiliado: cedula,
+      cedula_beneficiario: cedula,
+      fecha: fechaDate,
+      usr_creacion: usuario,
+      status_id: 101,
+      monto: Number(this.montoAnticipo || 0),
+      apellidos_beneficiario: apellidos,
+      movimiento_id: 5,
+      observ_ult_modificacion: "",
+      autoriza: "",
+      tipo_id: 1,
+      nombres_beneficiario: nombres,
+      tipoan: 1,
+      revision: "",
+      motivo: motivoTexto,
+      f_creacion: timestampStr,
+      f_ult_modificacion: timestampStr,
+    };
+  }
+
+  public insertarAnticipo(): void {
+    if (!this.militarData) {
+      alert("No se han cargado los datos del militar.");
+      return;
+    }
+
+    if (!this.motivoAnticipo) {
+      alert("Por favor seleccione un motivo para el anticipo.");
+      return;
+    }
+
+    if (!this.montoAnticipo || this.montoAnticipo <= 0) {
+      alert("Por favor ingrese un monto válido para el anticipo.");
+      return;
+    }
+
+    this.xAPI = {} as IAPICore;
+    this.xAPI.funcion = environment.funcion.INSERTAR_ORDEN;
+    this.xAPI.valores = JSON.stringify(this.anticipoData);
+
+    console.log(this.xAPI.valores);
+    this.apiService.post("crud", this.xAPI).subscribe({
+      next: (data: any) => {
+        alert("La nueva solicitud de anticipo fue registrada con éxito.");
+        this.modalService.dismissAll();
+        this.toggleView();
+        this.loadPendingData();
+      },
+      error: (err: any) => {
+        console.error("Error al registrar anticipo:", err);
+        alert("Ocurrió un error al registrar la solicitud de anticipo.");
+      },
+    });
   }
 
   public downloadCSV(data: any[], filename: string) {

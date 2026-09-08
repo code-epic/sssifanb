@@ -1531,7 +1531,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  consultarFechaUltimoAnticipo() {
+  public consultarFechaUltimoAnticipo() {
     const cedula = this.identificacionForm?.get(
       "persona.datobasico.cedula",
     )?.value;
@@ -1569,7 +1569,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  consultarFechaUtimoDepositoEnBanco() {
+  public consultarFechaUtimoDepositoEnBanco() {
     const cedula = this.identificacionForm?.get(
       "persona.datobasico.cedula",
     )?.value;
@@ -1607,7 +1607,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     });
   }
 
-  getCargo(): string {
+  public getCargo(): string {
     let cargo = "";
 
     if (this.loginService && this.loginService.Usuario) {

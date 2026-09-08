@@ -9,6 +9,12 @@
             (click)="toggleView()" ngbTooltip="Nuevo Anticipo">
             <i class="fas fa-plus"></i>
         </button>
+        <button *ngIf="currentTabId === '100'" 
+            class="btn shadow-sm mr-2 fade-in tooltip-action d-inline-flex align-items-center font-weight-bold px-3 py-2 transition-all" 
+            style="border-radius: 12px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border: none; font-size: 0.82rem; height: 38px; line-height: 1;"
+            (click)="generarCartaBanco()" ngbTooltip="Generar Carta a Banco (Memorándum)">
+            <i class="fas fa-file-pdf mr-2" style="font-size: 0.95rem;"></i> Carta a Banco
+        </button>
         <button class="btn btn-pastel-icon-circle fade-in tooltip-action btn-csv-emerald" 
             (click)="mostrarConfirmacionCSV()" ngbTooltip="Exportar CSV">
             <i class="fas fa-file-excel"></i>
@@ -423,3 +429,6 @@
         </div>
     </div>
 </ng-template>
+
+<app-punto-cuenta #puntoCuentaPdf [militar]="militarData" [calculosBunker]="calculosData"></app-punto-cuenta>
+<app-carta-banco #cartaBancoPdf [anticiposList]="pendingTableData" [fechaDesde]="fechaDesde" [fechaHasta]="fechaHasta"></app-carta-banco>

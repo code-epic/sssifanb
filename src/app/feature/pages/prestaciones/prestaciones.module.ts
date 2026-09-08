@@ -21,6 +21,9 @@ import { MailboxLayoutComponent } from 'src/app/shared/components/mailbox-layout
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { AuditoriaDiscrepanciasComponent } from './fideicomitentes/auditoria-discrepancias/auditoria-discrepancias.component';
 
+import { PuntoCuentaComponent } from './anticipos/pdf/punto-cuenta.component';
+import { CartaBancoComponent } from './anticipos/pdf/carta-banco.component';
+
 @NgModule({
     declarations: [
         AnticiposComponent,
@@ -45,7 +48,9 @@ import { AuditoriaDiscrepanciasComponent } from './fideicomitentes/auditoria-dis
         PastelDatepickerComponent,
         DynamicTableComponent,
         MailboxLayoutComponent,
-        ScrollingModule
+        ScrollingModule,
+        PuntoCuentaComponent,
+        CartaBancoComponent
     ]
 })
 export class PrestacionesModule { }
