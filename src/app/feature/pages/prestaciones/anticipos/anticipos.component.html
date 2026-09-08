@@ -244,13 +244,14 @@
             </div>
             <h4 class="font-weight-bold text-dark mb-2">¿Aprobar Anticipo?</h4>
             <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
-                ¿Está seguro que desea aprobar el anticipo de <strong>{{ selectedMilitar?.nombre }}</strong>? Esta acción actualizará el estatus formalmente.
+                ¿Está seguro que desea aprobar el anticipo de <strong>{{ selectedMilitar?.nombre }}</strong>? Esta acción actualizará el estatus formalmente a <strong>EJECUTADA / APROBADO (100)</strong>.
             </p>
             <div class="d-flex justify-content-center align-items-center">
                 <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
                     Cancelar
                 </button>
-                <button type="button" class="btn-header-action teal shadow-none w-100" (click)="confirmarAprobacion()">
+                <button type="button" class="btn-header-action teal shadow-none w-100" [disabled]="isProcessingAction" (click)="confirmarAprobacion()">
+                    <i *ngIf="isProcessingAction" class="fas fa-spinner fa-spin mr-2"></i>
                     Confirmar
                 </button>
             </div>
@@ -267,22 +268,93 @@
             </div>
             <h4 class="font-weight-bold text-dark mb-2">¿Rechazar Anticipo?</h4>
             <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
-                Se dispone a rechazar el anticipo de <strong>{{ selectedMilitar?.nombre }}</strong>. Esta acción quedará en bitácora.
+                Se dispone a rechazar el anticipo de <strong>{{ selectedMilitar?.nombre }}</strong>. Se actualizará el estatus formalmente a <strong>RECHAZADA (102)</strong>.
             </p>
             
-            <div class="modern-form-group mb-4 text-left">
+            <!-- Observación Actual (si existe en la orden) -->
+            <div *ngIf="selectedMilitar?.observacion || selectedMilitar?.motivo" class="p-3 mb-3 text-left border rounded-12" style="background: #f8fafc; border-color: #e2e8f0 !important; border-radius: 12px;">
+                <span class="text-muted small font-weight-bold d-block mb-1 text-uppercase" style="letter-spacing: 0.5px;">Observación / Motivo Actual</span>
+                <span class="text-dark font-weight-500 small d-block">{{ selectedMilitar?.observacion || selectedMilitar?.motivo }}</span>
+            </div>
+
+            <div class="modern-form-group mb-3 text-left">
                 <label class="text-danger font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">MOTIVO DE RECHAZO *</label>
-                <textarea class="form-control border shadow-none" rows="2"
+                <div class="input-group">
+                    <select class="form-control text-dark font-weight-500" [(ngModel)]="motivoRechazoSelect">
+                        <option value="Documentación Incompleta">Documentación Incompleta</option>
+                        <option value="Monto Excede Disponibilidad">Monto Excede Disponibilidad</option>
+                        <option value="Medida Judicial Impedimento">Medida Judicial Impedimento</option>
+                        <option value="Solicitud Duplicada">Solicitud Duplicada</option>
+                        <option value="Otro Motivo">Otro Motivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modern-form-group mb-4 text-left">
+                <label class="text-muted font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">OBSERVACIONES / DETALLES</label>
+                <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="observacionRechazo"
                     placeholder="Describa el motivo detalladamente..."
-                    style="border-radius: 12px; border-color: #e2e8f0 !important; border-width: 2px !important; resize: none; font-size: 0.95rem; padding: 1rem; color: #475569;" required></textarea>
+                    style="border-radius: 12px; border-color: #e2e8f0 !important; border-width: 1.5px !important; resize: none; font-size: 0.9rem; padding: 0.75rem; color: #475569;"></textarea>
             </div>
 
             <div class="d-flex justify-content-center align-items-center">
                 <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
                     Cancelar
                 </button>
-                <button type="button" class="btn-header-action red shadow-none w-100" (click)="confirmarRechazo()">
+                <button type="button" class="btn-header-action red shadow-none w-100" [disabled]="isProcessingAction" (click)="confirmarRechazo()">
+                    <i *ngIf="isProcessingAction" class="fas fa-spinner fa-spin mr-2"></i>
                     Rechazar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Reversar Documento -->
+<ng-template #modalReversar let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse amber">
+                <i class="fas fa-history"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¿Reversar Anticipo Aprobado?</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                Se dispone a reversar la orden aprobada de <strong>{{ selectedMilitar?.nombre }}</strong>. Se actualizará el estatus formalmente a <strong>REVERSADA (103)</strong>.
+            </p>
+            
+            <!-- Observación Actual (si existe en la orden) -->
+            <div *ngIf="selectedMilitar?.observacion || selectedMilitar?.motivo" class="p-3 mb-3 text-left border rounded-12" style="background: #f8fafc; border-color: #e2e8f0 !important; border-radius: 12px;">
+                <span class="text-muted small font-weight-bold d-block mb-1 text-uppercase" style="letter-spacing: 0.5px;">Observación / Motivo Actual</span>
+                <span class="text-dark font-weight-500 small d-block">{{ selectedMilitar?.observacion || selectedMilitar?.motivo }}</span>
+            </div>
+            
+            <div class="modern-form-group mb-3 text-left">
+                <label class="text-amber font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">MOTIVO DE REVERSIÓN *</label>
+                <div class="input-group">
+                    <select class="form-control text-dark font-weight-500" [(ngModel)]="motivoReversadoSelect">
+                        <option value="Error en Cálculo o Monto Aprobado">Error en Cálculo o Monto Aprobado</option>
+                        <option value="Solicitud de Anulación por el Afiliado">Solicitud de Anulación por el Afiliado</option>
+                        <option value="Duplicidad de Registro">Duplicidad de Registro</option>
+                        <option value="Devolución por Entidad Bancaria">Devolución por Entidad Bancaria</option>
+                        <option value="Otro Motivo">Otro Motivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modern-form-group mb-4 text-left">
+                <label class="text-muted font-weight-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">OBSERVACIONES / DETALLES</label>
+                <textarea class="form-control border shadow-none" rows="2" [(ngModel)]="observacionReversado"
+                    placeholder="Describa el motivo de la reversión formal..."
+                    style="border-radius: 12px; border-color: #e2e8f0 !important; border-width: 1.5px !important; resize: none; font-size: 0.9rem; padding: 0.75rem; color: #475569;"></textarea>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action gray mr-3 shadow-none w-100" (click)="modal.dismiss()">
+                    Cancelar
+                </button>
+                <button type="button" class="btn-header-action amber shadow-none w-100" [disabled]="isProcessingAction" (click)="confirmarReversar()">
+                    <i *ngIf="isProcessingAction" class="fas fa-spinner fa-spin mr-2"></i>
+                    Reversar Anticipo
                 </button>
             </div>
         </div>

@@ -50,6 +50,9 @@ export class FiniquitosComponent
   extends BaseWorkflowClass
   implements OnDestroy
 {
+  onMailboxSelectAll($event: boolean) {
+    throw new Error("Method not implemented.");
+  }
   @ViewChild("modalAprobar") modalAprobar!: TemplateRef<any>;
   @ViewChild("modalRechazar") modalRechazar!: TemplateRef<any>;
   @ViewChild("modalCSV") modalCSV!: TemplateRef<any>;
@@ -87,7 +90,7 @@ export class FiniquitosComponent
     return Number(
       this.calculosData?.base?.depositado_en_banco ||
         this.calculosData?.base?.deposito_banco ||
-        0
+        0,
     );
   }
 
@@ -95,7 +98,7 @@ export class FiniquitosComponent
     return Number(
       this.calculosData?.base?.total_embargo ||
         this.calculosData?.movimientos?.embargos ||
-        0
+        0,
     );
   }
 
@@ -265,11 +268,7 @@ export class FiniquitosComponent
     private cdr: ChangeDetectorRef,
     private utilService: UtilService,
   ) {
-    super(
-      apiService,
-      layoutService,
-      "Principal / Prestaciones: Finiquitos",
-    );
+    super(apiService, layoutService, "Principal / Prestaciones: Finiquitos");
   }
 
   protected override onInitExtension(): void {
@@ -336,8 +335,130 @@ export class FiniquitosComponent
     return str;
   }
 
+  public formatNombreCompleto(item: any): string {
+    if (!item) return "";
+    const nomBen = (item.nombres_beneficiario || item.nombres || "").trim();
+    const apeBen = (item.apellidos_beneficiario || item.apellidos || "").trim();
+
+    if (!nomBen && !apeBen) return "";
+    if (!apeBen) return nomBen;
+    if (!nomBen) return apeBen;
+
+    if (nomBen.toUpperCase().includes(apeBen.toUpperCase())) {
+      return nomBen;
+    }
+
+    return `${nomBen} ${apeBen}`;
+  }
+
   public loadPendingData(): void {
     const statusId = this.currentTabId || "101";
+
+    if (statusId === "102" || statusId === "103") {
+      this.pendingTableConfig.columns = [
+        {
+          key: "cedulaFormat",
+          header: "Cédula",
+          type: "html",
+          align: "left",
+          cssClass: "px-4 py-3 align-middle text-nowrap",
+        },
+        {
+          key: "nombre",
+          header: "Nombres y Apellidos",
+          type: "text",
+          align: "left",
+          cssClass: "font-weight-600 align-middle text-dark",
+        },
+        {
+          key: "gradoFormat",
+          header: "Grado",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+        {
+          key: "componenteFormat",
+          header: "Comp.",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+        {
+          key: "observacionFormat",
+          header: "Motivo / Observación",
+          type: "html",
+          align: "left",
+          cssClass: "align-middle",
+        },
+        {
+          key: "montoFormat",
+          header: "Monto Liquidado (Bs)",
+          type: "html",
+          align: "right",
+          cssClass: "align-middle pr-4",
+        },
+        {
+          key: "fecha",
+          header: "Fecha Solicitud",
+          type: "text",
+          align: "center",
+          cssClass: "text-muted align-middle",
+        },
+      ];
+    } else {
+      this.pendingTableConfig.columns = [
+        {
+          key: "cedulaFormat",
+          header: "Cédula",
+          type: "html",
+          align: "left",
+          cssClass: "px-4 py-3 align-middle text-nowrap",
+        },
+        {
+          key: "nombre",
+          header: "Nombres y Apellidos",
+          type: "text",
+          align: "left",
+          cssClass: "font-weight-600 align-middle text-dark",
+        },
+        {
+          key: "gradoFormat",
+          header: "Grado",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+        {
+          key: "componenteFormat",
+          header: "Comp.",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+        {
+          key: "montoFormat",
+          header: "Monto Liquidado (Bs)",
+          type: "html",
+          align: "right",
+          cssClass: "align-middle pr-4",
+        },
+        {
+          key: "fecha",
+          header: "Fecha Solicitud",
+          type: "text",
+          align: "center",
+          cssClass: "text-muted align-middle",
+        },
+        {
+          key: "estatusFormat",
+          header: "Estatus",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+      ];
+    }
 
     if (statusId === "101") {
       this.pendingTableConfig.actions = [
@@ -354,15 +475,17 @@ export class FiniquitosComponent
           buttonClass: "btn-circular btn-danger-soft shadow-sm ml-2",
         },
       ];
-    } else {
+    } else if (statusId === "100") {
       this.pendingTableConfig.actions = [
         {
-          name: "ver",
-          icon: "fa-eye",
-          tooltip: "Ver Detalles",
-          buttonClass: "btn-circular btn-amber-soft shadow-sm ml-2",
+          name: "reversar",
+          icon: "fa-history",
+          tooltip: "Reversar Finiquito",
+          buttonClass: "btn-circular btn-warning-soft shadow-sm ml-2",
         },
       ];
+    } else {
+      this.pendingTableConfig.actions = [];
     }
 
     const fDesde = this.fechaDesde
@@ -399,14 +522,16 @@ export class FiniquitosComponent
                     .replace(".", "")} ${d.getFullYear()}`;
             }
 
+            const obsTexto = (item.observacion || item.observ_ult_modificacion || "").trim() || "N/A";
+
             return {
               ...item,
-              cedula: item.cedula_beneficiario,
-              nombre:
-                `${item.nombres_beneficiario || ""} ${item.apellidos_beneficiario || ""}`.trim(),
+              cedula: item.cedula_beneficiario || item.cedula,
+              nombre: this.formatNombreCompleto(item),
               grado: (item.nombre_grado || "").trim(),
               componente: (item.nombre_componente || "").trim(),
-              motivo: item.motivo || item.observacion || "FINIQUITO DE PRESTACIONES",
+              motivo:
+                item.motivo || item.observacion || "FINIQUITO DE PRESTACIONES",
               montoBs: item.monto ? parseFloat(item.monto) : 0,
               fecha: fechaStr,
               estatus: item.nombre_anticipo || "PENDIENTE",
@@ -416,6 +541,7 @@ export class FiniquitosComponent
               componenteFormat: this.getComponentBadge(
                 item.nombre_componente || "",
               ),
+              observacionFormat: `<span class="badge badge-pill bg-light text-muted border font-weight-500 text-wrap text-left py-1 px-2" style="font-size: 0.8rem; max-width: 220px; line-height: 1.3;">${obsTexto}</span>`,
               montoFormat: `<span class="font-weight-bold" style="color: #0f172a; font-size: 1.05rem;">${(item.monto ? parseFloat(item.monto) : 0).toLocaleString("es-VE")}</span>`,
               estatusFormat: this.getStatusBadge(
                 item.nombre_anticipo || "PENDIENTE",
@@ -485,8 +611,10 @@ export class FiniquitosComponent
                         gradoId,
                       )
                       .subscribe({
-                        next: (calcRes) => console.log("Cálculos finiquito iniciados:", calcRes),
-                        error: (calcErr) => console.error("Error cálculos finiquito:", calcErr),
+                        next: (calcRes) =>
+                          console.log("Cálculos finiquito iniciados:", calcRes),
+                        error: (calcErr) =>
+                          console.error("Error cálculos finiquito:", calcErr),
                       });
                   },
                 });
@@ -647,7 +775,9 @@ export class FiniquitosComponent
   }
 
   public confirmarAprobacion(): void {
-    alert(`Finiquito de ${this.selectedMilitar?.nombre} aprobado exitosamente.`);
+    alert(
+      `Finiquito de ${this.selectedMilitar?.nombre} aprobado exitosamente.`,
+    );
     this.modalService.dismissAll();
   }
 
@@ -691,7 +821,8 @@ export class FiniquitosComponent
       "";
     const usrName = this.loginService.Usuario?.usuario || "SISTEMA";
 
-    const totalMonto = this.montoNetoLiquidado ||
+    const totalMonto =
+      this.montoNetoLiquidado ||
       this.calculosData?.base?.asignacion_antiguedad ||
       this.calculosData?.base?.depositado_en_banco ||
       0;
@@ -708,7 +839,8 @@ export class FiniquitosComponent
       status_id: 101,
       monto: Number(totalMonto),
       fecha: fechaDate,
-      observacion: this.observacion || "LIQUIDACIÓN DEFINITIVA DE PRESTACIONES SOCIALES",
+      observacion:
+        this.observacion || "LIQUIDACIÓN DEFINITIVA DE PRESTACIONES SOCIALES",
       tipo_id: 6,
       f_creacion: timestampStr,
       usr_creacion: usrName,

@@ -38,6 +38,7 @@ export const environment = {
     CONSULTAR_MOVIMIENTOS_INDIVIDUAL: "IPSFA_CMovimientosIndividual",
     CONSULTAR_ORDENES: "IPSFA_COrdenes",
     INSERTAR_ORDEN: "IPSFA_IOrdenesDePago",
+    ACTUALIZAR_ORDEN: "IPSFA_UOrdenesDePago",
     CONSULTAR_SUELDOS: "IPSFA_CHistorialSueldo",
     CONSULTAR_MOTIVOS_MEDIDA_JUDICIAL: "IPSFA_CMotivosMedidaJudicial",
     CONSULTAR_MEDIDAS_JUDICIALES_ID: "IPSFA_CMedidasJudicialesID",

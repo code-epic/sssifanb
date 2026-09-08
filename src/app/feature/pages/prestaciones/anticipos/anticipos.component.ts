@@ -52,6 +52,7 @@ import { CartaBancoComponent } from "./pdf/carta-banco.component";
 export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   @ViewChild("modalAprobar") modalAprobar!: TemplateRef<any>;
   @ViewChild("modalRechazar") modalRechazar!: TemplateRef<any>;
+  @ViewChild("modalReversar") modalReversar!: TemplateRef<any>;
   @ViewChild("modalCSV") modalCSV!: TemplateRef<any>;
   @ViewChild("modalSolicitar") modalSolicitar!: TemplateRef<any>;
   @ViewChild("puntoCuentaPdf") puntoCuentaPdf!: PuntoCuentaComponent;
@@ -62,6 +63,12 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   private lastSearchedCedula: string = "";
   public militarData: any = null;
   public selectedMilitar: any = null;
+
+  public motivoRechazoSelect: string = "Documentación Incompleta";
+  public observacionRechazo: string = "";
+  public motivoReversadoSelect: string = "Error en Cálculo o Monto Aprobado";
+  public observacionReversado: string = "";
+  public isProcessingAction: boolean = false;
 
   public porcentajeAnticipo: number = 0;
   public montoAnticipo: number = 0;
@@ -405,8 +412,131 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     return str;
   }
 
+  public formatNombreCompleto(item: any): string {
+    if (!item) return "";
+    const nomBen = (item.nombres_beneficiario || item.nombres || "").trim();
+    const apeBen = (item.apellidos_beneficiario || item.apellidos || "").trim();
+
+    if (!nomBen && !apeBen) return "";
+    if (!apeBen) return nomBen;
+    if (!nomBen) return apeBen;
+
+    if (nomBen.toUpperCase().includes(apeBen.toUpperCase())) {
+      return nomBen;
+    }
+
+    return `${nomBen} ${apeBen}`;
+  }
+
   public loadPendingData(): void {
     const statusId = this.currentTabId || "101";
+
+    // Configurar columnas dinámicamente: Mostrar Observación sin Estatus en Rechazados (102) y Reversadas (103)
+    if (statusId === "102" || statusId === "103") {
+      this.pendingTableConfig.columns = [
+        {
+          key: "cedulaFormat",
+          header: "Cédula",
+          type: "html",
+          align: "left",
+          cssClass: "px-4 py-3 align-middle text-nowrap",
+        },
+        {
+          key: "nombre",
+          header: "Nombres y Apellidos",
+          type: "text",
+          align: "left",
+          cssClass: "font-weight-600 align-middle text-dark",
+        },
+        {
+          key: "gradoFormat",
+          header: "Grado",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+        {
+          key: "componenteFormat",
+          header: "Comp.",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+        {
+          key: "observacionFormat",
+          header: "Motivo / Observación",
+          type: "html",
+          align: "left",
+          cssClass: "align-middle",
+        },
+        {
+          key: "montoFormat",
+          header: "Monto (Bs)",
+          type: "html",
+          align: "right",
+          cssClass: "align-middle pr-4",
+        },
+        {
+          key: "fecha",
+          header: "Fecha",
+          type: "text",
+          align: "center",
+          cssClass: "text-muted align-middle",
+        },
+      ];
+    } else {
+      this.pendingTableConfig.columns = [
+        {
+          key: "cedulaFormat",
+          header: "Cédula",
+          type: "html",
+          align: "left",
+          cssClass: "px-4 py-3 align-middle text-nowrap",
+        },
+        {
+          key: "nombre",
+          header: "Nombres y Apellidos",
+          type: "text",
+          align: "left",
+          cssClass: "font-weight-600 align-middle text-dark",
+        },
+        {
+          key: "gradoFormat",
+          header: "Grado",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+        {
+          key: "componenteFormat",
+          header: "Comp.",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+        {
+          key: "montoFormat",
+          header: "Monto Neto (Bs)",
+          type: "html",
+          align: "right",
+          cssClass: "align-middle pr-4",
+        },
+        {
+          key: "fecha",
+          header: "Fecha Solicitud",
+          type: "text",
+          align: "center",
+          cssClass: "text-muted align-middle",
+        },
+        {
+          key: "estatusFormat",
+          header: "Estatus",
+          type: "html",
+          align: "center",
+          cssClass: "align-middle",
+        },
+      ];
+    }
 
     // Configurar acciones dinámicamente según el estatus (101 = Pendientes)
     if (statusId === "101") {
@@ -433,21 +563,14 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
           buttonClass: "btn-circular btn-info-soft shadow-sm ml-2",
         },
         {
-          name: "ver",
-          icon: "fa-eye",
-          tooltip: "Ver Detalles",
-          buttonClass: "btn-circular btn-amber-soft shadow-sm ml-2",
+          name: "reversar",
+          icon: "fa-history",
+          tooltip: "Reversar Anticipo",
+          buttonClass: "btn-circular btn-warning-soft shadow-sm ml-2",
         },
       ];
     } else {
-      this.pendingTableConfig.actions = [
-        {
-          name: "ver",
-          icon: "fa-eye",
-          tooltip: "Ver Detalles",
-          buttonClass: "btn-circular btn-amber-soft shadow-sm ml-2",
-        },
-      ];
+      this.pendingTableConfig.actions = [];
     }
 
     const fDesde = this.fechaDesde
@@ -484,22 +607,30 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
                     .replace(".", "")} ${d.getFullYear()}`;
             }
 
+            const nombreClean = this.formatNombreCompleto(item);
+            const obsTexto = (item.observacion || item.observ_ult_modificacion || "").trim() || "N/A";
+
             return {
               ...item,
-              cedula: item.cedula_beneficiario,
-              nombre:
-                `${item.nombres_beneficiario || ""} ${item.apellidos_beneficiario || ""}`.trim(),
+              id: item.id_operacion || item.id,
+              id_operacion: item.id_operacion || item.id,
+              cedula: item.cedula_beneficiario || item.cedula,
+              nombre: nombreClean,
+              nombres_beneficiario: item.nombres_beneficiario || item.nombres,
+              apellidos_beneficiario:
+                item.apellidos_beneficiario || item.apellidos,
               grado: (item.nombre_grado || "").trim(),
               componente: (item.nombre_componente || "").trim(),
               montoBs: item.monto ? parseFloat(item.monto) : 0,
               fecha: fechaStr,
               estatus: item.nombre_anticipo || "PENDIENTE",
 
-              cedulaFormat: `<span class="badge badge-pill bg-light text-muted border border-secondary shadow-sm font-weight-bold px-2 py-1">${this.formatCedula(item.cedula_beneficiario)}</span>`,
+              cedulaFormat: `<span class="badge badge-pill bg-light text-muted border border-secondary shadow-sm font-weight-bold px-2 py-1">${this.formatCedula(item.cedula_beneficiario || item.cedula)}</span>`,
               gradoFormat: `<span style="color: #64748b; font-weight: 500;">${item.nombre_grado || ""}</span>`,
               componenteFormat: this.getComponentBadge(
                 item.nombre_componente || "",
               ),
+              observacionFormat: `<span class="badge badge-pill bg-light text-muted border font-weight-500 text-wrap text-left py-1 px-2" style="font-size: 0.8rem; max-width: 220px; line-height: 1.3;">${obsTexto}</span>`,
               montoFormat: `<span class="font-weight-bold" style="color: #0f172a; font-size: 1.05rem;">${(item.monto ? parseFloat(item.monto) : 0).toLocaleString("es-VE")}</span>`,
               estatusFormat: this.getStatusBadge(
                 item.nombre_anticipo || "PENDIENTE",
@@ -678,7 +809,8 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
 
       // Enriquecer registros consultando por cédula si faltan datos del militar (grado, componente, nombre)
       const promises = list.map(async (row) => {
-        const cedula = row.cedula_beneficiario || row.cedula_afiliado || row.cedula;
+        const cedula =
+          row.cedula_beneficiario || row.cedula_afiliado || row.cedula;
         if (!cedula) return row;
 
         if (
@@ -690,7 +822,7 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
         ) {
           try {
             const res = await lastValueFrom(
-              this.prestacionesService.buscarMilitarPorCedula(cedula)
+              this.prestacionesService.buscarMilitarPorCedula(cedula),
             );
             const militarData = Array.isArray(res) ? res[0] : res;
             if (militarData) {
@@ -699,15 +831,21 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
                 datobasico.nombrecompleto ||
                 `${datobasico.nombres || ""} ${datobasico.apellidos || ""}`.trim();
               const gradoDesc =
-                militarData.grado?.descripcion || militarData.nombre_grado || row.grado;
+                militarData.grado?.descripcion ||
+                militarData.nombre_grado ||
+                row.grado;
               const compDesc =
-                militarData.componente?.descripcion || militarData.nombre_componente || row.componente;
+                militarData.componente?.descripcion ||
+                militarData.nombre_componente ||
+                row.componente;
 
               return {
                 ...row,
                 nombre: nombreFull || row.nombre,
-                nombres_beneficiario: datobasico.nombres || row.nombres_beneficiario,
-                apellidos_beneficiario: datobasico.apellidos || row.apellidos_beneficiario,
+                nombres_beneficiario:
+                  datobasico.nombres || row.nombres_beneficiario,
+                apellidos_beneficiario:
+                  datobasico.apellidos || row.apellidos_beneficiario,
                 grado: gradoDesc || row.grado,
                 nombre_grado: gradoDesc || row.nombre_grado,
                 componente: compDesc || row.componente,
@@ -715,7 +853,11 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
               };
             }
           } catch (e) {
-            console.warn("No se pudo consultar detalle del militar para cédula:", cedula, e);
+            console.warn(
+              "No se pudo consultar detalle del militar para cédula:",
+              cedula,
+              e,
+            );
           }
         }
         return row;
@@ -737,7 +879,17 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
         windowClass: "pastel-modal",
       });
     } else if (event.actionName === "rechazar") {
+      this.motivoRechazoSelect = "Documentación Incompleta";
+      this.observacionRechazo = (event.row?.observacion || event.row?.motivo || "").trim();
       this.modalService.open(this.modalRechazar, {
+        centered: true,
+        size: "md",
+        windowClass: "pastel-modal",
+      });
+    } else if (event.actionName === "reversar") {
+      this.motivoReversadoSelect = "Error en Cálculo o Monto Aprobado";
+      this.observacionReversado = (event.row?.observacion || event.row?.motivo || "").trim();
+      this.modalService.open(this.modalReversar, {
         centered: true,
         size: "md",
         windowClass: "pastel-modal",
@@ -745,7 +897,9 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     } else if (event.actionName === "cartaBanco") {
       this.generarCartaBanco(event.row);
     } else if (event.actionName === "ver") {
-      alert(`Ver detalles de ${event.row.nombre || event.row.nombres_beneficiario || 'solicitud'}`);
+      alert(
+        `Ver detalles de ${event.row.nombre || event.row.nombres_beneficiario || "solicitud"}`,
+      );
     }
   }
 
@@ -758,7 +912,8 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     let militarObj = this.militarData;
     let calculosObj = this.calculosData;
 
-    const mCedula = militarObj?.cedula || militarObj?.persona?.datobasico?.cedula;
+    const mCedula =
+      militarObj?.cedula || militarObj?.persona?.datobasico?.cedula;
     const isSameCedula = mCedula && String(mCedula) === String(cedula);
 
     if (!isSameCedula) {
@@ -767,11 +922,14 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
       if (cedula) {
         try {
           const resMilitar = await lastValueFrom(
-            this.prestacionesService.buscarMilitarPorCedula(cedula)
+            this.prestacionesService.buscarMilitarPorCedula(cedula),
           );
           militarObj = Array.isArray(resMilitar) ? resMilitar[0] : resMilitar;
         } catch (e) {
-          console.warn("No se pudo obtener militarData para Punto de Cuenta:", e);
+          console.warn(
+            "No se pudo obtener militarData para Punto de Cuenta:",
+            e,
+          );
         }
       }
     }
@@ -779,7 +937,7 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     if (!calculosObj && cedula) {
       try {
         const dirData: any = await lastValueFrom(
-          this.prestacionesService.obtenerDirectivaId(cedula)
+          this.prestacionesService.obtenerDirectivaId(cedula),
         );
         const directivaObj = dirData?.Cuerpo?.[0];
         const directivaId = directivaObj?.directiva_sueldo_id || 1;
@@ -805,27 +963,138 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
 
         calculosObj = await calculoPromise;
       } catch (e) {
-        console.warn("No se pudieron obtener cálculos para Punto de Cuenta:", e);
+        console.warn(
+          "No se pudieron obtener cálculos para Punto de Cuenta:",
+          e,
+        );
       }
     }
 
-    await this.puntoCuentaPdf.generarPDFPuntoCuenta(orden, militarObj, calculosObj);
+    await this.puntoCuentaPdf.generarPDFPuntoCuenta(
+      orden,
+      militarObj,
+      calculosObj,
+    );
   }
 
   public async confirmarAprobacion(): Promise<void> {
+    if (!this.selectedMilitar || this.isProcessingAction) return;
+    this.isProcessingAction = true;
     const militar = this.selectedMilitar;
-    this.modalService.dismissAll();
+    const orderId = String(
+      militar.id_operacion ||
+        militar.id ||
+        militar.id_orden ||
+        militar.oid ||
+        militar.id_solicitud ||
+        "",
+    );
 
+    console.log(
+      "Confirmando aprobación -> id_operacion:",
+      orderId,
+      "militar:",
+      militar,
+    );
     try {
+      if (orderId) {
+        await this.actualizarEstatus("100", orderId);
+      } else {
+        console.warn(
+          "ADVERTENCIA: No se detectó id_operacion para actualizar estatus.",
+        );
+      }
       await this.cargarDatosYPuntoCuenta(militar);
     } catch (e) {
-      console.error("Error generando PDF de Punto de Cuenta:", e);
+      console.error("Error al aprobar anticipo:", e);
+    } finally {
+      this.isProcessingAction = false;
+      this.modalService.dismissAll();
     }
   }
 
-  public confirmarRechazo(): void {
-    alert(`Anticipo de ${this.selectedMilitar?.nombre} rechazado.`);
-    this.modalService.dismissAll();
+  public async confirmarRechazo(): Promise<void> {
+    if (!this.selectedMilitar || this.isProcessingAction) return;
+    this.isProcessingAction = true;
+    const militar = this.selectedMilitar;
+    const orderId = String(
+      militar.id_operacion ||
+        militar.id ||
+        militar.id_orden ||
+        militar.oid ||
+        militar.id_solicitud ||
+        "",
+    );
+
+    const obs =
+      (this.observacionRechazo || "").trim() ||
+      this.motivoRechazoSelect ||
+      "RECHAZADO";
+
+    console.log(
+      "Confirmando rechazo -> id_operacion:",
+      orderId,
+      "militar:",
+      militar,
+      "obs:",
+      obs,
+    );
+    try {
+      if (orderId) {
+        await this.actualizarEstatus("102", orderId, obs);
+      } else {
+        console.warn(
+          "ADVERTENCIA: No se detectó id_operacion para actualizar estatus.",
+        );
+      }
+    } catch (e) {
+      console.error("Error al rechazar anticipo:", e);
+    } finally {
+      this.isProcessingAction = false;
+      this.modalService.dismissAll();
+    }
+  }
+
+  public async confirmarReversar(): Promise<void> {
+    if (!this.selectedMilitar || this.isProcessingAction) return;
+    this.isProcessingAction = true;
+    const militar = this.selectedMilitar;
+    const orderId = String(
+      militar.id_operacion ||
+        militar.id ||
+        militar.id_orden ||
+        militar.oid ||
+        militar.id_solicitud ||
+        "",
+    );
+
+    const obs =
+      (this.observacionReversado || "").trim() ||
+      this.motivoReversadoSelect ||
+      "REVERSADO";
+
+    console.log(
+      "Confirmando reversión -> id_operacion:",
+      orderId,
+      "militar:",
+      militar,
+      "obs:",
+      obs,
+    );
+    try {
+      if (orderId) {
+        await this.actualizarEstatus("103", orderId, obs);
+      } else {
+        console.warn(
+          "ADVERTENCIA: No se detectó id_operacion para actualizar estatus.",
+        );
+      }
+    } catch (e) {
+      console.error("Error al reversar anticipo:", e);
+    } finally {
+      this.isProcessingAction = false;
+      this.modalService.dismissAll();
+    }
   }
 
   public solicitarAnticipo(): void {
@@ -853,13 +1122,11 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     const datobasico = this.militarData?.persona?.datobasico || {};
     const nombres = (
       datobasico.nombres ||
-      datobasico.nombrecompleto ||
       this.militarData?.nombres ||
       ""
     ).trim();
     const apellidos = (
       datobasico.apellidos ||
-      datobasico.apellidocompleto ||
       this.militarData?.apellidos ||
       ""
     ).trim();
@@ -1044,5 +1311,42 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     } else {
       return `<span class="badge bg-light text-muted border px-2 py-1 shadow-sm font-weight-600">${estatus}</span>`;
     }
+  }
+
+  /**
+   * Actualiza el estatus de una orden de manera síncrona/reactiva
+   * @param codigo Código de la orden:
+   *   103: REVERSADA
+   *   102: RECHAZADA
+   *   101: PENDIENTE
+   *   100: APROBADO / EJECUTADO
+   * @param id ID de la orden a actualizar
+   * @param observacion Observación adicional a incluir en la actualización de la orden
+   */
+  public actualizarEstatus(
+    codigo: string,
+    id: string,
+    observacion: string = "",
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.xAPI = {} as IAPICore;
+      this.xAPI.funcion = environment.funcion.ACTUALIZAR_ORDEN;
+      this.xAPI.parametros = `${codigo},${observacion},${id}`;
+
+      this.apiService.post("crud", this.xAPI).subscribe({
+        next: (data: any) => {
+          console.log(
+            `Estatus ${codigo} actualizado para la orden ${id}:`,
+            data,
+          );
+          this.loadPendingData();
+          resolve(data);
+        },
+        error: (err: any) => {
+          console.error("Error al actualizar estatus de la orden:", err);
+          reject(err);
+        },
+      });
+    });
   }
 }
