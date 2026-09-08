@@ -64,6 +64,7 @@ export class PuntoCuentaComponent extends PdfLayoutBase {
       logoImg,
       photoImg: "", // Sin foto del militar en Punto de Cuenta
       hidePhoto: true,
+      pageOrientation: "landscape", // Punto de Cuenta en formato Horizontal
       qrImg,
       firmaImg,
       selloImg,

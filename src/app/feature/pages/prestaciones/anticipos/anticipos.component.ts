@@ -13,7 +13,7 @@ import { BaseWorkflowClass } from "src/app/shared/classes/base-workflow.class";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { PrestacionesSharedService } from "src/app/core/services/prestaciones/prestaciones-shared.service";
 import { LoginService } from "src/app/core/services/login/login.service";
-import { Subscription } from "rxjs";
+import { Subscription, lastValueFrom } from "rxjs";
 import { environment } from "src/environments/environment";
 import { IAPICore } from "src/app/core/models/api/api-model";
 
@@ -670,13 +670,61 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   }
 
   public async generarCartaBanco(item?: any): Promise<void> {
-    if (this.cartaBancoPdf) {
-      try {
-        const list = item ? [item] : this.pendingTableData || [];
-        await this.cartaBancoPdf.generarPDFCartaBanco(list);
-      } catch (e) {
-        console.error("Error generando Carta a Banco Memorandum:", e);
-      }
+    if (!this.cartaBancoPdf) return;
+
+    try {
+      const list = item ? [item] : [...(this.pendingTableData || [])];
+      if (list.length === 0) return;
+
+      // Enriquecer registros consultando por cédula si faltan datos del militar (grado, componente, nombre)
+      const promises = list.map(async (row) => {
+        const cedula = row.cedula_beneficiario || row.cedula_afiliado || row.cedula;
+        if (!cedula) return row;
+
+        if (
+          !row.grado ||
+          !row.componente ||
+          !row.nombre ||
+          row.grado === "N/D" ||
+          row.componente === "FANB"
+        ) {
+          try {
+            const res = await lastValueFrom(
+              this.prestacionesService.buscarMilitarPorCedula(cedula)
+            );
+            const militarData = Array.isArray(res) ? res[0] : res;
+            if (militarData) {
+              const datobasico = militarData.persona?.datobasico || {};
+              const nombreFull =
+                datobasico.nombrecompleto ||
+                `${datobasico.nombres || ""} ${datobasico.apellidos || ""}`.trim();
+              const gradoDesc =
+                militarData.grado?.descripcion || militarData.nombre_grado || row.grado;
+              const compDesc =
+                militarData.componente?.descripcion || militarData.nombre_componente || row.componente;
+
+              return {
+                ...row,
+                nombre: nombreFull || row.nombre,
+                nombres_beneficiario: datobasico.nombres || row.nombres_beneficiario,
+                apellidos_beneficiario: datobasico.apellidos || row.apellidos_beneficiario,
+                grado: gradoDesc || row.grado,
+                nombre_grado: gradoDesc || row.nombre_grado,
+                componente: compDesc || row.componente,
+                nombre_componente: compDesc || row.nombre_componente,
+              };
+            }
+          } catch (e) {
+            console.warn("No se pudo consultar detalle del militar para cédula:", cedula, e);
+          }
+        }
+        return row;
+      });
+
+      const enrichedList = await Promise.all(promises);
+      await this.cartaBancoPdf.generarPDFCartaBanco(enrichedList);
+    } catch (e) {
+      console.error("Error generando Carta a Banco Memorandum:", e);
     }
   }
 

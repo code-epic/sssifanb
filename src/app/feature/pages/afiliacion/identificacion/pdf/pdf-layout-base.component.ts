@@ -202,6 +202,7 @@ export class PdfLayoutBase {
     logoImg?: string;
     photoImg?: string;
     hidePhoto?: boolean;
+    pageOrientation?: "portrait" | "landscape";
     qrImg?: string;
     watermarkImg?: string;
     gradoBadgeImg?: string;
@@ -213,10 +214,12 @@ export class PdfLayoutBase {
     const buildDateTime = new Date().toLocaleString("es-VE");
     const responsable = this.getResponsable();
     const firmaDigitalSesion = this.getDigitalSignature();
+    const isLandscape = options.pageOrientation === "landscape";
 
     return {
       pageSize: "LETTER",
-      pageMargins: [36, 115, 36, 68], // Incrementado a 115pt para evitar superposiciones del contenido
+      pageOrientation: options.pageOrientation || "portrait",
+      pageMargins: isLandscape ? [36, 95, 36, 50] : [36, 115, 36, 68],
       info: {
         title: options.title,
         author: "Sandra Ecosystem",

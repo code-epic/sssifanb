@@ -134,6 +134,7 @@ export class CartaBancoComponent extends PdfLayoutBase {
       logoImg,
       photoImg: "",
       hidePhoto: true, // Sin foto en Carta a Banco
+      pageOrientation: "portrait", // Carta a Banco en formato Vertical
       qrImg,
       firmaImg,
       selloImg,
