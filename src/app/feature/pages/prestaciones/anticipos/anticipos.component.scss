@@ -252,3 +252,17 @@ $input-border: #e9ecef;
     70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(245, 158, 11, 0); }
     100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
+
+.shadow-xs {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.rounded-12 {
+    border-radius: 12px !important;
+}
+
+@media (min-width: 768px) {
+    .border-right-md {
+        border-right: 1px solid #e2e8f0;
+    }
+}

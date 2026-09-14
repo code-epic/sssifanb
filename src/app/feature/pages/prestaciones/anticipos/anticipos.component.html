@@ -366,18 +366,54 @@
     <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
         <!-- Encabezado con Ícono y Título -->
         <div class="modal-body p-4 bg-white">
-            <div class="d-flex align-items-center mb-4 pb-2" style="border-bottom: 1px solid #f1f5f9;">
+            <div class="d-flex align-items-center mb-3 pb-2" style="border-bottom: 1px solid #f1f5f9;">
                 <div class="icon-circle shadow-sm rounded-circle d-flex align-items-center justify-content-center text-white mr-3"
                     style="width: 48px; height: 48px; min-width: 48px; background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);">
                     <i class="fas fa-hand-holding-usd text-lg"></i>
                 </div>
                 <div class="w-100">
-                    <h5 class="mb-0 text-dark font-weight-bold">Determinar Nuevo Anticipo</h5>
-                    <small class="text-muted d-block mt-1">{{ militarData?.nombres }} | C.I. {{ militarData?.cedula }}</small>
+                    <h5 class="mb-0 text-dark font-weight-bold" style="font-size: 1.15rem;">Determinar Nuevo Anticipo</h5>
+                    <small class="text-muted d-block mt-0" style="font-size: 0.8rem;">Cálculo y procesamiento formal de prestaciones sociales</small>
                 </div>
                 <button type="button" class="close ml-auto m-0 p-0 text-muted shadow-none h-100 d-flex align-items-start" aria-label="Close" (click)="modal.dismiss()" style="outline: none;">
                     <span aria-hidden="true" style="font-size: 1.75rem;">&times;</span>
                 </button>
+            </div>
+
+            <!-- Ficha Elegante del Afiliado y Saldo Disponible -->
+            <div class="p-3 mb-4 rounded-12 shadow-sm" style="background: linear-gradient(135deg, #f8fafc 0%, #edf7f6 100%); border: 1px solid #e2e8f0; border-left: 5px solid #598c89; border-radius: 14px;">
+                <div class="row align-items-center">
+                    <!-- Datos del Afiliado: Nombre, Cédula, Grado, Componente -->
+                    <div class="col-md-7 border-right-md pr-md-3">
+                        <div class="d-flex flex-wrap align-items-center mb-2">
+                            <span class="badge badge-pill bg-white text-dark border font-weight-bold px-2 py-1 mr-2 mb-1 shadow-xs" style="font-size: 0.82rem;">
+                                <i class="fas fa-id-card text-primary mr-1"></i> {{ militarCedula }}
+                            </span>
+                            <span *ngIf="militarGrado" class="badge badge-pill font-weight-600 px-2 py-1 mr-2 mb-1 shadow-xs" style="background-color: #f1f5f9; color: #334155; font-size: 0.78rem;">
+                                <i class="fas fa-star text-warning mr-1"></i> {{ militarGrado }}
+                            </span>
+                            <span *ngIf="militarComponente" class="badge badge-pill font-weight-bold px-2 py-1 mb-1 shadow-xs" style="background-color: #e0f2fe; color: #0369a1; font-size: 0.78rem;">
+                                <i class="fas fa-shield-alt mr-1"></i> {{ militarComponente }}
+                            </span>
+                        </div>
+                        <h4 class="mb-0 text-dark font-weight-bold text-truncate" style="font-size: 1.15rem; letter-spacing: -0.2px;">
+                            {{ militarNombreCompleto }}
+                        </h4>
+                    </div>
+
+                    <!-- Saldo Disponible KPI Card -->
+                    <div class="col-md-5 text-md-right mt-3 mt-md-0 pl-md-3">
+                        <span class="text-uppercase font-weight-bold d-block text-muted" style="font-size: 0.72rem; letter-spacing: 0.8px;">
+                            <i class="fas fa-wallet mr-1" style="color: #598c89;"></i> Saldo Disponible
+                        </span>
+                        <div class="font-weight-bold tracking-tight" style="color: #598c89; font-size: 1.45rem; line-height: 1.2;">
+                            Bs. {{ getSaldoDisponible() | number:'1.2-2' }}
+                        </div>
+                        <small class="text-muted font-weight-500 d-block mt-1" style="font-size: 0.78rem;">
+                            Máx. Anticipo (75%): <strong class="text-dark">Bs. {{ getMaxMontoAnticipoDisponible() | number:'1.2-2' }}</strong>
+                        </small>
+                    </div>
+                </div>
             </div>
 
             <!-- Fila 1: Garantías y Capital en Banco -->
@@ -454,33 +490,70 @@
 
             <!-- Fila 4: Cálculos Automáticos (Porcentaje / Monto) -->
             <div class="row px-2 mt-2">
-                <div class="col-sm-12 text-muted mb-3"><small class="font-weight-600 pl-1"><i class="fas fa-calculator mr-1"></i> Calculadora (Determine el Descuento via Porcentaje o Monto Fijo)</small></div>
+                <div class="col-sm-12 d-flex justify-content-between align-items-center mb-3">
+                    <small class="font-weight-bold text-dark" style="font-size: 0.85rem;">
+                        <i class="fas fa-calculator mr-1" style="color: #598c89;"></i> Calculadora de Anticipo (Máximo Legal 75%)
+                    </small>
+                    <span class="badge badge-pill bg-light text-muted border font-weight-500" style="font-size: 0.74rem;">
+                        Base: Saldo Disponible
+                    </span>
+                </div>
                 <div class="col-md-6">
                     <div class="modern-form-group mb-0">
-                        <label>Cálculo por Porcentaje (%)</label>
-                        <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
-                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="porcentajeAnticipo" (ngModelChange)="calcularPorPorcentaje()">
+                        <label class="d-flex justify-content-between">
+                            <span>Cálculo por Porcentaje (%)</span>
+                            <span class="text-muted font-weight-normal" style="font-size: 0.78rem;">Tope: 75%</span>
+                        </label>
+                        <div class="input-group shadow-sm" 
+                            [style.border-color]="porcentajeAnticipo > 75 ? '#f87171' : '#e2e8f0'"
+                            [style.background-color]="porcentajeAnticipo > 75 ? '#fef2f2' : '#f8fafc'"
+                            style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; transition: all 0.25s ease;">
+                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0" min="0" max="75" step="1"
+                                style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="porcentajeAnticipo" 
+                                (ngModelChange)="calcularPorPorcentaje()" (change)="validarYNotificarPorPorcentaje()" (blur)="validarYNotificarPorPorcentaje()">
                             <div class="input-group-append p-1">
                                 <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 
-                                        style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button">
+                                        style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button"
+                                        title="Aplicar máximo 75%" (click)="porcentajeAnticipo = 75; calcularPorPorcentaje()">
                                     <i class="fas fa-percent"></i>
                                 </button>
                             </div>
                         </div>
+                        <small *ngIf="porcentajeAnticipo > 75" class="text-danger font-weight-bold pl-1 mt-1 d-block" style="font-size: 0.75rem;">
+                            <i class="fas fa-exclamation-circle mr-1"></i> Excede el límite legal del 75%
+                        </small>
+                        <small *ngIf="porcentajeAnticipo <= 75" class="text-muted pl-1 mt-1 d-block" style="font-size: 0.75rem;">
+                            Hasta 75% del Saldo Disponible
+                        </small>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="modern-form-group mb-0">
-                        <label>Cálculo por Monto (Bs.)</label>
-                        <div class="input-group shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc;">
-                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="montoAnticipo" (ngModelChange)="calcularPorMonto()">
+                        <label class="d-flex justify-content-between">
+                            <span>Cálculo por Monto (Bs.)</span>
+                            <span class="text-muted font-weight-normal" style="font-size: 0.78rem;">Máx: {{ getMaxMontoAnticipoDisponible() | number:'1.2-2' }}</span>
+                        </label>
+                        <div class="input-group shadow-sm" 
+                            [style.border-color]="montoAnticipo > getMaxMontoAnticipoDisponible() ? '#f87171' : '#e2e8f0'"
+                            [style.background-color]="montoAnticipo > getMaxMontoAnticipoDisponible() ? '#fef2f2' : '#f8fafc'"
+                            style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; transition: all 0.25s ease;">
+                            <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" min="0" [max]="getMaxMontoAnticipoDisponible()"
+                                style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="montoAnticipo" 
+                                (ngModelChange)="calcularPorMonto()" (change)="validarYNotificarMonto()" (blur)="validarYNotificarMonto()">
                             <div class="input-group-append p-1">
                                 <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 
-                                        style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button">
+                                        style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button"
+                                        title="Aplicar monto máximo" (click)="montoAnticipo = getMaxMontoAnticipoDisponible(); calcularPorMonto()">
                                     <i class="fas fa-coins"></i>
                                 </button>
                             </div>
                         </div>
+                        <small *ngIf="montoAnticipo > getMaxMontoAnticipoDisponible()" class="text-danger font-weight-bold pl-1 mt-1 d-block" style="font-size: 0.75rem;">
+                            <i class="fas fa-exclamation-circle mr-1"></i> Excede el límite de Bs. {{ getMaxMontoAnticipoDisponible() | number:'1.2-2' }}
+                        </small>
+                        <small *ngIf="montoAnticipo <= getMaxMontoAnticipoDisponible()" class="text-muted pl-1 mt-1 d-block" style="font-size: 0.75rem;">
+                            Equivale al {{ porcentajeAnticipo }}% de disponibilidad
+                        </small>
                     </div>
                 </div>
             </div>

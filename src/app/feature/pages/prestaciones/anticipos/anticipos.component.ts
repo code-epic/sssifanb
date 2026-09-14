@@ -16,6 +16,7 @@ import { LoginService } from "src/app/core/services/login/login.service";
 import { Subscription, lastValueFrom } from "rxjs";
 import { environment } from "src/environments/environment";
 import { IAPICore } from "src/app/core/models/api/api-model";
+import Swal from "sweetalert2";
 
 export interface IAnticipo {
   usr_modificacion?: string;
@@ -73,6 +74,8 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   public porcentajeAnticipo: number = 0;
   public montoAnticipo: number = 0;
   public motivoAnticipo: string = "";
+  private timerValidacionMonto: any = null;
+  private timerValidacionPorcentaje: any = null;
 
   private masterPendingData: any[] = [];
   public isSearching: boolean = false;
@@ -250,6 +253,14 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     if (this.calculosSub) {
       this.calculosSub.unsubscribe();
     }
+    if (this.timerValidacionMonto) {
+      clearTimeout(this.timerValidacionMonto);
+      this.timerValidacionMonto = null;
+    }
+    if (this.timerValidacionPorcentaje) {
+      clearTimeout(this.timerValidacionPorcentaje);
+      this.timerValidacionPorcentaje = null;
+    }
   }
 
   // Método para simular la carga de tabuladores mientras conectamos DB
@@ -277,29 +288,65 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     }
   }
 
-  private getMontoDisponible(): number {
-    if (!this.calculosData || !this.calculosData.base) return 0;
+  public getSaldoDisponible(): number {
+    if (!this.calculosData) return 0;
+    const base = this.calculosData.base;
     return Number(
-      this.calculosData.base.depositado_en_banco ||
-        this.calculosData.base.deposito_banco ||
-        this.calculosData.base.saldo_disponible ||
+      base?.saldo_disponible ??
+        this.calculosData.saldo_disponible ??
+        base?.depositado_en_banco ??
+        base?.deposito_banco ??
         0,
     );
   }
 
-  private getMaxMontoAnticipoDisponible(): number {
-    const monto_disponible = this.getMontoDisponible();
-    if (monto_disponible <= 0) return 0;
+  public getMontoDisponible(): number {
+    return this.getSaldoDisponible();
+  }
 
-    const anticipos_aux = Number(this.calculosData?.movimientos?.anticipo || 0);
+  public getMaxMontoAnticipoDisponible(): number {
+    const saldo_disponible = this.getSaldoDisponible();
+    if (saldo_disponible <= 0) return 0;
+
     const dem = Number(this.calculosData?.movimientos?.embargo || 0);
 
-    const mt = monto_disponible * 0.25;
+    const mt = saldo_disponible * 0.25;
     const monto_resguardo = dem > mt ? dem - mt : 0;
 
-    const max_disponible =
-      monto_disponible * 0.75 - anticipos_aux - monto_resguardo;
+    const max_disponible = saldo_disponible * 0.75 - monto_resguardo;
     return max_disponible > 0 ? parseFloat(max_disponible.toFixed(2)) : 0;
+  }
+
+  public get militarNombreCompleto(): string {
+    if (!this.militarData) return "";
+    const db = this.militarData.persona?.datobasico;
+    if (db?.nombrecompleto) return db.nombrecompleto;
+    return this.formatNombreCompleto(this.militarData);
+  }
+
+  public get militarCedula(): string {
+    const raw =
+      this.militarData?.persona?.datobasico?.cedula ||
+      this.militarData?.cedula ||
+      this.searchCedula ||
+      "";
+    return this.formatCedula(raw);
+  }
+
+  public get militarGrado(): string {
+    return (
+      this.militarData?.grado?.descripcion ||
+      this.militarData?.nombre_grado ||
+      ""
+    ).trim();
+  }
+
+  public get militarComponente(): string {
+    return (
+      this.militarData?.componente?.descripcion ||
+      this.militarData?.nombre_componente ||
+      ""
+    ).trim();
   }
 
   public calcularPorPorcentaje(): void {
@@ -312,24 +359,55 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
       return;
     }
 
-    const monto_disponible = this.getMontoDisponible();
-    if (monto_disponible <= 0) {
+    const saldo_disponible = this.getSaldoDisponible();
+    if (saldo_disponible <= 0) {
       this.porcentajeAnticipo = 0;
       this.montoAnticipo = 0;
       return;
     }
 
-    const max_monto = this.getMaxMontoAnticipoDisponible();
-    let montoCalculado = (monto_disponible * pct) / 100;
+    let montoCalculado = (saldo_disponible * pct) / 100;
+    this.montoAnticipo = parseFloat(montoCalculado.toFixed(2));
 
-    if (montoCalculado > max_monto) {
-      montoCalculado = max_monto;
-      this.porcentajeAnticipo = parseFloat(
-        ((max_monto * 100) / monto_disponible).toFixed(2),
-      );
+    if (this.timerValidacionPorcentaje) {
+      clearTimeout(this.timerValidacionPorcentaje);
+      this.timerValidacionPorcentaje = null;
     }
 
-    this.montoAnticipo = parseFloat(montoCalculado.toFixed(2));
+    // Si excede el 75% legal, programa alerta elegante
+    if (pct > 75) {
+      this.timerValidacionPorcentaje = setTimeout(() => {
+        this.validarYNotificarPorPorcentaje();
+      }, 700);
+    }
+  }
+
+  public validarYNotificarPorPorcentaje(): boolean {
+    if (this.timerValidacionPorcentaje) {
+      clearTimeout(this.timerValidacionPorcentaje);
+      this.timerValidacionPorcentaje = null;
+    }
+
+    if (!this.calculosData) return true;
+
+    const saldo_disponible = this.getSaldoDisponible();
+    const max_monto = this.getMaxMontoAnticipoDisponible();
+    let pct = Number(this.porcentajeAnticipo);
+
+    if (pct > 75) {
+      const pctExcedido = pct;
+      this.porcentajeAnticipo = 75;
+      this.montoAnticipo = max_monto;
+      this.cdr.detectChanges();
+
+      this.mostrarAlertaLimiteExcedido(
+        "Porcentaje Superior al Límite Legal",
+        `El porcentaje ingresado (<strong>${pctExcedido}%</strong>) supera el tope máximo establecido del <strong>75%</strong> sobre el saldo disponible.`,
+        `Se ha ajustado automáticamente al porcentaje máximo permitido por ley (<strong>75%</strong> equivalente a <strong>Bs. ${max_monto.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>).`
+      );
+      return false;
+    }
+    return true;
   }
 
   public calcularPorMonto(): void {
@@ -341,22 +419,86 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
       return;
     }
 
-    const monto_disponible = this.getMontoDisponible();
-    if (monto_disponible <= 0) {
+    const saldo_disponible = this.getSaldoDisponible();
+    if (saldo_disponible <= 0) {
       this.montoAnticipo = 0;
       this.porcentajeAnticipo = 0;
       return;
     }
 
     const max_monto = this.getMaxMontoAnticipoDisponible();
+    let pct = (monto * 100) / saldo_disponible;
+    this.porcentajeAnticipo = parseFloat(pct.toFixed(2));
 
-    if (monto > max_monto) {
-      monto = max_monto;
-      this.montoAnticipo = monto;
+    if (this.timerValidacionMonto) {
+      clearTimeout(this.timerValidacionMonto);
+      this.timerValidacionMonto = null;
     }
 
-    const pct = (monto * 100) / monto_disponible;
-    this.porcentajeAnticipo = parseFloat(pct.toFixed(2));
+    // Si excede el monto máximo disponible, programa alerta elegante
+    if (monto > max_monto) {
+      this.timerValidacionMonto = setTimeout(() => {
+        this.validarYNotificarMonto();
+      }, 700);
+    }
+  }
+
+  public validarYNotificarMonto(): boolean {
+    if (this.timerValidacionMonto) {
+      clearTimeout(this.timerValidacionMonto);
+      this.timerValidacionMonto = null;
+    }
+
+    if (!this.calculosData) return true;
+
+    const saldo_disponible = this.getSaldoDisponible();
+    const max_monto = this.getMaxMontoAnticipoDisponible();
+    let monto = Number(this.montoAnticipo);
+
+    if (monto > max_monto) {
+      const montoExcedido = monto;
+      this.montoAnticipo = max_monto;
+      this.porcentajeAnticipo = 75;
+      this.cdr.detectChanges();
+
+      this.mostrarAlertaLimiteExcedido(
+        "Monto Superior al Límite Permitido",
+        `El monto ingresado (<strong>Bs. ${montoExcedido.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>) supera el límite máximo legal disponible del <strong>75%</strong> (<strong>Bs. ${max_monto.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>).`,
+        `Se ha ajustado automáticamente al monto máximo legal permitido (75% del Saldo Disponible).`
+      );
+      return false;
+    }
+    return true;
+  }
+
+  private mostrarAlertaLimiteExcedido(titulo: string, detalle: string, pie: string): void {
+    if (Swal.isVisible()) return;
+
+    Swal.fire({
+      icon: "warning",
+      title: `<span style="color: #1e293b; font-weight: 700; font-size: 1.25rem;">${titulo}</span>`,
+      html: `
+        <div style="font-size: 0.95rem; color: #475569; text-align: left; padding: 0.25rem 0.25rem;">
+          <p style="margin-bottom: 1rem; line-height: 1.5;">${detalle}</p>
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #598c89; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
+            <div style="font-size: 0.85rem; color: #334155;">
+              <i class="fas fa-info-circle mr-1" style="color: #598c89;"></i>
+              ${pie}
+            </div>
+          </div>
+          <div style="font-size: 0.78rem; color: #94a3b8; text-align: right; font-style: italic;">
+            Ley Orgánica de Seguridad Social de la FANB (Negro Primero)
+          </div>
+        </div>
+      `,
+      confirmButtonText: '<i class="fas fa-check mr-1"></i> Entendido',
+      confirmButtonColor: "#598c89",
+      customClass: {
+        popup: "border-0 shadow-lg rounded-20 px-3 py-3",
+        confirmButton: "btn px-4 py-2 font-weight-bold shadow-sm",
+      },
+      buttonsStyling: true,
+    });
   }
 
   // Eventos interceptados desde el Mailbox Layout
@@ -1098,6 +1240,14 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   }
 
   public solicitarAnticipo(): void {
+    if (this.timerValidacionMonto) {
+      clearTimeout(this.timerValidacionMonto);
+      this.timerValidacionMonto = null;
+    }
+    if (this.timerValidacionPorcentaje) {
+      clearTimeout(this.timerValidacionPorcentaje);
+      this.timerValidacionPorcentaje = null;
+    }
     this.porcentajeAnticipo = 0;
     this.montoAnticipo = 0;
     this.motivoAnticipo = "";
@@ -1110,6 +1260,9 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   }
 
   public procesarSolicitud(): void {
+    if (!this.validarYNotificarMonto() || !this.validarYNotificarPorPorcentaje()) {
+      return;
+    }
     this.insertarAnticipo();
   }
 
@@ -1182,6 +1335,12 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
 
     if (!this.montoAnticipo || this.montoAnticipo <= 0) {
       alert("Por favor ingrese un monto válido para el anticipo.");
+      return;
+    }
+
+    const max_monto = this.getMaxMontoAnticipoDisponible();
+    if (this.montoAnticipo > max_monto) {
+      this.validarYNotificarMonto();
       return;
     }
 
