@@ -288,35 +288,71 @@
 
         <div class="modal-body p-4 bg-white">
             
-            <!-- Resumen del Militar (Si existe data) -->
-            <div *ngIf="militarData" class="militar-modal-card mb-4">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <div class="d-flex align-items-center">
-                        <div class="avatar-circle mr-3" style="width: 44px; height: 44px; border-radius: 50%; background: #598c89; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; box-shadow: 0 4px 8px rgba(89, 140, 137, 0.25);">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div>
-                            <h6 class="font-weight-bold text-dark mb-0">
-                                {{ militarData?.persona?.datobasico?.nombres || militarData?.nombres }} {{ militarData?.persona?.datobasico?.apellidos || militarData?.apellidos }}
-                            </h6>
-                            <div class="d-flex align-items-center mt-1">
-                                <span class="badge badge-pill bg-light text-muted border mr-2 font-weight-600">
-                                    C.I: {{ formatCedula(searchCedula || militarData?.cedula) }}
-                                </span>
-                                <span class="badge badge-pill bg-secondary-soft text-secondary font-weight-600 mr-2">
-                                    {{ militarData?.grado?.nombre || militarData?.nombre_grado || 'MILITAR' }}
-                                </span>
-                                <span class="badge badge-pill bg-info-soft text-info font-weight-600">
-                                    {{ militarData?.componente?.nombre || militarData?.nombre_componente || 'FANB' }}
-                                </span>
+            <!-- Resumen del Militar y Directiva Final -->
+            <div class="militar-modal-card mb-4">
+                <div class="row align-items-center">
+                    <!-- Datos del Militar: Cédula, Nombre, Grado, Componente -->
+                    <div class="col-lg-7 border-right-lg pr-lg-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar-circle mr-3" style="width: 46px; height: 46px; border-radius: 50%; background: #598c89; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.15rem; box-shadow: 0 4px 8px rgba(89, 140, 137, 0.25); flex-shrink: 0;">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <h5 class="font-weight-bold text-dark mb-1 text-truncate" style="font-size: 1.15rem; letter-spacing: -0.2px;">
+                                    {{ militarNombreCompleto || 'Militar Seleccionado' }}
+                                </h5>
+                                <div class="d-flex flex-wrap align-items-center">
+                                    <span class="badge badge-pill bg-white text-dark border font-weight-bold px-2 py-1 mr-2 mb-1 shadow-xs" style="font-size: 0.8rem;">
+                                        <i class="fas fa-id-card text-primary mr-1"></i> {{ militarCedula }}
+                                    </span>
+                                    <span *ngIf="militarGrado" class="badge badge-pill bg-secondary-soft text-secondary font-weight-600 px-2 py-1 mr-2 mb-1 shadow-xs" style="font-size: 0.78rem;">
+                                        <i class="fas fa-star text-warning mr-1"></i> {{ militarGrado }}
+                                    </span>
+                                    <span *ngIf="militarComponente" class="badge badge-pill bg-info-soft text-info font-weight-600 px-2 py-1 mb-1 shadow-xs" style="font-size: 0.78rem;">
+                                        <i class="fas fa-shield-alt mr-1"></i> {{ militarComponente }}
+                                    </span>
+                                </div>
+
+                                <!-- Datos de Servicio: Fecha Ingreso, Último Ascenso, Antigüedad, Tiempo de Servicio -->
+                                <div class="d-flex flex-wrap align-items-center mt-2 pt-2 border-top" style="border-color: #e2e8f0 !important;">
+                                    <span class="badge badge-pill bg-white text-dark border font-weight-bold px-2 py-1 mr-2 mb-1 shadow-xs" style="font-size: 0.76rem;" title="Fecha de Ingreso">
+                                        <i class="fas fa-calendar-plus text-primary mr-1"></i> F. Ingreso: <span class="font-weight-600 text-dark">{{ militarFechaIngreso || 'N/D' }}</span>
+                                    </span>
+                                    <span class="badge badge-pill bg-white text-dark border font-weight-bold px-2 py-1 mr-2 mb-1 shadow-xs" style="font-size: 0.76rem;" title="Fecha de Último Ascenso">
+                                        <i class="fas fa-medal text-warning mr-1"></i> Últ. Ascenso: <span class="font-weight-600 text-dark">{{ militarFechaUltimoAscenso || 'N/D' }}</span>
+                                    </span>
+                                    <span *ngIf="militarAntiguedad" class="badge badge-pill bg-info-soft text-info font-weight-700 px-2 py-1 mr-2 mb-1 shadow-xs" style="font-size: 0.76rem;" title="Antigüedad">
+                                        <i class="fas fa-history mr-1"></i> Antigüedad: <span class="text-dark font-weight-600">{{ militarAntiguedad }}</span>
+                                    </span>
+                                    <span *ngIf="militarTiempoServicio" class="badge badge-pill bg-success-soft text-success font-weight-700 px-2 py-1 mb-1 shadow-xs" style="font-size: 0.76rem;" title="Tiempo de Servicio">
+                                        <i class="fas fa-briefcase mr-1"></i> T. Servicio: <span class="text-dark font-weight-600">{{ militarTiempoServicio }}</span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <span class="text-muted small d-block font-weight-500">Fecha de Ingreso</span>
-                        <span class="font-weight-bold text-dark" style="font-size: 0.9rem;">
-                            <i class="far fa-calendar-alt text-muted mr-1"></i> {{ militarData?.fingreso || 'N/D' }}
-                        </span>
+
+                    <!-- Directiva Final del Usuario (identificacion getDirectivaID) -->
+                    <div class="col-lg-5 mt-3 mt-lg-0 pl-lg-3 text-lg-right">
+                        <div class="p-2 px-3 rounded-12" style="background: rgba(89, 140, 137, 0.08); border: 1px dashed rgba(89, 140, 137, 0.35);">
+                            <div class="d-flex align-items-center justify-content-between justify-content-lg-end mb-1">
+                                <span class="text-uppercase font-weight-bold text-muted mr-lg-2" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                    <i class="fas fa-gavel mr-1" style="color: #598c89;"></i> Directiva Final
+                                </span>
+                                <span class="badge badge-pill bg-success-soft text-success font-weight-700" style="font-size: 0.7rem;">
+                                    {{ directivaDetalle?.codigo || directivaData?.codigo || ('DIR-' + (directivaId || directivaData?.directiva_sueldo_id || '1')) }}
+                                </span>
+                            </div>
+                            <div class="font-weight-bold text-dark text-truncate" style="font-size: 0.92rem; color: #0f172a;" [title]="directivaDetalle?.nombre || directivaData?.nombre || ('Directiva #' + (directivaId || 1))">
+                                <span *ngIf="isLoadingDirectiva"><i class="fas fa-spinner fa-spin mr-1"></i> Consultando directiva...</span>
+                                <span *ngIf="!isLoadingDirectiva">{{ directivaDetalle?.nombre || directivaData?.nombre || directivaData?.numero || ('Directiva de Sueldo #' + (directivaId || directivaData?.directiva_sueldo_id || '1')) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between justify-content-lg-end align-items-center mt-1" style="font-size: 0.75rem; color: #64748b;">
+                                <span class="mr-lg-3">ID: <strong class="text-dark">{{ directivaId || directivaData?.directiva_sueldo_id || 1 }}</strong></span>
+                                <span *ngIf="grado_id || directivaData?.grado_id">Grado ID: <strong class="text-dark">{{ grado_id || directivaData?.grado_id }}</strong></span>
+                                <span *ngIf="directivaDetalle?.unidad_tributaria" class="ml-lg-3">U.T: <strong class="text-dark">Bs. {{ directivaDetalle?.unidad_tributaria | number:'1.2-2' }}</strong></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -369,113 +405,291 @@
                 </div>
             </div>
 
-            <!-- Formulario de Configuración del Finiquito -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="modern-form-group">
-                        <label class="font-weight-600 text-dark">
-                            <i class="fas fa-list-alt text-muted mr-1"></i> Motivo de Finiquito
-                        </label>
-                        <div class="input-group">
-                            <select class="form-control" [(ngModel)]="motivoFiniquito">
-                                <option value="RETIRO POR TIEMPO DE SERVICIO">RETIRO POR TIEMPO DE SERVICIO</option>
-                                <option value="CAUSA DE MUERTE / FALLECIMIENTO">CAUSA DE MUERTE / FALLECIMIENTO</option>
-                                <option value="INVALIDEZ O INCAPACIDAD">INVALIDEZ O INCAPACIDAD</option>
-                                <option value="CESE DE FUNCIONES">CESE DE FUNCIONES</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="modern-form-group">
-                        <label class="font-weight-600 text-dark">
-                            <i class="fas fa-file-invoice text-muted mr-1"></i> Partida Presupuestaria
-                        </label>
-                        <div class="input-group">
-                            <select class="form-control" [(ngModel)]="partidaPresupuestaria">
-                                <option value="01.01.02.01">01.01.02.01 - LIQUIDACIONES Y FINIQUITOS</option>
-                                <option value="01.01.01.01">01.01.01.01 - GASTOS DE PERSONAL MILITAR</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- PESTAÑAS (TABS) DEL MODAL DE FINIQUITO -->
+            <ul class="nav nav-tabs modern-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link pointer" [class.active]="activeModalTab === 'finiquito'" (click)="selectModalTab('finiquito')">
+                        <i class="fas fa-file-contract mr-2"></i> 1. Datos Finiquito
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link pointer" [class.active]="activeModalTab === 'asignacion'" (click)="selectModalTab('asignacion')">
+                        <i class="fas fa-coins mr-2"></i> 2. Datos de Asignación
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link pointer" [class.active]="activeModalTab === 'ajustes'" (click)="selectModalTab('ajustes')">
+                        <i class="fas fa-sliders-h mr-2"></i> 3. Ajustes
+                    </a>
+                </li>
+            </ul>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="modern-form-group">
-                        <label class="font-weight-600 text-dark">
-                            <i class="far fa-calendar-alt text-muted mr-1"></i> Fecha Efectiva de Retiro / Cese
-                        </label>
-                        <div class="input-group">
-                            <input type="date" class="form-control" [(ngModel)]="fechaRetiro">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="modern-form-group">
-                        <label class="font-weight-600 text-dark">
-                            <i class="fas fa-percentage text-muted mr-1"></i> Ajuste por Intereses (Bs.)
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-plus text-success"></i></span>
+            <div class="tab-content" style="min-height: 240px;">
+                <!-- ================= TAB 1: DATOS FINIQUITO ================= -->
+                <div *ngIf="activeModalTab === 'finiquito'" class="fade-in-tab">
+                    <!-- Fila: Motivo de Finiquito (8 columnas) y Fecha Efectiva de Retiro (4 columnas) -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-list-alt text-muted mr-1"></i> Motivo de Finiquito
+                                </label>
+                                <div class="input-group">
+                                    <select class="form-control" [(ngModel)]="motivoFiniquito">
+                                        <option value="RETIRO POR TIEMPO DE SERVICIO">RETIRO POR TIEMPO DE SERVICIO</option>
+                                        <option value="CAUSA DE MUERTE / FALLECIMIENTO">CAUSA DE MUERTE / FALLECIMIENTO</option>
+                                        <option value="INVALIDEZ O INCAPACIDAD">INVALIDEZ O INCAPACIDAD</option>
+                                        <option value="CESE DE FUNCIONES">CESE DE FUNCIONES</option>
+                                    </select>
+                                </div>
                             </div>
-                            <input type="number" class="form-control" [(ngModel)]="ajusteIntereses" placeholder="0.00">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="far fa-calendar-alt text-muted mr-1"></i> Fecha Efectiva de Retiro
+                                </label>
+                                <div class="input-group">
+                                    <input type="date" class="form-control" [(ngModel)]="fechaRetiro">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="modern-form-group">
+                    <!-- Banner Informativo por Muerte / Beneficiarios -->
+                    <div *ngIf="motivoFiniquito === 'CAUSA DE MUERTE / FALLECIMIENTO'" class="p-3 mb-4 rounded-16 border" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.25) !important;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-users text-amber mr-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h6 class="font-weight-bold text-dark mb-0">Distribución a Beneficiarios / Herederos Legales</h6>
+                                <p class="text-muted small mb-0 font-weight-500">
+                                    Según Ley Orgánica de Seguridad Social FANB (Ley Negro Primero), la liquidación final se prorrateará entre los beneficiarios con derecho.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="modern-form-group mb-2">
                         <label class="font-weight-600 text-dark">
-                            <i class="fas fa-balance-scale-left text-muted mr-1"></i> Monto por Deuda (Bs.)
+                            <i class="fas fa-comment-alt text-muted mr-1"></i> Observaciones / Justificación Legal
                         </label>
                         <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-minus text-danger"></i></span>
-                            </div>
-                            <input type="number" class="form-control" [(ngModel)]="montoDeuda" placeholder="0.00">
+                            <textarea class="form-control" rows="2" [(ngModel)]="observacion" placeholder="Ingrese detalles o justificación de la liquidación definitiva..." style="height: auto; padding-top: 0.75rem;"></textarea>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="modern-form-group">
-                        <label class="font-weight-600 text-dark">
-                            <i class="fas fa-hand-holding-usd text-muted mr-1"></i> Monto a Recuperar (Bs.)
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-minus text-danger"></i></span>
+
+                <!-- ================= TAB 2: DATOS DE ASIGNACIÓN ================= -->
+                <div *ngIf="activeModalTab === 'asignacion'" class="fade-in-tab">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-hand-holding-usd text-muted mr-1"></i> Anticipos Otorgados
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-receipt text-primary"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control text-dark font-weight-bold" [value]="'Bs. ' + (totalAnticipos | number:'1.2-2')" readonly>
+                                </div>
                             </div>
-                            <input type="number" class="form-control" [(ngModel)]="montoRecuperar" placeholder="0.00">
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-calendar-plus text-muted mr-1"></i> Días Adicionales
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-clock text-warning"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control text-dark font-weight-bold" [value]="diasAdicionales + ' días'" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-shield-alt text-muted mr-1"></i> Depósito de Garantías
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-piggy-bank text-info"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control text-dark font-weight-bold" [value]="'Bs. ' + (depositoGarantias | number:'1.2-2')" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-briefcase text-muted mr-1"></i> Comisión de Servicios
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-user-tie text-secondary"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control text-dark font-weight-bold" [value]="'Bs. ' + (comisionServicios | number:'1.2-2')" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-balance-scale text-muted mr-1"></i> A.A. Diferencia
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-calculator text-primary"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control text-dark font-weight-bold" [value]="'Bs. ' + (montoDiferencia | number:'1.2-2')" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-ribbon text-muted mr-1"></i> Asig. Causa Muerte
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-cross text-amber"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control text-dark font-weight-bold" [value]="'Bs. ' + (montoCausaMuerte | number:'1.2-2')" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-university text-muted mr-1"></i> Total Acumulado en Banco
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-landmark text-success"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control text-dark font-weight-bold" [value]="'Bs. ' + (totalBanco | number:'1.2-2')" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-12 border d-flex align-items-center" style="background: rgba(89, 140, 137, 0.05); border-color: rgba(89, 140, 137, 0.2) !important; height: 3.8rem; margin-top: 1.9rem;">
+                                <i class="fas fa-info-circle mr-3" style="font-size: 1.3rem; color: #598c89;"></i>
+                                <span class="small text-muted font-weight-500">
+                                    Valores provenientes de la liquidación actuarial calculada en el Kernel PACE para el beneficiario.
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Banner Informativo por Muerte / Beneficiarios -->
-            <div *ngIf="motivoFiniquito === 'CAUSA DE MUERTE / FALLECIMIENTO'" class="p-3 mb-4 rounded-16 border" style="background: rgba(245, 158, 11, 0.08); border-color: rgba(245, 158, 11, 0.25) !important;">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-users text-amber mr-3" style="font-size: 1.5rem;"></i>
-                    <div>
-                        <h6 class="font-weight-bold text-dark mb-0">Distribución a Beneficiarios / Herederos Legales</h6>
-                        <p class="text-muted small mb-0 font-weight-500">
-                            Según Ley Orgánica de Seguridad Social FANB (Ley Negro Primero), la liquidación final se prorrateará entre los beneficiarios con derecho.
-                        </p>
+                <!-- ================= TAB 3: AJUSTES ================= -->
+                <div *ngIf="activeModalTab === 'ajustes'" class="fade-in-tab">
+                    <!-- Fila: Ajuste por Intereses, Monto por Deuda, Monto a Recuperar -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-percentage text-muted mr-1"></i> Ajuste por Intereses (Bs.)
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-plus text-success"></i></span>
+                                    </div>
+                                    <input type="number" class="form-control" [(ngModel)]="ajusteIntereses" placeholder="0.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-balance-scale-left text-muted mr-1"></i> Monto por Deuda (Bs.)
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-minus text-danger"></i></span>
+                                    </div>
+                                    <input type="number" class="form-control" [(ngModel)]="montoDeuda" placeholder="0.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-hand-holding-usd text-muted mr-1"></i> Monto a Recuperar (Bs.)
+                                </label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-minus text-danger"></i></span>
+                                    </div>
+                                    <input type="number" class="form-control" [(ngModel)]="montoRecuperar" placeholder="0.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Observaciones -->
-            <div class="modern-form-group mb-2">
-                <label class="font-weight-600 text-dark">
-                    <i class="fas fa-comment-alt text-muted mr-1"></i> Observaciones / Justificación Legal
-                </label>
-                <div class="input-group">
-                    <textarea class="form-control" rows="2" [(ngModel)]="observacion" placeholder="Ingrese detalles o justificación de la liquidación definitiva..." style="height: auto; padding-top: 0.75rem;"></textarea>
+                    <!-- Fila: Partida Presupuestaria, Proyecto y Unidad Ejecutora (Al final de los montos) -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-file-invoice text-muted mr-1"></i> Partida Presupuestaria
+                                </label>
+                                <div class="input-group">
+                                    <select class="form-control" [(ngModel)]="partidaPresupuestaria">
+                                        <option value="01.01.02.01">01.01.02.01 - LIQUIDACIONES Y FINIQUITOS</option>
+                                        <option value="01.01.01.01">01.01.01.01 - GASTOS DE PERSONAL MILITAR</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-project-diagram text-muted mr-1"></i> Proyecto
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" [(ngModel)]="proyecto" placeholder="Nombre o código de proyecto...">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label class="font-weight-600 text-dark">
+                                    <i class="fas fa-landmark text-muted mr-1"></i> Unidad Ejecutora
+                                </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" [(ngModel)]="unidadEjecutora" placeholder="Unidad ejecutora...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen del impacto de los Ajustes -->
+                    <div class="p-3 rounded-16 border mb-2" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap">
+                            <div class="d-flex align-items-center mb-2 mb-md-0">
+                                <i class="fas fa-calculator text-primary mr-3" style="font-size: 1.4rem;"></i>
+                                <div>
+                                    <h6 class="font-weight-bold text-dark mb-0">Impacto Neto de Ajustes</h6>
+                                    <small class="text-muted">Ajuste Intereses (+) menos Deducción por Deuda y Monto a Recuperar (-)</small>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="badge badge-pill px-3 py-2 font-weight-700" [ngClass]="(ajusteIntereses - montoDeuda - montoRecuperar) >= 0 ? 'bg-success-soft text-success' : 'bg-danger-soft text-danger'" style="font-size: 0.95rem;">
+                                    {{ (ajusteIntereses - montoDeuda - montoRecuperar) >= 0 ? '+' : '' }} Bs. {{ (ajusteIntereses - montoDeuda - montoRecuperar) | number:'1.2-2' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

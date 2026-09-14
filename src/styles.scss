@@ -700,3 +700,11 @@ ngb-datepicker {
     animation: pulse 1.8s infinite ease-in-out;
   }
 }
+
+// Modal Finiquito con ancho ampliado (+20% respecto al modal-lg estándar de 800px -> 960px)
+.modal-finiquito-wide .modal-dialog {
+  max-width: 960px !important;
+  @media (min-width: 1200px) {
+    max-width: 980px !important;
+  }
+}

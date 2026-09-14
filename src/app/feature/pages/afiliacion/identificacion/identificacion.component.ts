@@ -5,6 +5,7 @@ import {
   ChangeDetectorRef,
   HostListener,
   ViewChild,
+  TemplateRef,
   NgZone,
 } from "@angular/core";
 import {
@@ -76,6 +77,22 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
 
   public selectedMotivoEmision: string = "";
   public selectedNomina: string = "";
+
+  // Variables para Estatus Reincorporado
+  @ViewChild("modalReincorporado") modalReincorporado!: TemplateRef<any>;
+  public reincorporadoFechaDesde: string = "";
+  public reincorporadoFechaHasta: string = "";
+  public reincorporadoObservacion: string = "";
+  public previousEstatusValue: string = "";
+  public reincorporadoData: {
+    fechaDesde: string;
+    fechaHasta: string;
+    observacion?: string;
+  } = {
+    fechaDesde: "",
+    fechaHasta: "",
+    observacion: "",
+  };
 
   // Add Family Member Modal Data
   public selectedNacionalidadFamiliar: string = "";
@@ -181,6 +198,17 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           }
 
           this.militar = afiliadoData;
+          if (afiliadoData.reincorporado) {
+            this.reincorporadoFechaDesde = afiliadoData.reincorporado.fechaDesde || "";
+            this.reincorporadoFechaHasta = afiliadoData.reincorporado.fechaHasta || "";
+            this.reincorporadoObservacion = afiliadoData.reincorporado.observacion || "";
+            this.reincorporadoData = { ...afiliadoData.reincorporado };
+          } else {
+            this.reincorporadoFechaDesde = "";
+            this.reincorporadoFechaHasta = "";
+            this.reincorporadoObservacion = "";
+            this.reincorporadoData = { fechaDesde: "", fechaHasta: "", observacion: "" };
+          }
           // console.log('Datos Crudos Normalizados:', afiliadoData);
           const parsedData = this.parseData(afiliadoData);
           // console.log('Datos Procesados (ready to patch):', parsedData);
@@ -931,6 +959,102 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     if (!this.selectedNomina) return;
     console.log("Generando Neto para la nómina:", this.selectedNomina);
     // Lógica de impresión/generación PDF
+    modal.close();
+  }
+
+  // --- MÉTODOS PARA ESTATUS REINCORPORADO ---
+  public onEstatusFocus(): void {
+    this.previousEstatusValue =
+      this.identificacionForm?.get("persona.datobasico.estatus")?.value || "";
+  }
+
+  public onEstatusChange(event: any): void {
+    const val = event?.target?.value;
+    const estObj = this.estatusBeneficiarios.find(
+      (e) => String(e.id).trim() === String(val).trim()
+    );
+    const nombre = (estObj?.nombre || "").toUpperCase().trim();
+    const descripcion = (estObj?.descripcion || "").toUpperCase().trim();
+
+    const isReincorporado =
+      nombre.includes("REINCORPORAD") ||
+      descripcion.includes("REINCORPORAD") ||
+      String(val).toUpperCase().includes("REINCORPORAD");
+
+    if (isReincorporado) {
+      this.abrirModalReincorporado();
+    }
+  }
+
+  public isEstatusReincorporado(): boolean {
+    const val = this.identificacionForm?.get("persona.datobasico.estatus")?.value;
+    if (!val) return false;
+    const estObj = this.estatusBeneficiarios.find(
+      (e) => String(e.id).trim() === String(val).trim()
+    );
+    const nombre = (estObj?.nombre || "").toUpperCase().trim();
+    const descripcion = (estObj?.descripcion || "").toUpperCase().trim();
+    return (
+      nombre.includes("REINCORPORAD") ||
+      descripcion.includes("REINCORPORAD") ||
+      String(val).toUpperCase().includes("REINCORPORAD")
+    );
+  }
+
+  public abrirModalReincorporado(): void {
+    if (!this.modalReincorporado) return;
+    const modalRef = this.modalService.open(this.modalReincorporado, {
+      centered: true,
+      size: "md",
+      backdrop: "static",
+    });
+
+    modalRef.result.then(
+      () => {},
+      () => {
+        // Al descartar con escape o backdrop, si no hay fecha desde confirmada, revertir selección
+        if (!this.reincorporadoData?.fechaDesde) {
+          this.identificacionForm
+            ?.get("persona.datobasico.estatus")
+            ?.setValue(this.previousEstatusValue);
+        }
+      }
+    );
+  }
+
+  public cancelarReincorporado(modal: any): void {
+    if (!this.reincorporadoData?.fechaDesde && this.previousEstatusValue !== undefined) {
+      this.identificacionForm
+        ?.get("persona.datobasico.estatus")
+        ?.setValue(this.previousEstatusValue);
+    }
+    modal.dismiss("Cancel");
+  }
+
+  public confirmarReincorporado(modal: any): void {
+    if (!this.reincorporadoFechaDesde) {
+      alert("Por favor indique la Fecha Desde para la reincorporación.");
+      return;
+    }
+
+    this.reincorporadoData = {
+      fechaDesde: this.reincorporadoFechaDesde,
+      fechaHasta: this.reincorporadoFechaHasta,
+      observacion: this.reincorporadoObservacion,
+    };
+
+    if (this.militar) {
+      this.militar.reincorporado = { ...this.reincorporadoData };
+    }
+
+    if (this.reincorporadoObservacion) {
+      const currentObs = this.observaciones.value || "";
+      const notaReinc = `Reincorporado: ${this.reincorporadoFechaDesde}${this.reincorporadoFechaHasta ? " al " + this.reincorporadoFechaHasta : ""}. ${this.reincorporadoObservacion}`;
+      if (!currentObs.includes(this.reincorporadoFechaDesde)) {
+        this.observaciones.setValue(currentObs ? `${currentObs} - ${notaReinc}` : notaReinc);
+      }
+    }
+
     modal.close();
   }
 

@@ -74,6 +74,7 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   public porcentajeAnticipo: number = 0;
   public montoAnticipo: number = 0;
   public motivoAnticipo: string = "";
+  public intentoProcesar: boolean = false;
   private timerValidacionMonto: any = null;
   private timerValidacionPorcentaje: any = null;
 
@@ -349,14 +350,55 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     ).trim();
   }
 
+  public onPorcentajeInput(event: any): void {
+    const input = event.target as HTMLInputElement;
+    if (!input) return;
+    let val = input.value;
+
+    // Elimina ceros a la izquierda cuando se transcriba (ej: "075" -> "75", "05" -> "5")
+    if (/^0+[1-9]/.test(val)) {
+      val = val.replace(/^0+/, "");
+      input.value = val;
+    } else if (val === "00") {
+      val = "0";
+      input.value = val;
+    }
+
+    let num = Number(val);
+    // Si excede el 75%, que no pase de 75
+    if (num > 75) {
+      input.value = "75";
+      this.porcentajeAnticipo = 75;
+      this.validarYNotificarPorPorcentaje();
+      return;
+    }
+
+    this.porcentajeAnticipo = isNaN(num) ? 0 : num;
+    this.calcularPorPorcentaje();
+  }
+
   public calcularPorPorcentaje(): void {
     if (!this.calculosData) return;
+
+    // Normalizar ceros a la izquierda
+    let rawVal = String(this.porcentajeAnticipo ?? "").trim();
+    if (/^0+[1-9]/.test(rawVal)) {
+      rawVal = rawVal.replace(/^0+/, "");
+      this.porcentajeAnticipo = Number(rawVal);
+    }
 
     let pct = Number(this.porcentajeAnticipo);
     if (isNaN(pct) || pct <= 0) {
       this.porcentajeAnticipo = 0;
       this.montoAnticipo = 0;
       return;
+    }
+
+    // Que no pase del 75%
+    if (pct > 75) {
+      this.porcentajeAnticipo = 75;
+      pct = 75;
+      this.validarYNotificarPorPorcentaje();
     }
 
     const saldo_disponible = this.getSaldoDisponible();
@@ -372,13 +414,6 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     if (this.timerValidacionPorcentaje) {
       clearTimeout(this.timerValidacionPorcentaje);
       this.timerValidacionPorcentaje = null;
-    }
-
-    // Si excede el 75% legal, programa alerta elegante
-    if (pct > 75) {
-      this.timerValidacionPorcentaje = setTimeout(() => {
-        this.validarYNotificarPorPorcentaje();
-      }, 700);
     }
   }
 
@@ -1251,6 +1286,7 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     this.porcentajeAnticipo = 0;
     this.montoAnticipo = 0;
     this.motivoAnticipo = "";
+    this.intentoProcesar = false;
     this.cdr.detectChanges();
     this.modalService.open(this.modalSolicitar, {
       centered: true,
@@ -1260,6 +1296,50 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   }
 
   public procesarSolicitud(): void {
+    this.intentoProcesar = true;
+
+    // Validación obligatoria del Motivo del Anticipo
+    if (!this.motivoAnticipo || this.motivoAnticipo.trim() === "") {
+      Swal.fire({
+        icon: "warning",
+        title: `<span style="color: #1e293b; font-weight: 700; font-size: 1.25rem;">Motivo del Anticipo Requerido</span>`,
+        html: `
+          <div style="font-size: 0.95rem; color: #475569; text-align: left; padding: 0.25rem 0.25rem;">
+            <p style="margin-bottom: 0.75rem; line-height: 1.5;">Debe seleccionar un <strong>Motivo del Anticipo</strong> para poder tramitar la solicitud.</p>
+            <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 0.75rem 1rem;">
+              <div style="font-size: 0.85rem; color: #92400e;">
+                <i class="fas fa-exclamation-triangle mr-1" style="color: #f59e0b;"></i>
+                El motivo es de carácter obligatorio según lo establecido en el Artículo 59 de la Ley Orgánica de Seguridad Social de la FANB (Ley Negro Primero).
+              </div>
+            </div>
+          </div>
+        `,
+        confirmButtonText: '<i class="fas fa-check mr-1"></i> Entendido',
+        confirmButtonColor: "#598c89",
+        customClass: {
+          popup: "border-0 shadow-lg rounded-20 px-3 py-3",
+          confirmButton: "btn px-4 py-2 font-weight-bold shadow-sm",
+        },
+      });
+      return;
+    }
+
+    // Validación de monto o porcentaje mayor a cero
+    if (!this.montoAnticipo || Number(this.montoAnticipo) <= 0) {
+      Swal.fire({
+        icon: "warning",
+        title: `<span style="color: #1e293b; font-weight: 700; font-size: 1.25rem;">Monto Inválido</span>`,
+        html: `
+          <div style="font-size: 0.95rem; color: #475569; text-align: left; padding: 0.25rem 0.25rem;">
+            <p style="margin-bottom: 0.5rem; line-height: 1.5;">Debe indicar un porcentaje o monto mayor a cero para el anticipo.</p>
+          </div>
+        `,
+        confirmButtonText: '<i class="fas fa-check mr-1"></i> Entendido',
+        confirmButtonColor: "#598c89",
+      });
+      return;
+    }
+
     if (!this.validarYNotificarMonto() || !this.validarYNotificarPorPorcentaje()) {
       return;
     }
@@ -1324,12 +1404,17 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
 
   public insertarAnticipo(): void {
     if (!this.militarData) {
-      alert("No se han cargado los datos del militar.");
+      Swal.fire({
+        icon: "error",
+        title: "Datos Faltantes",
+        text: "No se han cargado los datos del militar.",
+        confirmButtonColor: "#598c89",
+      });
       return;
     }
 
     if (!this.motivoAnticipo) {
-      alert("Por favor seleccione un motivo para el anticipo.");
+      this.procesarSolicitud();
       return;
     }
 

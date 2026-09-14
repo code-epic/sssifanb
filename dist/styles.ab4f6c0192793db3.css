@@ -1165,6 +1165,15 @@ ngb-datepicker {
 .fullscreen-loading .animate-pulse {
   animation: pulse 1.8s infinite ease-in-out;
 }
+
+.modal-finiquito-wide .modal-dialog {
+  max-width: 960px !important;
+}
+@media (min-width: 1200px) {
+  .modal-finiquito-wide .modal-dialog {
+    max-width: 980px !important;
+  }
+}
 @charset "UTF-8";
 /*!
 

@@ -473,17 +473,23 @@
                 </div>
                 <div class="col-md-8">
                     <div class="modern-form-group">
-                        <label>Motivo del Anticipo</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-list-ul text-verde-titulos"></i></span></div>
-                            <select class="form-control text-dark font-weight-500" [(ngModel)]="motivoAnticipo">
-                                <option value="" disabled>Seleccione un Motivo...</option>
+                        <label>Motivo del Anticipo <span class="text-danger font-weight-bold">*</span></label>
+                        <div class="input-group shadow-sm" [style.border]="(!motivoAnticipo && intentoProcesar) ? '1px solid #f59e0b' : '1px solid #e2e8f0'" style="border-radius: 8px; overflow: hidden; transition: border-color 0.25s ease;">
+                            <div class="input-group-prepend"><span class="input-group-text border-0" [style.background-color]="(!motivoAnticipo && intentoProcesar) ? '#fffbeb' : '#f8fafc'"><i class="fas fa-list-ul" [style.color]="(!motivoAnticipo && intentoProcesar) ? '#d97706' : '#598c89'"></i></span></div>
+                            <select class="form-control text-dark font-weight-500 border-0" 
+                                    [style.background-color]="(!motivoAnticipo && intentoProcesar) ? '#fffbeb' : '#f8fafc'"
+                                    [(ngModel)]="motivoAnticipo" 
+                                    (change)="intentoProcesar = false">
+                                <option value="" disabled selected>Seleccione un Motivo...</option>
                                 <option value="1">Adquisición de Vivienda</option>
                                 <option value="2">Reparación de Vivienda</option>
                                 <option value="3">Gastos Médicos Mayores</option>
                                 <option value="4">Educación</option>
                             </select>
                         </div>
+                        <small *ngIf="!motivoAnticipo && intentoProcesar" class="text-danger font-weight-bold pl-1 mt-1 d-block" style="font-size: 0.75rem;">
+                            <i class="fas fa-exclamation-circle mr-1"></i> Debe seleccionar el motivo del anticipo para continuar
+                        </small>
                     </div>
                 </div>
             </div>
@@ -510,6 +516,7 @@
                             style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; transition: all 0.25s ease;">
                             <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0" min="0" max="75" step="1"
                                 style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="porcentajeAnticipo" 
+                                (input)="onPorcentajeInput($event)"
                                 (ngModelChange)="calcularPorPorcentaje()" (change)="validarYNotificarPorPorcentaje()" (blur)="validarYNotificarPorPorcentaje()">
                             <div class="input-group-append p-1">
                                 <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 

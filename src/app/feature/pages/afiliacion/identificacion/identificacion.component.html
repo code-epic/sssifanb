@@ -208,17 +208,30 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="modern-form-group">
-                                    <label>Estatus</label>
+                                    <label class="d-flex justify-content-between align-items-center">
+                                        <span>Estatus</span>
+                                        <a *ngIf="isEstatusReincorporado()" 
+                                           href="javascript:void(0)" 
+                                           (click)="abrirModalReincorporado()" 
+                                           class="text-verde-titulos font-weight-bold" 
+                                           style="font-size: 0.72rem; text-decoration: none;"
+                                           title="Ver o modificar periodo de reincorporación">
+                                            <i class="fas fa-calendar-alt mr-1"></i> Periodo
+                                        </a>
+                                    </label>
                                     <div class="input-group">
                                         <div class="input-group-prepend d-none d-lg-flex"><span class="input-group-text"><i
                                                     class="fas fa-heart"></i></span></div>
-                                        <select class="form-control" formControlName="estatus">
+                                        <select class="form-control" formControlName="estatus" (focus)="onEstatusFocus()" (change)="onEstatusChange($event)">
                                             <option value="">Seleccione...</option>
                                             <option *ngFor="let est of estatusBeneficiarios" [value]="est.id">
                                                 {{ est.nombre | uppercase }}
                                             </option>
                                         </select>
                                     </div>
+                                    <small *ngIf="isEstatusReincorporado() && reincorporadoFechaDesde" class="text-muted pl-1 mt-1 d-block" style="font-size: 0.72rem;">
+                                        <i class="fas fa-calendar-check text-success mr-1"></i> Periodo: {{ reincorporadoFechaDesde }}{{ reincorporadoFechaHasta ? ' - ' + reincorporadoFechaHasta : '' }}
+                                    </small>
                                 </div>
                             </div>
                             <div class="col-md-9">
@@ -2335,6 +2348,91 @@
                 style="background-color: rgba(108, 118, 127, 0.1); color: #637381; border-color: transparent; padding: 0.5rem 1.5rem; transition: all 0.3s ease;"
                 onmouseover="this.style.backgroundColor='rgba(108, 118, 127, 0.15)'" onmouseout="this.style.backgroundColor='rgba(108, 118, 127, 0.1)'">
                 Cerrar
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Periodo de Reincorporación -->
+<ng-template #modalReincorporado let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+        <div class="modal-header d-flex justify-content-between align-items-center bg-white border-bottom-0 pt-4 pb-0 px-4">
+            <div class="d-flex align-items-center">
+                <div class="icon-circle mr-3" style="width: 44px; height: 44px; background-color: rgba(89, 140, 137, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user-clock" style="color: #598c89; font-size: 1.25rem;"></i>
+                </div>
+                <div>
+                    <h5 class="font-weight-bold text-dark mb-0">Periodo de Reincorporación</h5>
+                    <small class="text-muted font-weight-500">Defina el lapso temporal del militar en estatus Reincorporado</small>
+                </div>
+            </div>
+            <button type="button" class="close" (click)="cancelarReincorporado(modal)" style="outline: none;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <div class="modal-body p-4 bg-white">
+            <div class="alert shadow-none border-0 mb-4" style="background: linear-gradient(135deg, rgba(89, 140, 137, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%); border-radius: 12px; border: 1px solid rgba(89, 140, 137, 0.2) !important;">
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-info-circle mr-2 mt-1" style="color: #598c89; font-size: 1.1rem;"></i>
+                    <div style="font-size: 0.85rem; color: #334155; line-height: 1.45;">
+                        Ingrese las fechas que delimitan el periodo oficial de reincorporación a la FANB con formato <strong>DD/MM/YYYY</strong>.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="modern-form-group mb-3">
+                        <label class="font-weight-bold text-dark" style="font-size: 0.82rem; letter-spacing: 0.3px;">
+                            FECHA DESDE <span class="text-danger">*</span>
+                        </label>
+                        <app-pastel-datepicker 
+                            [(ngModel)]="reincorporadoFechaDesde" 
+                            placeholder="DD/MM/YYYY" 
+                            iconClass="fas fa-calendar-alt"
+                            [maxDate]="reincorporadoFechaHasta">
+                        </app-pastel-datepicker>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-form-group mb-3">
+                        <label class="font-weight-bold text-dark" style="font-size: 0.82rem; letter-spacing: 0.3px;">
+                            FECHA HASTA
+                        </label>
+                        <app-pastel-datepicker 
+                            [(ngModel)]="reincorporadoFechaHasta" 
+                            placeholder="DD/MM/YYYY" 
+                            iconClass="fas fa-calendar-check"
+                            [minDate]="reincorporadoFechaDesde">
+                        </app-pastel-datepicker>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modern-form-group mb-1">
+                <label class="font-weight-bold text-dark" style="font-size: 0.82rem; letter-spacing: 0.3px;">
+                    OBSERVACIÓN O RESOLUCIÓN
+                </label>
+                <div class="input-group">
+                    <div class="input-group-prepend d-none d-lg-flex">
+                        <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Ej: Resuelto N° 012345 / Reincorporación al servicio activo"
+                        [(ngModel)]="reincorporadoObservacion">
+                </div>
+                <small class="text-muted pl-1 mt-1 d-block" style="font-size: 0.72rem;">Información adicional o soporte de la orden</small>
+            </div>
+        </div>
+
+        <div class="modal-footer bg-white border-top-0 d-flex justify-content-between p-3 px-4" style="border-radius: 0 0 16px 16px;">
+            <button type="button" class="btn btn-light shadow-sm font-weight-bold px-4"
+                style="border-radius: 8px; color: #64748b;" (click)="cancelarReincorporado(modal)">
+                Cancelar
+            </button>
+            <button type="button" class="btn btn-header-action teal shadow-sm px-4 m-0"
+                (click)="confirmarReincorporado(modal)">
+                <i class="fas fa-check-circle mr-2"></i> Confirmar Periodo
             </button>
         </div>
     </div>

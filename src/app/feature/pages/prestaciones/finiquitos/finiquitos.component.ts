@@ -31,6 +31,8 @@ export interface IFiniquito {
   apellidos_beneficiario?: string;
   motivo?: string;
   partida?: string;
+  proyecto?: string;
+  unidad_ejecutora?: string;
   deuda?: number;
   intereses?: number;
   f_retiro?: string;
@@ -75,12 +77,143 @@ export class FiniquitosComponent
 
   // Campos para nuevo Finiquito
   public partidaPresupuestaria: string = "01.01.02.01";
+  public proyecto: string = "";
+  public unidadEjecutora: string = "";
   public motivoFiniquito: string = "RETIRO POR TIEMPO DE SERVICIO";
   public observacion: string = "";
   public montoDeuda: number = 0;
   public montoRecuperar: number = 0;
   public ajusteIntereses: number = 0;
   public fechaRetiro: string = "";
+
+  // Variables para Directiva Final
+  public directivaData: any = null;
+  public directivaId: number = 0;
+  public grado_id: number = 0;
+  public directivaDetalle: any = null;
+  public isLoadingDirectiva: boolean = false;
+
+  public get militarNombreCompleto(): string {
+    if (!this.militarData && !this.selectedMilitar) return "";
+    const obj = this.militarData || this.selectedMilitar;
+    const db = obj.persona?.datobasico;
+    if (db?.nombrecompleto) return db.nombrecompleto;
+    return this.formatNombreCompleto(obj);
+  }
+
+  public get militarCedula(): string {
+    const raw =
+      this.militarData?.persona?.datobasico?.cedula ||
+      this.militarData?.cedula ||
+      this.selectedMilitar?.cedula ||
+      this.searchCedula ||
+      "";
+    return this.formatCedula(raw);
+  }
+
+  public get militarGrado(): string {
+    const obj = this.militarData || this.selectedMilitar;
+    return (
+      obj?.grado?.descripcion ||
+      obj?.grado?.nombre ||
+      obj?.nombre_grado ||
+      obj?.grado ||
+      ""
+    ).trim();
+  }
+
+  public get militarComponente(): string {
+    const obj = this.militarData || this.selectedMilitar;
+    return (
+      obj?.componente?.descripcion ||
+      obj?.componente?.nombre ||
+      obj?.nombre_componente ||
+      obj?.componente ||
+      ""
+    ).trim();
+  }
+
+  public get militarFechaIngreso(): string {
+    const obj = this.militarData || this.selectedMilitar;
+    const raw =
+      obj?.fingreso ||
+      obj?.fecha_ingreso ||
+      this.calculosData?.base?.fecha_ingreso ||
+      "";
+    return this.formatDateDisplay(raw);
+  }
+
+  public get militarFechaUltimoAscenso(): string {
+    const obj = this.militarData || this.selectedMilitar;
+    const raw =
+      obj?.fascenso ||
+      obj?.f_ult_ascenso ||
+      this.calculosData?.base?.f_ult_ascenso ||
+      "";
+    return this.formatDateDisplay(raw);
+  }
+
+  public get militarTiempoServicio(): string {
+    if (this.calculosData?.base?.tiempo_servicio) {
+      return String(this.calculosData.base.tiempo_servicio);
+    }
+    const obj = this.militarData || this.selectedMilitar;
+    if (obj?.tiemposervicio) {
+      return String(obj.tiemposervicio);
+    }
+    const fIng = obj?.fingreso || this.calculosData?.base?.fecha_ingreso;
+    if (fIng) {
+      const fIngIso = typeof fIng === "string" ? fIng.split("T")[0] : "";
+      const situacion = obj?.situacion || "ACT";
+      const fRet = this.fechaRetiro || this.calculosData?.base?.f_retiro || "";
+      const ts = this.utilService.calcularTServicio(fIngIso, fRet, situacion);
+      if (ts) return ts;
+    }
+    return "";
+  }
+
+  public get militarAntiguedad(): string {
+    if (this.calculosData?.base?.antiguedad) {
+      return String(this.calculosData.base.antiguedad);
+    }
+    const obj = this.militarData || this.selectedMilitar;
+    if (obj?.antiguedad) {
+      return String(obj.antiguedad);
+    }
+    const fAsc =
+      obj?.fascenso ||
+      obj?.f_ult_ascenso ||
+      this.calculosData?.base?.f_ult_ascenso;
+    if (fAsc) {
+      const fAscIso = typeof fAsc === "string" ? fAsc.split("T")[0] : "";
+      const situacion = obj?.situacion || "ACT";
+      const fRet = this.fechaRetiro || this.calculosData?.base?.f_retiro || "";
+      const ant = this.utilService.calcularTServicio(fAscIso, fRet, situacion);
+      if (ant) return ant;
+    }
+    return this.militarTiempoServicio;
+  }
+
+  private formatDateDisplay(val: any): string {
+    if (!val) return "";
+    if (typeof val === "object" && val.$date) val = val.$date;
+    if (typeof val === "string") {
+      const s = val.split("T")[0];
+      const parts = s.split("-");
+      if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      if (s.includes("/")) return s;
+    }
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) {
+      const dd = String(d.getUTCDate()).padStart(2, "0");
+      const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+      const yyyy = d.getUTCFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+    return String(val);
+  }
 
   public get totalAsignacionAntiguedad(): number {
     return Number(this.calculosData?.base?.asignacion_antiguedad || 0);
@@ -102,8 +235,60 @@ export class FiniquitosComponent
     );
   }
 
+  public activeModalTab: string = "finiquito";
+
+  public selectModalTab(tab: string): void {
+    this.activeModalTab = tab;
+  }
+
   public get totalAnticipos(): number {
-    return Number(this.calculosData?.movimientos?.anticipo || 0);
+    return Number(
+      this.calculosData?.movimientos?.anticipo ||
+        this.calculosData?.base?.anticipos ||
+        0,
+    );
+  }
+
+  public get diasAdicionales(): number {
+    return Number(
+      this.calculosData?.base?.dias_adicionales ||
+        this.calculosData?.dias_adicionales ||
+        0,
+    );
+  }
+
+  public get depositoGarantias(): number {
+    return Number(
+      this.calculosData?.movimientos?.deposito_de_garantias ||
+        this.calculosData?.base?.garantias ||
+        this.calculosData?.garantias ||
+        0,
+    );
+  }
+
+  public get comisionServicios(): number {
+    return Number(
+      this.calculosData?.movimientos?.comision_servicios ||
+        this.calculosData?.base?.comision_servicios ||
+        0,
+    );
+  }
+
+  public get montoCausaMuerte(): number {
+    return Number(
+      this.calculosData?.movimientos?.asignacion_causa ||
+        this.calculosData?.base?.asignacion_causa ||
+        0,
+    );
+  }
+
+  public get totalBanco(): number {
+    return Number(
+      this.calculosData?.base?.total_banco ||
+        this.calculosData?.base?.deposito_banco ||
+        this.totalDepositadoBanco ||
+        0,
+    );
   }
 
   public get montoDiferencia(): number {
@@ -574,6 +759,10 @@ export class FiniquitosComponent
     this.militarData = null;
     this.historyTableData = [];
     this.calculosData = null;
+    this.directivaData = null;
+    this.directivaId = 0;
+    this.grado_id = 0;
+    this.directivaDetalle = null;
 
     const cargo = this.loginService.Usuario?.cargo || "";
 
@@ -591,33 +780,7 @@ export class FiniquitosComponent
               }
 
               this.cargarMovimientos();
-
-              this.prestacionesService
-                .obtenerDirectivaId(this.searchCedula)
-                .subscribe({
-                  next: (dirData: any) => {
-                    const directivaObj = dirData.Cuerpo?.[0];
-                    const directivaId = directivaObj?.directiva_sueldo_id || 1;
-                    const gradoId =
-                      directivaObj?.grado_id ||
-                      this.militarData?.grado_id ||
-                      this.militarData?.grado?.id;
-
-                    this.prestacionesService
-                      .iniciarCalculosPrestaciones(
-                        directivaId,
-                        this.searchCedula,
-                        "",
-                        gradoId,
-                      )
-                      .subscribe({
-                        next: (calcRes) =>
-                          console.log("Cálculos finiquito iniciados:", calcRes),
-                        error: (calcErr) =>
-                          console.error("Error cálculos finiquito:", calcErr),
-                      });
-                  },
-                });
+              this.getDirectivaID(this.searchCedula);
             } else {
               alert("No se encontraron resultados para la cédula ingresada.");
             }
@@ -787,13 +950,112 @@ export class FiniquitosComponent
   }
 
   public solicitarFiniquito(): void {
+    this.activeModalTab = "finiquito";
     this.observacion = "";
     this.montoDeuda = 0;
     this.montoRecuperar = 0;
+    this.ajusteIntereses = 0;
+    this.proyecto = "";
+    this.unidadEjecutora = "";
+
+    const cedula =
+      this.militarData?.persona?.datobasico?.cedula ||
+      this.militarData?.cedula ||
+      this.selectedMilitar?.cedula ||
+      this.searchCedula ||
+      "";
+
+    if (cedula && (!this.directivaData || !this.directivaId)) {
+      this.getDirectivaID(cedula);
+    }
+
+    this.cdr.detectChanges();
     this.modalService.open(this.modalSolicitar, {
       centered: true,
       size: "lg",
-      windowClass: "pastel-modal",
+      windowClass: "pastel-modal modal-finiquito-wide",
+    });
+  }
+
+  /**
+   * Obtiene la directiva final del usuario según el patrón de identificacion.component.ts:L328
+   */
+  public getDirectivaID(cedulaParam?: string): void {
+    const rawCed = (
+      cedulaParam ||
+      this.militarCedula ||
+      this.searchCedula ||
+      ""
+    ).toString();
+    const cedula = rawCed.replace(/\D/g, "").trim();
+    if (!cedula) return;
+
+    this.isLoadingDirectiva = true;
+    const payload = {
+      funcion: environment.funcion.OBTENER_BENEFICIARIO_DIRECTIVA_ID,
+      parametros: `${cedula}`,
+    };
+
+    this.apiService.post("crud", payload).subscribe({
+      next: (data: any) => {
+        if (data && data.Cuerpo && data.Cuerpo.length > 0) {
+          this.directivaData = data.Cuerpo[0];
+          this.directivaId = this.directivaData.directiva_sueldo_id || 1;
+          this.grado_id =
+            this.directivaData.grado_id ||
+            this.militarData?.grado_id ||
+            this.militarData?.grado?.id ||
+            0;
+
+          console.log(
+            "Directiva final obtenida para finiquito:",
+            this.directivaData,
+          );
+
+          this.buscarInfoDirectivaCompleta(this.directivaId);
+
+          // Si aún no se han disparado los cálculos de finiquito, iniciarlos
+          if (!this.calculosData) {
+            this.prestacionesService
+              .iniciarCalculosPrestaciones(
+                this.directivaId,
+                cedula,
+                "",
+                this.grado_id,
+              )
+              .subscribe({
+                next: (calcRes) =>
+                  console.log("Cálculos finiquito iniciados:", calcRes),
+                error: (calcErr) =>
+                  console.error("Error cálculos finiquito:", calcErr),
+              });
+          }
+        }
+        this.isLoadingDirectiva = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error al obtener directiva del militar:", err);
+        this.isLoadingDirectiva = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  public buscarInfoDirectivaCompleta(id: number): void {
+    const payload = {
+      funcion: environment.funcion.LISTAR_DIRECTIVAS,
+      parametros: "",
+    };
+    this.apiService.post("crud", payload).subscribe({
+      next: (res: any) => {
+        if (res?.Cuerpo && Array.isArray(res.Cuerpo)) {
+          this.directivaDetalle =
+            res.Cuerpo.find((d: any) => d.id == id || d.codigo == id) || null;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {},
     });
   }
 
@@ -848,6 +1110,8 @@ export class FiniquitosComponent
       usr_modificacion: usrName,
       observ_ult_modificacion: "SOLICITUD INICIAL DE FINIQUITO",
       partida: this.partidaPresupuestaria,
+      proyecto: this.proyecto,
+      unidad_ejecutora: this.unidadEjecutora,
       deuda: Number(this.montoDeuda) || 0,
       intereses: Number(this.ajusteIntereses) || 0,
       f_retiro: this.fechaRetiro || fechaDate,
