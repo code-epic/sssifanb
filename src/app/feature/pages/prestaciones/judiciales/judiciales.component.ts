@@ -14,6 +14,7 @@ import { PrestacionesSharedService } from "src/app/core/services/prestaciones/pr
 import { LoginService } from "src/app/core/services/login/login.service";
 import { UtilService } from "src/app/core/services/util/util.service";
 import { environment } from "src/environments/environment";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-prest-judiciales",
@@ -322,10 +323,54 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
       });
   }
 
+  public get militarNombreCompleto(): string {
+    const p = this.militarData?.persona?.datobasico;
+    if (p?.nombrecompleto) return p.nombrecompleto;
+    const nombres = p?.nombres || this.militarData?.nombres || "";
+    const apellidos = p?.apellidos || this.militarData?.apellidos || "";
+    return `${nombres} ${apellidos}`.trim();
+  }
+
+  public get militarGrado(): string {
+    return (
+      this.militarData?.grado?.descripcion ||
+      this.militarData?.nombre_grado ||
+      ""
+    ).trim();
+  }
+
+  public get militarCedula(): string {
+    return (
+      this.militarData?.cedula ||
+      this.militarData?.persona?.datobasico?.cedula ||
+      this.searchCedula ||
+      ""
+    );
+  }
+
+  public get militarComponente(): string {
+    return (
+      this.militarData?.componente?.descripcion ||
+      this.militarData?.nombre_componente ||
+      ""
+    ).trim();
+  }
+
   public solicitarMedida(): void {
-    this.medidaForm = {}; // reset
+    const todayStr = new Date().toISOString().substring(0, 10);
+    this.medidaForm = {
+      tipo_medida_id: "1",
+      f_documento: todayStr,
+      f_recepcion: todayStr,
+      forma_pago_id: "",
+      parentesco_id: "",
+    };
     this.currentModalStep = 1;
-    this.modalService.open(this.modalSolicitar, { centered: true, size: "lg" });
+    this.modalService.open(this.modalSolicitar, {
+      centered: true,
+      size: "lg",
+      windowClass: "pastel-modal",
+    });
   }
 
   public onHistoryAction(event: any): void {
@@ -343,10 +388,21 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
         }
       }
 
+      if (
+        this.medidaForm.f_recepcion &&
+        typeof this.medidaForm.f_recepcion === "string"
+      ) {
+        const parsed = this.medidaForm.f_recepcion.substring(0, 10);
+        if (parsed.includes("-")) {
+          this.medidaForm.f_recepcion = parsed;
+        }
+      }
+
       this.currentModalStep = 1;
       this.modalService.open(this.modalSolicitar, {
         centered: true,
         size: "lg",
+        windowClass: "pastel-modal",
       });
     }
   }
@@ -385,7 +441,28 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   }
 
   public procesarSolicitud(): void {
-    alert("La medida judicial ha sido registrada exitosamente.");
+    Swal.fire({
+      icon: "success",
+      title: `<span style="color: #1e293b; font-weight: 700; font-size: 1.25rem;">Medida Judicial Registrada</span>`,
+      html: `
+        <div style="font-size: 0.95rem; color: #475569; text-align: left; padding: 0.25rem 0.25rem;">
+          <p style="margin-bottom: 0.75rem; line-height: 1.5;">La medida judicial ha sido registrada exitosamente para el expediente militar.</p>
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #598c89; border-radius: 8px; padding: 0.75rem 1rem;">
+            <div style="font-size: 0.85rem; color: #334155;">
+              <i class="fas fa-check-circle mr-1" style="color: #598c89;"></i>
+              Beneficiario: <strong>${this.medidaForm.n_beneficiario || "N/A"}</strong> | C.I. <strong>${this.medidaForm.ci_beneficiario || "N/A"}</strong>
+            </div>
+          </div>
+        </div>
+      `,
+      confirmButtonText: '<i class="fas fa-check mr-1"></i> Finalizar',
+      confirmButtonColor: "#598c89",
+      customClass: {
+        popup: "border-0 shadow-lg rounded-20 px-3 py-3",
+        confirmButton: "btn px-4 py-2 font-weight-bold shadow-sm",
+      },
+    });
+
     this.modalService.dismissAll();
     this.toggleView();
     this.loadData();
