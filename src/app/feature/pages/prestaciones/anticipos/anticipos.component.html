@@ -39,29 +39,26 @@
             <label>Componente Militar</label>
             <div class="input-group">
                 <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-shield-alt text-verde-titulos"></i></span></div>
-                <select class="form-control" style="font-size: 0.85rem;">
-                    <option value="" selected>Todos los Componentes...</option>
-                    <option value="EJ">Ejército Bolivariano</option>
-                    <option value="AR">Armada Bolivariana</option>
-                    <option value="AM">Aviación Militar</option>
-                    <option value="GN">Guardia Nacional</option>
+                <select class="form-control" style="font-size: 0.85rem;" [(ngModel)]="filtroComponente">
+                    <option value="" selected>TODOS LOS COMPONENTES...</option>
+                    <option value="EJERCITO">EJERCITO BOLIVARIANO</option>
+                    <option value="ARMADA">ARMADA BOLIVARIANA</option>
+                    <option value="AVIACION">AVIACION MILITAR BOLIVARIANA</option>
+                    <option value="GUARDIA NACIONAL">GUARDIA NACIONAL BOLIVARIANA</option>
                 </select>
             </div>
         </div>
 
-        <div class="modern-form-group mb-1">
+        <!-- <div class="modern-form-group mb-1">
             <label>Grado Jerárquico</label>
             <div class="input-group">
                 <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-star text-verde-titulos"></i></span></div>
-                <select class="form-control" style="font-size: 0.85rem;">
-                    <option value="" selected>Todos los Grados...</option>
-                    <option>General / Almirante</option>
-                    <option>Oficial Superior</option>
-                    <option>Oficial Subalterno</option>
-                    <option>Tropa Profesional</option>
+                <select class="form-control" style="font-size: 0.85rem;" [(ngModel)]="filtroGrado">
+                    <option value="" selected>SELECCIONE GRADO...</option>
+                    <option *ngFor="let grado of gradosDisponibles" [value]="grado">{{ grado }}</option>
                 </select>
             </div>
-        </div>
+        </div> -->
 
         <div class="d-flex align-items-center justify-content-end mt-4 pt-2" style="border-top: 1px solid #f1f5f9;">
             <button class="btn btn-light shadow-sm font-weight-bold px-4 mr-2" 
@@ -516,11 +513,13 @@
                             style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; transition: all 0.25s ease;">
                             <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0" min="0" max="75" step="1"
                                 style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="porcentajeAnticipo" 
+                                [disabled]="getMaxMontoAnticipoDisponible() <= 0"
                                 (input)="onPorcentajeInput($event)"
                                 (ngModelChange)="calcularPorPorcentaje()" (change)="validarYNotificarPorPorcentaje()" (blur)="validarYNotificarPorPorcentaje()">
                             <div class="input-group-append p-1">
                                 <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 
                                         style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button"
+                                        [disabled]="getMaxMontoAnticipoDisponible() <= 0"
                                         title="Aplicar máximo 75%" (click)="porcentajeAnticipo = 75; calcularPorPorcentaje()">
                                     <i class="fas fa-percent"></i>
                                 </button>
@@ -546,10 +545,12 @@
                             style="border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; transition: all 0.25s ease;">
                             <input type="number" class="form-control font-weight-bold bg-transparent" placeholder="0.00" min="0" [max]="getMaxMontoAnticipoDisponible()"
                                 style="font-size: 1.15rem; border: none; color: #0f172a;" [(ngModel)]="montoAnticipo" 
+                                [disabled]="getMaxMontoAnticipoDisponible() <= 0"
                                 (ngModelChange)="calcularPorMonto()" (change)="validarYNotificarMonto()" (blur)="validarYNotificarMonto()">
                             <div class="input-group-append p-1">
                                 <button class="btn border-0 rounded text-white d-flex align-items-center justify-content-center px-4" 
                                         style="background-color: #598c89; height: 100%; border-radius: 6px !important;" type="button"
+                                        [disabled]="getMaxMontoAnticipoDisponible() <= 0"
                                         title="Aplicar monto máximo" (click)="montoAnticipo = getMaxMontoAnticipoDisponible(); calcularPorMonto()">
                                     <i class="fas fa-coins"></i>
                                 </button>

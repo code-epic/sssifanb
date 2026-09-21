@@ -86,6 +86,10 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
   public fechaDesde: string = "";
   public fechaHasta: string = "";
 
+  public filtroComponente: string = "";
+  public filtroGrado: string = "";
+  public gradosDisponibles: string[] = [];
+
   public isTableLoading: boolean = false;
 
   // --- CONFIG: Tabla Principal (Pendientes) ---
@@ -816,7 +820,21 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
           });
 
           this.masterPendingData = [...mappedData];
-          this.pendingTableData = [...mappedData];
+          
+          const gradosSet = new Set(this.masterPendingData.map(item => (item.grado || "").trim()).filter(g => g));
+          this.gradosDisponibles = Array.from(gradosSet).sort();
+
+          let filtered = [...mappedData];
+          
+          if (this.filtroComponente) {
+            filtered = filtered.filter(item => item.componente === this.filtroComponente);
+          }
+          
+          if (this.filtroGrado) {
+            filtered = filtered.filter(item => (item.grado || "").trim() === this.filtroGrado);
+          }
+
+          this.pendingTableData = filtered;
         } else {
           this.masterPendingData = [];
           this.pendingTableData = [];
@@ -1288,6 +1306,26 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     this.motivoAnticipo = "";
     this.intentoProcesar = false;
     this.cdr.detectChanges();
+
+    const max_monto = this.getMaxMontoAnticipoDisponible();
+    if (max_monto <= 0) {
+      Swal.fire({
+        icon: "warning",
+        title: `<span style="color: #1e293b; font-weight: 700; font-size: 1.25rem;">Sin Disponibilidad</span>`,
+        html: `
+          <div style="font-size: 0.95rem; color: #475569; text-align: left; padding: 0.25rem 0.25rem;">
+            <p style="margin-bottom: 0.5rem; line-height: 1.5;">El afiliado no posee saldo disponible o excede el límite de capacidad disponible en este momento.</p>
+          </div>
+        `,
+        confirmButtonText: '<i class="fas fa-check mr-1"></i> Entendido',
+        confirmButtonColor: "#598c89",
+        customClass: {
+          popup: "border-0 shadow-lg rounded-20 px-3 py-3",
+          confirmButton: "btn px-4 py-2 font-weight-bold shadow-sm",
+        },
+      });
+    }
+
     this.modalService.open(this.modalSolicitar, {
       centered: true,
       size: "lg",
