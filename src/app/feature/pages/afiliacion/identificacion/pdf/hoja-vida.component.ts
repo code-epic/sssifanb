@@ -152,6 +152,10 @@ export class HojaVidaComponent extends PdfLayoutBase {
     const calculos = base?.calculos || {};
     const movimientos = bunker?.movimientos || {};
 
+    const sitMilitar = String(militarDb?.situacion?.abreviatura || militarDb?.situacion?.nombre || militarDb?.situacion || "").toUpperCase();
+    const esRetirado = sitMilitar !== "" && sitMilitar !== "ACT" && sitMilitar !== "ACTIVO";
+    const saldoDisponibleFinal = esRetirado ? 0 : (base.saldo_disponible || 0);
+
     const componentes = ["EJB", "ARV", "FAV", "GN", "MIL"];
     const compIdx = militarDb?.componente_id ? militarDb.componente_id - 1 : 0;
     const componenteFull = componentes[compIdx] || "N/D";
@@ -356,7 +360,7 @@ export class HojaVidaComponent extends PdfLayoutBase {
                 ],
                 [
                   { text: "SALDO DISPONIBLE", fontSize: 8.5, bold: true },
-                  { text: `${moneda} ${fmt(base.saldo_disponible)}`, fontSize: 8.5, bold: true, alignment: "right" }
+                  { text: `${moneda} ${fmt(saldoDisponibleFinal)}`, fontSize: 8.5, bold: true, alignment: "right" }
                 ]
               ]
             },

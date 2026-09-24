@@ -6,7 +6,7 @@ export const environment = {
   API: "/v1/api/",
   BasePath: "crud",
   Hash: "8768b8d1727cb2d1ec9f0a8d8bc45f8b.sse",
-  buildDateTime: "Thu Sep 24 2026 15:02:16 GMT-0400 (Venezuela Time)",
+  buildDateTime: "Thu Sep 24 2026 15:16:30 GMT-0400 (Venezuela Time)",
   version: "Broglie 1.0.1-1b419f3",
   fecha: "2025-04-12 05:08:00",
   coleciones: {

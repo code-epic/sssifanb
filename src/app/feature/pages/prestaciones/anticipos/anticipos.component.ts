@@ -295,6 +295,17 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
 
   public getSaldoDisponible(): number {
     if (!this.calculosData) return 0;
+    let situacionVal =
+      this.militarData?.situacion ||
+      this.militarData?.persona?.datobasico?.situacion;
+    if (typeof situacionVal === "object" && situacionVal !== null) {
+      situacionVal = situacionVal.abreviatura || situacionVal.nombre || "";
+    }
+    const sit = String(situacionVal || "").trim().toUpperCase();
+    if (sit !== "" && sit !== "ACT" && sit !== "ACTIVO") {
+      return 0;
+    }
+
     const base = this.calculosData.base;
     return Number(
       base?.saldo_disponible ??

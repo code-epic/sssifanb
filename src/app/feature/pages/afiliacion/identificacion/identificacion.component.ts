@@ -143,6 +143,17 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public calculosBunker: any = null;
   public retiradoFideicomiso: IRetiradoFideicomiso | null = null;
   public permisos: { [key: string]: boolean } = {};
+
+  public get esRetirado(): boolean {
+    let situacionVal =
+      this.militar?.situacion ||
+      this.identificacionForm?.get("situacion")?.value;
+    if (typeof situacionVal === "object" && situacionVal !== null) {
+      situacionVal = situacionVal.abreviatura || situacionVal.nombre || "";
+    }
+    const sit = String(situacionVal || "").trim().toUpperCase();
+    return sit !== "" && sit !== "ACT" && sit !== "ACTIVO";
+  }
   public poseemedida = false;
   public grado_id: string = "";
 
@@ -1429,13 +1440,8 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           .replace(",", "."),
       ) || 0);
 
-    const saldoDispNum =
-      calc.saldo_disponible_aux ??
-      (parseFloat(
-        String(calc.saldo_disponible || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
+    // Para usuarios retirados el saldo disponible debe ser 0 ya que están retirados
+    const saldoDispNum = 0;
     const asigAntiguedadNum =
       calc.asignacion_antiguedad_aux ??
       (parseFloat(
@@ -2067,6 +2073,10 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       ) {
         this.calculosBunker = JSON.parse(newContent)[0];
         this.isBunkerSync = true;
+
+        if (this.esRetirado && this.calculosBunker && this.calculosBunker.base) {
+          this.calculosBunker.base.saldo_disponible = 0;
+        }
 
         if (this.calculosBunker && this.calculosBunker.base) {
           if (this.calculosBunker.base.status_id !== undefined) {
