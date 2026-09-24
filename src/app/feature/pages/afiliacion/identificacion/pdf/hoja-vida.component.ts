@@ -122,12 +122,30 @@ export class HojaVidaComponent extends PdfLayoutBase {
     });
   }
 
+  public formatoMoneda(val: any): string {
+    if (val === null || val === undefined || val === "") return "0,00";
+    let num: number;
+    if (typeof val === "number") {
+      num = val;
+    } else {
+      const str = String(val).trim();
+      if (str.includes(",") && str.includes(".")) {
+        num = parseFloat(str.replace(/\./g, "").replace(",", "."));
+      } else if (str.includes(",")) {
+        num = parseFloat(str.replace(",", "."));
+      } else {
+        num = parseFloat(str);
+      }
+    }
+    if (isNaN(num)) return "0,00";
+
+    const parts = num.toFixed(2).split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return parts.join(",");
+  }
+
   private buildBodyContent(militarDb: any, bunker: any): any[] {
-    const formatter = new Intl.NumberFormat("de-DE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-    const fmt = (val: any) => formatter.format(Number(val) || 0);
+    const fmt = (val: any) => this.formatoMoneda(val);
 
     const moneda = "Bs.";
     const base = bunker?.base || {};

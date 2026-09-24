@@ -641,7 +641,7 @@
                                     </div>
                                     <h3 class="font-weight-500 mb-0"
                                         style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda }}
-                                        {{ (calculosBunker?.base?.sueldo_integral || 0) | number:'1.2-2' }}</h3>
+                                        {{ formatoMoneda(calculosBunker?.base?.sueldo_integral) }}</h3>
                                 </div>
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush">
@@ -658,7 +658,7 @@
                                                     style="font-size: 0.95rem; color: #64748b;">Sueldo Base</span>
                                             </div>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.sueldo_base || 0) | number:'1.2-2' }}</span>
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.sueldo_base) }}</span>
                                         </li>
                                         <!-- Item -->
                                         <li
@@ -673,7 +673,7 @@
                                                     style="font-size: 0.95rem; color: #64748b;">Sueldo Mensual</span>
                                             </div>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.sueldo_mensual || 0) | number:'1.2-2' }}</span>
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.sueldo_mensual) }}</span>
                                         </li>
                                         <!-- List Divider -->
                                         <li class="list-group-item text-muted font-weight-500 text-uppercase py-2 px-4"
@@ -693,7 +693,7 @@
                                                     style="font-size: 0.95rem; color: #64748b;">Bono Fin de Año</span>
                                             </div>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.aguinaldos || 0) | number:'1.2-2' }}</span>
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.aguinaldos) }}</span>
                                         </li>
                                         <!-- Item -->
                                         <li
@@ -707,7 +707,7 @@
                                                     style="font-size: 0.95rem; color: #64748b;">Bono Vacacional</span>
                                             </div>
                                             <span class="font-weight-600 tracking-tight"
-                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.vacaciones || 0) | number:'1.2-2' }}</span>
+                                                style="color: #475569; font-size: 1.05rem;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.vacaciones) }}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -741,7 +741,7 @@
                                                     <td class="font-weight-500 pl-4 border-top-0 py-3"
                                                         style="font-size: 0.95rem;">Transporte</td>
                                                     <td class="text-right pr-4 font-weight-600 border-top-0 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_transporte || 0) | number:'1.2-2' }}
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.calculos?.prima_transporte) }}
                                                     </td>
                                                 </tr>
                                                
@@ -749,7 +749,7 @@
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Descendencia</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_descendencia || 0) | number:'1.2-2' }}
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.calculos?.prima_descendencia) }}
                                                     </td>
                                                 </tr>
                                                 <!--
@@ -757,14 +757,14 @@
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Productividad</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_especial || 0) | number:'1.2-2' }}
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.calculos?.prima_especial) }}
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Estabilidad</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_compensacion_especial || 0) | number:'1.2-2' }}
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.calculos?.prima_compensacion_especial) }}
                                                     </td>
                                                 </tr>
                                                 -->
@@ -772,7 +772,7 @@
                                                     <td class="font-weight-500 pl-4 py-3" style="font-size: 0.95rem;">
                                                         Profesionalización</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3"
-                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_profesionalizacion || 0) | number:'1.2-2' }}
+                                                        style="font-size: 1.05rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.calculos?.prima_profesionalizacion) }}
                                                     </td>
                                                 </tr>
                                                 <tr class="bg-light">
@@ -781,7 +781,7 @@
                                                             class="fas fa-clock mr-2 opacity-5 mt-1"></i>Tiempo de
                                                         Servicio</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3 text-muted"
-                                                        style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_tiemposervicio || 0) | number:'1.2-2' }}</td>
+                                                        style="font-size: 1.05rem;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.calculos?.prima_tiemposervicio) }}</td>
                                                 </tr>
                                                 <tr class="bg-light">
                                                     <td class="font-weight-500 pl-4 py-3 text-muted"
@@ -789,7 +789,7 @@
                                                             class="fas fa-times-circle mr-2 opacity-5 mt-1"></i>No
                                                         Ascenso</td>
                                                     <td class="text-right pr-4 font-weight-600 py-3 text-muted"
-                                                        style="font-size: 1.05rem;">{{ moneda }} {{ (calculosBunker?.base?.calculos?.prima_noascenso || 0) | number:'1.2-2' }}</td>
+                                                        style="font-size: 1.05rem;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.calculos?.prima_noascenso) }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -836,7 +836,7 @@
                                             Disponible Total</h6>
                                         <h3 class="mb-0 font-weight-600"
                                             style="color: #598c89; font-size: 1.4rem; letter-spacing: 0.1px;">{{ moneda
-                                            }} {{ (calculosBunker?.base?.saldo_disponible || 0) | number:'1.2-2' }}</h3>
+                                            }} {{ formatoMoneda(calculosBunker?.base?.saldo_disponible) }}</h3>
                                     </div>
                                     <div class="icon-circle shadow-sm"
                                         style="width: 42px; height: 42px; background-color: rgba(89, 140, 137, 0.1); z-index: 1;">
@@ -862,23 +862,23 @@
                                             <ul class="list-group list-group-flush h-100">
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">A. de Antigüedad</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.asignacion_antiguedad || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.asignacion_antiguedad) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Días Adicionales</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_de_dias_adicionales || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.movimientos?.deposito_de_dias_adicionales) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Diferencia A.A.</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.diferencia_asignacion || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.diferencia_asignacion) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Embargo</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.embargo || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.movimientos?.embargo) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Comisión S.</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.comision_servicio || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.movimientos?.comision_servicio) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light bg-light" style="background-color: rgba(248, 250, 252, 0.5) !important;">
                                                     <span class="font-weight-600" style="font-size: 0.90rem; color: #475569;">Total Calculados</span>
@@ -896,11 +896,11 @@
                                             <ul class="list-group list-group-flush h-100">
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Capital En Banco</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.deposito_banco || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.deposito_banco) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Depositado en Banco</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.depositado_en_banco || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.depositado_en_banco) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Fecha Último Dep.</span>
@@ -908,11 +908,11 @@
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Anticipos</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.anticipo || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.movimientos?.anticipo) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Monto Recuperado Act.</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.monto_recuperado_activo || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.movimientos?.monto_recuperado_activo) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light bg-light" style="background-color: rgba(248, 250, 252, 0.5) !important;">
                                                     <span class="font-weight-600" style="font-size: 0.90rem; color: #475569;">Total Cancelados</span>
@@ -930,15 +930,15 @@
                                             <ul class="list-group list-group-flush h-100">
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Garantías</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.movimientos?.deposito_de_garantias || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.movimientos?.deposito_de_garantias) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Saldo Disponible</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ (calculosBunker?.base?.saldo_disponible || 0) | number:'1.2-2' }}</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ moneda }} {{ formatoMoneda(calculosBunker?.base?.saldo_disponible) }}</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">% Aportado</span>
-                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ (calculosBunker?.base?.porcentaje_cancelado || 0) | number:'1.2-2' }} %</span>
+                                                    <span class="font-weight-600 tracking-tight" style="font-size: 0.95rem; color: #475569;">{{ formatoMoneda(calculosBunker?.base?.porcentaje_cancelado) }} %</span>
                                                 </li>
                                                 <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-2 border-light">
                                                     <span class="font-weight-500" style="font-size: 0.90rem; color: #64748b;">Fecha U. Anticipo</span>
@@ -2131,7 +2131,7 @@
                                 <small class="text-muted"><i class="far fa-clock mr-1"></i> {{ mov.fecha | date:'hh:mm a' }}</small>
                             </td>
                             <td class="font-weight-600 py-3" style="font-size: 1.05rem;" [ngStyle]="{'color': mov.monto > 0 ? '#34d399' : (mov.monto < 0 ? '#fb7185' : '#94a3b8')}">
-                                {{ (mov.monto > 0 ? mov.monto : (mov.monto * -1)) | number:'1.2-2' }} {{ moneda }}
+                                {{ formatoMoneda(mov.monto > 0 ? mov.monto : (mov.monto * -1)) }} {{ moneda }}
                             </td>
                             <td *ngIf="!tipoMovimientoFiltro" class="text-right pr-4 font-weight-500 py-3" style="font-size: 0.95rem; color: #64748b;">
                                 {{ mov.descripcion }}
@@ -2301,10 +2301,10 @@
                                 <div>{{ sld.fecha | date:'dd/MM/yyyy' }}</div>
                             </td>
                             <td class="font-weight-600 py-3" style="font-size: 1.05rem; color: #475569;">
-                                {{ sld.sueldoBase | number:'1.2-2' }} {{ moneda }}
+                                {{ formatoMoneda(sld.sueldoBase) }} {{ moneda }}
                             </td>
                             <td class="text-right pr-4 font-weight-600 py-3 text-success" style="font-size: 1.05rem;">
-                                {{ sld.sueldoMensual | number:'1.2-2' }} {{ moneda }}
+                                {{ formatoMoneda(sld.sueldoMensual) }} {{ moneda }}
                             </td>
                         </tr>
                         <tr *ngIf="sueldosPaginados.length === 0">
