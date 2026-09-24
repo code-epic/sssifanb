@@ -91,14 +91,7 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
         cssClass: "align-middle pr-4",
       },
     ],
-    actions: [
-      {
-        name: "ver",
-        icon: "fa-eye",
-        tooltip: "Ver Expediente",
-        buttonClass: "btn-circular btn-amber-soft shadow-sm ml-2",
-      },
-    ],
+    actions: [],
   };
 
   public mainTableData: any[] = [];
@@ -188,8 +181,13 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   private loadTabs(): void {
     this.isLoadingData = true;
     setTimeout(() => {
-      this.workflowTabs = [{ id: "RECIBIDO", nombre: "Recibidos" }];
-      this.currentTabId = "RECIBIDO";
+      this.workflowTabs = [
+        { id: "220", nombre: "ACTIVO" },
+        { id: "221", nombre: "INACTIVO" },
+        { id: "222", nombre: "SUSPENDIDA" },
+        { id: "223", nombre: "EJECUTADA / PAGADA" },
+      ];
+      this.currentTabId = "220";
       this.isLoadingData = false;
     }, 300);
   }
@@ -232,9 +230,21 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   }
 
   public getMedidasJudiciales(): void {
+    const fDesde = this.fechaDesde
+      ? this.fechaDesde.includes(" ")
+        ? this.fechaDesde
+        : `${this.fechaDesde} 00:00:00`
+      : `${new Date().getFullYear()}-01-01 00:00:00`;
+
+    const fHasta = this.fechaHasta
+      ? this.fechaHasta.includes(" ")
+        ? this.fechaHasta
+        : `${this.fechaHasta} 00:00:00`
+      : `${new Date().getFullYear() + 1}-01-01 00:00:00`;
+
     let payload = {
       funcion: environment.funcion.CONSULTAR_MEDIDAS_JUDICIALES,
-      parametros: `${this.fechaDesde},${this.fechaHasta}`,
+      parametros: `${this.currentTabId},${fDesde},${fHasta}`,
     };
 
     this.apiService.post("crud", payload).subscribe({
@@ -264,6 +274,62 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
           this.masterData = [];
           this.mainTableData = [];
         }
+
+        if (this.currentTabId === "220") {
+          this.mainTableConfig.actions = [
+            {
+              name: "imprimir",
+              icon: "fa-print",
+              tooltip: "Imprimir Medida",
+              buttonClass: "btn-circular btn-info-soft shadow-sm ml-2",
+            },
+            {
+              name: "modificar",
+              icon: "fa-pencil-alt",
+              tooltip: "Modificar Medida",
+              buttonClass: "btn-circular btn-warning-soft shadow-sm ml-2",
+            },
+            {
+              name: "suspender",
+              icon: "fa-pause",
+              tooltip: "Suspender Medida",
+              buttonClass: "btn-circular btn-danger-soft shadow-sm ml-2",
+            },
+            {
+              name: "inactivar",
+              icon: "fa-times",
+              tooltip: "Inactivar Medida",
+              buttonClass: "btn-circular btn-dark-soft shadow-sm ml-2",
+            },
+          ];
+        } else if (this.currentTabId === "221" || this.currentTabId === "222") {
+          this.mainTableConfig.actions = [
+            {
+              name: "imprimir",
+              icon: "fa-print",
+              tooltip: "Imprimir Medida",
+              buttonClass: "btn-circular btn-info-soft shadow-sm ml-2",
+            },
+            {
+              name: "reactivar",
+              icon: "fa-play",
+              tooltip: "Reactivar",
+              buttonClass: "btn-circular btn-success-soft shadow-sm ml-2",
+            },
+          ];
+        } else if (this.currentTabId === "223") {
+          this.mainTableConfig.actions = [
+            {
+              name: "imprimir",
+              icon: "fa-print",
+              tooltip: "Imprimir Medida",
+              buttonClass: "btn-circular btn-info-soft shadow-sm ml-2",
+            },
+          ];
+        } else {
+          this.mainTableConfig.actions = [];
+        }
+
         this.cdr.markForCheck();
       },
       error: (err: any) => {
@@ -363,6 +429,9 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
       f_documento: todayStr,
       f_recepcion: todayStr,
       forma_pago_id: "",
+      estado_id: "",
+      ciudad_id: "",
+      municipio_id: "",
       parentesco_id: "",
     };
     this.currentModalStep = 1;
@@ -407,7 +476,43 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
     }
   }
 
+  public calcularMontoTotal(): void {
+    const salario = Number(this.medidaForm.salario) || 0;
+    const mensualidades = Number(this.medidaForm.mensualidades) || 0;
+    this.medidaForm.total_monto = parseFloat(
+      (salario * mensualidades).toFixed(2),
+    );
+  }
+
   public nextStep(): void {
+    if (this.currentModalStep === 2) {
+      if (
+        !this.medidaForm.forma_pago_id ||
+        this.medidaForm.porcentaje === undefined ||
+        this.medidaForm.porcentaje === null ||
+        this.medidaForm.porcentaje === "" ||
+        this.medidaForm.unidad_tributaria === undefined ||
+        this.medidaForm.unidad_tributaria === null ||
+        this.medidaForm.unidad_tributaria === "" ||
+        this.medidaForm.mensualidades === undefined ||
+        this.medidaForm.mensualidades === null ||
+        this.medidaForm.mensualidades === "" ||
+        this.medidaForm.salario === undefined ||
+        this.medidaForm.salario === null ||
+        this.medidaForm.salario === "" ||
+        this.medidaForm.total_monto === undefined ||
+        this.medidaForm.total_monto === null ||
+        this.medidaForm.total_monto === ""
+      ) {
+        Swal.fire({
+          icon: "warning",
+          title: "Campos Obligatorios",
+          text: "Debe llenar todos los campos de la pestaña CÁLCULO antes de continuar.",
+          confirmButtonColor: "#598c89",
+        });
+        return;
+      }
+    }
     if (this.currentModalStep < 4) this.currentModalStep++;
   }
 
@@ -418,7 +523,40 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   public onActionClick(event: any): void {
     const { action, row } = event;
     this.selectedRecord = row;
-    if (action === "aprobar") {
+    
+    if (action === "inactivar") {
+      Swal.fire({
+        title: '¿Está seguro?',
+        text: "¿Desea inactivar esta medida judicial?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#598c89',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, inactivar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          console.log("Inactivando medida:", row);
+          Swal.fire('Inactivada', 'La medida judicial ha sido inactivada exitosamente.', 'success');
+        }
+      });
+    } else if (action === "suspender") {
+      Swal.fire({
+        title: '¿Está seguro?',
+        text: "¿Desea suspender esta medida judicial?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#598c89',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, suspender',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          console.log("Suspendiendo medida:", row);
+          Swal.fire('Suspendida', 'La medida judicial ha sido suspendida exitosamente.', 'success');
+        }
+      });
+    } else if (action === "aprobar") {
       this.modalService.open(this.modalAprobar, { centered: true });
     } else if (action === "ver") {
       console.log("Ver expediente:", row);
@@ -480,7 +618,7 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
     let payload = {};
     payload = {
       funcion: environment.funcion.CONSULTAR_MOTIVOS_MEDIDA_JUDICIAL,
-      parametros: "",
+      parametros: `${this.currentTabId}`,
     };
 
     this.apiService.post("crud", payload).subscribe({

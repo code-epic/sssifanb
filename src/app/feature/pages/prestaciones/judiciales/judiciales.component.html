@@ -199,10 +199,10 @@
 
             <!-- Stepper (Simple & Clean) -->
             <div class="stepper-mini mt-2">
-                <div class="step-item" [class.active]="currentModalStep === 1" (click)="currentModalStep = 1">Origen</div>
-                <div class="step-item" [class.active]="currentModalStep === 2" [class.disabled]="currentModalStep < 2" (click)="currentModalStep >= 2 ? currentModalStep = 2 : null">Economía</div>
-                <div class="step-item" [class.active]="currentModalStep === 3" [class.disabled]="currentModalStep < 3" (click)="currentModalStep >= 3 ? currentModalStep = 3 : null">Autoridad</div>
-                <div class="step-item" [class.active]="currentModalStep === 4" [class.disabled]="currentModalStep < 4" (click)="currentModalStep >= 4 ? currentModalStep = 4 : null">Beneficiario</div>
+                <div class="step-item" [class.active]="currentModalStep === 1" (click)="currentModalStep = 1">ORIGEN</div>
+                <div class="step-item" [class.active]="currentModalStep === 2" [class.disabled]="currentModalStep < 2" (click)="currentModalStep >= 2 ? currentModalStep = 2 : null">CÁLCULO</div>
+                <div class="step-item" [class.active]="currentModalStep === 3" [class.disabled]="currentModalStep < 3" (click)="currentModalStep >= 3 ? currentModalStep = 3 : null">AUTORIDAD</div>
+                <div class="step-item" [class.active]="currentModalStep === 4" [class.disabled]="currentModalStep < 4" (click)="currentModalStep >= 4 ? currentModalStep = 4 : null">BENEFICIARIO</div>
             </div>
 
             <!-- Wizard Content (Anticipos Style Inputs) -->
@@ -286,14 +286,13 @@
                     </div>
                 </div>
 
-                <!-- Paso 2: Economía -->
+                <!-- Paso 2: Cálculo -->
                 <div *ngIf="currentModalStep === 2">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="modern-form-group">
                                 <label>Forma de Pago <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-money-check text-verde-titulos"></i></span></div>
                                     <select class="form-control text-dark font-weight-500" [(ngModel)]="medidaForm.forma_pago_id">
                                         <option value="" disabled selected>Seleccione Forma de Pago...</option>
                                         <option value="1">CHEQUE</option>
@@ -305,19 +304,17 @@
                         </div>
                         <div class="col-md-4">
                             <div class="modern-form-group">
-                                <label>Monto Total (Bs)</label>
+                                <label>Porcentaje (%) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-coins text-verde-titulos"></i></span></div>
-                                    <input type="number" class="form-control font-weight-bold" placeholder="0.00" [(ngModel)]="medidaForm.total_monto">
+                                    <input type="number" class="form-control font-weight-bold" placeholder="0" min="0" max="100" [(ngModel)]="medidaForm.porcentaje">
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="modern-form-group">
-                                <label>Porcentaje (%)</label>
+                                <label>Unidades Tributarias <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-percent text-verde-titulos"></i></span></div>
-                                    <input type="number" class="form-control font-weight-bold" placeholder="0" min="0" max="100" [(ngModel)]="medidaForm.porcentaje">
+                                    <input type="number" class="form-control" placeholder="0" [(ngModel)]="medidaForm.unidad_tributaria">
                                 </div>
                             </div>
                         </div>
@@ -325,28 +322,32 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="modern-form-group">
-                                <label>Cantidad Salarios</label>
+                                <label>Mensualidades <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-money-bill-wave text-verde-titulos"></i></span></div>
-                                    <input type="number" class="form-control" placeholder="0" [(ngModel)]="medidaForm.cantidad_salario">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="modern-form-group">
-                                <label>Unidades Tributarias</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-file-invoice-dollar text-verde-titulos"></i></span></div>
-                                    <input type="number" class="form-control" placeholder="0" [(ngModel)]="medidaForm.unidad_tributaria">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="modern-form-group">
-                                <label>Mensualidades</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-calendar-check text-verde-titulos"></i></span></div>
                                     <input type="number" class="form-control" placeholder="0" [(ngModel)]="medidaForm.mensualidades">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Salario <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" placeholder="0" [(ngModel)]="medidaForm.salario">
+                                    <div class="input-group-append p-1">
+                                        <button class="btn border-0 rounded text-dark d-flex align-items-center justify-content-center px-3" 
+                                                style="background-color: #f1f5f9; height: 100%; border-radius: 6px !important; border: 1px solid #cbd5e1 !important;" type="button"
+                                                title="Calcular Total" (click)="calcularMontoTotal()">
+                                            Calc.
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Monto Total <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control font-weight-bold text-dark" placeholder="0.00" [(ngModel)]="medidaForm.total_monto">
                                 </div>
                             </div>
                         </div>
@@ -358,38 +359,61 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="modern-form-group">
-                                <label>Municipio / Jurisdicción</label>
+                                <label>Juzgado / Institución Judicial</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-map-marker-alt text-verde-titulos"></i></span></div>
-                                    <input type="text" class="form-control font-weight-500" placeholder="Ej: Municipio Libertador / Chacao" [(ngModel)]="medidaForm.municipio_id">
+                                    <input type="text" class="form-control font-weight-500" placeholder="" [(ngModel)]="medidaForm.institucion">
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="modern-form-group">
-                                <label>Juzgado / Institución Judicial <span class="text-danger">*</span></label>
+                                <label>Cargo de la Autoridad</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-university text-verde-titulos"></i></span></div>
-                                    <input type="text" class="form-control font-weight-500" placeholder="Nombre del tribunal o juzgado" [(ngModel)]="medidaForm.institucion">
+                                    <input type="text" class="form-control font-weight-500" placeholder="" [(ngModel)]="medidaForm.cargo_autoridad">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-4">
                             <div class="modern-form-group">
-                                <label>Descripción de Institución / Notificación</label>
-                                <textarea class="form-control modern-textarea" rows="3" placeholder="Detalles, dirección o especificaciones del juzgado remitente..." [(ngModel)]="medidaForm.desc_institucion"></textarea>
+                                <label>Estado</label>
+                                <div class="input-group">
+                                    <select class="form-control text-dark font-weight-500" [(ngModel)]="medidaForm.estado_id">
+                                        <option value="" disabled selected>Seleccione Estado...</option>
+                                        <option value="1">DISTRITO CAPITAL</option>
+                                        <option value="2">MIRANDA</option>
+                                        <option value="3">ARAGUA</option>
+                                        <option value="4">CARABOBO</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="modern-form-group mb-2">
-                                <label>Cargo de la Autoridad Judicial</label>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Ciudad</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-id-badge text-verde-titulos"></i></span></div>
-                                    <input type="text" class="form-control font-weight-500" placeholder="Ej: Juez Primero de Primera Instancia / Juez de Control" [(ngModel)]="medidaForm.cargo_autoridad">
+                                    <select class="form-control text-dark font-weight-500" [(ngModel)]="medidaForm.ciudad_id">
+                                        <option value="" disabled selected>Seleccione Ciudad...</option>
+                                        <option value="1">CARACAS</option>
+                                        <option value="2">LOS TEQUES</option>
+                                        <option value="3">MARACAY</option>
+                                        <option value="4">VALENCIA</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="modern-form-group">
+                                <label>Municipio</label>
+                                <div class="input-group">
+                                    <select class="form-control text-dark font-weight-500" [(ngModel)]="medidaForm.municipio_id">
+                                        <option value="" disabled selected>Seleccione Municipio...</option>
+                                        <option value="1">LIBERTADOR</option>
+                                        <option value="2">SUCRE</option>
+                                        <option value="3">CHACAO</option>
+                                        <option value="4">BARUTA</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

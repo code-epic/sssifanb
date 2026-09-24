@@ -29,6 +29,10 @@ import { UtilService } from "src/app/core/services/util/util.service";
 import { jwtDecode } from "jwt-decode";
 import { ConstanciaAfiliacionComponent } from "./pdf/constancia-afiliacion.component";
 import { HojaVidaComponent } from "./pdf/hoja-vida.component";
+import {
+  IRetiradoFideicomiso,
+  IRetiradoFideicomisoRespuesta,
+} from "src/app/core/models/afiliacion/retirado-fideicomiso.model";
 
 import * as pdfMake from "pdfmake/build/pdfmake";
 const pdfFonts = require("pdfmake/build/vfs_fonts");
@@ -137,6 +141,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
   public isBunkerSync: boolean = false;
   public observaciones: FormControl<any> = new FormControl("");
   public calculosBunker: any = null;
+  public retiradoFideicomiso: IRetiradoFideicomiso | null = null;
   public permisos: { [key: string]: boolean } = {};
   public poseemedida = false;
   public grado_id: string = "";
@@ -324,12 +329,25 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
           // console.log("Fecha de retiro:", f_retiro);
 
           this.getPhotoId();
-          this.getMedidasJudiciales();
-          this.getDirectivaID();
-          this.consultarFechaUltimoAnticipo();
-          this.consultarFechaUtimoDepositoEnBanco();
-          //   console.log("Iniciando metodo de carga");
-          this.initMessagePort();
+
+          let situacionVal = parsedData.situacion;
+          if (typeof situacionVal === "object" && situacionVal !== null) {
+            situacionVal = situacionVal.abreviatura || situacionVal.nombre || "";
+          }
+          const situacionMilitar = String(situacionVal || "").trim().toUpperCase();
+          const esActivo =
+            situacionMilitar === "ACT" || situacionMilitar === "ACTIVO";
+
+          if (esActivo) {
+            this.getMedidasJudiciales();
+            this.getDirectivaID();
+            this.consultarFechaUltimoAnticipo();
+            this.consultarFechaUtimoDepositoEnBanco();
+            // console.log("Iniciando metodo de carga");
+            this.initMessagePort();
+          } else {
+            this.consultarRetiradosFideicomiso();
+          }
         }
       });
 
@@ -1285,6 +1303,10 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             (m) => m.descripcion,
           );
           this.gruposMovimientos = Array.from(new Set(descripciones)).sort();
+        } else if (
+          this.retiradoFideicomiso?.respuesta?.HistorialDetalleMovimiento?.Detalle
+        ) {
+          this.cargarMovimientosDesdeRetirado();
         } else {
           this.movimientosOriginales = [];
           this.gruposMovimientos = [];
@@ -1294,11 +1316,444 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error("Error consultando movimientos individuales", error);
-        this.movimientosOriginales = [];
+        if (
+          this.retiradoFideicomiso?.respuesta?.HistorialDetalleMovimiento?.Detalle
+        ) {
+          this.cargarMovimientosDesdeRetirado();
+        } else {
+          this.movimientosOriginales = [];
+        }
         this.filtrarMovimientos();
         this.cdr.detectChanges();
       },
     });
+  }
+
+  public consultarRetiradosFideicomiso(): void {
+    const cedula = this.identificacionForm?.get(
+      "persona.datobasico.cedula",
+    )?.value;
+    if (!cedula) return;
+
+    const payload = {
+      funcion: environment.funcion.CONSULTAR_RETIRADOS_FIDEICOMISO,
+      parametros: `${cedula}`,
+    };
+
+    this.apiService.post("crud", payload).subscribe({
+      next: (data: any) => {
+        let rawItem: any = null;
+        if (
+          data &&
+          data.Cuerpo &&
+          Array.isArray(data.Cuerpo) &&
+          data.Cuerpo.length > 0
+        ) {
+          rawItem = data.Cuerpo[0];
+        } else if (Array.isArray(data) && data.length > 0) {
+          rawItem = data[0];
+        } else if (data && data.respuesta) {
+          rawItem = data;
+        }
+
+        if (typeof rawItem === "string") {
+          try {
+            rawItem = JSON.parse(rawItem);
+          } catch (e) {
+            console.error("Error parseando rawItem de retirado", e);
+          }
+        }
+
+        if (!rawItem || !rawItem.respuesta) {
+          console.warn(
+            "No se encontró respuesta válida en retirados fideicomiso",
+            data,
+          );
+          return;
+        }
+
+        let resp: IRetiradoFideicomisoRespuesta = rawItem.respuesta;
+        if (typeof resp === "string") {
+          try {
+            resp = JSON.parse(resp);
+          } catch (e) {
+            console.error("Error parseando respuesta de retirado", e);
+          }
+        }
+
+        this.retiradoFideicomiso = {
+          ...rawItem,
+          respuesta: resp,
+        };
+
+        this.sincronizarDatosRetirado(resp);
+        this.cdr.detectChanges();
+      },
+      error: (error: any) => {
+        console.error("Error consultando retirados fideicomiso", error);
+      },
+    });
+  }
+
+  private sincronizarDatosRetirado(resp: IRetiradoFideicomisoRespuesta): void {
+    const calc = resp.Calculo || {};
+    const prima = resp.Prima || {};
+
+    const sueldoBaseNum = parseFloat(String(resp.sueldo_base || "0")) || 0;
+    const sueldoMensualNum =
+      resp.sueldo_global ??
+      (parseFloat(
+        String(resp.sueldo_global_aux || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const sueldoIntegralNum =
+      resp.sueldo_integral ??
+      (parseFloat(
+        String(resp.sueldo_integral_aux || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const aguinaldosNum =
+      resp.aguinaldos ??
+      (parseFloat(
+        String(resp.aguinaldos_aux || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const vacacionesNum =
+      resp.vacaciones ??
+      (parseFloat(
+        String(resp.vacaciones_aux || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+
+    const saldoDispNum =
+      calc.saldo_disponible_aux ??
+      (parseFloat(
+        String(calc.saldo_disponible || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const asigAntiguedadNum =
+      calc.asignacion_antiguedad_aux ??
+      (parseFloat(
+        String(calc.asignacion_antiguedad || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const diasAdicNum =
+      calc.dias_adicionales_aux ??
+      (parseFloat(
+        String(calc.dias_adicionales || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const difAsigNum =
+      calc.asignacion_diferencia_aux ??
+      (parseFloat(
+        String(calc.asignacion_diferencia || calc.diferencia_AA || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const embargosNum =
+      calc.embargos_aux ??
+      (parseFloat(
+        String(calc.embargos || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const comisionNum =
+      calc.comision_servicios_aux ??
+      (parseFloat(
+        String(calc.comision_servicios || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const capBancoNum =
+      typeof calc.capital_banco_aux === "number"
+        ? calc.capital_banco_aux
+        : parseFloat(
+            String(calc.capital_banco_aux || calc.capital_banco || "0")
+              .replace(/\./g, "")
+              .replace(",", "."),
+          ) || 0;
+    const asigDepNum =
+      calc.asignacion_depositada_aux ??
+      (parseFloat(
+        String(calc.asignacion_depositada || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const anticiposNum =
+      calc.anticipos_aux ??
+      (parseFloat(
+        String(calc.anticipos || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const montoRecupNum =
+      calc.monto_recuperado_aux ??
+      (parseFloat(
+        String(calc.monto_recuperado || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const garantiasNum =
+      calc.garantias_aux ??
+      (parseFloat(
+        String(calc.garantias || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0);
+    const pctCanceladoNum =
+      parseFloat(
+        String(calc.porcentaje_cancelado || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) || 0;
+
+    const primaTransporte =
+      resp.prima_transporte ??
+      (prima["1"] ? prima["1"].P_TRANSPORTE ?? 0 : 0);
+    const primaDescendencia =
+      resp.prima_descendencia ??
+      (prima["4"] ? prima["4"].P_DESCENDECIA ?? 0 : 0);
+    const primaTiemposervicio =
+      resp.prima_tiemposervicio ??
+      (prima["5"] ? prima["5"].P_TIEMPOSERVICIO ?? 0 : 0);
+    const primaNoascenso =
+      resp.prima_noascenso ??
+      (prima["6"] ? prima["6"].P_NOASCENSO ?? 0 : 0);
+    const primaProfesionalizacion =
+      resp.prima_profesionalizacion ??
+      (prima["8"] ? prima["8"].P_PROFESIONALIZACION ?? 0 : 0);
+    const primaEspecial = resp.prima_especial ?? 0;
+    const primaCompEspecial = resp.prima_compensacion_especial ?? 0;
+
+    const gradoNombre =
+      resp.Componente?.Grado?.nombre ||
+      resp.grado_codigo ||
+      this.militar?.grado?.abreviatura ||
+      "";
+
+    this.calculosBunker = {
+      nombres: resp.nombres,
+      apellidos: resp.apellidos,
+      estatus: resp.estatus_descripcion || "Finiquito",
+      status_id: resp.estatus_activo,
+      numero_cuenta: resp.numero_cuenta,
+      f_ingreso_sistema: resp.fecha_ingreso,
+      f_retiro: resp.fecha_retiro,
+      f_ult_ascenso: resp.fecha_ultimo_ascenso,
+      base: {
+        grado_id: gradoNombre,
+        fecha_ingreso: resp.fecha_ingreso,
+        f_ult_ascenso: resp.fecha_ultimo_ascenso,
+        f_retiro: resp.fecha_retiro,
+        sueldo_integral: sueldoIntegralNum,
+        sueldo_base: sueldoBaseNum,
+        sueldo_mensual: sueldoMensualNum,
+        aguinaldos: aguinaldosNum,
+        vacaciones: vacacionesNum,
+        calculos: {
+          prima_transporte: primaTransporte,
+          prima_descendencia: primaDescendencia,
+          prima_especial: primaEspecial,
+          prima_compensacion_especial: primaCompEspecial,
+          prima_profesionalizacion: primaProfesionalizacion,
+          prima_tiemposervicio: primaTiemposervicio,
+          prima_noascenso: primaNoascenso,
+        },
+        saldo_disponible: saldoDispNum,
+        asignacion_antiguedad: asigAntiguedadNum,
+        diferencia_asignacion: difAsigNum,
+        deposito_banco: capBancoNum,
+        depositado_en_banco: asigDepNum,
+        porcentaje_cancelado: pctCanceladoNum,
+        status_id: resp.estatus_activo,
+        n_hijos: resp.numero_hijos ? Number(resp.numero_hijos) : 0,
+        st_profesion: resp.profesionalizacion,
+      },
+      movimientos: {
+        deposito_de_dias_adicionales: diasAdicNum,
+        embargo: embargosNum,
+        comision_servicio: comisionNum,
+        anticipo: anticiposNum,
+        monto_recuperado_activo: montoRecupNum,
+        deposito_de_garantias: garantiasNum,
+      },
+    };
+    this.isBunkerSync = true;
+
+    // Sincronizar fechas de anticipo y depósito
+    if (calc.fecha_ultimo_anticipo && calc.fecha_ultimo_anticipo.trim() !== "") {
+      this.fechaUltimoAnticipo = this.formatearFechaSimple(
+        calc.fecha_ultimo_anticipo,
+      );
+    } else {
+      this.fechaUltimoAnticipo = "DD/MM/AAAA";
+    }
+
+    if (calc.fecha_ultimo_deposito && calc.fecha_ultimo_deposito.trim() !== "") {
+      this.fechaUltimoDepositoEnBanco = this.formatearFechaSimple(
+        calc.fecha_ultimo_deposito,
+      );
+    } else {
+      this.fechaUltimoDepositoEnBanco = "DD/MM/AAAA";
+    }
+
+    // Sincronizar medidas judiciales
+    const medidas =
+      resp.MedidaJudicialActiva && resp.MedidaJudicialActiva.length > 0
+        ? resp.MedidaJudicialActiva
+        : resp.MedidaJudicial || [];
+    this.lstMedidas = medidas;
+    const tieneMedidaCalculo =
+      (calc.medida_judicial_activas_aux !== undefined &&
+        calc.medida_judicial_activas_aux > 0) ||
+      parseFloat(
+        String(calc.medida_judicial_activas || "0")
+          .replace(/\./g, "")
+          .replace(",", "."),
+      ) > 0;
+    this.poseemedida = this.lstMedidas.length > 0 || tieneMedidaCalculo;
+
+    // Sincronizar cuenta bancaria PACE
+    if (resp.numero_cuenta) {
+      const cuentaPace = resp.numero_cuenta;
+      const existe = this.cuentasBancarias.find(
+        (c) =>
+          c.cuenta === cuentaPace &&
+          c.origen === "PRESTACIONES SOCIALES (PACE)",
+      );
+      if (!existe) {
+        this.cuentasBancarias.push({
+          institucion: "0102",
+          nombreInstitucion: "BANCO DE VENEZUELA",
+          tipo: "AH",
+          cuenta: cuentaPace,
+          color: "#d60d0d",
+          archivo: null,
+          origen: "PRESTACIONES SOCIALES (PACE)",
+        });
+      }
+    }
+
+    // Sincronizar campos del formulario
+    if (resp.estatus_activo !== undefined) {
+      const datobasico = this.identificacionForm?.get(
+        "persona.datobasico",
+      ) as FormGroup;
+      if (datobasico) {
+        datobasico.get("estatus")?.setValue(String(resp.estatus_activo));
+      }
+    }
+    if (resp.numero_hijos !== undefined) {
+      this.identificacionForm
+        ?.get("numerohijos")
+        ?.setValue(Number(resp.numero_hijos));
+    }
+    if (resp.profesionalizacion !== undefined) {
+      this.identificacionForm
+        ?.get("pprof")
+        ?.setValue(resp.profesionalizacion);
+    }
+
+    // Sincronizar array de movimientos para constancia / hoja de vida
+    const listMov: any[] = [];
+    if (
+      resp.HistorialDetalleMovimiento &&
+      resp.HistorialDetalleMovimiento.Detalle
+    ) {
+      Object.keys(resp.HistorialDetalleMovimiento.Detalle).forEach((key) => {
+        const arr = resp.HistorialDetalleMovimiento!.Detalle![key];
+        if (Array.isArray(arr)) {
+          arr.forEach((m) => {
+            listMov.push({
+              f_contable: m.fecha,
+              monto: parseFloat(m.monto || "0") || 0,
+              concepto: m.detalle || m.observacion || "MOVIMIENTO",
+              tipo: m.tipo,
+              observacion: m.observacion,
+            });
+          });
+        }
+      });
+    }
+    if (listMov.length > 0) {
+      listMov.sort(
+        (a, b) =>
+          new Date(b.f_contable).getTime() - new Date(a.f_contable).getTime(),
+      );
+      this.movimientos = listMov;
+    }
+  }
+
+  private cargarMovimientosDesdeRetirado(): void {
+    const detalle =
+      this.retiradoFideicomiso?.respuesta?.HistorialDetalleMovimiento?.Detalle;
+    if (!detalle) return;
+
+    const list: any[] = [];
+    Object.keys(detalle).forEach((key) => {
+      const arr = detalle[key];
+      if (Array.isArray(arr)) {
+        arr.forEach((m) => {
+          const montoVal = parseFloat(m.monto || "0") || 0;
+          let tipoVal = (m.tipo_texto || "").toUpperCase();
+          if (!tipoVal) {
+            if (m.detalle?.includes("PAGO") || montoVal < 0) {
+              tipoVal = "EGRESO";
+            } else if (m.detalle?.includes("AJUSTE")) {
+              tipoVal = "AJUSTE";
+            } else {
+              tipoVal = "INGRESO";
+            }
+          }
+          list.push({
+            fecha: new Date(m.fecha || m.fecha_creacion || new Date()),
+            tipo: tipoVal,
+            descripcion: m.detalle || m.observacion || "MOVIMIENTO",
+            monto: Math.abs(montoVal),
+            estatus: "Aprobado",
+          });
+        });
+      }
+    });
+    list.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+    this.movimientosOriginales = list;
+    const descripciones = this.movimientosOriginales.map((m) => m.descripcion);
+    this.gruposMovimientos = Array.from(new Set(descripciones)).sort();
+  }
+
+  private formatearFechaSimple(fechaStr: string): string {
+    if (!fechaStr) return "DD/MM/AAAA";
+    const str = fechaStr.trim();
+    if (str.includes("-")) {
+      const parts = str.substring(0, 10).split("-");
+      if (parts.length === 3) {
+        if (parts[0].length === 4) {
+          return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        } else {
+          return `${parts[0]}/${parts[1]}/${parts[2]}`;
+        }
+      }
+    } else if (str.includes("/")) {
+      const parts = str.substring(0, 10).split("/");
+      if (parts.length === 3) {
+        if (parts[0].length === 4) {
+          return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        } else {
+          return `${parts[0]}/${parts[1]}/${parts[2]}`;
+        }
+      }
+    }
+    const d = new Date(str);
+    return isNaN(d.getTime())
+      ? str
+      : `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
   }
 
   filtrarMovimientos() {

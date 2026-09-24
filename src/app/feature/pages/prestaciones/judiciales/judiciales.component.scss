@@ -8,6 +8,10 @@ $input-bg: #f8f9fe;
 $input-border: #e9ecef;
 
 // --- MODERN INPUTS (Non-Floating) ---
+::ng-deep .mailbox-nav-item span {
+    text-transform: uppercase !important;
+}
+
 .modern-form-group {
     margin-bottom: 2rem;
   
