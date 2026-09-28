@@ -5,6 +5,7 @@ import { CommonModule, NgFor, NgIf, NgClass } from '@angular/common';
 import { NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 import { ROUTES } from '../../../core/models/menu/menu-models';
 import { AfiliadoService } from '../../../core/services/afiliacion/afiliado.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-sidebar',
@@ -21,6 +22,38 @@ export class SidebarComponent implements OnInit {
   public activeSubMenu: string | null = null;
   public usuario: string = '';
   public cargo: string = '';
+
+  public get buildDateFormatted(): string {
+    const raw = environment.buildDateTime;
+    if (!raw) return '';
+    try {
+      const d = new Date(raw);
+      if (isNaN(d.getTime())) return raw;
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const day = pad(d.getDate());
+      const month = pad(d.getMonth() + 1);
+      const year = d.getFullYear();
+      const hours = pad(d.getHours());
+      const minutes = pad(d.getMinutes());
+      const seconds = pad(d.getSeconds());
+      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    } catch {
+      return raw;
+    }
+  }
+
+  public get version(): string {
+    return environment.version || '';
+  }
+
+  public get fullVersionInfo(): string {
+    const date = this.buildDateFormatted;
+    const ver = this.version;
+    if (date && ver) {
+      return `${date} ${ver}`;
+    }
+    return date || ver;
+  }
 
   constructor(
     private router: Router,

@@ -78,6 +78,22 @@
         </li>
       </ul>
 
+      <!-- Footer Versión de Compilación elegante y fija al pie -->
+      <div class="sidebar-footer-version mt-auto" *ngIf="buildDateFormatted || version">
+        <div class="version-container text-center" [title]="fullVersionInfo">
+          <div class="version-datetime-line d-flex align-items-center justify-content-center text-truncate">
+            <i class="far fa-clock mr-1.5 version-icon"></i>
+            <span class="version-datetime">{{ buildDateFormatted }}</span>
+          </div>
+          <div class="version-tag-line d-flex align-items-center justify-content-center mt-1 text-truncate" *ngIf="version">
+            <span class="badge badge-pill badge-version-soft text-truncate">
+              <i class="fas fa-code-branch mr-1" style="font-size: 0.60rem;"></i>
+              {{ version }}
+            </span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </nav>

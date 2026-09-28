@@ -785,8 +785,188 @@ export class JudicialesComponent extends BaseWorkflowClass implements OnInit {
   }
 
   public confirmarCSV(): void {
-    alert("Generando archivo CSV de Medidas Judiciales...");
+    const dataToExport =
+      this.mainTableData && this.mainTableData.length > 0
+        ? this.mainTableData
+        : this.masterData && this.masterData.length > 0
+          ? this.masterData
+          : this.lstMedidas;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "Sin registros",
+        text: "No hay registros disponibles para exportar a CSV.",
+        confirmButtonColor: "#598c89",
+      });
+      this.modalService.dismissAll();
+      return;
+    }
+
+    const tabName =
+      this.workflowTabs.find((t: any) => t.id === this.currentTabId)?.nombre ||
+      "medidas";
+    const cleanTabName = tabName.toLowerCase().replace(/[^a-z0-9]/g, "_");
+    const today = new Date().toISOString().substring(0, 10);
+    const filename = `medidas_judiciales_${cleanTabName}_${today}.csv`;
+
+    this.downloadCSV(dataToExport, filename);
     this.modalService.dismissAll();
+  }
+
+  public downloadCSV(data: any[], filename: string): void {
+    if (!data || data.length === 0) return;
+
+    const separator = ";";
+    const columns: { header: string; getValue: (row: any) => any }[] = [
+      { header: "CEDULA_TITULAR", getValue: (r) => r.cedula || "" },
+      { header: "GRADO", getValue: (r) => r.grado || r.grado_nombre || "" },
+      {
+        header: "TITULAR",
+        getValue: (r) =>
+          r.titularNombre ||
+          `${r.nombres || ""} ${r.apellidos || ""}`.trim() ||
+          r.nombre_militar ||
+          "",
+      },
+      { header: "TIPO_MEDIDA", getValue: (r) => r.tipo || r.tipoNombre || "" },
+      { header: "NRO_OFICIO", getValue: (r) => r.oficio || r.nro_oficio || "" },
+      {
+        header: "NRO_EXPEDIENTE",
+        getValue: (r) => r.expediente || r.nro_expediente || "",
+      },
+      {
+        header: "FECHA_DOCUMENTO",
+        getValue: (r) =>
+          r.f_documento ? String(r.f_documento).substring(0, 10) : "",
+      },
+      {
+        header: "CEDULA_BENEFICIARIO",
+        getValue: (r) => r.ci_beneficiario || r.cedula_beneficiario || "",
+      },
+      {
+        header: "BENEFICIARIO",
+        getValue: (r) => r.n_beneficiario || r.nombre || "",
+      },
+      {
+        header: "TOTAL_MONTO",
+        getValue: (r) =>
+          r.total_monto !== undefined && r.total_monto !== null
+            ? r.total_monto
+            : "",
+      },
+      { header: "PORCENTAJE", getValue: (r) => r.porcentaje ?? "" },
+      {
+        header: "UNIDAD_TRIBUTARIA",
+        getValue: (r) => r.unidad_tributaria ?? "",
+      },
+      {
+        header: "CANTIDAD_SALARIO",
+        getValue: (r) => r.cantidad_salario ?? "",
+      },
+      { header: "MENSUALIDADES", getValue: (r) => r.mensualidades ?? "" },
+      {
+        header: "FORMA_PAGO",
+        getValue: (r) =>
+          r.forma_pago_id == 1
+            ? "CHEQUE"
+            : r.forma_pago_id == 2
+              ? "DEPOSITO"
+              : r.forma_pago_id == 3
+                ? "TRANSFERENCIA"
+                : r.forma_pago_id || "",
+      },
+      {
+        header: "DESC_EMBARGO",
+        getValue: (r) => r.desc_embargo || "",
+      },
+      {
+        header: "INSTITUCION_TRIBUNAL",
+        getValue: (r) => r.desc_institucion || r.institucion || "",
+      },
+      {
+        header: "AUTORIDAD",
+        getValue: (r) => r.nombre_autoridad || "",
+      },
+      {
+        header: "CARGO_AUTORIDAD",
+        getValue: (r) => r.cargo_autoridad || "",
+      },
+      {
+        header: "ESTATUS",
+        getValue: (r) =>
+          r.status_id == 220
+            ? "ACTIVO"
+            : r.status_id == 221
+              ? "INACTIVO"
+              : r.status_id == 222
+                ? "SUSPENDIDA"
+                : r.status_id == 223
+                  ? "EJECUTADA / PAGADA"
+                  : r.status_id || "",
+      },
+      { header: "FECHA_CREACION", getValue: (r) => r.f_creacion || "" },
+      { header: "USUARIO_CREACION", getValue: (r) => r.usr_creacion || "" },
+    ];
+
+    const headerLine = columns.map((c) => c.header).join(separator);
+    const lines = data.map((row) =>
+      columns
+        .map((col) => {
+          let val = col.getValue(row);
+          if (val === null || val === undefined) val = "";
+          let cellStr = String(val).replace(/"/g, '""');
+          if (cellStr.search(/("|,|;|\n|\r)/g) >= 0) {
+            cellStr = `"${cellStr}"`;
+          }
+          return cellStr;
+        })
+        .join(separator),
+    );
+
+    const csvContent = headerLine + "\n" + lines.join("\n");
+
+    // Sandra Sandbox Bridge
+    const csvBase64 = btoa(unescape(encodeURIComponent("\ufeff" + csvContent)));
+    const csvDataUri = `data:text/csv;base64,${csvBase64}`;
+
+    if (window.parent && window !== window.parent) {
+      window.parent.postMessage(
+        {
+          type: "OPEN_CSV",
+          payload: {
+            fileName: filename,
+            data: csvDataUri,
+          },
+        },
+        "*",
+      );
+    }
+
+    // Descarga directa Blob en navegador
+    const blob = new Blob(["\ufeff" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", filename);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    Swal.fire({
+      icon: "success",
+      title: "Archivo Generado",
+      text: `El archivo '${filename}' se ha generado exitosamente.`,
+      confirmButtonColor: "#598c89",
+      timer: 2000,
+      showConfirmButton: false,
+    });
   }
 
   public confirmarEjecucion(): void {
