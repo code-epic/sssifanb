@@ -1,7 +1,7 @@
 <!-- MAIN VIEW: MAILBOX LAYOUT -->
 <app-mailbox-layout #mailboxLayout *ngIf="!isNewRecordView" [tabs]="workflowTabs" [currentTabId]="currentTabId"
     [isLoadingTabs]="isLoadingData" [showToolbar]="true" [allSelected]="allSelected"
-    [searchPlaceholder]="'Buscar por cédula o expediente...'"
+    [searchPlaceholder]="'Buscar por titular, beneficiario, cédula o expediente...'"
     (search)="onMailboxSearch($event)" (tabSwitch)="onMailboxTabSwitch($event)" (refresh)="loadData()">
 
     <ng-container toolbar-actions>
@@ -11,14 +11,41 @@
         </button>
         <button class="btn btn-pastel-icon-circle tooltip-action btn-csv-emerald shadow-sm" 
             (click)="exportarCSV()" ngbTooltip="Exportar Registro">
-            <i class="fas fa-file-excel"></i>
+            <i class="fas fa-file-excel" style="color: #598c89;"></i>
         </button>
     </ng-container>
 
     <!-- Contenido Principal: Tabla Dinámica -->
     <div mailbox-body class="fade-in">
+        <!-- Barra elegante de agrupación y conteo por tipo -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap px-3 py-2 mb-2 bg-white shadow-sm border" 
+             style="border-radius: 14px; border-color: rgba(89, 140, 137, 0.15) !important;">
+            <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+                <span class="text-muted mr-1 font-weight-700 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                    <i class="fas fa-layer-group text-verde-titulos mr-1"></i> Tipo:
+                </span>
+                <button type="button" class="btn btn-sm btn-filter-pill" [class.active]="filtroTipo === 'TODOS'" (click)="setFiltroTipo('TODOS')">
+                    <span>Todos</span>
+                    <span class="badge badge-pill ml-1.5 count-badge">{{ totalTodos }}</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-filter-pill pill-antiguedad" [class.active]="filtroTipo === 'ANTIGUEDAD'" (click)="setFiltroTipo('ANTIGUEDAD')">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    <span>Asig. Antigüedad</span>
+                    <span class="badge badge-pill ml-1.5 count-badge">{{ totalAntiguedad }}</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-filter-pill pill-intereses" [class.active]="filtroTipo === 'INTERESES'" (click)="setFiltroTipo('INTERESES')">
+                    <i class="fas fa-percentage mr-1"></i>
+                    <span>Intereses</span>
+                    <span class="badge badge-pill ml-1.5 count-badge">{{ totalIntereses }}</span>
+                </button>
+            </div>
+            <div class="text-muted small font-weight-500 mt-1 mt-md-0" *ngIf="mainTableData.length > 0">
+                Mostrando <strong class="text-dark">{{ mainTableData.length }}</strong> registros
+            </div>
+        </div>
+
         <app-dynamic-table [config]="mainTableConfig" [data]="mainTableData"
-            (actionClick)="onActionClick($event)"></app-dynamic-table>
+            (actionClicked)="onActionClick($event)"></app-dynamic-table>
     </div>
 
     <!-- FILTROS INYECTADOS -->
@@ -40,10 +67,10 @@
                 <label>Tipo de Retención</label>
                 <div class="input-group">
                     <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-filter text-verde-titulos"></i></span></div>
-                    <select class="form-control">
-                        <option value="">Todas las categorías...</option>
-                        <option value="1">Antigüedad (Principal)</option>
-                        <option value="2">Intereses de Mora</option>
+                    <select class="form-control" [(ngModel)]="filtroTipo" (change)="aplicarFiltros()">
+                        <option value="TODOS">Todas las categorías...</option>
+                        <option value="ANTIGUEDAD">Antigüedad (Principal)</option>
+                        <option value="INTERESES">Intereses de Mora</option>
                     </select>
                 </div>
             </div>
@@ -210,7 +237,7 @@
                 <!-- Paso 1: Origen -->
                 <div *ngIf="currentModalStep === 1">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <div class="modern-form-group">
                                 <label>Tipo de Medida <span class="text-danger">*</span></label>
                                 <div class="input-group">
@@ -219,20 +246,6 @@
                                         <option value="" disabled selected>SELECCIONE...</option>
                                         <option value="1">ASIGNACION DE ANTIGUEDAD</option>
                                         <option value="2">INTERESES</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="modern-form-group">
-                                <label>Motivo de la Medida <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-tags text-verde-titulos"></i></span></div>
-                                    <select class="form-control text-dark font-weight-500" [(ngModel)]="medidaForm.motivo_id">
-                                        <option value="" disabled selected>Seleccione...</option>
-                                        <option *ngFor="let m of lstMotivos" [value]="m.id">
-                                            {{ m.nombre }} | {{ m.descripcion }}
-                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -361,7 +374,25 @@
                             <div class="modern-form-group">
                                 <label>Juzgado / Institución Judicial</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control font-weight-500" placeholder="" [(ngModel)]="medidaForm.institucion">
+                                    <input type="text" class="form-control font-weight-500" placeholder="Ej: Tribunal Primero de Instancia" [(ngModel)]="medidaForm.institucion">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Descripción de la Institución</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control font-weight-500" placeholder="Ej: Circuito Judicial Penal / Civil" [(ngModel)]="medidaForm.desc_institucion">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="modern-form-group">
+                                <label>Nombre de la Autoridad</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control font-weight-500" placeholder="Ej: Dr. Carlos Mendoza" [(ngModel)]="medidaForm.nombre_autoridad">
                                 </div>
                             </div>
                         </div>
@@ -369,7 +400,7 @@
                             <div class="modern-form-group">
                                 <label>Cargo de la Autoridad</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control font-weight-500" placeholder="" [(ngModel)]="medidaForm.cargo_autoridad">
+                                    <input type="text" class="form-control font-weight-500" placeholder="Ej: Juez Provisorio" [(ngModel)]="medidaForm.cargo_autoridad">
                                 </div>
                             </div>
                         </div>
@@ -452,12 +483,12 @@
                                     <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-users text-verde-titulos"></i></span></div>
                                     <select class="form-control text-dark font-weight-500" [(ngModel)]="medidaForm.parentesco_id">
                                         <option value="" disabled selected>Seleccione...</option>
-                                        <option value="HIJO">HIJO / HIJA</option>
-                                        <option value="ESPOSA">CÓNYUGE / ESPOSA(O)</option>
-                                        <option value="PADRE">PADRE / MADRE</option>
-                                        <option value="CONCUBINA">CONCUBINA(O)</option>
-                                        <option value="HERMANO">HERMANO / HERMANA</option>
-                                        <option value="OTRO">OTRO / TERCERO</option>
+                                        <option value="1">HIJO / HIJA</option>
+                                        <option value="2">CÓNYUGE / ESPOSA(O)</option>
+                                        <option value="3">PADRE / MADRE</option>
+                                        <option value="4">CONCUBINA(O)</option>
+                                        <option value="5">HERMANO / HERMANA</option>
+                                        <option value="6">OTRO / TERCERO</option>
                                     </select>
                                 </div>
                             </div>
@@ -511,8 +542,10 @@
                     Siguiente <i class="fas fa-chevron-right ml-2"></i>
                 </button>
                 <button type="button" class="btn btn-header-action teal shadow-sm px-5 m-0" 
-                        *ngIf="currentModalStep === 4" (click)="procesarSolicitud()">
-                    <i class="fas fa-check-double mr-2"></i> Procesar Registro
+                        *ngIf="currentModalStep === 4" [disabled]="isSavingMedida" (click)="GuardarMedida()">
+                    <i class="fas fa-spinner fa-spin mr-2" *ngIf="isSavingMedida"></i>
+                    <i class="fas fa-check-double mr-2" *ngIf="!isSavingMedida"></i>
+                    {{ isSavingMedida ? 'Guardando Medida...' : 'Procesar Registro' }}
                 </button>
             </div>
         </div>
@@ -523,8 +556,8 @@
 <ng-template #modalCSV let-modal>
     <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
         <div class="modal-body p-5 text-center bg-white">
-            <div class="icon-confirm-pulse" style="background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2);">
-                <i class="fas fa-file-excel"></i>
+            <div class="icon-confirm-pulse" style="background-color: rgba(89, 140, 137, 0.12); color: #598c89; border: 1px solid rgba(89, 140, 137, 0.25);">
+                <i class="fas fa-file-excel" style="color: #598c89;"></i>
             </div>
             <h4 class="font-weight-bold text-dark mb-2">¿Exportar a CSV?</h4>
             <p class="text-muted font-weight-500 mb-5" style="font-size: 0.95rem;">
@@ -535,8 +568,8 @@
                     Cancelar
                 </button>
                 <button type="button" class="btn-header-action shadow-none w-100" 
-                    style="background-color: #f1fdf6; color: #10b981; border: 1px solid #d1fae5;" (click)="confirmarCSV()">
-                    Generar CSV
+                    style="background-color: rgba(89, 140, 137, 0.1); color: #598c89; border: 1px solid rgba(89, 140, 137, 0.3);" (click)="confirmarCSV()">
+                    <i class="fas fa-file-excel mr-1" style="color: #598c89;"></i> Generar CSV
                 </button>
             </div>
         </div>
@@ -560,6 +593,29 @@
                 </button>
                 <button type="button" class="btn-header-action teal shadow-none w-100" (click)="confirmarEjecucion()">
                     Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Modal: Registro Exitoso de Medida Judicial -->
+<ng-template #modalExito let-modal>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+        <div class="modal-body p-5 text-center bg-white">
+            <div class="icon-confirm-pulse teal" style="background-color: rgba(89, 140, 137, 0.12); color: #598c89; border: 1px solid rgba(89, 140, 137, 0.25);">
+                <i class="fas fa-check-circle" style="color: #598c89; font-size: 2.2rem;"></i>
+            </div>
+            <h4 class="font-weight-bold text-dark mb-2">¡Medida Judicial Registrada!</h4>
+            <p class="text-muted font-weight-500 mb-4" style="font-size: 0.95rem;">
+                La medida judicial se ha guardado exitosamente en el sistema bajo el oficio <strong>N° {{ medidaForm.nro_oficio }}</strong>
+                y expediente <strong>N° {{ medidaForm.nro_expediente }}</strong>.
+            </p>
+            <div class="d-flex justify-content-center align-items-center">
+                <button type="button" class="btn-header-action teal shadow-none px-5 py-2.5" 
+                        style="background-color: #598c89; color: #ffffff; border-radius: 12px; font-weight: 600;"
+                        (click)="cerrarModalExito()">
+                    <i class="fas fa-check mr-2"></i> Continuar
                 </button>
             </div>
         </div>

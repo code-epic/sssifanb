@@ -13,35 +13,35 @@ $input-border: #e9ecef;
 }
 
 .modern-form-group {
-    margin-bottom: 2rem;
+    margin-bottom: 1.15rem;
   
     label {
-      font-size: 0.9rem; 
-      font-weight: 500;
-      color: #525f7f;
-      margin-bottom: 0.5rem;
+      font-size: 0.82rem; 
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 0.35rem;
       text-transform: none;
       letter-spacing: normal; 
       display: block;
     }
   
     .input-group {
-      border-radius: 8px;
+      border-radius: 7px;
       transition: all 0.25s ease;
-      background-color: #f1f4f8;
+      background-color: #f8fafc;
       border: 1px solid #e2e8f0;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.015);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
       overflow: hidden;
   
       &:hover {
-        background-color: #e9ecef;
+        background-color: #f1f5f9;
         border-color: #cbd5e1;
       }
   
       &:focus-within {
         background-color: #ffffff;
         border-color: rgba($teal-accent, 0.8);
-        box-shadow: 0 0 0 4px rgba($teal-accent, 0.15);
+        box-shadow: 0 0 0 3px rgba($teal-accent, 0.15);
   
         .input-group-text {
           color: $teal-accent; 
@@ -53,11 +53,11 @@ $input-border: #e9ecef;
       background: transparent;
       border: none;
       box-shadow: none;
-      height: 3rem;
-      padding-left: 0.75rem;
+      height: 2.6rem;
+      padding-left: 0.65rem;
       color: #1e293b;
       font-weight: 500;
-      font-size: 0.95rem;
+      font-size: 0.88rem;
   
       &::placeholder {
         color: #94a3b8;
@@ -245,3 +245,140 @@ $input-border: #e9ecef;
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+// Scroll Horizontal y Columnas Compactas
+::ng-deep {
+    .table-scroll-container {
+        overflow-x: auto !important;
+        width: 100%;
+    }
+
+    .table-horizontal-scroll {
+        min-width: 820px;
+        width: 100% !important;
+        font-family: 'Roboto', 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+
+        th, td {
+            white-space: nowrap;
+            padding: 0.42rem 0.65rem !important;
+            font-size: 0.81rem !important;
+            line-height: 1.2 !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            font-size: 0.69rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.4px !important;
+            padding-top: 0.55rem !important;
+            padding-bottom: 0.55rem !important;
+            color: #475569 !important;
+            background: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc !important;
+        }
+    }
+
+    .table-responsive-pastel {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+            height: 6px;
+        }
+        &::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+            &:hover {
+                background: #94a3b8;
+            }
+        }
+    }
+}
+
+// Botón Excel con color verde de la paleta
+.btn-csv-emerald {
+    background-color: rgba(89, 140, 137, 0.12) !important;
+    border: 1px solid rgba(89, 140, 137, 0.3) !important;
+    color: #598c89 !important;
+    box-shadow: 0 2px 4px rgba(89, 140, 137, 0.1) !important;
+    transition: all 0.2s ease !important;
+
+    i, .fa-file-excel {
+        color: #598c89 !important;
+        font-size: 1.05rem !important;
+    }
+
+    &:hover {
+        background-color: #598c89 !important;
+        border-color: #598c89 !important;
+        color: #ffffff !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(89, 140, 137, 0.3) !important;
+
+        i, .fa-file-excel {
+            color: #ffffff !important;
+        }
+    }
+}
+
+// Botones de filtro por tipo / píldoras de agrupación
+.btn-filter-pill {
+    border-radius: 30px;
+    padding: 0.32rem 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+
+    .count-badge {
+        background-color: #e2e8f0;
+        color: #475569;
+        font-size: 0.70rem;
+        padding: 0.18rem 0.45rem;
+        transition: all 0.2s ease;
+    }
+
+    &:hover {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #1e293b;
+    }
+
+    &.active {
+        background-color: #598c89;
+        color: #ffffff;
+        border-color: #598c89;
+        box-shadow: 0 2px 6px rgba(89, 140, 137, 0.25);
+
+        .count-badge {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+    }
+
+    &.pill-antiguedad.active {
+        background-color: #598c89;
+        border-color: #598c89;
+    }
+
+    &.pill-intereses.active {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    }
+}
+
+

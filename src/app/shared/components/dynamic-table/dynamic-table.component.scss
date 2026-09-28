@@ -11,7 +11,7 @@
         font-size: 0.72rem;
         letter-spacing: 0.5px;
         color: #64748b;
-        font-weight: 800;
+        font-weight: 600;
         padding: 1.25rem 1rem;
         background: #f8fafc;
         user-select: none;
@@ -313,7 +313,7 @@
 // CUSTOM SCROLLBAR (CLEAN & PASTEL)
 // ----------------------------------------------------------------------------
 .table-responsive-pastel {
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: hidden;
     width: 100%;
     border-radius: 16px; // Match container
