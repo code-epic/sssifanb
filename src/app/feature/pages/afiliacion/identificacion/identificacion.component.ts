@@ -1410,115 +1410,79 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     const calc = resp.Calculo || {};
     const prima = resp.Prima || {};
 
-    const sueldoBaseNum = parseFloat(String(resp.sueldo_base || "0")) || 0;
-    const sueldoMensualNum =
-      resp.sueldo_global ??
-      (parseFloat(
-        String(resp.sueldo_global_aux || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const sueldoIntegralNum =
-      resp.sueldo_integral ??
-      (parseFloat(
-        String(resp.sueldo_integral_aux || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const aguinaldosNum =
-      resp.aguinaldos ??
-      (parseFloat(
-        String(resp.aguinaldos_aux || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const vacacionesNum =
-      resp.vacaciones ??
-      (parseFloat(
-        String(resp.vacaciones_aux || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
+    // En caso de retirados, el campo Antigüedad se reemplaza por tiempo_servicio_aux en años (ej. "15 AÑOS")
+    const tsVal =
+      resp.tiempo_servicio_aux !== undefined &&
+      resp.tiempo_servicio_aux !== null &&
+      String(resp.tiempo_servicio_aux).trim() !== ""
+        ? resp.tiempo_servicio_aux
+        : resp.tiempo_servicio !== undefined &&
+          resp.tiempo_servicio !== null &&
+          String(resp.tiempo_servicio).trim() !== ""
+          ? resp.tiempo_servicio
+          : null;
+
+    if (tsVal !== null) {
+      const tsStr = String(tsVal).trim();
+      const num = parseInt(tsStr, 10);
+      if (!isNaN(num)) {
+        this.tiempoServicio = `${num} ${num === 1 ? "AÑO" : "AÑOS"}`;
+      } else {
+        this.tiempoServicio = tsStr.toUpperCase().includes("AÑO")
+          ? tsStr
+          : `${tsStr} AÑOS`;
+      }
+    }
+
+    const sueldoBaseNum = this.parsearMonto(resp.sueldo_base);
+    const sueldoMensualNum = this.parsearMonto(
+      resp.sueldo_global ?? resp.sueldo_global_aux,
+    );
+    const sueldoIntegralNum = this.parsearMonto(
+      resp.sueldo_integral ?? resp.sueldo_integral_aux,
+    );
+    const aguinaldosNum = this.parsearMonto(
+      resp.aguinaldos ?? resp.aguinaldos_aux,
+    );
+    const vacacionesNum = this.parsearMonto(
+      resp.vacaciones ?? resp.vacaciones_aux,
+    );
 
     // Para usuarios retirados el saldo disponible debe ser 0 ya que están retirados
     const saldoDispNum = 0;
-    const asigAntiguedadNum =
-      calc.asignacion_antiguedad_aux ??
-      (parseFloat(
-        String(calc.asignacion_antiguedad || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const diasAdicNum =
-      calc.dias_adicionales_aux ??
-      (parseFloat(
-        String(calc.dias_adicionales || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const difAsigNum =
+    const asigAntiguedadNum = this.parsearMonto(
+      calc.asignacion_antiguedad_aux ?? calc.asignacion_antiguedad,
+    );
+    const diasAdicNum = this.parsearMonto(
+      calc.dias_adicionales_aux ?? calc.dias_adicionales,
+    );
+    const difAsigNum = this.parsearMonto(
       calc.asignacion_diferencia_aux ??
-      (parseFloat(
-        String(calc.asignacion_diferencia || calc.diferencia_AA || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const embargosNum =
-      calc.embargos_aux ??
-      (parseFloat(
-        String(calc.embargos || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const comisionNum =
-      calc.comision_servicios_aux ??
-      (parseFloat(
-        String(calc.comision_servicios || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const capBancoNum =
-      typeof calc.capital_banco_aux === "number"
-        ? calc.capital_banco_aux
-        : parseFloat(
-            String(calc.capital_banco_aux || calc.capital_banco || "0")
-              .replace(/\./g, "")
-              .replace(",", "."),
-          ) || 0;
-    const asigDepNum =
-      calc.asignacion_depositada_aux ??
-      (parseFloat(
-        String(calc.asignacion_depositada || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const anticiposNum =
-      calc.anticipos_aux ??
-      (parseFloat(
-        String(calc.anticipos || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const montoRecupNum =
-      calc.monto_recuperado_aux ??
-      (parseFloat(
-        String(calc.monto_recuperado || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const garantiasNum =
-      calc.garantias_aux ??
-      (parseFloat(
-        String(calc.garantias || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0);
-    const pctCanceladoNum =
-      parseFloat(
-        String(calc.porcentaje_cancelado || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) || 0;
+        calc.asignacion_diferencia ??
+        calc.diferencia_AA,
+    );
+    const embargosNum = this.parsearMonto(
+      calc.embargos_aux ?? calc.embargos,
+    );
+    const comisionNum = this.parsearMonto(
+      calc.comision_servicios_aux ?? calc.comision_servicios,
+    );
+    const capBancoNum = this.parsearMonto(
+      calc.capital_banco_aux ?? calc.capital_banco,
+    );
+    const asigDepNum = this.parsearMonto(
+      calc.asignacion_depositada_aux ?? calc.asignacion_depositada,
+    );
+    const anticiposNum = this.parsearMonto(
+      calc.anticipos_aux ?? calc.anticipos,
+    );
+    const montoRecupNum = this.parsearMonto(
+      calc.monto_recuperado_aux ?? calc.monto_recuperado,
+    );
+    const garantiasNum = this.parsearMonto(
+      calc.garantias_aux ?? calc.garantias,
+    );
+    const pctCanceladoNum = this.parsearMonto(calc.porcentaje_cancelado);
 
     const primaTransporte =
       resp.prima_transporte ??
@@ -1619,11 +1583,7 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     const tieneMedidaCalculo =
       (calc.medida_judicial_activas_aux !== undefined &&
         calc.medida_judicial_activas_aux > 0) ||
-      parseFloat(
-        String(calc.medida_judicial_activas || "0")
-          .replace(/\./g, "")
-          .replace(",", "."),
-      ) > 0;
+      this.parsearMonto(calc.medida_judicial_activas) > 0;
     this.poseemedida = this.lstMedidas.length > 0 || tieneMedidaCalculo;
 
     // Sincronizar cuenta bancaria PACE
@@ -1762,23 +1722,21 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       : `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
   }
 
-  public formatoMoneda(val: any): string {
-    if (val === null || val === undefined || val === "") return "0,00";
-    let num: number;
-    if (typeof val === "number") {
-      num = val;
+  public parsearMonto(val: any): number {
+    if (val === null || val === undefined || val === "") return 0;
+    if (typeof val === "number") return isNaN(val) ? 0 : val;
+    const str = String(val).trim();
+    if (str.includes(",") && str.includes(".")) {
+      return parseFloat(str.replace(/\./g, "").replace(",", ".")) || 0;
+    } else if (str.includes(",")) {
+      return parseFloat(str.replace(",", ".")) || 0;
     } else {
-      const str = String(val).trim();
-      if (str.includes(",") && str.includes(".")) {
-        num = parseFloat(str.replace(/\./g, "").replace(",", "."));
-      } else if (str.includes(",")) {
-        num = parseFloat(str.replace(",", "."));
-      } else {
-        num = parseFloat(str);
-      }
+      return parseFloat(str) || 0;
     }
-    if (isNaN(num)) return "0,00";
+  }
 
+  public formatoMoneda(val: any): string {
+    const num = this.parsearMonto(val);
     const parts = num.toFixed(2).split(".");
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return parts.join(",");
@@ -2074,8 +2032,29 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
         this.calculosBunker = JSON.parse(newContent)[0];
         this.isBunkerSync = true;
 
-        if (this.esRetirado && this.calculosBunker && this.calculosBunker.base) {
-          this.calculosBunker.base.saldo_disponible = 0;
+        if (this.esRetirado && this.calculosBunker) {
+          if (this.calculosBunker.base) {
+            this.calculosBunker.base.saldo_disponible = 0;
+          }
+          const tsBunker =
+            this.calculosBunker.tiempo_servicio_aux ??
+            this.calculosBunker.base?.tiempo_servicio_aux ??
+            this.calculosBunker.tiempo_servicio;
+          if (
+            tsBunker !== undefined &&
+            tsBunker !== null &&
+            String(tsBunker).trim() !== ""
+          ) {
+            const tsStr = String(tsBunker).trim();
+            const num = parseInt(tsStr, 10);
+            if (!isNaN(num)) {
+              this.tiempoServicio = `${num} ${num === 1 ? "AÑO" : "AÑOS"}`;
+            } else {
+              this.tiempoServicio = tsStr.toUpperCase().includes("AÑO")
+                ? tsStr
+                : `${tsStr} AÑOS`;
+            }
+          }
         }
 
         if (this.calculosBunker && this.calculosBunker.base) {
