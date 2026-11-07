@@ -1,12 +1,12 @@
 export const environment = {
   production: true,
   enableServiceWorker: true,
-  ID: "ipsfa",
+  ID: "app.sandra.sssifanb",
   Url: "http://localhost",
   API: "/v1/api/",
   BasePath: "crud",
   Hash: "8768b8d1727cb2d1ec9f0a8d8bc45f8b.sse",
-  buildDateTime: "Mon Sep 28 2026 14:57:20 GMT-0400 (Venezuela Time)",
+  buildDateTime: "Sat Nov 07 2026 10:03:31 GMT-0400 (Venezuela Time)",
   version: "Broglie 1.0.1-1b419f3",
   fecha: "2025-04-12 05:08:00",
   coleciones: {

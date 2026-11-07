@@ -28,6 +28,37 @@ import {
 import { environment } from "src/environments/environment";
 import Swal from "sweetalert2";
 
+/**
+ * Evalúa y obtiene la abreviatura del componente militar:
+ * - GUARDIA -> GN
+ * - ARMADA -> AR
+ * - AVIACION -> AV
+ * - EJERCITO -> EJ
+ */
+export function obtenerCodigoComponente(componente?: string | null): string {
+  if (!componente) return "";
+  const comp = componente.trim().toUpperCase();
+
+  if (
+    comp.includes("GUARDIA") ||
+    comp === "GN" ||
+    comp === "GU" ||
+    comp.includes("GNB")
+  ) {
+    return "GN";
+  }
+  if (comp.includes("ARMADA") || comp === "AR") {
+    return "AR";
+  }
+  if (comp.includes("AVIACION") || comp.includes("AVIACIÓN") || comp === "AV") {
+    return "AV";
+  }
+  if (comp.includes("EJERCITO") || comp.includes("EJÉRCITO") || comp === "EJ") {
+    return "EJ";
+  }
+  return comp.substring(0, 2);
+}
+
 @Component({
   selector: "app-cargar-nomina",
   standalone: true,
@@ -46,6 +77,7 @@ import Swal from "sweetalert2";
 export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   public componentes = COMPONENTES_MILITARES;
   public grados = GRADOS_MILITARES;
+  public obtenerCodigoComponente = obtenerCodigoComponente;
 
   @ViewChild("modalAprobar") modalAprobar!: TemplateRef<any>;
   @ViewChild("modalRechazar") modalRechazar!: TemplateRef<any>;
@@ -266,87 +298,87 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       alertSeverity: 1,
       showAlertsIcon: true,
     });
-    let comp = sessionStorage.getItem("existe_componente") || "";
-    comp = comp.trim().toUpperCase();
+    const comp = sessionStorage.getItem("existe_componente") || "";
+    const codigoComponente = obtenerCodigoComponente(comp);
 
-    let xAPI = {
-      funcion: "Fnx_DatosFideicomitentes",
-      componente: `${comp.substring(0, 2)}`,
-      // componente: `19`,
-    };
+    // let xAPI = {
+    //   funcion: "Fnx_DatosFideicomitentes",
+    //   componente: `${codigoComponente}`,
+    //   // componente: `19`,
+    // };
 
-    this.apiService.post("fnx", xAPI).subscribe({
-      next: (data: any) => {
-        console.log(data.contenido.id);
-        setTimeout(() => {
-          this.apiService.get("fnx:" + data.contenido.id).subscribe({
-            next: (data: any) => {
-              console.log("datos de la nomina: " + data.documento);
-              if (data.documento == "PROCESADO") {
-                let manifiesto = JSON.parse(data.rs);
-                console.log(manifiesto);
-                if (manifiesto && manifiesto.metrics) {
-                  this.cardCorrectoCount = manifiesto.metrics.hits_100 || 0;
-                  this.cardRevisionCount =
-                    manifiesto.metrics.diferencias_parciales || 0;
-                  this.cardRechazoCount =
-                    manifiesto.metrics.no_encontrados_csv || 0;
+    // this.apiService.post("fnx", xAPI).subscribe({
+    //   next: (data: any) => {
+    //     console.log(data.contenido.id);
+    //     setTimeout(() => {
+    //       this.apiService.get("fnx:" + data.contenido.id).subscribe({
+    //         next: (data: any) => {
+    //           console.log("datos de la nomina: " + data.documento);
+    //           if (data.documento == "PROCESADO") {
+    //             let manifiesto = JSON.parse(data.rs);
+    //             console.log(manifiesto);
+    //             if (manifiesto && manifiesto.metrics) {
+    //               this.cardCorrectoCount = manifiesto.metrics.hits_100 || 0;
+    //               this.cardRevisionCount =
+    //                 manifiesto.metrics.diferencias_parciales || 0;
+    //               this.cardRechazoCount =
+    //                 manifiesto.metrics.no_encontrados_csv || 0;
 
-                  if (manifiesto.metrics.no_encontrados_grpc !== undefined) {
-                    this.cardNuevosCount =
-                      manifiesto.metrics.no_encontrados_grpc;
-                  } else if (manifiesto.metrics.registros_csv !== undefined) {
-                    this.cardNuevosCount =
-                      manifiesto.metrics.registros_csv -
-                      ((manifiesto.metrics.hits_100 || 0) +
-                        (manifiesto.metrics.diferencias_parciales || 0));
-                  } else {
-                    this.cardNuevosCount = 0;
-                  }
+    //               if (manifiesto.metrics.no_encontrados_grpc !== undefined) {
+    //                 this.cardNuevosCount =
+    //                   manifiesto.metrics.no_encontrados_grpc;
+    //               } else if (manifiesto.metrics.registros_csv !== undefined) {
+    //                 this.cardNuevosCount =
+    //                   manifiesto.metrics.registros_csv -
+    //                   ((manifiesto.metrics.hits_100 || 0) +
+    //                     (manifiesto.metrics.diferencias_parciales || 0));
+    //               } else {
+    //                 this.cardNuevosCount = 0;
+    //               }
 
-                  if (
-                    manifiesto.archivos_generados &&
-                    Array.isArray(manifiesto.archivos_generados)
-                  ) {
-                    this.isManifestLoaded = true;
-                    this.manifestFilesData = manifiesto.archivos_generados.map(
-                      (item: any) => ({
-                        ...item,
-                        idFormat: `<div class="d-flex flex-column align-items-start"><span class="text-dark font-weight-600 mb-1" style="font-size: 0.9rem;">${item.nombre}</span></div>`,
-                        componenteFormat: this.getComponentBadge(
-                          this.componenteSeleccionado || "N/A",
-                        ),
-                        origenFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;"><i class="fas fa-file-csv text-muted mr-1"></i>${item.nombre}</span>`,
-                        cantidadFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;">${item.lineas > 0 ? item.lineas - 1 : 0}</span>`,
-                        fechaFormat: this.utilService.formatFechaRelativa(
-                          manifiesto.fecha || new Date().toISOString(),
-                        ),
-                        estatusFormat: `<span class="badge badge-pill badge-light text-muted border px-2 py-1" style="font-size: 0.75rem;">${item.descripcion || "Generado"}</span>`,
-                      }),
-                    );
-                    this.filtrarDatosPorTab();
-                  }
+    //               if (
+    //                 manifiesto.archivos_generados &&
+    //                 Array.isArray(manifiesto.archivos_generados)
+    //               ) {
+    //                 this.isManifestLoaded = true;
+    //                 this.manifestFilesData = manifiesto.archivos_generados.map(
+    //                   (item: any) => ({
+    //                     ...item,
+    //                     idFormat: `<div class="d-flex flex-column align-items-start"><span class="text-dark font-weight-600 mb-1" style="font-size: 0.9rem;">${item.nombre}</span></div>`,
+    //                     componenteFormat: this.getComponentBadge(
+    //                       this.componenteSeleccionado || "N/A",
+    //                     ),
+    //                     origenFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;"><i class="fas fa-file-csv text-muted mr-1"></i>${item.nombre}</span>`,
+    //                     cantidadFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;">${item.lineas > 0 ? item.lineas - 1 : 0}</span>`,
+    //                     fechaFormat: this.utilService.formatFechaRelativa(
+    //                       manifiesto.fecha || new Date().toISOString(),
+    //                     ),
+    //                     estatusFormat: `<span class="badge badge-pill badge-light text-muted border px-2 py-1" style="font-size: 0.75rem;">${item.descripcion || "Generado"}</span>`,
+    //                   }),
+    //                 );
+    //                 this.filtrarDatosPorTab();
+    //               }
 
-                  this.actualizarPorcentajes();
-                  this.showCards = true;
-                }
-              } else if (data.documento == "ZOMBIE") {
-                this.showCards = false;
-                this.utilService.AlertMini(
-                  "top-end",
-                  "info",
-                  `Nomina esta en proceso de revision`,
-                  4000,
-                );
-              } else {
-              }
-            },
-            error: (err) => {},
-          });
-        }, 1000);
-      },
-      error: (err) => {},
-    });
+    //               this.actualizarPorcentajes();
+    //               this.showCards = true;
+    //             }
+    //           } else if (data.documento == "ZOMBIE") {
+    //             this.showCards = false;
+    //             this.utilService.AlertMini(
+    //               "top-end",
+    //               "info",
+    //               `Nomina esta en proceso de revision`,
+    //               4000,
+    //             );
+    //           } else {
+    //           }
+    //         },
+    //         error: (err) => {},
+    //       });
+    //     }, 1000);
+    //   },
+    //   error: (err) => {},
+    // });
 
     this.Componente = sessionStorage.getItem("existe_componente") || "";
     this.Componente =
@@ -487,12 +519,12 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   public loadPendingData(): void {
     this.isLoadingData = true;
-    let comp = sessionStorage.getItem("existe_componente") || "";
-    comp = comp.trim().toUpperCase();
+    const comp = sessionStorage.getItem("existe_componente") || "";
+    const codigoComponente = obtenerCodigoComponente(comp);
 
     const payload = {
       funcion: environment.funcion.LISTAR_FIDEICOMITENTES_POR_COMPONENTE,
-      parametros: `${comp.substring(0, 2)}`,
+      parametros: `${codigoComponente}`,
     };
 
     this.apiService.post("crud", payload).subscribe({
@@ -852,26 +884,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     this.tipoNominaSeleccionado = "PERSONAL MILITAR ACTIVO";
 
     // Obtener componente militar del sessionStorage
-    let cmp = (sessionStorage.getItem("existe_componente") || "")
-      .trim()
-      .toUpperCase();
-    let compAbbr = "";
-    if (cmp.includes("EJERCITO") || cmp.includes("EJÉRCITO") || cmp === "EJ") {
-      compAbbr = "EJ";
-    } else if (cmp.includes("ARMADA") || cmp === "AR") {
-      compAbbr = "AR";
-    } else if (
-      cmp.includes("AVIACION") ||
-      cmp.includes("AVIACIÓN") ||
-      cmp === "AV"
-    ) {
-      compAbbr = "AV";
-    } else if (cmp.includes("GUARDIA") || cmp.includes("GNB") || cmp === "GN") {
-      compAbbr = "GN";
-    } else {
-      compAbbr = cmp.substring(0, 2);
-    }
-    this.componenteSeleccionado = compAbbr;
+    const cmp = sessionStorage.getItem("existe_componente") || "";
+    this.componenteSeleccionado = obtenerCodigoComponente(cmp);
 
     // Obtener fecha actual en formato YYYY-MM-DD
     const today = new Date();
@@ -1434,11 +1448,9 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       JSON.stringify(this.homologaciones),
     );
 
-    let cmp = sessionStorage.getItem("existe_componente") || "";
-    cmp =
-      cmp.trim().toUpperCase().substring(0, 2) == "GU"
-        ? "GN"
-        : cmp.trim().toUpperCase().substring(0, 2);
+    const cmp = obtenerCodigoComponente(
+      sessionStorage.getItem("existe_componente") || "",
+    );
 
     const body = {
       funcion: "IPSFA_UComponentes",
@@ -1518,6 +1530,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   async listaHomologadaGrados() {
     const componenteFilter = sessionStorage.getItem("existe_componente") || "";
+    const codComp = obtenerCodigoComponente(componenteFilter);
 
     const payload = {
       funcion: environment.funcion.LISTAR_GRADOS,
@@ -1534,7 +1547,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
         rawData.forEach((item: any) => {
           const gradesArray = item.Grado;
-          if (item.codigo.substring(0, 2) == componenteFilter.substring(0, 2)) {
+          if (item.codigo.substring(0, 2) === codComp) {
             console.log(gradesArray);
             if (Array.isArray(gradesArray)) {
               const excludedCodes = [
