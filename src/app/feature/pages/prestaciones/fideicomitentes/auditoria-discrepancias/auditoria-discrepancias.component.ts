@@ -210,13 +210,11 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
   }
 
   public async loadPendingData() {
-    let cmp = (sessionStorage.getItem("existe_componente") || "")
-      .trim()
-      .toUpperCase();
+    const compId = this.getCompontente();
 
     const payload = {
       funcion: environment.funcion.LISTAR_REVISION_FIDEICOMITENTES,
-      parametros: this.getCompontente(cmp).toString(),
+      parametros: compId.toString(),
     };
 
     const acumulado: Discrepancia[] = [];
@@ -328,25 +326,74 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
     }
   }
 
-  public getCompontente(abreviado: string): number {
-    switch (abreviado) {
-      case "EJERCITO":
-        return 1;
-      case "ARMADA":
-        return 2;
-      case "AVIACION":
-        return 3;
-      case "GUARDIA NACIONAL":
-        return 4;
-      default:
-        return 0;
+  public getCompontente(abreviado?: string): number {
+    const valor = (
+      abreviado ||
+      this.componenteSeleccionado ||
+      sessionStorage.getItem("existe_componente") ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+    if (valor.startsWith("EJ") || valor.includes("EJERC")) {
+      return 1;
     }
+    if (valor.startsWith("AR") || valor.includes("ARMADA")) {
+      return 2;
+    }
+    if (valor.startsWith("AV") || valor.includes("AVIAC")) {
+      return 3;
+    }
+    if (
+      valor.startsWith("GN") ||
+      valor.startsWith("GU") ||
+      valor.includes("GUARDIA") ||
+      valor.includes("GNB")
+    ) {
+      return 4;
+    }
+    return 0;
+  }
+
+  /**
+   * Obtiene el nombre del componente en minúsculas requerido por la consulta (ejercito, aviacion, guardia, armada).
+   */
+  public getNombreComponenteParam(comp?: string): string {
+    const valor = (
+      comp ||
+      this.componenteSeleccionado ||
+      sessionStorage.getItem("existe_componente") ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+    if (valor.startsWith("AV") || valor.includes("AVIAC")) {
+      return "aviacion";
+    }
+    if (valor.startsWith("EJ") || valor.includes("EJERC")) {
+      return "ejercito";
+    }
+    if (
+      valor.startsWith("GN") ||
+      valor.startsWith("GU") ||
+      valor.includes("GUARDIA") ||
+      valor.includes("GNB")
+    ) {
+      return "guardia";
+    }
+    if (valor.startsWith("AR") || valor.includes("ARMADA")) {
+      return "armada";
+    }
+    return valor.toLowerCase();
   }
 
   public async LoadDataDiscrepacia() {
+    const compNombre = this.getNombreComponenteParam();
     const payload = {
-      funcion: environment.funcion.LISTAR_TMP_AVIACION,
-      parametros: "",
+      funcion: environment.funcion.LISTAR_TMP_COMPONENTE,
+      parametros: compNombre,
     };
 
     const acumulado: Discrepancia[] = [];

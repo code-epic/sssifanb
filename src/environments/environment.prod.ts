@@ -6,7 +6,7 @@ export const environment = {
   API: "/v1/api/",
   BasePath: "crud",
   Hash: "8768b8d1727cb2d1ec9f0a8d8bc45f8b.sse",
-  buildDateTime: "Sat Nov 07 2026 14:16:26 GMT-0400 (Venezuela Time)",
+  buildDateTime: "Sat Nov 07 2026 16:11:14 GMT-0400 (Venezuela Time)",
   version: "Broglie 1.0.1-1b419f3",
   fecha: "2025-04-12 05:08:00",
   coleciones: {
@@ -33,7 +33,7 @@ export const environment = {
     LISTAR_ESTATUS: "IPSFA_CEstatus",
     LISTAR_REVISION_FIDEICOMITENTES: "IPSFA_CRevisionFidecomimites",
     OBTENER_BENEFICIARIO_DIRECTIVA_ID: "IPSFA_CBeneficiarioDirectivaID",
-    LISTAR_TMP_AVIACION: "IPSFA_CTmpAviacion",
+    LISTAR_TMP_COMPONENTE: "IPSFA_CTmpComponente",
     CONSULTAR_MOVIMIENTOS: "IPSFA_CMovimientosTipo",
     CONSULTAR_MOVIMIENTOS_INDIVIDUAL: "IPSFA_CMovimientosIndividual",
     CONSULTAR_ORDENES: "IPSFA_COrdenes",
