@@ -28,6 +28,52 @@ import {
 import { environment } from "src/environments/environment";
 import Swal from "sweetalert2";
 
+/**
+ * Normaliza y obtiene el código de 2 caracteres del componente militar.
+ * GUARDIA -> GN
+ * ARMADA -> AR
+ * AVIACION -> AV
+ * EJERCITO -> EJ
+ * @param componente Cadena opcional con el nombre o código. Si no se pasa, lee de sessionStorage('existe_componente').
+ */
+export function obtenerCodigoComponente(componente?: string | null): string {
+  const comp =
+    componente !== undefined && componente !== null
+      ? componente
+      : sessionStorage.getItem("existe_componente") || "";
+
+  if (!comp) return "";
+  const normalizado = comp.trim().toUpperCase();
+
+  if (
+    normalizado.startsWith("GUARDIA") ||
+    normalizado.includes("GNB") ||
+    normalizado === "GN" ||
+    normalizado === "GU"
+  ) {
+    return "GN";
+  }
+  if (normalizado.startsWith("ARMADA") || normalizado === "AR") {
+    return "AR";
+  }
+  if (
+    normalizado.startsWith("AVIAC") ||
+    normalizado.startsWith("AVIACIÓN") ||
+    normalizado === "AV"
+  ) {
+    return "AV";
+  }
+  if (
+    normalizado.startsWith("EJERC") ||
+    normalizado.startsWith("EJÉRC") ||
+    normalizado === "EJ"
+  ) {
+    return "EJ";
+  }
+
+  return normalizado.substring(0, 2);
+}
+
 @Component({
   selector: "app-cargar-nomina",
   standalone: true,
@@ -266,12 +312,11 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       alertSeverity: 1,
       showAlertsIcon: true,
     });
-    let comp = sessionStorage.getItem("existe_componente") || "";
-    comp = comp.trim().toUpperCase();
+    const compCodigo = obtenerCodigoComponente();
 
     let xAPI = {
       funcion: "Fnx_DatosFideicomitentes",
-      componente: `${comp.substring(0, 2)}`,
+      componente: `${compCodigo}`,
       // componente: `19`,
     };
 
@@ -348,11 +393,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       error: (err) => {},
     });
 
-    this.Componente = sessionStorage.getItem("existe_componente") || "";
-    this.Componente =
-      this.Componente.trim() != ""
-        ? this.Componente.trim().toUpperCase().substring(0, 2)
-        : "";
+    this.Componente = obtenerCodigoComponente();
   }
 
   protected override onInitExtension(): void {}
@@ -487,12 +528,11 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   public loadPendingData(): void {
     this.isLoadingData = true;
-    let comp = sessionStorage.getItem("existe_componente") || "";
-    comp = comp.trim().toUpperCase();
+    const compCodigo = obtenerCodigoComponente();
 
     const payload = {
       funcion: environment.funcion.LISTAR_FIDEICOMITENTES_POR_COMPONENTE,
-      parametros: `${comp.substring(0, 2)}`,
+      parametros: `${compCodigo}`,
     };
 
     this.apiService.post("crud", payload).subscribe({
@@ -851,27 +891,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     this.pasoActual = 1;
     this.tipoNominaSeleccionado = "PERSONAL MILITAR ACTIVO";
 
-    // Obtener componente militar del sessionStorage
-    let cmp = (sessionStorage.getItem("existe_componente") || "")
-      .trim()
-      .toUpperCase();
-    let compAbbr = "";
-    if (cmp.includes("EJERCITO") || cmp.includes("EJÉRCITO") || cmp === "EJ") {
-      compAbbr = "EJ";
-    } else if (cmp.includes("ARMADA") || cmp === "AR") {
-      compAbbr = "AR";
-    } else if (
-      cmp.includes("AVIACION") ||
-      cmp.includes("AVIACIÓN") ||
-      cmp === "AV"
-    ) {
-      compAbbr = "AV";
-    } else if (cmp.includes("GUARDIA") || cmp.includes("GNB") || cmp === "GN") {
-      compAbbr = "GN";
-    } else {
-      compAbbr = cmp.substring(0, 2);
-    }
-    this.componenteSeleccionado = compAbbr;
+    // Obtener componente militar del sessionStorage normalizado
+    this.componenteSeleccionado = obtenerCodigoComponente();
 
     // Obtener fecha actual en formato YYYY-MM-DD
     const today = new Date();
@@ -1434,11 +1455,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       JSON.stringify(this.homologaciones),
     );
 
-    let cmp = sessionStorage.getItem("existe_componente") || "";
-    cmp =
-      cmp.trim().toUpperCase().substring(0, 2) == "GU"
-        ? "GN"
-        : cmp.trim().toUpperCase().substring(0, 2);
+    const cmp = obtenerCodigoComponente();
 
     const body = {
       funcion: "IPSFA_UComponentes",
