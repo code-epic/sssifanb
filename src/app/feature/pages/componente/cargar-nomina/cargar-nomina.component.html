@@ -14,89 +14,104 @@
          }">
 
 
-        <!-- 1. Nóminas Enviadas por el Componente -->
-        <div class="stat-card card-blue fade-in pointer d-flex flex-column position-relative overflow-hidden" 
-             [class.active]="currentTabId === 'PRINCIPAL'"
-             (click)="onMailboxTabSwitch('PRINCIPAL')"
+        <!-- Datos Correctos -->
+        <div class="stat-card card-teal fade-in pointer d-flex flex-column position-relative overflow-hidden" 
+             [class.active]="currentTabId === 'CORRECTOS'"
+             (click)="onMailboxTabSwitch('CORRECTOS')"
              style="animation-delay: 0.1s; min-height: 140px;">
             <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
                 <div>
-                    <div class="d-flex align-items-baseline mb-1">
-                        <h3 class="stat-value text-primary-blue mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">
-                            {{ cardNominasTotalProcesados | number }}
-                        </h3>
-                        <small class="text-muted font-weight-600 ml-2" style="font-size: 0.78rem;">filas enviadas</small>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Nóminas Enviadas</span>
-                        <span class="badge badge-pill badge-light text-primary-blue border ml-2" style="font-size: 0.72rem; padding: 2px 7px;">
-                            <i class="fas fa-folder mr-1"></i>{{ cardNominasArchivosCount }} {{ cardNominasArchivosCount === 1 ? 'archivo' : 'archivos' }}
-                        </span>
-                    </div>
-                </div>
-                <div class="icon-circle bg-light-blue" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-file-invoice text-primary-blue" style="font-size: 1.4rem;"></i>
-                </div>
-            </div>
-            
-            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
-                <div class="d-flex align-items-center" style="background: rgba(59, 130, 246, 0.05); padding: 4px 10px; border-radius: 8px;">
-                    <span class="text-primary-blue mr-2" style="font-size: 0.8rem; font-weight: 600;">
-                        <i class="fas fa-clock mr-1"></i>{{ cardNominasUltimaFecha || 'Sin envíos' }}
-                    </span>
-                    <span class="text-primary-blue" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Último Envío</span>
-                </div>
-                <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15);"></div>
-            </div>
-            <i class="fas fa-file-invoice position-absolute card-watermark" style="font-size: 7rem; color: rgba(59,130,246,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
-        </div>
-
-
-        <!-- 2. Activos en BD IPSFANB -->
-        <div class="stat-card card-teal fade-in d-flex flex-column position-relative overflow-hidden" 
-             style="animation-delay: 0.2s; min-height: 140px;">
-            <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
-                <div>
-                    <h3 class="stat-value text-primary-teal mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">{{ cardActivosCount | number }}</h3>
-                    <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Activos en BD IPSFANB</span>
+                    <h3 class="stat-value text-primary-teal mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">{{ cardCorrectoCount | number }}</h3>
+                    <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Datos Correctos</span>
                 </div>
                 <div class="icon-circle bg-light-teal" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-user-check text-primary-teal" style="font-size: 1.4rem;"></i>
+                    <i class="fas fa-check-circle text-primary-teal" style="font-size: 1.4rem;"></i>
                 </div>
             </div>
             
             <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
                 <div class="d-flex align-items-center" style="background: rgba(89, 140, 137, 0.05); padding: 4px 10px; border-radius: 8px;">
-                    <span class="text-primary-teal mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> {{ pctActivos }}%</span>
-                    <span class="text-primary-teal" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Población Activa</span>
+                    <span class="text-primary-teal mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> {{ pctCorrectos }}%</span>
+                    <span class="text-primary-teal" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Tendencia</span>
                 </div>
                 <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #598c89; box-shadow: 0 0 0 3px rgba(89,140,137,0.15);"></div>
             </div>
-            <i class="fas fa-user-check position-absolute card-watermark" style="font-size: 7rem; color: rgba(89,140,137,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
+            <i class="fas fa-check-circle position-absolute card-watermark" style="font-size: 7rem; color: rgba(89,140,137,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
         </div>
 
 
-        <!-- 3. Paralizados -->
-        <div class="stat-card card-amber fade-in d-flex flex-column position-relative overflow-hidden" 
-             style="animation-delay: 0.3s; min-height: 140px;">
+        <!-- Revisión -->
+        <div class="stat-card card-amber fade-in pointer d-flex flex-column position-relative overflow-hidden" 
+             [class.active]="currentTabId === 'REVISION'"
+             (click)="onMailboxTabSwitch('REVISION')"
+             style="animation-delay: 0.2s; min-height: 140px;">
             <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
                 <div>
-                    <h3 class="stat-value text-amber mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">{{ cardParalizadosCount | number }}</h3>
-                    <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Paralizados</span>
+                    <h3 class="stat-value text-amber mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">{{ cardRevisionCount | number }}</h3>
+                    <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Revisión</span>
                 </div>
                 <div class="icon-circle bg-light-amber" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-user-clock text-amber" style="font-size: 1.4rem;"></i>
+                    <i class="fas fa-history text-amber" style="font-size: 1.4rem;"></i>
                 </div>
             </div>
             
             <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
                 <div class="d-flex align-items-center" style="background: rgba(245, 158, 11, 0.05); padding: 4px 10px; border-radius: 8px;">
-                    <span class="text-amber mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-pause-circle"></i> {{ pctParalizados }}%</span>
-                    <span class="text-amber" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Población Paralizada</span>
+                    <span class="text-amber mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-arrow-down"></i> {{ pctRevision }}%</span>
+                    <span class="text-amber" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Tendencia</span>
                 </div>
                 <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.15);"></div>
             </div>
-            <i class="fas fa-user-clock position-absolute card-watermark" style="font-size: 7rem; color: rgba(245,158,11,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
+            <i class="fas fa-history position-absolute card-watermark" style="font-size: 7rem; color: rgba(245,158,11,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
+        </div>
+
+
+        <!-- Nuevos -->
+        <div class="stat-card card-blue fade-in pointer d-flex flex-column position-relative overflow-hidden" 
+             [class.active]="currentTabId === 'NUEVOS'"
+             (click)="onMailboxTabSwitch('NUEVOS')"
+             style="animation-delay: 0.4s; min-height: 140px;">
+            <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+                <div>
+                    <h3 class="stat-value text-primary-blue mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">{{ cardNuevosCount | number }}</h3>
+                    <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Nuevos Registros</span>
+                </div>
+                <div class="icon-circle bg-light-blue" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-file-medical text-primary-blue" style="font-size: 1.4rem;"></i>
+                </div>
+            </div>
+            
+            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+                <div class="d-flex align-items-center" style="background: rgba(59, 130, 246, 0.05); padding: 4px 10px; border-radius: 8px;">
+                    <span class="text-primary-blue mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-arrow-up"></i> {{ pctNuevos }}%</span>
+                    <span class="text-primary-blue" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Tendencia</span>
+                </div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15);"></div>
+            </div>
+            <i class="fas fa-file-medical position-absolute card-watermark" style="font-size: 7rem; color: rgba(59,130,246,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
+        </div>
+
+        <!-- Verificar Estatus -->
+        <div class="stat-card card-red fade-in d-flex flex-column position-relative overflow-hidden" 
+             style="animation-delay: 0.3s; min-height: 140px; cursor: default;">
+            <div class="d-flex justify-content-between align-items-start mb-3" style="position: relative; z-index: 2;">
+                <div>
+                    <h3 class="stat-value text-red mb-0" style="font-size: 1.8rem; font-weight: 700; font-family: 'Roboto', sans-serif; letter-spacing: -0.5px; line-height: 1;">{{ cardRechazoCount | number }}</h3>
+                    <span class="stat-label text-muted" style="font-size: 0.8rem; font-weight: 500;">Verificar Estatus</span>
+                </div>
+                <div class="icon-circle bg-light-red" style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-times-circle text-red" style="font-size: 1.4rem;"></i>
+                </div>
+            </div>
+            
+            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" style="border-top-color: rgba(0,0,0,0.03) !important; position: relative; z-index: 2;">
+                <div class="d-flex align-items-center" style="background: rgba(239, 68, 68, 0.05); padding: 4px 10px; border-radius: 8px;">
+                    <span class="text-danger mr-2" style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i></span>
+                    <span class="text-danger" style="font-size: 0.7rem; font-weight: 500; text-transform: uppercase;">Atención</span>
+                </div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.15);"></div>
+            </div>
+            <i class="fas fa-times-circle position-absolute card-watermark" style="font-size: 7rem; color: rgba(239,68,68,0.08); bottom: -1rem; right: -1rem; z-index: 1;"></i>
         </div>
     </div>
 
@@ -681,63 +696,77 @@
         </div>
         <div class="modal-body p-4 pt-2">
             
-            <!-- Población Base Componente (Activos / Paralizados) -->
+            <!-- Población Base (Sana) -->
             <div class="stats-comparative card p-4 shadow-sm mb-4" style="border: none; border-radius: 16px; background: #f8fafc;">
                 
                 <div class="mb-4 position-relative">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="font-weight-600 text-dark" style="font-size: 0.95rem;"><i class="fas fa-users text-primary-teal mr-2"></i> Población Total del Componente</span>
-                        <span class="font-weight-700 text-dark" style="font-size: 1.2rem;">{{ (cardActivosCount + cardParalizadosCount) | number }} <span style="font-size: 0.85rem; color: #64748b; font-weight: normal; margin-left: 4px;">(100%)</span></span>
+                        <span class="font-weight-600 text-dark" style="font-size: 0.95rem;"><i class="fas fa-layer-group text-primary-teal mr-2"></i> Población Base</span>
+                        <span class="font-weight-700 text-dark" style="font-size: 1.2rem;">{{ (cardCorrectoCount + cardRevisionCount + cardNuevosCount) | number }} <span style="font-size: 0.85rem; color: #64748b; font-weight: normal; margin-left: 4px;">(100%)</span></span>
                     </div>
                     
                     <!-- Stacked Bar -->
                     <div class="progress" style="height: 20px; border-radius: 10px; background: #e2e8f0; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
                         <div class="progress-bar" role="progressbar" 
-                             [style.width.%]="pctActivos" 
+                             [style.width.%]="((cardCorrectoCount / ((cardCorrectoCount + cardRevisionCount + cardNuevosCount) || 1)) * 100)"
                              style="background-color: #598c89;" 
-                             ngbTooltip="Activos: {{ cardActivosCount | number }}">
+                             ngbTooltip="Correctos: {{ cardCorrectoCount | number }}">
                         </div>
                         <div class="progress-bar" role="progressbar" 
-                             [style.width.%]="pctParalizados" 
-                             style="background-color: #f59e0b;" 
-                             ngbTooltip="Paralizados: {{ cardParalizadosCount | number }}">
+                             [style.width.%]="((cardRevisionCount / ((cardCorrectoCount + cardRevisionCount + cardNuevosCount) || 1)) * 100)"
+                             style="background-color: #f59e0b;"
+                             ngbTooltip="Revisión: {{ cardRevisionCount | number }}">
+                        </div>
+                        <div class="progress-bar" role="progressbar" 
+                             [style.width.%]="((cardNuevosCount / ((cardCorrectoCount + cardRevisionCount + cardNuevosCount) || 1)) * 100)"
+                             style="background-color: #3b82f6;"
+                             ngbTooltip="Nuevos: {{ cardNuevosCount | number }}">
                         </div>
                     </div>
                 </div>
                 
                 <!-- Legend Grid -->
                 <div class="row text-center">
-                    <div class="col-6">
+                    <div class="col-4">
                         <div class="d-flex flex-column align-items-center">
                             <div style="width: 12px; height: 12px; border-radius: 3px; background-color: #598c89; margin-bottom: 6px;"></div>
-                            <span class="font-weight-700 text-dark" style="font-size: 1.05rem;">{{ pctActivos }}%</span>
-                            <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Activos ({{ cardActivosCount | number }})</span>
+                            <span class="font-weight-700 text-dark" style="font-size: 1.05rem;">{{ ((cardCorrectoCount / ((cardCorrectoCount + cardRevisionCount + cardNuevosCount) || 1)) * 100).toFixed(1) }}%</span>
+                            <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Correctos</span>
                         </div>
                     </div>
-                    <div class="col-6 border-left" style="border-color: rgba(0,0,0,0.05) !important;">
+                    <div class="col-4 border-left border-right" style="border-color: rgba(0,0,0,0.05) !important;">
                         <div class="d-flex flex-column align-items-center">
                             <div style="width: 12px; height: 12px; border-radius: 3px; background-color: #f59e0b; margin-bottom: 6px;"></div>
-                            <span class="font-weight-700 text-dark" style="font-size: 1.05rem;">{{ pctParalizados }}%</span>
-                            <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Paralizados ({{ cardParalizadosCount | number }})</span>
+                            <span class="font-weight-700 text-dark" style="font-size: 1.05rem;">{{ ((cardRevisionCount / ((cardCorrectoCount + cardRevisionCount + cardNuevosCount) || 1)) * 100).toFixed(1) }}%</span>
+                            <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Revisión</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="d-flex flex-column align-items-center">
+                            <div style="width: 12px; height: 12px; border-radius: 3px; background-color: #3b82f6; margin-bottom: 6px;"></div>
+                            <span class="font-weight-700 text-dark" style="font-size: 1.05rem;">{{ ((cardNuevosCount / ((cardCorrectoCount + cardRevisionCount + cardNuevosCount) || 1)) * 100).toFixed(1) }}%</span>
+                            <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Nuevos</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Resumen de Nóminas Enviadas por el Componente -->
-            <div class="card p-4 shadow-sm" style="border: 1px dashed rgba(59, 130, 246, 0.4); border-radius: 16px; background: rgba(59, 130, 246, 0.03);">
+            <!-- Verificaciones (Rechazados / Errores) separadas y comparativas -->
+            <div class="card p-4 shadow-sm" style="border: 1px dashed rgba(239, 68, 68, 0.4); border-radius: 16px; background: rgba(239, 68, 68, 0.03);">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="font-weight-600" style="color: #2563eb; font-size: 0.95rem;"><i class="fas fa-file-invoice mr-2"></i> Nóminas Enviadas por el Componente</span>
-                    <span class="font-weight-700 text-dark" style="font-size: 1.2rem;">{{ cardNominasTotalProcesados | number }} <small class="text-muted" style="font-size: 0.8rem;">filas</small></span>
+                    <span class="font-weight-600" style="color: #dc2626; font-size: 0.95rem;"><i class="fas fa-exclamation-triangle mr-2"></i> Verificaciones Pendientes</span>
+                    <span class="font-weight-700 text-dark" style="font-size: 1.2rem;">{{ cardRechazoCount | number }}</span>
                 </div>
                 
-                <p class="text-muted mb-2" style="font-size: 0.85rem; line-height: 1.4;">
-                    Total de <strong>{{ cardNominasArchivosCount }} {{ cardNominasArchivosCount === 1 ? 'archivo' : 'archivos' }}</strong> de fideicomitentes registrados y procesados en la plataforma para este componente militar.
+                <p class="text-muted mb-3" style="font-size: 0.85rem; line-height: 1.4;">
+                    El volumen de verificaciones y validaciones de estatus es equivalente al <strong>{{ ((cardRechazoCount / ((cardCorrectoCount + cardRevisionCount + cardNuevosCount) || 1)) * 100).toFixed(1) }}%</strong> respecto a la población base actual.
                 </p>
 
-                <div class="d-flex align-items-center justify-content-between pt-2 border-top" style="border-color: rgba(59, 130, 246, 0.1) !important;">
-                    <span class="text-muted" style="font-size: 0.78rem;"><i class="fas fa-calendar-check mr-1 text-primary-blue"></i> Último envío registrado:</span>
-                    <span class="font-weight-600 text-dark" style="font-size: 0.82rem;">{{ cardNominasUltimaFecha || 'Sin envíos registrados' }}</span>
+                <div class="progress" style="height: 8px; border-radius: 4px; background: #e2e8f0; overflow: hidden;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
+                         [style.width.%]="((cardRechazoCount / ((cardCorrectoCount + cardRevisionCount + cardNuevosCount) || 1)) * 100)"
+                         style="background-color: #ef4444; max-width: 100%;">
+                    </div>
                 </div>
             </div>
 

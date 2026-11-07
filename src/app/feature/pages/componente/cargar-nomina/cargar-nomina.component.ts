@@ -28,62 +28,6 @@ import {
 import { environment } from "src/environments/environment";
 import Swal from "sweetalert2";
 
-/**
- * Evalúa y obtiene la abreviatura del componente militar:
- * - GUARDIA -> GN
- * - ARMADA -> AR
- * - AVIACION -> AV
- * - EJERCITO -> EJ
- */
-export function obtenerCodigoComponente(componente?: string | null): string {
-  if (!componente) return "";
-  const comp = componente.trim().toUpperCase();
-
-  if (
-    comp.includes("GUARDIA") ||
-    comp === "GN" ||
-    comp === "GU" ||
-    comp.includes("GNB")
-  ) {
-    return "GN";
-  }
-  if (comp.includes("ARMADA") || comp === "AR") {
-    return "AR";
-  }
-  if (comp.includes("AVIACION") || comp.includes("AVIACIÓN") || comp === "AV") {
-    return "AV";
-  }
-  if (comp.includes("EJERCITO") || comp.includes("EJÉRCITO") || comp === "EJ") {
-    return "EJ";
-  }
-  return comp.substring(0, 2);
-}
-
-/**
- * Obtiene el ID numérico del componente para la función IPSFA_CEstaditicasComponente:
- * - EJ -> '1'
- * - AR -> '2'
- * - AV -> '3'
- * - GN -> '4'
- */
-export function obtenerIdEstadisticaComponente(
-  componente?: string | null,
-): string {
-  const cod = obtenerCodigoComponente(componente);
-  switch (cod) {
-    case "EJ":
-      return "1";
-    case "AR":
-      return "2";
-    case "AV":
-      return "3";
-    case "GN":
-      return "4";
-    default:
-      return "1";
-  }
-}
-
 @Component({
   selector: "app-cargar-nomina",
   standalone: true,
@@ -102,8 +46,6 @@ export function obtenerIdEstadisticaComponente(
 export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   public componentes = COMPONENTES_MILITARES;
   public grados = GRADOS_MILITARES;
-  public obtenerCodigoComponente = obtenerCodigoComponente;
-  public obtenerIdEstadisticaComponente = obtenerIdEstadisticaComponente;
 
   @ViewChild("modalAprobar") modalAprobar!: TemplateRef<any>;
   @ViewChild("modalRechazar") modalRechazar!: TemplateRef<any>;
@@ -217,13 +159,6 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   public lineasCorrectasPrevia: string[][] = [];
 
   public selectedItem: any = null;
-  public override currentTabId: string = "PRINCIPAL";
-  public override workflowTabs: any[] = [
-    { id: "PRINCIPAL", nombre: "Activos / Procesados" },
-    { id: "CORRECTOS", nombre: "Correctos" },
-    { id: "REVISION", nombre: "Revisión" },
-    { id: "NUEVOS", nombre: "Nuevos (Fideicomitentes)" },
-  ];
   private masterPendingData: any[] = [];
   public manifestFilesData: any[] = [];
 
@@ -237,23 +172,14 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   public validacionHomologada = [];
 
-  // Variables para las tarjetas de indicadores (Nóminas Enviadas, Activos, Paralizados)
-  public showCards: boolean = true;
-  public cardNominasEnviadasCount: number = 0;
-  public cardNominasArchivosCount: number = 0;
-  public cardNominasTotalProcesados: number = 0;
-  public cardNominasUltimaFecha: string = "";
-
-  public cardActivosCount: number = 0;
-  public cardParalizadosCount: number = 0;
-  public pctActivos: number = 0;
-  public pctParalizados: number = 0;
-
-  // Variables anteriores para compatibilidad
+  // Variables para las 4 tarjetas de indicadores
+  public showCards: boolean = false;
   public cardCorrectoCount: number = 0;
   public cardRevisionCount: number = 0;
   public cardRechazoCount: number = 0;
   public cardNuevosCount: number = 0;
+
+  // Variables para porcentajes (100% = Correctos + Revision + Nuevos)
   public pctCorrectos: number = 0;
   public pctRevision: number = 0;
   public pctNuevos: number = 0;
@@ -332,9 +258,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     this.layoutService.triggerScrollToTop();
     this.loadMockTabs();
     this.loadPendingData();
-    this.cargarEstadisticasComponente();
 
-    this.showCards = true;
     this.layoutService.toggleCards(false);
     this.layoutService.updateHeader({
       title: "Principal / Componente: Cargar Nómina",
@@ -342,8 +266,87 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       alertSeverity: 1,
       showAlertsIcon: true,
     });
-    const comp = sessionStorage.getItem("existe_componente") || "";
-    const codigoComponente = obtenerCodigoComponente(comp);
+    let comp = sessionStorage.getItem("existe_componente") || "";
+    comp = comp.trim().toUpperCase();
+
+    let xAPI = {
+      funcion: "Fnx_DatosFideicomitentes",
+      componente: `${comp.substring(0, 2)}`,
+      // componente: `19`,
+    };
+
+    this.apiService.post("fnx", xAPI).subscribe({
+      next: (data: any) => {
+        console.log(data.contenido.id);
+        setTimeout(() => {
+          this.apiService.get("fnx:" + data.contenido.id).subscribe({
+            next: (data: any) => {
+              console.log("datos de la nomina: " + data.documento);
+              if (data.documento == "PROCESADO") {
+                let manifiesto = JSON.parse(data.rs);
+                console.log(manifiesto);
+                if (manifiesto && manifiesto.metrics) {
+                  this.cardCorrectoCount = manifiesto.metrics.hits_100 || 0;
+                  this.cardRevisionCount =
+                    manifiesto.metrics.diferencias_parciales || 0;
+                  this.cardRechazoCount =
+                    manifiesto.metrics.no_encontrados_csv || 0;
+
+                  if (manifiesto.metrics.no_encontrados_grpc !== undefined) {
+                    this.cardNuevosCount =
+                      manifiesto.metrics.no_encontrados_grpc;
+                  } else if (manifiesto.metrics.registros_csv !== undefined) {
+                    this.cardNuevosCount =
+                      manifiesto.metrics.registros_csv -
+                      ((manifiesto.metrics.hits_100 || 0) +
+                        (manifiesto.metrics.diferencias_parciales || 0));
+                  } else {
+                    this.cardNuevosCount = 0;
+                  }
+
+                  if (
+                    manifiesto.archivos_generados &&
+                    Array.isArray(manifiesto.archivos_generados)
+                  ) {
+                    this.isManifestLoaded = true;
+                    this.manifestFilesData = manifiesto.archivos_generados.map(
+                      (item: any) => ({
+                        ...item,
+                        idFormat: `<div class="d-flex flex-column align-items-start"><span class="text-dark font-weight-600 mb-1" style="font-size: 0.9rem;">${item.nombre}</span></div>`,
+                        componenteFormat: this.getComponentBadge(
+                          this.componenteSeleccionado || "N/A",
+                        ),
+                        origenFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;"><i class="fas fa-file-csv text-muted mr-1"></i>${item.nombre}</span>`,
+                        cantidadFormat: `<span class="text-dark font-weight-600" style="font-size: 0.9rem;">${item.lineas > 0 ? item.lineas - 1 : 0}</span>`,
+                        fechaFormat: this.utilService.formatFechaRelativa(
+                          manifiesto.fecha || new Date().toISOString(),
+                        ),
+                        estatusFormat: `<span class="badge badge-pill badge-light text-muted border px-2 py-1" style="font-size: 0.75rem;">${item.descripcion || "Generado"}</span>`,
+                      }),
+                    );
+                    this.filtrarDatosPorTab();
+                  }
+
+                  this.actualizarPorcentajes();
+                  this.showCards = true;
+                }
+              } else if (data.documento == "ZOMBIE") {
+                this.showCards = false;
+                this.utilService.AlertMini(
+                  "top-end",
+                  "info",
+                  `Nomina esta en proceso de revision`,
+                  4000,
+                );
+              } else {
+              }
+            },
+            error: (err) => {},
+          });
+        }, 1000);
+      },
+      error: (err) => {},
+    });
 
     this.Componente = sessionStorage.getItem("existe_componente") || "";
     this.Componente =
@@ -355,14 +358,17 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   protected override onInitExtension(): void {}
 
   private loadMockTabs(): void {
-    this.workflowTabs = [
-      { id: "PRINCIPAL", nombre: "Activos / Procesados" },
-      { id: "CORRECTOS", nombre: "Correctos" },
-      { id: "REVISION", nombre: "Revisión" },
-      { id: "NUEVOS", nombre: "Nuevos (Fideicomitentes)" },
-    ];
-    this.currentTabId = "PRINCIPAL";
-    this.filtrarDatosPorTab();
+    this.isLoadingData = true;
+    setTimeout(() => {
+      this.workflowTabs = [
+        { id: "PRINCIPAL", nombre: "Activos / Procesados" },
+        { id: "CORRECTOS", nombre: "Correctos" },
+        { id: "REVISION", nombre: "Revisión" },
+        { id: "NUEVOS", nombre: "Nuevos (Fideicomitentes)" },
+      ];
+      this.currentTabId = "PRINCIPAL";
+      this.isLoadingData = false;
+    }, 500);
   }
 
   public onMailboxSearch(term: string): void {
@@ -432,10 +438,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   }
 
   public onMailboxTabSwitch(tabId: string): void {
-    this.currentTabId = tabId;
     this.onTabSwitch(tabId, () => {
       this.filtrarDatosPorTab();
-      this.cdr.detectChanges();
     });
   }
 
@@ -448,23 +452,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
   }
 
   private actualizarPorcentajes(): void {
-    // Porcentajes para Activos y Paralizados basándonos en la población del componente
-    const baseTotalBeneficiarios =
-      this.cardActivosCount + this.cardParalizadosCount;
-
-    if (baseTotalBeneficiarios > 0) {
-      this.pctActivos = Number(
-        ((this.cardActivosCount / baseTotalBeneficiarios) * 100).toFixed(1),
-      );
-      this.pctParalizados = Number(
-        ((this.cardParalizadosCount / baseTotalBeneficiarios) * 100).toFixed(1),
-      );
-    } else {
-      this.pctActivos = 0;
-      this.pctParalizados = 0;
-    }
-
-    // Compatibilidad adicional
+    // Para las tarjetas, evaluamos el porcentaje basándonos únicamente en el universo "Sano/En Proceso"
+    // para que la suma de estas tres tendencias sea exactamente 100%.
     const baseTotal =
       this.cardCorrectoCount + this.cardRevisionCount + this.cardNuevosCount;
 
@@ -486,51 +475,6 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     this.cdr.detectChanges();
   }
 
-  public cargarEstadisticasComponente(): void {
-    const comp = sessionStorage.getItem("existe_componente") || "";
-    const parametroId = obtenerIdEstadisticaComponente(comp);
-
-    const payload = {
-      funcion: "IPSFA_CEstaditicasComponente",
-      parametros: `${parametroId}`,
-    };
-
-    this.apiService.post("crud", payload).subscribe({
-      next: (data: any) => {
-        let cuerpo: any[] = [];
-        if (data && Array.isArray(data.Cuerpo)) {
-          cuerpo = data.Cuerpo;
-        } else if (Array.isArray(data)) {
-          cuerpo = data;
-        }
-
-        const itemActivo = cuerpo.find(
-          (c) =>
-            Number(c.status_id) === 201 ||
-            (c.descripcion && c.descripcion.toLowerCase().includes("activo")),
-        );
-        const itemParalizado = cuerpo.find(
-          (c) =>
-            Number(c.status_id) === 205 ||
-            (c.descripcion &&
-              c.descripcion.toLowerCase().includes("paralizado")),
-        );
-
-        this.cardActivosCount = itemActivo
-          ? Number(itemActivo.total_beneficiarios || 0)
-          : 0;
-        this.cardParalizadosCount = itemParalizado
-          ? Number(itemParalizado.total_beneficiarios || 0)
-          : 0;
-
-        this.actualizarPorcentajes();
-      },
-      error: (err) => {
-        console.error("Error al cargar estadísticas del componente:", err);
-      },
-    });
-  }
-
   public mostrarEstadisticas(): void {
     if (this.modalEstadisticas) {
       this.modalService.open(this.modalEstadisticas, {
@@ -543,64 +487,25 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   public loadPendingData(): void {
     this.isLoadingData = true;
-    const comp = sessionStorage.getItem("existe_componente") || "";
-    const codigoComponente = obtenerCodigoComponente(comp);
+    let comp = sessionStorage.getItem("existe_componente") || "";
+    comp = comp.trim().toUpperCase();
 
     const payload = {
       funcion: environment.funcion.LISTAR_FIDEICOMITENTES_POR_COMPONENTE,
-      parametros: `${codigoComponente}`,
+      parametros: `${comp.substring(0, 2)}`,
     };
 
     this.apiService.post("crud", payload).subscribe({
       next: (data: any) => {
         this.isLoadingData = false;
-        let rawData: any[] = [];
+        let rawData = [];
         if (Array.isArray(data)) {
           rawData = data;
-        } else if (data && Array.isArray(data.Cuerpo)) {
+        } else if (data && data.Cuerpo) {
           rawData = data.Cuerpo;
-        } else if (data && data.Cuerpo && typeof data.Cuerpo === "object") {
-          rawData = [data.Cuerpo];
-        } else if (
-          data &&
-          !data.Cabecera &&
-          !data.msj &&
-          typeof data === "object"
-        ) {
+        } else if (data && typeof data === "object") {
           rawData = [data]; // En caso de que devuelva el objeto directo
         }
-
-        this.cardNominasArchivosCount = rawData.length;
-        this.cardNominasEnviadasCount = rawData.length;
-        this.cardNominasTotalProcesados = rawData.reduce(
-          (acc, item) => acc + (Number(item.procesados) || 0),
-          0,
-        );
-
-        if (rawData.length > 0) {
-          const fechasValidas = rawData
-            .map((item: any) => item.fecha)
-            .filter((f: any) => !!f)
-            .map((f: any) => new Date(f))
-            .filter((d: Date) => !isNaN(d.getTime()));
-
-          if (fechasValidas.length > 0) {
-            fechasValidas.sort((a: Date, b: Date) => b.getTime() - a.getTime());
-            const maxDate = fechasValidas[0];
-            const d = maxDate.getDate().toString().padStart(2, "0");
-            const m = (maxDate.getMonth() + 1).toString().padStart(2, "0");
-            const y = maxDate.getFullYear();
-            const hh = maxDate.getHours().toString().padStart(2, "0");
-            const mm = maxDate.getMinutes().toString().padStart(2, "0");
-            this.cardNominasUltimaFecha = `${d}/${m}/${y} ${hh}:${mm}`;
-          } else {
-            this.cardNominasUltimaFecha = "";
-          }
-        } else {
-          this.cardNominasUltimaFecha = "";
-        }
-
-        this.showCards = true;
 
         const mappedData = rawData.map((item) => ({
           ...item,
@@ -620,7 +525,6 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         }));
 
         this.masterPendingData = [...mappedData];
-        this.pendingTableData = [...mappedData];
         this.filtrarDatosPorTab();
         this.cdr.detectChanges();
       },
@@ -636,7 +540,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   public filtrarDatosPorTab(): void {
     let filtered: any[] = [];
-    if (!this.currentTabId || this.currentTabId === "PRINCIPAL") {
+    if (this.currentTabId === "PRINCIPAL") {
       filtered = [...this.masterPendingData];
     } else if (this.isManifestLoaded) {
       if (this.currentTabId === "CORRECTOS") {
@@ -948,8 +852,26 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
     this.tipoNominaSeleccionado = "PERSONAL MILITAR ACTIVO";
 
     // Obtener componente militar del sessionStorage
-    const cmp = sessionStorage.getItem("existe_componente") || "";
-    this.componenteSeleccionado = obtenerCodigoComponente(cmp);
+    let cmp = (sessionStorage.getItem("existe_componente") || "")
+      .trim()
+      .toUpperCase();
+    let compAbbr = "";
+    if (cmp.includes("EJERCITO") || cmp.includes("EJÉRCITO") || cmp === "EJ") {
+      compAbbr = "EJ";
+    } else if (cmp.includes("ARMADA") || cmp === "AR") {
+      compAbbr = "AR";
+    } else if (
+      cmp.includes("AVIACION") ||
+      cmp.includes("AVIACIÓN") ||
+      cmp === "AV"
+    ) {
+      compAbbr = "AV";
+    } else if (cmp.includes("GUARDIA") || cmp.includes("GNB") || cmp === "GN") {
+      compAbbr = "GN";
+    } else {
+      compAbbr = cmp.substring(0, 2);
+    }
+    this.componenteSeleccionado = compAbbr;
 
     // Obtener fecha actual en formato YYYY-MM-DD
     const today = new Date();
@@ -1512,9 +1434,11 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       JSON.stringify(this.homologaciones),
     );
 
-    const cmp = obtenerCodigoComponente(
-      sessionStorage.getItem("existe_componente") || "",
-    );
+    let cmp = sessionStorage.getItem("existe_componente") || "";
+    cmp =
+      cmp.trim().toUpperCase().substring(0, 2) == "GU"
+        ? "GN"
+        : cmp.trim().toUpperCase().substring(0, 2);
 
     const body = {
       funcion: "IPSFA_UComponentes",
@@ -1594,7 +1518,6 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
   async listaHomologadaGrados() {
     const componenteFilter = sessionStorage.getItem("existe_componente") || "";
-    const codComp = obtenerCodigoComponente(componenteFilter);
 
     const payload = {
       funcion: environment.funcion.LISTAR_GRADOS,
@@ -1611,7 +1534,7 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
 
         rawData.forEach((item: any) => {
           const gradesArray = item.Grado;
-          if (item.codigo.substring(0, 2) === codComp) {
+          if (item.codigo.substring(0, 2) == componenteFilter.substring(0, 2)) {
             console.log(gradesArray);
             if (Array.isArray(gradesArray)) {
               const excludedCodes = [

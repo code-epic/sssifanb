@@ -173,12 +173,6 @@ export class FideicomitentesComponent
         tooltip: "Procesar",
         buttonClass: "btn-circular btn-success-soft shadow-sm ml-2",
       },
-      {
-        name: "ver",
-        icon: "fa-file-alt",
-        tooltip: "Ver Documento",
-        buttonClass: "btn-circular btn-info-soft shadow-sm ml-2",
-      },
     ],
   };
 
@@ -607,8 +601,6 @@ export class FideicomitentesComponent
         size: "md",
         windowClass: "pastel-modal",
       });
-    } else if (event.actionName === "ver") {
-      alert(`Ver documento de ${event.row.id}`);
     }
   }
 
