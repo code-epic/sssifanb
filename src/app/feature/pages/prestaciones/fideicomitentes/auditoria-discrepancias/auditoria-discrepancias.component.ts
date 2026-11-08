@@ -26,10 +26,12 @@ export interface Discrepancia {
   grado: string;
   diferencias: any[];
   linea: string;
+  rawCSV?: string;
   parametro: string;
   detalles: any;
   casos: string;
   estatus: number;
+  motivo?: any;
 }
 
 @Component({
@@ -221,97 +223,121 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
 
     try {
       await this.apiService.postStream("crudstream", payload, (item: any) => {
-        // item tiene el formato {parametro: 3, listado: [ {linea:"",casos:"rechazos",cedula:"10309188",estatus:0,detalles:{...}}... ]}
+        // item tiene el formato {parametro: 3, listado: [ {linea:"",casos:"rechazos",cedula:"10309188",estatus:0,detalles:{...},motivo:{...}}... ]}
         if (!item || !item.listado || !Array.isArray(item.listado)) return;
 
         const parametro = item.parametro;
 
         item.listado.forEach((element: any) => {
-          const { linea, casos, cedula, estatus, detalles } = element;
-
-          // Extraer los valores de la línea original CSV
-          const csvValues = (linea || "").split(",");
-          const csvObj: any = {
-            cedula: csvValues[0] || "",
-            grado: csvValues[1] || "",
-            n_hijos: csvValues[2] || "",
-            fecha_ingreso: csvValues[3] || "",
-            f_ult_ascenso: csvValues[4] || "",
-            st_profesion: csvValues[5] || "",
-            anio_reconocido: csvValues[6] || "",
-            mes_reconocido: csvValues[7] || "",
-            dia_reconocido: csvValues[8] || "",
-          };
-
-          const etiquetas: any = {
-            grado: "Grado",
-            n_hijos: "Número de Hijos",
-            fecha_ingreso: "Fecha de Ingreso",
-            f_ult_ascenso: "Fecha Último Ascenso",
-            st_profesion: "Prima de Profesión",
-            anio_reconocido: "Años Reconocidos",
-            mes_reconocido: "Meses Reconocidos",
-            dia_reconocido: "Días Reconocidos",
-          };
+          const { linea, casos, cedula, estatus, detalles, motivo } = element;
 
           const diferencias: any[] = [];
           const carpetas = new Set<string>();
           const dts = detalles || {};
 
-          // Comparar cada campo del sistema (detalles) con el CSV
-          Object.keys(dts).forEach((key) => {
-            const valCSV = csvObj[key];
-            const valSistema = dts[key];
-
-            const normalize = (v: string) =>
-              v ? v.toString().split("T")[0] : "";
-
-            if (normalize(valCSV) !== normalize(valSistema)) {
-              let carpeta = "OTROS";
-
-              if (key === "fecha_ingreso" || key === "f_ult_ascenso") {
-                carpeta = "FECHAS";
-              } else if (key.includes("reconocido")) {
-                carpeta = "TIEMPO_RECONOCIDO";
-              } else if (key === "grado") {
-                carpeta = "GRADOS";
-              } else if (key === "st_profesion") {
-                carpeta = "PROFESION";
-              } else if (key === "n_hijos") {
-                carpeta = "FAMILIA";
-              }
-
-              carpetas.add(carpeta);
-
-              diferencias.push({
-                campo: key,
-                etiqueta: etiquetas[key] || key,
-                origenCSV: valCSV,
-                sistemaGRPC: valSistema,
-                carpeta: carpeta,
+          // 1. Evaluar objeto 'motivo' si viene estructurado desde el backend
+          if (motivo) {
+            if (Array.isArray(motivo.categorias) && motivo.categorias.length > 0) {
+              motivo.categorias.forEach((cat: string) => {
+                const normal = this.normalizarCategoria(cat);
+                if (normal) carpetas.add(normal);
               });
             }
-          });
+
+            if (Array.isArray(motivo.campos) && motivo.campos.length > 0) {
+              motivo.campos.forEach((c: any) => {
+                const carp = this.getCarpetaPorCampo(c.campo);
+                if (carp !== "OTROS") {
+                  carpetas.add(carp);
+                }
+                diferencias.push({
+                  campo: c.campo,
+                  etiqueta: this.formatEtiqueta(c.campo),
+                  origenCSV: c.valor_csv !== undefined && c.valor_csv !== null ? String(c.valor_csv) : "",
+                  sistemaGRPC: c.valor_sssifanb !== undefined && c.valor_sssifanb !== null ? String(c.valor_sssifanb) : "",
+                  carpeta: carp,
+                });
+              });
+            }
+          }
+
+          // 2. Si no se especificaron discrepancias por motivo, recurrir a comparación con delimitador detectado
+          if (carpetas.size === 0) {
+            const delimiter = (linea || "").includes(";") ? ";" : ",";
+            const csvValues = (linea || "").split(delimiter);
+            const csvObj: any = {
+              cedula: (csvValues[0] || "").trim(),
+              grado: (csvValues[1] || "").trim(),
+              n_hijos: (csvValues[2] || "").trim(),
+              fecha_ingreso: (csvValues[3] || "").trim(),
+              f_ult_ascenso: (csvValues[4] || "").trim(),
+              st_profesion: (csvValues[5] || "").trim(),
+              anio_reconocido: (csvValues[6] || "").trim(),
+              mes_reconocido: (csvValues[7] || "").trim(),
+              dia_reconocido: (csvValues[8] || "").trim(),
+            };
+
+            Object.keys(dts).forEach((key) => {
+              if (csvObj[key] === undefined) return;
+              const valCSV = csvObj[key];
+              const valSistema = dts[key];
+
+              const normalize = (v: any) =>
+                v !== null && v !== undefined
+                  ? v.toString().trim().split("T")[0]
+                  : "";
+
+              if (valCSV !== "" && valSistema !== "" && normalize(valCSV) !== normalize(valSistema)) {
+                const carpeta = this.getCarpetaPorCampo(key);
+                carpetas.add(carpeta);
+
+                diferencias.push({
+                  campo: key,
+                  etiqueta: this.formatEtiqueta(key),
+                  origenCSV: valCSV,
+                  sistemaGRPC: valSistema,
+                  carpeta: carpeta,
+                });
+              }
+            });
+          }
+
+          // 3. Evaluar estatus administrativos
+          if (element.componente_id == null && element.grado_id == null && (carpetas.size === 0 || carpetas.has("OTROS"))) {
+            carpetas.add("NUEVO");
+          } else if (element.componente && element.componente_id && element.componente != element.componente_id) {
+            carpetas.add("CAMBIO_COMPONENTE");
+          }
+
+          if (estatus == 202 || estatus == 203) {
+            carpetas.add("REINCORPORADOS");
+          } else if (estatus == 205) {
+            carpetas.add("PARALIZADOS");
+          } else if (estatus == 204 || estatus == 206) {
+            carpetas.add("RETIRADOS");
+          }
 
           const grupoValidacion =
             carpetas.size > 0
               ? Array.from(carpetas).join(", ")
-              : "SIN DISCREPANCIAS";
+              : (casos === "rechazos" ? "RECHAZADO" : "SIN DISCREPANCIAS");
 
           acumulado.push({
-            id: cedula || new Date().getTime().toString(),
+            id: cedula || new Date().getTime().toString() + Math.random(),
             cedula: cedula || "N/A",
-            status: casos === "rechazos" ? "PartialMatch" : "Match",
+            status: casos === "rechazos" || carpetas.size > 0 ? "PartialMatch" : "Match",
             grupoValidacion: grupoValidacion,
             fechaOperacion: new Date().toISOString().split("T")[0],
             anioReconocido: Number(dts.anio_reconocido || 0),
             grado: dts.grado || "",
             diferencias: diferencias,
             linea: linea || "",
+            rawCSV: linea || "",
             parametro: parametro,
             detalles: dts,
             casos: casos,
             estatus: estatus,
+            motivo: motivo,
           });
         });
       });
@@ -387,6 +413,60 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
       return "armada";
     }
     return valor.toLowerCase();
+  }
+
+  /**
+   * Normaliza la categoría indicada en motivo.categorias a los IDs de carpetas del sistema.
+   */
+  public normalizarCategoria(cat: string): string {
+    if (!cat) return "OTROS";
+    const c = cat.trim().toUpperCase();
+    if (c.includes("GRADO")) return "GRADOS";
+    if (c.includes("FECHA")) return "FECHAS";
+    if (c.includes("RECONOC") || c.includes("TIEMPO")) return "TIEMPO_RECONOCIDO";
+    if (c.includes("FAMILI") || c.includes("HIJO")) return "FAMILIA";
+    if (c.includes("PROFESI")) return "PROFESION";
+    if (c.includes("NUEVO")) return "NUEVO";
+    if (c.includes("REINCORPORA")) return "REINCORPORADOS";
+    if (c.includes("PARALIZA")) return "PARALIZADOS";
+    if (c.includes("CAMBIO") || c.includes("COMPONENTE")) return "CAMBIO_COMPONENTE";
+    if (c.includes("RETIRA")) return "RETIRADOS";
+    return c;
+  }
+
+  /**
+   * Deduce la carpeta de validación asociada a un campo con discrepancia.
+   */
+  public getCarpetaPorCampo(campo: string): string {
+    const f = (campo || "").toLowerCase();
+    if (f.includes("grado")) return "GRADOS";
+    if (f.includes("fecha") || f === "f_ult_ascenso") return "FECHAS";
+    if (f.includes("reconocido")) return "TIEMPO_RECONOCIDO";
+    if (f.includes("profesion") || f === "st_profesion") return "PROFESION";
+    if (f.includes("hijo") || f === "n_hijos" || f.includes("familia")) return "FAMILIA";
+    if (f.includes("componente")) return "CAMBIO_COMPONENTE";
+    return "OTROS";
+  }
+
+  /**
+   * Formatea la etiqueta legible para un campo técnico.
+   */
+  public formatEtiqueta(campo: string): string {
+    const etiquetas: Record<string, string> = {
+      grado: "Grado",
+      n_hijos: "Número de Hijos",
+      fecha_ingreso: "Fecha de Ingreso",
+      f_ult_ascenso: "Fecha Último Ascenso",
+      st_profesion: "Prima de Profesión",
+      anio_reconocido: "Años Reconocidos",
+      mes_reconocido: "Meses Reconocidos",
+      dia_reconocido: "Días Reconocidos",
+      componente: "Componente Militar",
+    };
+    return (
+      etiquetas[campo] ||
+      campo.charAt(0).toUpperCase() + campo.slice(1).replace(/_/g, " ")
+    );
   }
 
   public async LoadDataDiscrepacia() {
@@ -548,81 +628,144 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
   }
 
   public mostrarEstadisticas(): void {
-    const calcWidth = (val: number) =>
-      this.kpis.total > 0 ? (val / this.kpis.total) * 100 : 0;
+    const total = this.kpis.total;
+    const calcWidth = (val: number) => (total > 0 ? (val / total) * 100 : 0);
+    const calcPct = (val: number) =>
+      total > 0 ? `${Math.round((val / total) * 100)}%` : "0%";
 
-    Swal.fire({
-      title: "Estadísticas de Discrepancias",
-      html: `
-        <div style="display: flex; flex-direction: column; gap: 20px; margin-top: 15px; text-align: left;">
-          
-          <div style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; flex-direction: column;">
-              <span style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: #64748b;">Total Evaluado</span>
-              <span style="font-size: 1.8rem; font-weight: 800; color: #1e293b; line-height: 1;">${this.kpis.total}</span>
-            </div>
-            <i class="fas fa-chart-pie" style="font-size: 2.5rem; color: #3b82f6; opacity: 0.8;"></i>
+    const discrepanciasCount =
+      this.kpis.grados +
+      this.kpis.fechas +
+      this.kpis.reconocimiento +
+      this.kpis.familia +
+      this.kpis.profesion;
+
+    const sinDiscrepancias = Math.max(0, total - discrepanciasCount);
+
+    const categoriasConfig = [
+      {
+        id: "GRADOS",
+        label: "Grados Militares",
+        val: this.kpis.grados,
+        color: "#eab308",
+        icon: "fa-medal",
+      },
+      {
+        id: "FECHAS",
+        label: "Fechas (Ingreso / Ascenso)",
+        val: this.kpis.fechas,
+        color: "#6366f1",
+        icon: "fa-calendar-times",
+      },
+      {
+        id: "TIEMPO_RECONOCIDO",
+        label: "Tiempo Reconocido",
+        val: this.kpis.reconocimiento,
+        color: "#10b981",
+        icon: "fa-history",
+      },
+      {
+        id: "FAMILIA",
+        label: "Carga Familiar (Hijos)",
+        val: this.kpis.familia,
+        color: "#ec4899",
+        icon: "fa-users",
+      },
+      {
+        id: "PROFESION",
+        label: "Prima de Profesión",
+        val: this.kpis.profesion,
+        color: "#f97316",
+        icon: "fa-user-md",
+      },
+      {
+        id: "NUEVO",
+        label: "Nuevos en Sistema",
+        val: this.kpis.nuevo,
+        color: "#3b82f6",
+        icon: "fa-user-plus",
+      },
+      {
+        id: "REINCORPORADOS",
+        label: "Reincorporados",
+        val: this.kpis.reincorporados,
+        color: "#14b8a6",
+        icon: "fa-user-check",
+      },
+      {
+        id: "PARALIZADOS",
+        label: "Paralizados",
+        val: this.kpis.paralizados,
+        color: "#f43f5e",
+        icon: "fa-user-slash",
+      },
+      {
+        id: "CAMBIO_COMPONENTE",
+        label: "Cambio de Componente",
+        val: this.kpis.cambioComponente,
+        color: "#8b5cf6",
+        icon: "fa-exchange-alt",
+      },
+      {
+        id: "RETIRADOS",
+        label: "Retirados",
+        val: this.kpis.retirados,
+        color: "#94a3b8",
+        icon: "fa-user-minus",
+      },
+    ];
+
+    const filasHtml = categoriasConfig
+      .map(
+        (c) => `
+        <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 4px;">
+            <span style="font-weight: 600; color: #334155; font-size: 0.85rem; display: flex; align-items: center;">
+              <i class="fas ${c.icon} mr-2" style="color: ${c.color}; font-size: 0.85rem; width: 16px;"></i> ${c.label}
+            </span>
+            <span style="font-weight: 700; color: ${c.color}; font-size: 0.85rem;">
+              ${c.val} <small style="font-weight: 500; opacity: 0.75; font-size: 0.75rem;">(${calcPct(c.val)})</small>
+            </span>
           </div>
-
-          <div style="display: flex; flex-direction: column; gap: 15px;">
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-              <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
-                <span style="font-weight: 600; color: #1e293b; font-size: 0.9rem;">Fechas</span>
-                <span style="font-weight: 700; color: #6366f1;">${this.kpis.fechas}</span>
-              </div>
-              <div style="width: 100%; background: #e2e8f0; border-radius: 8px; height: 12px; overflow: hidden;">
-                <div style="width: ${calcWidth(this.kpis.fechas)}%; background: #6366f1; height: 100%; border-radius: 8px; transition: width 1s ease-in-out;"></div>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-              <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
-                <span style="font-weight: 600; color: #1e293b; font-size: 0.9rem;">Años Reconocidos</span>
-                <span style="font-weight: 700; color: #8b5cf6;">${this.kpis.reconocimiento}</span>
-              </div>
-              <div style="width: 100%; background: #e2e8f0; border-radius: 8px; height: 12px; overflow: hidden;">
-                <div style="width: ${calcWidth(this.kpis.reconocimiento)}%; background: #8b5cf6; height: 100%; border-radius: 8px; transition: width 1s ease-in-out;"></div>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-              <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
-                <span style="font-weight: 600; color: #1e293b; font-size: 0.9rem;">Grados</span>
-                <span style="font-weight: 700; color: #ec4899;">${this.kpis.grados}</span>
-              </div>
-              <div style="width: 100%; background: #e2e8f0; border-radius: 8px; height: 12px; overflow: hidden;">
-                <div style="width: ${calcWidth(this.kpis.grados)}%; background: #ec4899; height: 100%; border-radius: 8px; transition: width 1s ease-in-out;"></div>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-              <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
-                <span style="font-weight: 600; color: #1e293b; font-size: 0.9rem;">Carga Familiar</span>
-                <span style="font-weight: 700; color: #10b981;">${this.kpis.familia}</span>
-              </div>
-              <div style="width: 100%; background: #e2e8f0; border-radius: 8px; height: 12px; overflow: hidden;">
-                <div style="width: ${calcWidth(this.kpis.familia)}%; background: #10b981; height: 100%; border-radius: 8px; transition: width 1s ease-in-out;"></div>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-              <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
-                <span style="font-weight: 600; color: #1e293b; font-size: 0.9rem;">Prima de Profesión</span>
-                <span style="font-weight: 700; color: #f97316;">${this.kpis.profesion}</span>
-              </div>
-              <div style="width: 100%; background: #e2e8f0; border-radius: 8px; height: 12px; overflow: hidden;">
-                <div style="width: ${calcWidth(this.kpis.profesion)}%; background: #f97316; height: 100%; border-radius: 8px; transition: width 1s ease-in-out;"></div>
-              </div>
-            </div>
-
+          <div style="width: 100%; background: #e2e8f0; border-radius: 6px; height: 8px; overflow: hidden;">
+            <div style="width: ${calcWidth(c.val)}%; background: ${c.color}; height: 100%; border-radius: 6px; transition: width 0.8s ease-in-out;"></div>
           </div>
         </div>
       `,
+      )
+      .join("");
+
+    Swal.fire({
+      title: "Resumen Estadístico de Auditoría",
+      html: `
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px; text-align: left;">
+          
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+            <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); padding: 10px 12px; border-radius: 12px; text-align: center;">
+              <span style="font-size: 0.68rem; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 0.4px;">Total Evaluado</span>
+              <div style="font-size: 1.4rem; font-weight: 800; color: #1e293b; line-height: 1.2;">${total}</div>
+            </div>
+            <div style="background: rgba(234, 179, 8, 0.08); border: 1px solid rgba(234, 179, 8, 0.2); padding: 10px 12px; border-radius: 12px; text-align: center;">
+              <span style="font-size: 0.68rem; text-transform: uppercase; font-weight: 700; color: #b45309; letter-spacing: 0.4px;">Discrepancias</span>
+              <div style="font-size: 1.4rem; font-weight: 800; color: #b45309; line-height: 1.2;">${discrepanciasCount}</div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 10px 12px; border-radius: 12px; text-align: center;">
+              <span style="font-size: 0.68rem; text-transform: uppercase; font-weight: 700; color: #047857; letter-spacing: 0.4px;">Conformes</span>
+              <div style="font-size: 1.4rem; font-weight: 800; color: #047857; line-height: 1.2;">${sinDiscrepancias}</div>
+            </div>
+          </div>
+
+          <div style="max-height: 320px; overflow-y: auto; padding-right: 4px;">
+            ${filasHtml}
+          </div>
+
+        </div>
+      `,
       showConfirmButton: true,
-      confirmButtonText: "Cerrar",
+      confirmButtonText: "Entendido",
       buttonsStyling: false,
       customClass: {
-        confirmButton: "btn btn-outline-secondary px-4 py-2 mt-4",
+        confirmButton: "btn btn-outline-secondary px-4 py-2 mt-3",
         popup: "rounded-20 px-4 py-4",
         title: "font-weight-bold text-left w-100 m-0",
       },
