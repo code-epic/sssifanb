@@ -74,6 +74,49 @@ export function obtenerCodigoComponente(componente?: string | null): string {
   return normalizado.substring(0, 2);
 }
 
+/**
+ * Lista de códigos CPACE excluidos para homologación de grados.
+ */
+export const CODIGOS_GRADOS_EXCLUIDOS: string[] = [
+  "3100",
+  "3110",
+  "3120",
+  "3130",
+  "3140",
+  "3150",
+  "3160",
+  "3170",
+  "4180",
+  "4190",
+  "4200",
+  "4210",
+  "4220",
+  "4230",
+  "4240",
+  "4250",
+  "4260",
+  "5270",
+  "5280",
+  "5290",
+  "5300",
+  "5310",
+  "5320",
+  "7400",
+  "7410",
+  "7420",
+  "7430",
+  "7440",
+  "7450",
+  "8440",
+  "8450",
+  "8460",
+  "8470",
+  "8480",
+  "8490",
+  "8500",
+  "8510",
+];
+
 @Component({
   selector: "app-cargar-nomina",
   standalone: true,
@@ -1258,27 +1301,14 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         if (Array.isArray(data)) rawData = data;
         const list: any[] = [];
 
-        const filtro =
-          componentFilter.substring(0, 2) == "GU"
-            ? "GN"
-            : componentFilter.substring(0, 2);
+        const filtro = obtenerCodigoComponente(componentFilter);
         rawData.forEach((item: any) => {
           const gradesArray = item.Grado;
-          if (item.codigo.substring(0, 2) == filtro) {
+          if (obtenerCodigoComponente(item.codigo) === filtro) {
             if (Array.isArray(gradesArray)) {
               gradesArray.forEach((g: any) => {
-                const cpace = g.cpace ? String(g.cpace) : "";
-                const excludedCodes = [
-                  "3100",
-                  "3110",
-                  "3120",
-                  "3130",
-                  "3140",
-                  "3150",
-                  "3160",
-                  "3170",
-                ];
-                if (excludedCodes.includes(cpace)) {
+                const cpace = g.cpace ? String(g.cpace).trim() : "";
+                if (CODIGOS_GRADOS_EXCLUIDOS.includes(cpace)) {
                   return;
                 }
 
@@ -1549,24 +1579,15 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         if (Array.isArray(data)) rawData = data;
         const list: any[] = [];
 
+        const compFiltro = obtenerCodigoComponente(componenteFilter);
         rawData.forEach((item: any) => {
           const gradesArray = item.Grado;
-          if (item.codigo.substring(0, 2) == componenteFilter.substring(0, 2)) {
+          if (obtenerCodigoComponente(item.codigo) === compFiltro) {
             console.log(gradesArray);
             if (Array.isArray(gradesArray)) {
-              const excludedCodes = [
-                "3100",
-                "3110",
-                "3120",
-                "3130",
-                "3140",
-                "3150",
-                "3160",
-                "3170",
-              ];
               this.validacionHomologada = gradesArray.filter((g: any) => {
-                const cpace = g.cpace ? String(g.cpace) : "";
-                return !excludedCodes.includes(cpace);
+                const cpace = g.cpace ? String(g.cpace).trim() : "";
+                return !CODIGOS_GRADOS_EXCLUIDOS.includes(cpace);
               });
             }
           }
