@@ -7,6 +7,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { HttpErrorResponse } from "@angular/common/http";
 import { Router, RouterLink } from "@angular/router";
 import { ConstanciaAfiliacionComponent } from "../../afiliacion/identificacion/pdf/constancia-afiliacion.component";
 import { AfiliadoService } from "src/app/core/services/afiliacion/afiliado.service";
@@ -276,11 +277,14 @@ export class MobileIdentificacionComponent implements OnInit, OnDestroy {
             this.fotoAfiliadoBlobUrl = "";
           }
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
           this.isLoadingFoto = false;
-          console.error("Error loading military photo", error);
           this.fotoAfiliadoBlobUrl = "";
           this.cdr.markForCheck();
+          // 404/409: el militar no tiene foto en el CDN; caso esperado.
+          if (error.status !== 404 && error.status !== 409) {
+            console.error("[loadMilitarPhoto] Error inesperado:", error);
+          }
         },
       });
     } else {

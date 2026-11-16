@@ -14,6 +14,7 @@ import {
   FormGroup,
   Validators,
 } from "@angular/forms";
+import { HttpErrorResponse } from "@angular/common/http";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { LayoutService } from "src/app/core/services/layout/layout.service";
 import { AfiliadoService } from "src/app/core/services/afiliacion/afiliado.service";
@@ -1930,10 +1931,17 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
             this.fotoAfiliadoBlobUrl = "";
           }
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
           this.isLoadingFoto = false;
-          console.error(error);
           this.fotoAfiliadoBlobUrl = "";
+          // 404/409: el afiliado no tiene foto en el CDN. Es un caso esperado,
+          // no un error de la aplicación; no se registra como console.error.
+          if (error.status !== 404 && error.status !== 409) {
+            console.error(
+              "[getPhotoId] Error inesperado al cargar la fotografía:",
+              error,
+            );
+          }
         },
       });
     }

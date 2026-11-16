@@ -42,6 +42,25 @@ export interface IAnticipo {
   f_ult_modificacion?: string;
 }
 
+export interface IMovimientoAnticipo {
+  cedula: string;
+  tipo_movimiento: number;
+  monto: number;
+  monto_digital: number;
+  f_contable: string;
+  status_id: number;
+  motivo_id: number;
+  partida_id: number;
+  codigo: string;
+  transaccion_id: number;
+  observaciones: string;
+  observ_ult_modificacion: string;
+  usr_creacion: string;
+  usr_modificacion: string;
+  f_creacion: string;
+  f_ult_modificacion: string;
+}
+
 import { PuntoCuentaComponent } from "./pdf/punto-cuenta.component";
 import { CartaBancoComponent } from "./pdf/carta-banco.component";
 
@@ -309,10 +328,10 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     const base = this.calculosData.base;
     return Number(
       base?.saldo_disponible ??
-        this.calculosData.saldo_disponible ??
-        base?.depositado_en_banco ??
-        base?.deposito_banco ??
-        0,
+      this.calculosData.saldo_disponible ??
+      base?.depositado_en_banco ??
+      base?.deposito_banco ??
+      0,
     );
   }
 
@@ -795,8 +814,8 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
               fechaStr = isNaN(d.getTime())
                 ? fechaStr
                 : `${String(d.getDate()).padStart(2, "0")} ${d
-                    .toLocaleString("es-ES", { month: "short" })
-                    .replace(".", "")} ${d.getFullYear()}`;
+                  .toLocaleString("es-ES", { month: "short" })
+                  .replace(".", "")} ${d.getFullYear()}`;
             }
 
             const nombreClean = this.formatNombreCompleto(item);
@@ -831,16 +850,16 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
           });
 
           this.masterPendingData = [...mappedData];
-          
+
           const gradosSet = new Set(this.masterPendingData.map(item => (item.grado || "").trim()).filter(g => g));
           this.gradosDisponibles = Array.from(gradosSet).sort();
 
           let filtered = [...mappedData];
-          
+
           if (this.filtroComponente) {
             filtered = filtered.filter(item => item.componente === this.filtroComponente);
           }
-          
+
           if (this.filtroGrado) {
             filtered = filtered.filter(item => (item.grado || "").trim() === this.filtroGrado);
           }
@@ -1189,11 +1208,11 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     const militar = this.selectedMilitar;
     const orderId = String(
       militar.id_operacion ||
-        militar.id ||
-        militar.id_orden ||
-        militar.oid ||
-        militar.id_solicitud ||
-        "",
+      militar.id ||
+      militar.id_orden ||
+      militar.oid ||
+      militar.id_solicitud ||
+      "",
     );
 
     console.log(
@@ -1211,6 +1230,7 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
         );
       }
       await this.cargarDatosYPuntoCuenta(militar);
+      await this.insertarMovimientoAnticipo(militar, orderId);
     } catch (e) {
       console.error("Error al aprobar anticipo:", e);
     } finally {
@@ -1219,17 +1239,109 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     }
   }
 
+  public construirMovimientoAnticipo(
+    militar: any,
+    orderId: string = "",
+  ): IMovimientoAnticipo {
+    const now = new Date();
+    const fechaDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+    const cedula = String(
+      militar?.cedula_beneficiario ||
+      militar?.cedula_afiliado ||
+      militar?.cedula ||
+      "",
+    ).trim();
+
+    const montoNum = parseFloat(
+      Number(militar?.monto ?? militar?.montoBs ?? 0).toFixed(2),
+    );
+    const montoDigitalNum = parseFloat(
+      Number(
+        militar?.monto_digital ?? militar?.monto ?? militar?.montoBs ?? 0,
+      ).toFixed(2),
+    );
+
+    const usuario = String(
+      this.loginService.Usuario?.usuario ||
+      this.loginService.Usuario?.login ||
+      "SYSTEM",
+    ).trim();
+
+    const observaciones = String(
+      militar?.observacion ||
+      militar?.observaciones ||
+      militar?.motivo ||
+      "ANTICIPO DE PRESTACIONES",
+    ).trim();
+
+    const observUltMod = String(
+      militar?.observ_ult_modificacion || observaciones || "",
+    ).trim();
+
+    return {
+      cedula: cedula,
+      tipo_movimiento: 5,
+      monto: isNaN(montoNum) ? 0 : montoNum,
+      monto_digital: isNaN(montoDigitalNum) ? 0 : montoDigitalNum,
+      f_contable: fechaDate,
+      status_id: 100,
+      motivo_id: 1,
+      partida_id: 0,
+      codigo: String(militar?.codigo || orderId || "").trim(),
+      transaccion_id: 0,
+      observaciones: observaciones,
+      observ_ult_modificacion: observUltMod,
+      usr_creacion: String(militar?.usr_creacion || usuario).trim(),
+      usr_modificacion: usuario,
+      f_creacion: fechaDate,
+      f_ult_modificacion: fechaDate,
+    };
+  }
+
+  /**
+   * Insertar los movimiento de anticipo
+   * @param militar 
+   * @param orderId 
+   * @returns 
+   */
+
+  public insertarMovimientoAnticipo(
+    militar: any,
+    orderId: string = "",
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const movimientoObj = this.construirMovimientoAnticipo(militar, orderId);
+      const xAPI = {} as IAPICore;
+      xAPI.funcion = environment.funcion.INSERTAR_MOVIMIENTO;
+      xAPI.valores = JSON.stringify(movimientoObj);
+
+      console.log("Insertando movimiento de anticipo ($values):", xAPI.valores);
+
+      this.apiService.post("crud", xAPI).subscribe({
+        next: (data: any) => {
+          console.log("Movimiento de anticipo insertado con éxito:", data);
+          resolve(data);
+        },
+        error: (err: any) => {
+          console.error("Error al insertar movimiento de anticipo:", err);
+          reject(err);
+        },
+      });
+    });
+  }
+
   public async confirmarRechazo(): Promise<void> {
     if (!this.selectedMilitar || this.isProcessingAction) return;
     this.isProcessingAction = true;
     const militar = this.selectedMilitar;
     const orderId = String(
       militar.id_operacion ||
-        militar.id ||
-        militar.id_orden ||
-        militar.oid ||
-        militar.id_solicitud ||
-        "",
+      militar.id ||
+      militar.id_orden ||
+      militar.oid ||
+      militar.id_solicitud ||
+      "",
     );
 
     const obs =
@@ -1267,11 +1379,11 @@ export class AnticiposComponent extends BaseWorkflowClass implements OnDestroy {
     const militar = this.selectedMilitar;
     const orderId = String(
       militar.id_operacion ||
-        militar.id ||
-        militar.id_orden ||
-        militar.oid ||
-        militar.id_solicitud ||
-        "",
+      militar.id ||
+      militar.id_orden ||
+      militar.oid ||
+      militar.id_solicitud ||
+      "",
     );
 
     const obs =
