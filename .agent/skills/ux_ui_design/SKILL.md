@@ -1,6 +1,6 @@
 ---
-name: UX/UI Design & Aesthetics
-description: Guía de renderización de colores, marcados y componentes UI.
+name: ux-ui-design
+description: Guía de diseño UX/UI y estética de SSSIFANB. Paleta de colores pastel, degradados teal (#5eaaa8 a #4a8b89), tarjetas con bordes redondeados (rounded-16, rounded-20), diseño responsive con Flexbox/Grid, sombras tenues y estados interactivos sin usar !important. Activar al diseñar o estilizar interfaces, modales y tablas.
 ---
 
 # Requerimientos UX/UI

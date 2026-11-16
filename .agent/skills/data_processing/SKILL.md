@@ -1,6 +1,6 @@
 ---
-name: Processamiento y Optimización de Datos
-description: Técnicas para grandes archivos y flujos streaming.
+name: data-processing
+description: Procesamiento y optimización de grandes volúmenes de datos en streaming (crudstream, postStream), Web Workers, procesamiento por lotes (chunking) y gestión eficiente de memoria cliente. Activar al procesar archivos masivos, nóminas grandes o flujos reactivos pesados.
 ---
 
 # Procesamiento de Datos

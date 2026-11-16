@@ -1,6 +1,6 @@
 ---
-name: Project Architecture Angular
-description: Árbol de directorios general y patrones espaciales.
+name: project-architecture
+description: Arquitectura estructural y árbol de directorios de SSSIFANB (core/, feature/pages/, shared/, environments/). Convenciones de ubicación para servicios singleton, componentes de vistas y utilidades compartidas. Activar al planificar la creación o reorganización de módulos y carpetas.
 ---
 
 # Arquitectura Front-end (`src/app`)

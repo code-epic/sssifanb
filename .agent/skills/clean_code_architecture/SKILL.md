@@ -1,6 +1,6 @@
 ---
-name: Código Limpio y Arquitectura
-description: Principios Clean Code y Patrones (óptimo para IA).
+name: clean-code-architecture
+description: Principios Clean Code, SOLID y patrones de diseño en TypeScript/Angular. Separación de responsabilidades (UI en componentes, lógica en servicios), nomenclatura estándar (camelCase, PascalCase, UPPER_SNAKE_CASE) y funciones puras reutilizables. Activar al refactorizar, estructurar código nuevo o diseñar clases y utilidades.
 ---
 
 # Código Limpio

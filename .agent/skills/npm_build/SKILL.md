@@ -1,6 +1,6 @@
 ---
-name: Compilación NPM Build (Angular Production)
-description: Habilidad estandarizada para compilar la aplicación Angular SSS IFANB para ambientes de despliegue.
+name: npm-build
+description: Compilación y build de producción de la aplicación Angular SSS IFANB (Angular 17). Verificación de integridad con tsc --noEmit, resolución de errores de build y optimización de paquetes para despliegue. Activar al verificar la compilación o preparar el proyecto para producción.
 ---
 
 # 🏗️ NPM Build Skill (Angular 17)

@@ -1,6 +1,6 @@
 ---
-name: Ejecución y Debugging
-description: Uso de CLI, flags y testing.
+name: debugging
+description: Guía de comandos de arranque local, ejecución con flags de proxy, bypass SSL, depuración de servicios y pruebas de conectividad de la aplicación SSSIFANB. Activar al diagnosticar errores en tiempo de ejecución, problemas de CORS o pruebas locales.
 ---
 
 # Comandos de Arranque y Control Local

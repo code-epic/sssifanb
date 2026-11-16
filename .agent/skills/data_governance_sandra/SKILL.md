@@ -1,6 +1,6 @@
 ---
-name: Gobernanza de Datos (Sandra Strategy)
-description: Funciones clave del Ecosistema Bunker/Sandra Server.
+name: data-governance-sandra
+description: Estrategia y gobernanza del ecosistema Bunker / Sandra Server. PDF Inteligente blindado (AES-256), control remoto activo (anti-copy, oscurecimiento de capturas), trazabilidad y autenticación Zero-Trust / FIDO2. Activar al interactuar con servicios de Sandra Server, Bunker o generación segura de documentos.
 ---
 
 # Estrategia Sandra Server

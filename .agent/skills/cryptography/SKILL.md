@@ -1,6 +1,6 @@
 ---
-name: Criptografía y Seguridad
-description: Estándares estrictos de seguridad de datos.
+name: cryptography
+description: Estándares estrictos de seguridad de datos y criptografía en SSSIFANB. Uso de SHA-256 (sha256.ts), protección contra hardcoding de secretos, payloads cifrados en POST/PUT, variables seguras de entorno y sanitización contra ataques XSS. Activar en tareas que involucren seguridad, autenticación o manejo de datos sensibles.
 ---
 
 # Protocolos Criptográficos

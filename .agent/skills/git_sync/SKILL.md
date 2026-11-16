@@ -1,14 +1,7 @@
 ---
-name: Git Synchronization
-description: Estándar para agregar, commitear y hacer push de cambios en el proyecto SSSIFANB.
-model: Gemini Flash (Optimizado para latencia y costo)
+name: git-sync
+description: Estándar y procedimiento estricto para commit y push en el repositorio SSSIFANB. Mensajes semánticos (feat, fix, refactor, docs), validación previa de compilación limpia y preservación del historial. Activar cuando el usuario solicite subir, guardar o hacer commit/push de cambios.
 ---
-
-# 🤖 Agent Model Optimization
-
-// Este Skill está optimizado para ejecutarse bajo el modelo **Gemini Flash**.
-// Se recomienda al usuario asegurar que el agente esté operando en este modelo
-// para garantizar la máxima velocidad de respuesta en tareas de sincronización.
 
 # 🛡️ Git Synchronization Skill
 
@@ -50,13 +43,11 @@ Cuando se te pida "Sincronizar el repositorio", debes ejecutar exactamente estos
    # Ejemplo: git commit -m "feat(nomina): agregar cálculo de utilidades anuales"
    ```
 
-4. **Sincronizar (Push):**
+4. **Subir al remoto:**
+
    ```bash
    git push origin main
-   # (Asume 'main' a menos que se indique otra rama)
    ```
 
-## 🚨 Condiciones Críticas de Parada
-
-- Si los tests de Angular fallan, detén el commit inmediatamente.
-- Si hay credenciales expuestas en la pantalla de `git status` o un `.env`, no hacer commit y alertar al orquestador.
+5. **Notificar:**
+   Informa al usuario que los cambios están respaldados de forma segura con el hash generado.

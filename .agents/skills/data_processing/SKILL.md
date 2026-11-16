@@ -1,0 +1,13 @@
+---
+name: data-processing
+description: Procesamiento y optimización de grandes volúmenes de datos en streaming (crudstream, postStream), Web Workers, procesamiento por lotes (chunking) y gestión eficiente de memoria cliente. Activar al procesar archivos masivos, nóminas grandes o flujos reactivos pesados.
+---
+
+# Procesamiento de Datos
+
+- **Cargas Masivas (Archivos)**: Implementa "Chunking" (cargas por trozos) para evitar cuelgues del navegador. Valida formato/tamaño localmente antes de subir. Utiliza `Web Workers` si se parsean JSON/CSV inmensos.
+- **Flujos (Streaming)**:
+  - Respeta el `Backpressure` (contrapresión): no ahogues la UI con más datos de los que puede dibujar.
+  - Usa `Virtual Scrolling` (ej. Angular CDK) para renderizar únicamente lo visible.
+  - Regula con operadores RxJS (`throttleTime`, `debounceTime`).
+- **Gestión de Cierre**: Purga observables y limpiezas al destruir componentes (`ngOnDestroy` / `takeUntilDestroyed`). No mantengas macro-objetos en memoria persistente.

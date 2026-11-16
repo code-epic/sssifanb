@@ -1,6 +1,6 @@
 ---
-name: Protocolo de Comunicación
-description: Instrucciones absolutas de respuesta y ejecución.
+name: communication-protocol
+description: Protocolo estricto de comunicación e interacción con el usuario en SSSIFANB. Respuestas concisas en español, sin rodeos ni disculpas, ejecución directa de código, alertas inmediatas ante riesgos estructurales y rescate de contexto. Activar para alinear el comportamiento del asistente.
 ---
 
 # Protocolo Estricto de Interacción IA

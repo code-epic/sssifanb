@@ -1,6 +1,6 @@
 ---
-name: Migración y Kernel PACE
-description: Estructura del Kernel PHP heredado y lógica a migrar.
+name: pace-kernel-migration
+description: Arquitectura de migración del Kernel PACE (PHP a Rust/Angular). Estructura del modelo MBeneficiario, lógica de cálculos en KCalculo.php, concepto de memoización KPerceptron y mapeo de precisión monetaria. Activar al trabajar en módulos de liquidación, aportes, cálculos de prestaciones o migración de lógica PACE.
 ---
 
 # Migración de Kernel PACE (PHP a Rust/Angular)

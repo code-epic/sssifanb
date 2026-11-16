@@ -1,6 +1,6 @@
 ---
-name: "Ley Negro Primero (Seguridad Social FANB)"
-description: "Documentación completa del Decreto con Rango, Valor y Fuerza de Ley Orgánica de Seguridad Social de la Fuerza Armada Nacional Bolivariana (Ley Negro Primero), para usar sin omisiones."
+name: ley-negro-primero
+description: Texto y normativa legal completa del Decreto con Rango, Valor y Fuerza de Ley Orgánica de Seguridad Social de la Fuerza Armada Nacional Bolivariana (Ley Negro Primero). Activar al consultar normativas, artículos, pensiones, asignaciones, finiquitos, sobrevivientes, montepío o derechos de la seguridad social militar FANB.
 ---
 
 # Ley Orgánica de Seguridad Social de la Fuerza Armada Nacional Bolivariana (Ley Negro Primero)

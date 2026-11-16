@@ -1,6 +1,6 @@
 ---
-name: Manejo de Errores y Registro (Logging)
-description: Protocolo IA de interceptores y manejo de bugs.
+name: error-handling
+description: Protocolo estándar de manejo de errores e interceptores HTTP en Angular. Manejo de códigos 401/403/500, notificaciones amigables con SweetAlert2 (UtilService.AlertMini) y trazabilidad centralizada de excepciones. Activar al agregar o corregir capturas de error y flujos de fallos.
 ---
 
 # Manejo de Errores

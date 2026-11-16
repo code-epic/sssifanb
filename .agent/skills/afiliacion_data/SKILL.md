@@ -1,6 +1,6 @@
 ---
-name: Manejo de Datos de Afiliación
-description: Estructura compleja y tipado base de datos Afiliados.
+name: afiliacion-data
+description: Manejo, modelado y tipado de datos de afiliación militar (IAfiliado, titulares, familiares, parentesco, carnets y parseo de fechas BSON/MongoDB). Activar al consultar, validar o manipular beneficiarios, afiliados militares o grupos familiares.
 ---
 
 # Afiliación de Datos (IAfiliado)

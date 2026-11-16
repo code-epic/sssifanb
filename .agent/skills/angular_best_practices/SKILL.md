@@ -1,6 +1,6 @@
 ---
-name: Mejores Prácticas de Angular
-description: Directrices optimizadas para el desarrollo de Angular.
+name: angular-best-practices
+description: Estándares y mejores prácticas de Angular 17. Componentes standalone, ChangeDetectionStrategy.OnPush, inyección con inject(), señales (signals), gestión de RxJS con takeUntilDestroyed() o AsyncPipe, y tipado estricto sin any. Activar al crear o modificar componentes, directivas, pipes, templates o servicios de Angular.
 ---
 
 # Estándares de Angular
