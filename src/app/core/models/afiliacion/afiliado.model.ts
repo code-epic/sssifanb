@@ -225,13 +225,27 @@ export interface IDatosSueldo {
 }
 
 export interface IPrimas {
+    /** P_TRANSPORTE: Compensación Especial de Protección y Movilidad ante la Guerra Económica */
     transporte: number;
+    /** P_DESCENDENCIA: Prima por Descendencia */
     descendencia: number;
+    /** P_ESPECIAL: Complemento Salarial de Productividad */
     especial: number;
+    /** P_TIEMPOSERVICIO: Prima por Tiempo de Servicio */
     tiempo_servicio: number;
+    /** P_NOASCENSO: Prima por No Ascenso */
     no_ascenso: number;
+    /** P_PROFESIONALIZACION: Prima de Profesionalización */
     profesionalizacion: number;
+    /** P_COMPENSACION_ESPECIAL: Compensación Especial de Protección y Estabilidad Familiar */
     compensacion_especial: number;
+    prima_transporte?: number;
+    prima_descendencia?: number;
+    prima_especial?: number;
+    prima_tiemposervicio?: number;
+    prima_noascenso?: number;
+    prima_profesionalizacion?: number;
+    prima_compensacion_especial?: number;
 }
 
 export interface IAsignacionAntiguedad {

@@ -1485,23 +1485,65 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
     );
     const pctCanceladoNum = this.parsearMonto(calc.porcentaje_cancelado);
 
-    const primaTransporte =
+    const buscarClavePrima = (claveBD: string): any => {
+      for (const k of Object.keys(prima)) {
+        if (prima[k] && prima[k][claveBD] !== undefined) {
+          return prima[k][claveBD];
+        }
+      }
+      return undefined;
+    };
+
+    const primaTransporte = this.parsearMonto(
       resp.prima_transporte ??
-      (prima["1"] ? prima["1"].P_TRANSPORTE ?? 0 : 0);
-    const primaDescendencia =
+        resp.prima_transporte_aux ??
+        buscarClavePrima("P_TRANSPORTE") ??
+        this.militar?.fideicomiso?.primas?.transporte ??
+        0,
+    );
+    const primaDescendencia = this.parsearMonto(
       resp.prima_descendencia ??
-      (prima["4"] ? prima["4"].P_DESCENDECIA ?? 0 : 0);
-    const primaTiemposervicio =
+        resp.prima_descendencia_aux ??
+        buscarClavePrima("P_DESCENDECIA") ??
+        buscarClavePrima("P_DESCENDENCIA") ??
+        this.militar?.fideicomiso?.primas?.descendencia ??
+        0,
+    );
+    const primaTiemposervicio = this.parsearMonto(
       resp.prima_tiemposervicio ??
-      (prima["5"] ? prima["5"].P_TIEMPOSERVICIO ?? 0 : 0);
-    const primaNoascenso =
+        resp.prima_tiemposervicio_aux ??
+        buscarClavePrima("P_TIEMPOSERVICIO") ??
+        this.militar?.fideicomiso?.primas?.tiempo_servicio ??
+        0,
+    );
+    const primaNoascenso = this.parsearMonto(
       resp.prima_noascenso ??
-      (prima["6"] ? prima["6"].P_NOASCENSO ?? 0 : 0);
-    const primaProfesionalizacion =
+        resp.prima_noascenso_aux ??
+        buscarClavePrima("P_NOASCENSO") ??
+        this.militar?.fideicomiso?.primas?.no_ascenso ??
+        0,
+    );
+    const primaProfesionalizacion = this.parsearMonto(
       resp.prima_profesionalizacion ??
-      (prima["8"] ? prima["8"].P_PROFESIONALIZACION ?? 0 : 0);
-    const primaEspecial = resp.prima_especial ?? 0;
-    const primaCompEspecial = resp.prima_compensacion_especial ?? 0;
+        resp.prima_profesionalizacion_aux ??
+        buscarClavePrima("P_PROFESIONALIZACION") ??
+        this.militar?.fideicomiso?.primas?.profesionalizacion ??
+        0,
+    );
+    const primaEspecial = this.parsearMonto(
+      resp.prima_especial ??
+        resp.prima_especial_aux ??
+        buscarClavePrima("P_ESPECIAL") ??
+        this.militar?.fideicomiso?.primas?.especial ??
+        0,
+    );
+    const primaCompEspecial = this.parsearMonto(
+      resp.prima_compensacion_especial ??
+        resp.prima_compensacion_especial_aux ??
+        buscarClavePrima("P_COMPENSACION_ESPECIAL") ??
+        this.militar?.fideicomiso?.primas?.compensacion_especial ??
+        0,
+    );
 
     const gradoNombre =
       resp.Componente?.Grado?.nombre ||
@@ -2039,6 +2081,38 @@ export class IdentificacionComponent implements OnInit, OnDestroy {
       ) {
         this.calculosBunker = JSON.parse(newContent)[0];
         this.isBunkerSync = true;
+
+        if (this.calculosBunker?.base) {
+          this.calculosBunker.base.calculos =
+            this.calculosBunker.base.calculos || {};
+          const calcBunker = this.calculosBunker.base.calculos;
+          const primasFid = this.militar?.fideicomiso?.primas || {};
+
+          calcBunker.prima_transporte = this.parsearMonto(
+            calcBunker.prima_transporte ??
+              calcBunker.transporte ??
+              calcBunker.P_TRANSPORTE ??
+              primasFid.prima_transporte ??
+              primasFid.transporte ??
+              0,
+          );
+          calcBunker.prima_especial = this.parsearMonto(
+            calcBunker.prima_especial ??
+              calcBunker.especial ??
+              calcBunker.P_ESPECIAL ??
+              primasFid.prima_especial ??
+              primasFid.especial ??
+              0,
+          );
+          calcBunker.prima_compensacion_especial = this.parsearMonto(
+            calcBunker.prima_compensacion_especial ??
+              calcBunker.compensacion_especial ??
+              calcBunker.P_COMPENSACION_ESPECIAL ??
+              primasFid.prima_compensacion_especial ??
+              primasFid.compensacion_especial ??
+              0,
+          );
+        }
 
         if (this.esRetirado && this.calculosBunker) {
           if (this.calculosBunker.base) {

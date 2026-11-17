@@ -159,7 +159,7 @@ export class HojaVidaComponent extends PdfLayoutBase {
     const componentes = ["EJB", "ARV", "FAV", "GN", "MIL"];
     const compIdx = militarDb?.componente_id ? militarDb.componente_id - 1 : 0;
     const componenteFull = componentes[compIdx] || "N/D";
-    
+
     // Configuración de tabla heredada de la constancia
     const standardTableLayout = {
       hLineWidth: (i: number) => 0.5,
@@ -185,7 +185,7 @@ export class HojaVidaComponent extends PdfLayoutBase {
           const d = new Date(item.f_contable);
           fecha = !isNaN(d.getTime()) ? `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}` : "N/A";
         }
-        
+
         historyRows.push([
           { text: (item.concepto || "ANTICIPO").toUpperCase(), fontSize: 8.5 },
           { text: `Bs ${fmt(item.monto)}`, fontSize: 8.5, bold: true, alignment: "right", color: "#10B981" },
@@ -280,8 +280,20 @@ export class HojaVidaComponent extends PdfLayoutBase {
                   { text: "Monto", style: "tableHeader", alignment: "right" }
                 ],
                 [
+                  { text: "Compensación Esp. de Protección y Movilidad", fontSize: 8 },
+                  { text: `${moneda} ${fmt(calculos.prima_transporte)}`, fontSize: 8.5, bold: true, alignment: "right" }
+                ],
+                [
                   { text: "Descendencia", fontSize: 8.5 },
                   { text: `${moneda} ${fmt(calculos.prima_descendencia)}`, fontSize: 8.5, bold: true, alignment: "right" }
+                ],
+                [
+                  { text: "Complemento Salarial de Productividad", fontSize: 8 },
+                  { text: `${moneda} ${fmt(calculos.prima_especial)}`, fontSize: 8.5, bold: true, alignment: "right" }
+                ],
+                [
+                  { text: "Compensación Esp. Estabilidad Familiar", fontSize: 8 },
+                  { text: `${moneda} ${fmt(calculos.prima_compensacion_especial)}`, fontSize: 8.5, bold: true, alignment: "right" }
                 ],
                 [
                   { text: "Profesionalización", fontSize: 8.5 },
