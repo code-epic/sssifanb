@@ -1,20 +1,37 @@
 import {
   Component,
   OnInit,
+  OnChanges,
+  SimpleChanges,
   ChangeDetectionStrategy,
   ViewChild,
+  TemplateRef,
   Input,
   Output,
   EventEmitter,
   ChangeDetectorRef,
   HostListener,
 } from "@angular/core";
-import { BehaviorSubject, Observable, combineLatest } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest, firstValueFrom } from "rxjs";
 import { map, debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import Swal from "sweetalert2";
 import { ApiService } from "src/app/core/services/api.service";
+import { LoginService } from "src/app/core/services/login/login.service";
+import { UtilService } from "src/app/core/services/util/util.service";
 import { environment } from "src/environments/environment";
+
+export interface IRechazoDiscrepancia {
+  id: string;
+  usuario: string;
+  fecha: string;
+  linea_base: string;
+  cedula: string;
+  status: string;
+  componente: string;
+  motivo: string;
+}
 
 export interface Discrepancia {
   id: string;
@@ -32,6 +49,8 @@ export interface Discrepancia {
   casos: string;
   estatus: number;
   motivo?: any;
+  reportado?: boolean;
+  reporteInfo?: IRechazoDiscrepancia | null;
 }
 
 @Component({
@@ -40,10 +59,23 @@ export interface Discrepancia {
   styleUrls: ["./auditoria-discrepancias.component.scss"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuditoriaDiscrepanciasComponent implements OnInit {
+export class AuditoriaDiscrepanciasComponent implements OnInit, OnChanges {
   @ViewChild(CdkVirtualScrollViewport) viewport!: CdkVirtualScrollViewport;
+  @ViewChild("modalRechazarCambios") modalRechazarCambios!: TemplateRef<unknown>;
   @Input() componenteSeleccionado: string = "";
   @Output() volver = new EventEmitter<void>();
+
+  // Estado de rechazos sincronizados desde err-fideicomitentes
+  private rechazosReportados: IRechazoDiscrepancia[] = [];
+
+  // Estado del modal de rechazo
+  public readonly maxCaracteresMotivo: number = 256;
+  public registroRechazo: Discrepancia | null = null;
+  public cedulaRechazoExtraida: string = "";
+  public motivoRechazo: string = "";
+  public totalPalabrasMotivo: number = 0;
+  public motivoTocado: boolean = false;
+  public enviandoRechazo: boolean = false;
 
   // State Management (Optimized for 1,000+ records)
   private registrosSubject = new BehaviorSubject<Discrepancia[]>([]);
@@ -155,6 +187,9 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
+    private modalService: NgbModal,
+    private loginService: LoginService,
+    private utilService: UtilService,
   ) {
     // Pipeline Reactivo para Búsqueda y Filtrado
     this.registros$ = combineLatest([
@@ -195,20 +230,152 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
     this.loadAllData();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes["componenteSeleccionado"] &&
+      !changes["componenteSeleccionado"].firstChange
+    ) {
+      this.loadAllData();
+    }
+  }
+
   public async loadAllData() {
     this.isLoadingData = true;
+    this.rechazosReportados = [];
     this.registrosSubject.next([]); // Limpiar data anterior
+    this.activeRecordId = null;
+    this.activeRecord = null;
     this.cdr.markForCheck();
 
     try {
-      // Ejecutar ambos streams en paralelo
-      await Promise.all([this.loadPendingData(), this.LoadDataDiscrepacia()]);
+      // Ejecutar consultas y streams en paralelo al seleccionar componente
+      await Promise.all([
+        this.loadRechazosReportados(),
+        this.loadPendingData(),
+        this.LoadDataDiscrepacia(),
+      ]);
+      this.sincronizarRechazosReportados();
     } catch (error) {
       console.error("Error al cargar datos combinados:", error);
     } finally {
       this.isLoadingData = false;
       this.cdr.markForCheck();
     }
+  }
+
+  public async loadRechazosReportados(): Promise<void> {
+    const codigoComponente = this.getCodigoComponenteNormalizado();
+    if (!codigoComponente || codigoComponente === "N/A") {
+      this.rechazosReportados = [];
+      return;
+    }
+
+    const payload = {
+      funcion: environment.funcion.CONSULTAR_RECHAZOS_FIDEICOMITENTES,
+      parametros: codigoComponente,
+    };
+
+    try {
+      const data: any = await firstValueFrom(
+        this.apiService.post("crud", payload),
+      );
+      let rawList: any[] = [];
+
+      if (Array.isArray(data)) {
+        rawList = data;
+      } else if (data && Array.isArray(data["err-fideicomitentes"])) {
+        rawList = data["err-fideicomitentes"];
+      } else if (data && Array.isArray(data.Cuerpo)) {
+        rawList = data.Cuerpo;
+      } else if (
+        data &&
+        data.Cuerpo &&
+        Array.isArray(data.Cuerpo["err-fideicomitentes"])
+      ) {
+        rawList = data.Cuerpo["err-fideicomitentes"];
+      } else if (
+        data &&
+        typeof data === "object" &&
+        (data.cedula || data.linea_base)
+      ) {
+        rawList = [data];
+      }
+
+      this.rechazosReportados = rawList
+        .filter((item) => item && (item.cedula || item.linea_base || item.linea))
+        .map((item) => {
+          const lineaBase = String(
+            item.linea_base || item.rawCSV || item.linea || "",
+          ).trim();
+          const cedula = this.extraerCedulaDeLineaBase(
+            lineaBase,
+            String(item.cedula || ""),
+          );
+          return {
+            id: String(item.id || ""),
+            usuario: String(item.usuario || "SISTEMA"),
+            fecha: String(item.fecha || ""),
+            linea_base: lineaBase,
+            cedula: cedula,
+            status: String(item.status || "RECHAZADO"),
+            componente: String(item.componente || codigoComponente),
+            motivo: String(item.motivo || ""),
+          };
+        });
+
+      this.sincronizarRechazosReportados();
+    } catch (error) {
+      console.error(
+        "[Auditoría Discrepancias] Error al consultar IPSFA_CRechazosFideicomitentes:",
+        error,
+      );
+      this.rechazosReportados = [];
+    }
+  }
+
+  private buscarRechazoReportado(
+    cedula: string,
+    lineaBase: string,
+  ): IRechazoDiscrepancia | null {
+    if (!this.rechazosReportados.length) return null;
+    const cedNorm = (cedula || "").trim();
+    const lineaNorm = (lineaBase || "").trim();
+
+    return (
+      this.rechazosReportados.find((rep) => {
+        const repCed = (rep.cedula || "").trim();
+        const repLinea = (rep.linea_base || "").trim();
+
+        if (lineaNorm && repLinea) {
+          return repCed === cedNorm && repLinea === lineaNorm;
+        }
+        return cedNorm !== "" && repCed === cedNorm;
+      }) || null
+    );
+  }
+
+  private sincronizarRechazosReportados(): void {
+    const actuales = this.registrosSubject.value;
+    if (!actuales.length) return;
+
+    const sincronizados = actuales.map((registro) => {
+      const lineaBase = (registro.rawCSV || registro.linea || "").trim();
+      const cedula = this.extraerCedulaDeLineaBase(lineaBase, registro.cedula);
+      const match = this.buscarRechazoReportado(cedula, lineaBase);
+
+      return {
+        ...registro,
+        reportado: Boolean(match),
+        reporteInfo: match,
+      };
+    });
+
+    this.registrosSubject.next(sincronizados);
+    if (this.activeRecordId) {
+      this.activeRecord =
+        sincronizados.find((r) => r.id === this.activeRecordId) || null;
+    }
+    this.cdr.markForCheck();
   }
 
   public async loadPendingData() {
@@ -346,6 +513,7 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
         ...this.registrosSubject.value,
         ...acumulado,
       ]);
+      this.sincronizarRechazosReportados();
       this.cdr.markForCheck();
     } catch (error) {
       console.error("Error al cargar datos en stream:", error);
@@ -537,6 +705,7 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
         ...this.registrosSubject.value,
         ...acumulado,
       ]);
+      this.sincronizarRechazosReportados();
       this.cdr.markForCheck();
     } catch (error) {
       console.error("Error al cargar datos en stream:", error);
@@ -621,6 +790,9 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
 
   @HostListener("document:keydown.escape", ["$event"])
   handleEscapeKey(event: KeyboardEvent) {
+    if (this.modalService.hasOpenModals()) {
+      return;
+    }
     if (this.currentFolder) {
       this.closeFolder();
       this.cdr.markForCheck();
@@ -786,21 +958,21 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
     accion: "ACEPTAR" | "RECHAZAR",
   ): Promise<void> {
     this.selectRecord(registro.id);
-    const isAceptar = accion === "ACEPTAR";
+
+    if (accion === "RECHAZAR") {
+      this.abrirModalRechazo(registro);
+      return;
+    }
 
     const confirm = await Swal.fire({
-      title: isAceptar ? "¿Aceptar Cambio?" : "¿Rechazar Cambio?",
+      title: "¿Aceptar Cambio?",
       text: `Se aplicará la acción sobre la cédula ${registro.cedula}. Esta operación actualizará la base de datos.`,
-      icon: isAceptar ? "warning" : "error",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: isAceptar
-        ? "Aceptar y Sincronizar"
-        : "Mantener Original",
+      confirmButtonText: "Aceptar y Sincronizar",
       cancelButtonText: "Cancelar",
       customClass: {
-        confirmButton: isAceptar
-          ? "btn btn-header-action teal"
-          : "btn btn-header-action red",
+        confirmButton: "btn btn-header-action teal",
         popup: "auditoria-modal-popup border-0 rounded-20 px-4 py-4",
       },
     });
@@ -813,6 +985,7 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
       this.registrosSubject.next(current);
       this.activeRecordId = null; // Clean state
       this.activeRecord = null;
+      this.cdr.markForCheck();
 
       Swal.fire({
         title: "¡Sincronizado!",
@@ -822,6 +995,189 @@ export class AuditoriaDiscrepanciasComponent implements OnInit {
         showConfirmButton: false,
       });
     }
+  }
+
+  public abrirModalRechazo(registro: Discrepancia): void {
+    const lineaBase = (registro.rawCSV || registro.linea || "").trim();
+    this.registroRechazo = registro;
+    this.cedulaRechazoExtraida = this.extraerCedulaDeLineaBase(
+      lineaBase,
+      registro.cedula,
+    );
+    this.motivoRechazo = "";
+    this.totalPalabrasMotivo = 0;
+    this.motivoTocado = false;
+    this.enviandoRechazo = false;
+    this.cdr.markForCheck();
+
+    this.modalService.open(this.modalRechazarCambios, {
+      centered: true,
+      size: "md",
+      windowClass: "pastel-modal",
+      backdrop: "static",
+    });
+  }
+
+  public onMotivoRechazoInput(event: Event): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    const valorNormalizado = (textarea.value || "")
+      .toUpperCase()
+      .slice(0, this.maxCaracteresMotivo);
+
+    if (textarea.value !== valorNormalizado) {
+      const pos = Math.min(
+        textarea.selectionStart ?? valorNormalizado.length,
+        valorNormalizado.length,
+      );
+      textarea.value = valorNormalizado;
+      textarea.setSelectionRange(pos, pos);
+    }
+
+    this.motivoRechazo = valorNormalizado;
+    this.totalPalabrasMotivo = this.contarPalabras(valorNormalizado);
+    this.motivoTocado = true;
+    this.cdr.markForCheck();
+  }
+
+  public confirmarRechazoCambios(): void {
+    this.motivoTocado = true;
+    const motivoLimpio = this.motivoRechazo.trim().toUpperCase();
+
+    if (!this.registroRechazo || !motivoLimpio || this.enviandoRechazo) {
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.registrarRechazoColeccion(this.registroRechazo, motivoLimpio);
+  }
+
+  private registrarRechazoColeccion(
+    registro: Discrepancia,
+    motivo: string,
+  ): void {
+    const endpoint = "ccoleccion";
+    const lineaBase = (registro.rawCSV || registro.linea || "").trim();
+    const cedulaExtraida = this.extraerCedulaDeLineaBase(
+      lineaBase,
+      registro.cedula,
+    );
+    const codigoComponente = this.getCodigoComponenteNormalizado();
+    const usuario = this.obtenerUsuarioActual();
+    const fecha = new Date().toISOString();
+    const idRegistro = `REC-${codigoComponente}-${cedulaExtraida}-${new Date().getTime()}`;
+
+    const objetoExtendido: IRechazoDiscrepancia = {
+      id: idRegistro,
+      usuario: usuario,
+      fecha: fecha,
+      linea_base: lineaBase,
+      cedula: cedulaExtraida,
+      status: "RECHAZADO",
+      componente: codigoComponente,
+      motivo: motivo,
+    };
+
+    const body = {
+      coleccion: "err-fideicomitentes",
+      objeto: objetoExtendido,
+      donde: `{\"id\":\"${idRegistro}\"}`,
+      driver: "MGDBA",
+      upsert: true,
+    };
+
+    this.enviandoRechazo = true;
+    this.cdr.markForCheck();
+
+    this.apiService.post(endpoint, body).subscribe({
+      next: () => {
+        this.enviandoRechazo = false;
+        this.rechazosReportados = [
+          ...this.rechazosReportados,
+          objetoExtendido,
+        ];
+        this.sincronizarRechazosReportados();
+        this.registroRechazo = null;
+        this.motivoRechazo = "";
+        this.totalPalabrasMotivo = 0;
+        this.motivoTocado = false;
+        this.modalService.dismissAll();
+        this.cdr.markForCheck();
+
+        this.utilService.AlertMini(
+          "top-end",
+          "success",
+          `Rechazo registrado para la cédula V-${cedulaExtraida}`,
+          2500,
+        );
+      },
+      error: (err) => {
+        console.error(
+          "[Auditoría Discrepancias] Error al registrar rechazo en ccoleccion:",
+          err,
+        );
+        this.enviandoRechazo = false;
+        this.cdr.markForCheck();
+        this.utilService.AlertMini(
+          "top-end",
+          "error",
+          "Error al registrar el rechazo en la colección",
+          3000,
+        );
+      },
+    });
+  }
+
+  private extraerCedulaDeLineaBase(
+    lineaBase: string,
+    fallbackCedula: string = "",
+  ): string {
+    if (lineaBase) {
+      const delimiter = lineaBase.includes(";") ? ";" : ",";
+      const primeraColumna = (lineaBase.split(delimiter)[0] || "")
+        .replace(/^["']|["']$/g, "")
+        .trim();
+      if (primeraColumna) {
+        return primeraColumna;
+      }
+    }
+    return (fallbackCedula || "").trim();
+  }
+
+  public getCodigoComponenteNormalizado(): string {
+    const valor = (
+      this.componenteSeleccionado ||
+      sessionStorage.getItem("existe_componente") ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+    if (valor.startsWith("EJ") || valor.includes("EJERC")) return "EJ";
+    if (valor.startsWith("AR") || valor.includes("ARMADA")) return "AR";
+    if (valor.startsWith("AV") || valor.includes("AVIAC")) return "AV";
+    if (
+      valor.startsWith("GN") ||
+      valor.startsWith("GU") ||
+      valor.includes("GUARDIA") ||
+      valor.includes("GNB")
+    ) {
+      return "GN";
+    }
+    return valor || "N/A";
+  }
+
+  private obtenerUsuarioActual(): string {
+    return (
+      this.loginService.Usuario?.usuario ||
+      this.loginService.Usuario?.login ||
+      "SISTEMA"
+    );
+  }
+
+  private contarPalabras(texto: string): number {
+    const limpio = (texto || "").trim();
+    if (!limpio) return 0;
+    return limpio.split(/\s+/).length;
   }
 
   public scrollToIndex(direction: "NEXT" | "PREV"): void {

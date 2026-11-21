@@ -101,22 +101,26 @@
             <ng-container *cdkVirtualFor="let registro of registros$ | async; trackBy: trackById">
               
               <div class="minimal-card fade-in" 
-                   [class.active]="activeRecordId === registro.id" 
+                   [class.active]="activeRecordId === registro.id"
+                   [class.reported]="registro.reportado"
                    (click)="selectRecord(registro.id)">
                    
                    <div class="d-flex justify-content-between align-items-center w-100">
                        <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
                            <div class="mini-icon mr-3">
-                               <i class="fas fa-file-invoice" style="color: #94a3b8; font-size: 1.1rem;"></i>
+                               <i class="fas" [ngClass]="registro.reportado ? 'fa-flag text-reported' : 'fa-file-invoice mini-icon-default'"></i>
                            </div>
                            <div class="d-flex flex-column text-truncate" style="min-width: 0;">
                                <span class="cedula-mini text-truncate">V-{{ registro.cedula }}</span>
-                               <small class="text-muted mt-1 text-truncate" style="font-size: 0.68rem; font-weight: 600;"><i class="fas fa-calendar-alt mr-1"></i> {{ registro.fechaOperacion }}</small>
+                               <small *ngIf="!registro.reportado" class="text-muted mt-1 text-truncate" style="font-size: 0.68rem; font-weight: 600;"><i class="fas fa-calendar-alt mr-1"></i> {{ registro.fechaOperacion }}</small>
+                               <small *ngIf="registro.reportado" class="reported-mini-label mt-1 text-truncate" title="Este caso ya fue reportado">
+                                   <i class="fas fa-exclamation-circle mr-1"></i> Caso ya reportado
+                               </small>
                            </div>
                        </div>
                        <div class="text-right d-flex flex-column align-items-end justify-content-center ml-2" style="flex-shrink: 0;">
                            <span class="badge badge-group mb-2" style="max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="registro.grupoValidacion">{{ registro.grupoValidacion }}</span>
-                           <span class="status-dot" [class.partial]="registro.status === 'PartialMatch'" [title]="registro.status === 'PartialMatch' ? 'Coincidencia Parcial' : registro.status"></span>
+                           <span class="status-dot" [class.partial]="registro.status === 'PartialMatch' && !registro.reportado" [class.reported]="registro.reportado" [title]="registro.reportado ? 'Caso ya reportado' : (registro.status === 'PartialMatch' ? 'Coincidencia Parcial' : registro.status)"></span>
                        </div>
                    </div>
               </div>
@@ -144,12 +148,36 @@
                 </div>
               </div>
               <div class="d-flex flex-column align-items-end">
-                  <span class="status-badge mb-2" [class.partial]="activeRecord.status === 'PartialMatch'"><i class="fas fa-exclamation-triangle mr-1"></i> {{ activeRecord.status === 'PartialMatch' ? 'Coincidencia Parcial' : activeRecord.status }}</span>
+                  <span *ngIf="activeRecord.reportado" class="status-badge reported mb-2">
+                    <i class="fas fa-flag mr-1"></i> Caso ya reportado
+                  </span>
+                  <span *ngIf="!activeRecord.reportado" class="status-badge mb-2" [class.partial]="activeRecord.status === 'PartialMatch'"><i class="fas fa-exclamation-triangle mr-1"></i> {{ activeRecord.status === 'PartialMatch' ? 'Coincidencia Parcial' : activeRecord.status }}</span>
                   <span class="badge badge-group" style="font-size: 0.8rem; padding: 6px 12px;">{{ activeRecord.grupoValidacion }}</span>
               </div>
             </div>
     
             <div class="card-body py-3 px-3 flex-grow-1 overflow-auto">
+              <!-- Aviso de Caso Ya Reportado -->
+              <div *ngIf="activeRecord.reportado" class="reported-case-banner mb-3 fade-in">
+                <div class="reported-case-icon">
+                  <i class="fas fa-flag"></i>
+                </div>
+                <div class="reported-case-body">
+                  <div class="reported-case-title">Este caso ya fue reportado</div>
+                  <div class="reported-case-motivo" *ngIf="activeRecord.reporteInfo?.motivo">
+                    <strong>Motivo:</strong> {{ activeRecord.reporteInfo?.motivo }}
+                  </div>
+                  <div class="reported-case-meta">
+                    <span *ngIf="activeRecord.reporteInfo?.usuario">
+                      <i class="fas fa-user mr-1"></i> {{ activeRecord.reporteInfo?.usuario }}
+                    </span>
+                    <span *ngIf="activeRecord.reporteInfo?.fecha">
+                      <i class="fas fa-clock mr-1"></i> {{ activeRecord.reporteInfo?.fecha | date:'dd/MM/yyyy HH:mm' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <!-- Destacar CSV Line -->
               <div class="csv-line-block mb-4 p-3 rounded" style="background: #1e293b; color: #38bdf8; font-family: 'Fira Code', monospace; font-size: 0.85rem; border-left: 4px solid #0ea5e9; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <div style="color: #94a3b8; font-size: 0.65rem; text-transform: uppercase; margin-bottom: 5px; font-family: sans-serif; letter-spacing: 1px;">Línea Base Original (CSV)</div>
@@ -186,12 +214,18 @@
             </div>
     
             <div class="card-footer d-flex justify-content-end align-items-center pt-3 pb-4 mb-2 mt-auto bg-white border-top">
-              <div class="action-buttons">
-                <button class="btn btn-rechazar mr-3 shadow-none px-4 py-2" (click)="procesarAccion(activeRecord, 'RECHAZAR'); $event.stopPropagation()" style="border-radius: 10px; font-weight: 700; border: 2px solid rgba(239, 68, 68, 0.2); background: white;">
-                  <i class="fas fa-times mr-2 text-danger"></i> Rechazar Cambios
+              <div class="action-buttons d-flex align-items-center">
+                <button
+                  type="button"
+                  class="btn btn-rechazar mr-3 shadow-none"
+                  [class.is-reported]="activeRecord.reportado"
+                  [disabled]="activeRecord.reportado"
+                  (click)="procesarAccion(activeRecord, 'RECHAZAR'); $event.stopPropagation()">
+                  <i class="fas mr-2" [ngClass]="activeRecord.reportado ? 'fa-flag' : 'fa-times-circle'"></i>
+                  {{ activeRecord.reportado ? 'Caso Reportado' : 'Rechazar Cambios' }}
                 </button>
-                <button class="btn btn-aceptar shadow-none px-4 py-2" (click)="procesarAccion(activeRecord, 'ACEPTAR'); $event.stopPropagation()" style="border-radius: 10px; font-weight: 700; background: #10b981; color: white; border: 2px solid #10b981; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);">
-                  <i class="fas fa-check mr-2"></i> Actualizar Cambios
+                <button type="button" class="btn btn-aceptar shadow-none" (click)="procesarAccion(activeRecord, 'ACEPTAR'); $event.stopPropagation()">
+                  <i class="fas fa-check-circle mr-2"></i> Actualizar Cambios
                 </button>
               </div>
             </div>
@@ -211,3 +245,84 @@
     </div>
 
   </div>
+
+<!-- MODAL: RECHAZAR CAMBIOS -->
+<ng-template #modalRechazarCambios let-modal>
+  <div class="modal-content modal-rechazo-shell border-0 shadow-lg">
+    <div class="modal-body p-4 p-md-5 text-center bg-white">
+      <div class="icon-confirm-pulse red">
+        <i class="fas fa-times"></i>
+      </div>
+
+      <h4 class="font-weight-bold text-dark mb-2">¿Rechazar Cambios?</h4>
+      <p class="text-muted font-weight-500 mb-3 modal-rechazo-subtitle">
+        Indique el motivo del rechazo para la cédula
+        <strong>V-{{ cedulaRechazoExtraida || registroRechazo?.cedula }}</strong>
+        <span class="badge-componente-rechazo ml-1">{{ getCodigoComponenteNormalizado() }}</span>
+      </p>
+
+      <div class="linea-base-preview text-left mb-3" *ngIf="registroRechazo?.rawCSV || registroRechazo?.linea">
+        <span class="linea-base-label">
+          <i class="fas fa-file-csv mr-1"></i> Línea Base Original (CSV)
+        </span>
+        <code class="linea-base-code">{{ registroRechazo?.rawCSV || registroRechazo?.linea }}</code>
+      </div>
+
+      <div class="motivo-rechazo-group text-left mb-4">
+        <label for="motivoRechazoInput" class="motivo-rechazo-label">
+          <i class="fas fa-comment-dots mr-1"></i> Motivo de Rechazo *
+        </label>
+        <div
+          class="motivo-textarea-wrapper"
+          [class.is-valid]="motivoRechazo.trim().length > 0"
+          [class.is-invalid]="motivoTocado && motivoRechazo.trim().length === 0">
+          <span class="motivo-textarea-icon">
+            <i class="fas fa-pen-nib"></i>
+          </span>
+          <textarea
+            id="motivoRechazoInput"
+            class="form-control motivo-textarea shadow-none"
+            rows="4"
+            [attr.maxlength]="maxCaracteresMotivo"
+            [value]="motivoRechazo"
+            (input)="onMotivoRechazoInput($event)"
+            placeholder="ESCRIBA EL MOTIVO DEL RECHAZO EN MAYÚSCULAS..."
+            [disabled]="enviandoRechazo"
+            required></textarea>
+        </div>
+
+        <div class="motivo-counter-bar d-flex justify-content-between align-items-center mt-2">
+          <small class="motivo-feedback-error" *ngIf="motivoTocado && motivoRechazo.trim().length === 0">
+            <i class="fas fa-exclamation-circle mr-1"></i> El motivo es obligatorio
+          </small>
+          <small class="motivo-feedback-ok" *ngIf="motivoRechazo.trim().length > 0">
+            <i class="fas fa-check-circle mr-1"></i> {{ totalPalabrasMotivo }} {{ totalPalabrasMotivo === 1 ? 'palabra' : 'palabras' }}
+          </small>
+          <small
+            class="motivo-char-counter ml-auto"
+            [class.at-limit]="motivoRechazo.length >= maxCaracteresMotivo">
+            {{ motivoRechazo.length }} / {{ maxCaracteresMotivo }}
+          </small>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-center align-items-center modal-rechazo-actions">
+        <button
+          type="button"
+          class="btn-modal-action gray w-100"
+          [disabled]="enviandoRechazo"
+          (click)="modal.dismiss()">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn-modal-action red w-100"
+          [disabled]="enviandoRechazo || motivoRechazo.trim().length === 0"
+          (click)="confirmarRechazoCambios()">
+          <i class="fas mr-2" [ngClass]="enviandoRechazo ? 'fa-spinner fa-spin' : 'fa-times-circle'"></i>
+          {{ enviandoRechazo ? 'Registrando...' : 'Confirmar Rechazo' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>

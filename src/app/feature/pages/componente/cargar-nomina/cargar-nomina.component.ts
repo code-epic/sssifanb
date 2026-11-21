@@ -429,17 +429,17 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
               } else {
               }
             },
-            error: (err) => {},
+            error: (err) => { },
           });
         }, 1000);
       },
-      error: (err) => {},
+      error: (err) => { },
     });
 
     this.Componente = obtenerCodigoComponente();
   }
 
-  protected override onInitExtension(): void {}
+  protected override onInitExtension(): void { }
 
   private loadMockTabs(): void {
     this.isLoadingData = true;
@@ -473,8 +473,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
       const matchesSearch = isItemFromManifest
         ? item.nombre && item.nombre.toLowerCase().includes(st)
         : (item.id && item.id.toLowerCase().includes(st)) ||
-          (item.origen && item.origen.toLowerCase().includes(st)) ||
-          (item.componente && item.componente.toLowerCase().includes(st));
+        (item.origen && item.origen.toLowerCase().includes(st)) ||
+        (item.componente && item.componente.toLowerCase().includes(st));
 
       if (!matchesSearch) return false;
 
@@ -489,9 +489,9 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
           } else {
             return (
               item.estatus === "APROBADO" ||
+              item.estatus === "PROCESADO" ||
               item.estatus === "PROCESO" ||
-              item.estatus === "CONCILIADO" ||
-              Number(item.errores) === 0
+              item.estatus === "CONCILIADO"
             );
           }
         case "REVISION":
@@ -499,6 +499,8 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
             return item.nombre && item.nombre.toLowerCase().includes("rechazo");
           } else {
             return (
+              item.estatus === "EN REVISIÓN" ||
+              item.estatus === "EN REVISION" ||
               item.estatus === "RECHAZADA" ||
               item.estatus === "ERROR" ||
               item.estatus === "RECHAZADO" ||
@@ -646,13 +648,15 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         filtered = this.masterPendingData.filter(
           (item) =>
             item.estatus === "APROBADO" ||
+            item.estatus === "PROCESADO" ||
             item.estatus === "PROCESO" ||
-            item.estatus === "CONCILIADO" ||
-            Number(item.errores) === 0,
+            item.estatus === "CONCILIADO",
         );
       } else if (this.currentTabId === "REVISION") {
         filtered = this.masterPendingData.filter(
           (item) =>
+            item.estatus === "EN REVISIÓN" ||
+            item.estatus === "EN REVISION" ||
             item.estatus === "RECHAZADA" ||
             item.estatus === "ERROR" ||
             item.estatus === "RECHAZADO" ||
@@ -1189,7 +1193,13 @@ export class CargarNominaComponent extends BaseWorkflowClass implements OnInit {
         icon = "fa-check-circle";
         colorClass = "text-success";
         break;
+      case "EN REVISIÓN":
+      case "EN REVISION":
+        icon = "fa-search";
+        colorClass = "text-info";
+        break;
       case "RECHAZADA":
+      case "RECHAZADO":
       case "ERROR":
         icon = "fa-times-circle";
         colorClass = "text-danger";

@@ -225,11 +225,12 @@ export class FideicomitentesComponent
 
   public onMailboxSearch(term: string): void {
     if (!term) {
-      this.pendingTableData = [...this.masterPendingData];
+      this.filtrarDatosPorTab();
       return;
     }
     const st = term.toLowerCase();
-    this.pendingTableData = this.masterPendingData.filter(
+    const baseList = this.obtenerListaPorTab();
+    this.pendingTableData = baseList.filter(
       (item) =>
         (item.id && item.id.toLowerCase().includes(st)) ||
         (item.origen && item.origen.toLowerCase().includes(st)) ||
@@ -239,8 +240,42 @@ export class FideicomitentesComponent
 
   public onMailboxTabSwitch(tabId: string): void {
     this.onTabSwitch(tabId, () => {
-      this.loadPendingData();
+      this.filtrarDatosPorTab();
     });
+  }
+
+  private obtenerListaPorTab(): any[] {
+    if (!this.currentTabId || this.currentTabId === "PROCESO") {
+      return this.masterPendingData.filter((item) => {
+        const est = (item.estatus || "PENDIENTE").toUpperCase();
+        return (
+          est === "PENDIENTE" ||
+          est === "EN REVISIÓN" ||
+          est === "EN REVISION" ||
+          est === "EN PROCESO" ||
+          est === "PROCESO"
+        );
+      });
+    }
+    if (this.currentTabId === "APROBADO") {
+      return this.masterPendingData.filter((item) => {
+        const est = (item.estatus || "").toUpperCase();
+        return (
+          est === "APROBADO" || est === "PROCESADO" || est === "CONCILIADO"
+        );
+      });
+    }
+    if (this.currentTabId === "RECHAZADO") {
+      return this.masterPendingData.filter((item) => {
+        const est = (item.estatus || "").toUpperCase();
+        return est === "RECHAZADA" || est === "RECHAZADO" || est === "ERROR";
+      });
+    }
+    return [...this.masterPendingData];
+  }
+
+  public filtrarDatosPorTab(): void {
+    this.pendingTableData = this.obtenerListaPorTab();
   }
 
   public onMailboxRefresh(): void {
@@ -289,7 +324,7 @@ export class FideicomitentesComponent
         }));
 
         this.masterPendingData = [...mappedData];
-        this.pendingTableData = [...mappedData];
+        this.filtrarDatosPorTab();
       },
       error: (err) => {
         this.isLoadingData = false;
@@ -623,12 +658,14 @@ export class FideicomitentesComponent
     };
 
     console.log(fnx);
+    const itemProcesado = this.selectedItem;
     this.apiService.post("fnx", fnx).subscribe({
       next: (data: any) => {
         console.log(data);
         // this.id = data.contenido.id //id de la funcion fnx
         // this.logContent += "\n// Petitorio aceptado. Procesando en segundo plano...";
         this.isLoadingData = false;
+        this.actualizarEstatusNomina(itemProcesado, "EN REVISIÓN");
       },
       error: (error) => {
         this.isLoadingData = false;
@@ -637,6 +674,42 @@ export class FideicomitentesComponent
     });
 
     this.modalService.dismissAll();
+  }
+
+  private actualizarEstatusNomina(item: any, nuevoEstatus: string): void {
+    if (!item || !item.id) return;
+
+    const objetoActualizado = {
+      ...item,
+      estatus: nuevoEstatus,
+    };
+    delete objetoActualizado._id;
+    delete objetoActualizado.idFormat;
+    delete objetoActualizado.componenteFormat;
+    delete objetoActualizado.origenFormat;
+    delete objetoActualizado.cantidadFormat;
+    delete objetoActualizado.fechaFormat;
+    delete objetoActualizado.estatusFormat;
+
+    const body = {
+      coleccion: "file-fideicomitentes",
+      objeto: objetoActualizado,
+      donde: `{\"id\":\"${item.id}\"}`,
+      driver: "MGDBA",
+      upsert: true,
+    };
+
+    this.apiService.post("ccoleccion", body).subscribe({
+      next: () => {
+        this.loadPendingData();
+      },
+      error: (err) => {
+        console.error(
+          "[Fideicomitentes] Error al actualizar estatus en ccoleccion:",
+          err,
+        );
+      },
+    });
   }
 
   private initMessagePort(): void {
@@ -664,7 +737,9 @@ export class FideicomitentesComponent
   }
 
   public confirmarRechazo(): void {
-    alert(`Fideicomitente ${this.selectedItem?.id} rechazado.`);
+    if (this.selectedItem) {
+      this.actualizarEstatusNomina(this.selectedItem, "RECHAZADA");
+    }
     this.modalService.dismissAll();
   }
 
@@ -977,7 +1052,13 @@ export class FideicomitentesComponent
         icon = "fa-check-circle";
         colorClass = "text-success";
         break;
+      case "EN REVISIÓN":
+      case "EN REVISION":
+        icon = "fa-search";
+        colorClass = "text-info";
+        break;
       case "RECHAZADA":
+      case "RECHAZADO":
       case "ERROR":
         icon = "fa-times-circle";
         colorClass = "text-danger";

@@ -112,6 +112,37 @@ $color-text-muted: #64748b;
     padding-left: 12px; // adjust for border
   }
 
+  &.reported {
+    background: rgba($color-danger, 0.05);
+    border-left: 4px solid #dc2626;
+    padding-left: 12px;
+
+    &:hover {
+      background: rgba($color-danger, 0.09);
+    }
+
+    &.active {
+      background: rgba($color-danger, 0.12);
+      border-left-color: #b91c1c;
+    }
+  }
+
+  .text-reported {
+    color: #dc2626;
+    font-size: 1.1rem;
+  }
+
+  .mini-icon-default {
+    color: #94a3b8;
+    font-size: 1.1rem;
+  }
+
+  .reported-mini-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #dc2626;
+  }
+
   .cedula-mini {
     font-weight: 700;
     font-size: 0.9rem;
@@ -137,6 +168,10 @@ $color-text-muted: #64748b;
     
     &.partial {
       background: $color-warning;
+    }
+
+    &.reported {
+      background: #dc2626;
     }
   }
 }
@@ -186,7 +221,62 @@ $color-text-muted: #64748b;
       border-radius: 6px;
       text-transform: uppercase;
       &.partial { background: rgba($color-warning, 0.15); color: darken($color-warning, 15%); }
+      &.reported { background: rgba($color-danger, 0.14); color: #b91c1c; border: 1px solid rgba($color-danger, 0.3); }
     }
+  }
+
+  .reported-case-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    background: rgba($color-danger, 0.07);
+    border: 1px solid rgba($color-danger, 0.28);
+    border-left: 4px solid #dc2626;
+  }
+
+  .reported-case-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba($color-danger, 0.14);
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+  }
+
+  .reported-case-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .reported-case-title {
+    font-size: 0.86rem;
+    font-weight: 800;
+    color: #b91c1c;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .reported-case-motivo {
+    font-size: 0.82rem;
+    color: #7f1d1d;
+    margin-top: 2px;
+    word-break: break-word;
+  }
+
+  .reported-case-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #991b1b;
   }
 
   .diff-grid-header, .diff-grid-row {
@@ -225,23 +315,261 @@ $color-text-muted: #64748b;
     .raw-data { color: #94a3b8; font-family: 'Fira Code', monospace; font-size: 0.7rem; }
     
     .btn {
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.6rem 1.35rem;
+      border-radius: 10px;
+      letter-spacing: 0.2px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
+
     .btn-rechazar {
-      background: rgba($color-danger, 0.1);
-      color: $color-danger;
-      border: 1px solid rgba($color-danger, 0.2);
-      &:hover { background: $color-danger; color: white; }
+      background: rgba($color-danger, 0.08);
+      color: #dc2626;
+      border: 1.5px solid rgba($color-danger, 0.3);
+      box-shadow: 0 2px 6px rgba($color-danger, 0.08);
+
+      &:hover {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: #ffffff;
+        border-color: #dc2626;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba($color-danger, 0.28);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &:disabled,
+      &.is-reported {
+        background: rgba($color-danger, 0.1);
+        color: #b91c1c;
+        border-color: rgba($color-danger, 0.25);
+        opacity: 0.72;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
     }
+
     .btn-aceptar {
-      background: rgba($color-success, 0.1);
-      color: $color-success;
-      border: 1px solid rgba($color-success, 0.2);
-      &:hover { background: $color-success; color: white; }
+      background: linear-gradient(135deg, #5eaaa8 0%, #4a8b89 100%);
+      color: #ffffff;
+      border: 1.5px solid #4a8b89;
+      box-shadow: 0 4px 10px rgba(74, 139, 137, 0.24);
+
+      &:hover {
+        background: linear-gradient(135deg, #4f9997 0%, #3d7876 100%);
+        color: #ffffff;
+        border-color: #3d7876;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(74, 139, 137, 0.32);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
     }
+  }
+}
+
+// Modal de Rechazo de Cambios
+.modal-rechazo-shell {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.modal-rechazo-subtitle {
+  font-size: 0.92rem;
+}
+
+.badge-componente-rechazo {
+  display: inline-block;
+  background: rgba(94, 170, 168, 0.14);
+  color: #4a8b89;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.linea-base-preview {
+  background: #1e293b;
+  border-left: 4px solid #0ea5e9;
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+}
+
+.linea-base-label {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.linea-base-code {
+  display: block;
+  color: #38bdf8;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.76rem;
+  word-break: break-all;
+}
+
+.motivo-rechazo-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #dc2626;
+  margin-bottom: 0.45rem;
+}
+
+.motivo-textarea-wrapper {
+  display: flex;
+  align-items: flex-start;
+  background: #f8fafc;
+  border: 1.5px solid $color-border;
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+  &:focus-within {
+    background: #ffffff;
+    border-color: #5eaaa8;
+    box-shadow: 0 0 0 3px rgba(94, 170, 168, 0.16);
+
+    .motivo-textarea-icon {
+      color: #5eaaa8;
+    }
+  }
+
+  &.is-valid {
+    border-color: rgba($color-success, 0.6);
+
+    .motivo-textarea-icon {
+      color: $color-success;
+    }
+  }
+
+  &.is-invalid {
+    border-color: rgba($color-danger, 0.7);
+    background: rgba($color-danger, 0.02);
+
+    .motivo-textarea-icon {
+      color: $color-danger;
+    }
+  }
+}
+
+.motivo-textarea-icon {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-right: 0.65rem;
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.motivo-textarea {
+  background: transparent;
+  border: none;
+  padding: 0;
+  resize: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $color-text-main;
+  text-transform: uppercase;
+  line-height: 1.45;
+
+  &:focus {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+}
+
+.motivo-counter-bar {
+  font-size: 0.76rem;
+}
+
+.motivo-feedback-error {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.motivo-feedback-ok {
+  color: #059669;
+  font-weight: 600;
+}
+
+.motivo-char-counter {
+  font-weight: 700;
+  color: $color-text-muted;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 6px;
+
+  &.at-limit {
+    color: #dc2626;
+    background: rgba($color-danger, 0.1);
+  }
+}
+
+.modal-rechazo-actions {
+  gap: 0.85rem;
+}
+
+.btn-modal-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+
+  &.gray {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+
+    &:hover:not(:disabled) {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+  }
+
+  &.red {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba($color-danger, 0.25);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba($color-danger, 0.34);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 }
